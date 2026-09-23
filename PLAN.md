@@ -16,14 +16,13 @@ Dernière mise à jour : 23/09/2026
 - **`npm run typecheck` doit passer avant chaque commit** (à partir de la fin de la phase 0).
 - **Aucune clé secrète dans le code ni dans les réponses envoyées à l'app.** Les secrets vont dans `supabase secrets set`.
 - **Noms de modèles IA toujours dans des secrets** (`GROQ_MODEL`, `GEMINI_MODEL`…), jamais en dur : les fournisseurs retirent des modèles régulièrement.
-- **Ne pas mettre à jour Expo avant la phase 7** : Expo Go sur l'App Store est bloqué en SDK 54.
 - En fin de phase : mettre à jour `PROJECT_CONTEXT.md` et régénérer l'export (`npm run export`).
 
 ## Stack cible
 
 | Rôle | Aujourd'hui | Cible |
 |---|---|---|
-| App | Expo SDK 54, expo-router 6 | Idem jusqu'à la phase 7, puis SDK 57 + build EAS |
+| App | Expo SDK 54, expo-router 6 | SDK 57 dès la phase 0.5 (tests sur Android), build EAS en phase 7 |
 | Backend | Supabase (clés `anon`, legacy) | Supabase (clés `sb_publishable_` / `sb_secret_`) |
 | Vision | Clarifai `food-item-recognition` | Gemini Flash-Lite (sortie structurée), si le test de la phase 3 le confirme |
 | Recettes | Groq `llama-3.3-70b-versatile` (**retiré le 16/08/2026**) | Gemini (principal) + Groq `openai/gpt-oss-120b` (secours) |
@@ -41,17 +40,33 @@ Dernière mise à jour : 23/09/2026
 - [x] Remplacer `llama-3.3-70b-versatile` par `openai/gpt-oss-120b`, lu depuis le secret `GROQ_MODEL` (valeur par défaut : `openai/gpt-oss-120b`), puis redéployer `generate-recipes` — déployé et testé avec curl le 23/09/2026
 - [x] `tsconfig.json` : ajouter `"exclude": ["supabase/functions"]`
 - [x] `LanguageContext.tsx` : typer `translations` en `Record<Language, Record<string, string>>`
-- [ ] **Action manuelle (toi)** : révoquer la clé Pollinations actuelle sur enter.pollinations.ai et en créer une nouvelle (l'ancienne a pu fuiter via les URL enregistrées en base)
+- [ ] **Action manuelle (toi)** : révoquer la clé Pollinations actuelle sur enter.pollinations.ai (l'ancienne a pu fuiter via les URL enregistrées en base). **Ne pas en créer de nouvelle** : images désactivées jusqu'à la phase 3 (voir journal)
 
 **Terminé quand** : une recette se génère de bout en bout depuis l'app, et `npm run typecheck` passe.
+
+## Phase 0.5 — Passage à Expo SDK 57
+
+- [ ] Lire les changements incompatibles des SDK 55, 56 et 57 (notes de version Expo) et lister ceux qui touchent l'app
+- [ ] Mettre à jour Expo vers le SDK 57, puis aligner les dépendances avec `npx expo install --fix`
+- [ ] `npx expo-doctor` passe sans erreur
+- [ ] Corriger ce qui casse (expo-router, expo-camera, expo-image-manipulator, reanimated…) ; `npm run typecheck` passe
+- [ ] Tester sur Android avec Expo Go du Play Store (SDK 57) : connexion, scan, garde-manger, génération, favoris, paramètres
+- [ ] Désinstaller l'Expo Go SDK 54 installé temporairement
+
+**Terminé quand** : l'app tourne dans Expo Go SDK 57 sur Android, un scan et une génération fonctionnent, et `npx expo-doctor` et `npm run typecheck` passent.
 
 ## Phase 1 — Bugs et données
 
 - [ ] Recettes en double : récupérer les `id` renvoyés par l'insert dans `saveRecipesToHistory`, et faire uniquement l'insert dans `favorites` dans `saveRecipe`
 - [ ] `setLanguage` : ajouter `onConflict: 'user_id'` à l'upsert de `user_preferences`
-- [ ] Migration : colonnes `servings` (integer) et `tips` (jsonb) sur `recipes`, et les enregistrer à la sauvegarde
+- [ ] Migration : colonnes `servings` (integer), `tips` (jsonb) et `suggestion` (text) sur `recipes`, et les enregistrer à la sauvegarde
 - [ ] Supprimer le code mort (`generateFallbackRecipe`)
 - [ ] Renommer l'app : `name`, `slug`, `scheme` dans `app.json`, `name` dans `package.json`
+- [ ] Inscription sans session (confirmation d'email active) : ne pas rediriger vers les onglets, afficher « Vérifie ta boîte mail »
+- [ ] Connexion avec un email non confirmé : afficher un message clair au lieu de l'erreur brute
+- [ ] Aucune écriture en base qui échoue en silence : vérifier `error` après chaque insert / update / delete et prévenir l'utilisateur
+- [ ] Onglets protégés : sans session, rediriger vers la connexion
+- [ ] Recharger les données au retour sur l'écran avec `useFocusEffect` : garde-manger, accueil, favoris
 
 **Terminé quand** : sauvegarder une recette ne crée qu'une seule ligne dans `recipes`, et on peut changer de langue trois fois de suite sans erreur.
 
@@ -75,6 +90,7 @@ Dernière mise à jour : 23/09/2026
 - [ ] Réécrire `analyze-image` avec Gemini et un schéma JSON : nom (dans la langue de l'utilisateur), quantité estimée, catégorie, niveau de confiance
 - [ ] Ajouter un mode « ticket de caisse » à `analyze-image`
 - [ ] Réécrire `generate-recipes` avec sortie structurée (schéma JSON) ; générer les 3 recettes en un appel ou en parallèle (supprimer la pause de 500 ms)
+- [ ] Remplacer la vérification des ingrédients interdits par mots-clés (`checkForbiddenIngredients`, faux positifs comme « lait de coco » en vegan) : dans la sortie structurée, le modèle indique pour chaque ingrédient s'il respecte chaque régime sélectionné, et le serveur garde une liste d'exceptions (lait de coco, lait d'amande, beurre de cacahuète…)
 - [ ] Nouvelle fonction `generate-recipe-image` : Cloudflare Workers AI (FLUX), appelée **seulement** à l'ouverture ou à la sauvegarde d'une recette
 - [ ] Bucket Supabase Storage `recipe-images` ; enregistrer uniquement l'URL Storage dans `recipes.image_url`
 - [ ] Retirer Clarifai et Pollinations : code, secrets, dépendances
@@ -114,7 +130,8 @@ Dernière mise à jour : 23/09/2026
 
 ## Phase 7 — Préparer le lancement
 
-- [ ] Passer à Expo SDK 57 et créer un build de développement EAS
+- [ ] Créer un build de développement EAS
+- [ ] Réactiver la confirmation d'email dans Supabase (Authentication → Sign In / Providers → Email)
 - [ ] Icône, écran de démarrage, nom définitif
 - [ ] Passer Gemini en offre payante (les données de l'offre gratuite servent à améliorer les produits Google)
 - [ ] Rédiger la politique de confidentialité (photos, données du garde-manger)
@@ -136,4 +153,8 @@ Dernière mise à jour : 23/09/2026
 | 23/09/2026 | gpt-oss : `reasoning_effort: 'low'` et `max_tokens` 4096 | Le raisonnement compte dans la limite de tokens et pourrait tronquer le JSON |
 | 23/09/2026 | Le type de repas est une préférence, seuls les régimes sont stricts | Le modèle refusait banane + lait pour un déjeuner ; il propose maintenant la recette la plus adaptée, complète avec `missing_ingredients` et ajoute une `suggestion` (ex : « Idéal aussi en petit-déjeuner ») |
 | 23/09/2026 | `ingredients_from_list` / `missing_ingredients` recalculés côté serveur | Le modèle rangeait des ingrédients ajoutés dans `ingredients_from_list` |
+| 23/09/2026 | Comparaison des ingrédients mot par mot (`matching.ts`, testé avec Deno) | La comparaison par sous-chaîne ratait les pluriels (« pommes de terre ») et confondait « lait » / « laitue » |
+| 23/09/2026 | Ne pas remettre de clé Pollinations ; images désactivées volontairement jusqu'à la phase 3 | Le code actuel met la clé dans l'URL des images : toute nouvelle clé fuiterait aussi. Remplacement par Cloudflare en phase 3 |
+| 23/09/2026 | Passage à Expo SDK 57 avancé en phase 0.5 (remplace la décision de rester en SDK 54 jusqu'à la phase 7) | Expo Go du Play Store est en SDK 57 et les tests se font sur Android (Expo Go SDK 54 installé temporairement) |
+| 23/09/2026 | Confirmation d'email désactivée dans Supabase pendant le développement | Simplifie les tests ; à réactiver en phase 7 |
 | | *(résultat du test Gemini vs Clarifai)* | |
