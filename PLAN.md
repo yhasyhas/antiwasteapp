@@ -38,7 +38,7 @@ Dernière mise à jour : 23/09/2026
 - [x] Vérifier dans le dashboard Supabase que le projet n'est pas en pause (le réactiver si besoin) — actif : Auth et REST répondent 200 (vérifié le 23/09/2026)
 - [x] Ajouter `supabase/.temp/` au `.gitignore`
 - [x] Commiter tout le travail en cours **tel quel** (sauvegarde, aucune correction)
-- [ ] Remplacer `llama-3.3-70b-versatile` par `openai/gpt-oss-120b`, lu depuis le secret `GROQ_MODEL` (valeur par défaut : `openai/gpt-oss-120b`), puis redéployer `generate-recipes` — code fait ; **reste le déploiement** (CLI Supabase non connecté)
+- [x] Remplacer `llama-3.3-70b-versatile` par `openai/gpt-oss-120b`, lu depuis le secret `GROQ_MODEL` (valeur par défaut : `openai/gpt-oss-120b`), puis redéployer `generate-recipes` — déployé et testé avec curl le 23/09/2026
 - [x] `tsconfig.json` : ajouter `"exclude": ["supabase/functions"]`
 - [x] `LanguageContext.tsx` : typer `translations` en `Record<Language, Record<string, string>>`
 - [ ] **Action manuelle (toi)** : révoquer la clé Pollinations actuelle sur enter.pollinations.ai et en créer une nouvelle (l'ancienne a pu fuiter via les URL enregistrées en base)
@@ -134,4 +134,6 @@ Dernière mise à jour : 23/09/2026
 | 23/09/2026 | Remplacer Pollinations par Cloudflare Workers AI | Clé exposée dans les URL ; offre gratuite quotidienne ; clé côté serveur |
 | 23/09/2026 | Images générées à la demande seulement | Divise la consommation par ~3 |
 | 23/09/2026 | gpt-oss : `reasoning_effort: 'low'` et `max_tokens` 4096 | Le raisonnement compte dans la limite de tokens et pourrait tronquer le JSON |
+| 23/09/2026 | Le type de repas est une préférence, seuls les régimes sont stricts | Le modèle refusait banane + lait pour un déjeuner ; il propose maintenant la recette la plus adaptée, complète avec `missing_ingredients` et ajoute une `suggestion` (ex : « Idéal aussi en petit-déjeuner ») |
+| 23/09/2026 | `ingredients_from_list` / `missing_ingredients` recalculés côté serveur | Le modèle rangeait des ingrédients ajoutés dans `ingredients_from_list` |
 | | *(résultat du test Gemini vs Clarifai)* | |
