@@ -1,6 +1,6 @@
 # Contexte du projet : app mobile anti-gaspi de recettes IA
 
-> Analyse rédigée le 2026-09-23 à partir du code (commit `6d9e455` + modifications non commitées).
+> Analyse rédigée le 2026-09-23, mise à jour à la fin de la phase 0. La feuille de route est dans `PLAN.md`.
 
 ## 1. Le produit
 
@@ -22,8 +22,8 @@ Langues : français (par défaut), anglais, espagnol.
 | UI | StyleSheet natif, icônes `lucide-react-native`, couleur principale `#10b981` (vert) |
 | Backend | Supabase (projet `iqzjonmjlscuckdmiehk`) : Auth, Postgres avec RLS, Edge Functions (Deno) |
 | Vision | Clarifai, modèle `food-item-recognition` (fonction `analyze-image`) |
-| Génération de recettes | Groq, modèle `llama-3.3-70b-versatile`, sortie JSON (fonction `generate-recipes`) |
-| Images des recettes | Pollinations.ai (modèle `flux`), une URL construite côté serveur |
+| Génération de recettes | Groq, modèle lu depuis le secret `GROQ_MODEL` (par défaut `openai/gpt-oss-120b`), sortie JSON (fonction `generate-recipes`) |
+| Images des recettes | **Désactivées** jusqu'à la phase 3 (Pollinations mettait sa clé dans l'URL) ; Cloudflare Workers AI prévu |
 
 Origine : le code a été généré par **bolt.new** (template `bolt-expo`), puis modifié à la main.
 
@@ -51,6 +51,7 @@ supabase/
   functions/
     analyze-image/       Clarifai → liste d'ingrédients filtrée (confiance > 0.7, max 8)
     generate-recipes/    Groq → N recettes (1 si ≤2 ingrédients, 2 si ≤5, sinon 3)
+      matching.ts        Comparaison des noms d'ingrédients (+ matching.test.ts, tests Deno)
 ```
 
 ### Base de données (toutes les tables en RLS, « chaque utilisateur ne voit que ses données »)
@@ -62,7 +63,7 @@ supabase/
 
 ### Configuration requise
 - `.env` (client) : `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`
-- Secrets des Edge Functions (`supabase secrets set ...`) : `GROQ_API_KEY`, `CLARIFAI_PAT`, `POLLINATIONS_API_KEY`
+- Secrets des Edge Functions (`supabase secrets set ...`) : `GROQ_API_KEY`, `CLARIFAI_PAT`, `GROQ_MODEL` (facultatif). `POLLINATIONS_API_KEY` volontairement absent (voir PLAN.md)
 
 ## 4. Historique : ce qui a été réalisé
 
@@ -71,45 +72,42 @@ supabase/
 - Scan caméra **simulé** : ingrédients aléatoires dans une liste fixe (tomates, oignons…).
 - Première version de `generate-recipes` et du schéma SQL initial.
 
-### Étape 2 — travail non commité (≈ +1300 / −365 lignes)
+### Étape 2 — commit `d201324` (sauvegarde du travail fait à la main)
 - **Vraie reconnaissance d'image** : compression avec `expo-image-manipulator` (800 px, JPEG 0.7, base64), nouvelle Edge Function `analyze-image` (Clarifai), **modal de confirmation** pour décocher des ingrédients avant de les enregistrer.
-- **Refonte de `generate-recipes`** : Groq/Llama 3.3, prompts détaillés et multilingues, règles strictes par régime (vegan, végétarien, sans gluten, sans lactose, low-carb), règles par type de repas, variations imposées (style / technique / texture) pour que les recettes soient différentes, nettoyage des quantités, vérification post-génération des ingrédients interdits, relance si une recette est rejetée, image Pollinations.
-- **Refonte de l'écran `recipe/generate`** (≈ 1200 lignes) : panneau de filtres (type de repas, difficulté, temps, régimes, langue), chargement des préférences utilisateur, cartes de recettes avec image, détail de recette, sauvegarde automatique dans l'historique.
-- **Internationalisation** : `LanguageContext` (fr/en/es), nouvel onglet **Settings**, accueil traduit.
+- **Refonte de `generate-recipes`** : Groq, prompts détaillés et multilingues, règles par régime (vegan, végétarien, sans gluten, sans lactose, low-carb), variations imposées (style / technique / texture), nettoyage des quantités, vérification post-génération des ingrédients interdits, relance si une recette est rejetée.
+- **Refonte de l'écran `recipe/generate`** (≈ 1200 lignes) : filtres (type de repas, difficulté, temps, régimes, langue), préférences utilisateur, cartes de recettes, détail, sauvegarde automatique dans l'historique.
+- **Internationalisation** : `LanguageContext` (fr/en/es), onglet **Settings**, accueil traduit.
 - Migration `20260228120000_update_recipes_schema.sql` : nouvelles colonnes pour `recipes` et `user_preferences`.
-- Dépendances ajoutées : `@react-native-async-storage/async-storage`, `expo-image-manipulator`.
 
-## 5. État actuel et problèmes relevés
+### Phase 0 — remettre l'app en marche (branche `phase-0`, validée depuis l'app)
+- Modèle Groq `llama-3.3-70b-versatile` (retiré) → `openai/gpt-oss-120b`, lu depuis le secret `GROQ_MODEL`.
+- Le **type de repas est une préférence**, seuls les régimes sont stricts : le modèle propose la recette la plus adaptée, complète avec `missing_ingredients` et peut ajouter une `suggestion` (« Idéal aussi en petit-déjeuner »), affichée dans l'app.
+- Erreurs distinctes renvoyées à l'app : `api_error` (502), `invalid_json` (502), `dietary_refusal` (422, seulement si un régime est sélectionné), avec un message dans la langue de l'utilisateur.
+- `ingredients_from_list` / `missing_ingredients` recalculés côté serveur, comparaison mot par mot (pluriels, accents, majuscules).
+- `npm run typecheck` passe ; `PLAN.md` et ce document ajoutés, script `npm run export`.
 
-**À faire en premier : commiter le travail en cours.** Tout ce qui est décrit à l'étape 2 n'existe que dans la copie de travail.
+## 5. État actuel et problèmes connus
 
-### Bugs
-1. **Recettes en double** : `generateRecipes` insère déjà toutes les recettes dans `recipes` (historique), puis `saveRecipe` les insère **une seconde fois** avant d'ajouter le favori (`app/recipe/generate.tsx`, fonctions `saveRecipesToHistory` / `saveRecipe`). Il faudrait récupérer les `id` au premier insert et ne faire que l'insert dans `favorites`.
-2. **Upsert de la langue** : `setLanguage` fait `upsert({ user_id, ... })` sans `onConflict: 'user_id'`. Le conflit est alors testé sur la clé `id`, donc le deuxième changement de langue échoue sur la contrainte unique `user_id` (`contexts/LanguageContext.tsx`).
-3. `servings` et `tips` sont générés mais **n'ont pas de colonne en base**, donc ils sont perdus une fois la recette sauvegardée.
-4. `npm run typecheck` échoue :
-   - `LanguageContext.tsx` : l'accès `translations[language][key]` n'est pas typé (il faut typer `translations` en `Record<Language, Record<string, string>>`).
-   - Les Edge Functions Deno sont incluses dans le `tsconfig` de l'app : ajouter `"exclude": ["supabase/functions"]`.
+### Bugs (prévus en phase 1)
+1. **Recettes en double** : `saveRecipesToHistory` insère déjà les recettes générées, puis `saveRecipe` les insère une seconde fois avant d'ajouter le favori.
+2. **Upsert de la langue** sans `onConflict: 'user_id'` : le deuxième changement de langue échoue.
+3. `servings`, `tips` et `suggestion` n'ont pas de colonne en base : perdus à la sauvegarde.
+4. Écritures en base dont l'erreur n'est pas vérifiée ; données non rechargées au retour sur un onglet ; onglets accessibles sans session ; inscription et email non confirmé mal gérés.
 
-### Sécurité
-- La **clé Pollinations est mise dans l'URL de l'image** renvoyée au client et enregistrée en base : elle est donc exposée.
-- Les Edge Functions ne vérifient pas le JWT utilisateur (appel avec la clé anon) et acceptent n'importe quelle origine (CORS `*`). N'importe qui ayant la clé anon peut consommer les quotas Groq et Clarifai.
+### Sécurité (phase 2)
+- Les Edge Functions ne vérifient pas l'utilisateur (appel avec la clé anon) et acceptent toutes les origines (CORS `*`) : n'importe qui ayant la clé anon peut consommer les quotas Groq et Clarifai.
+- Des URL d'images Pollinations contenant l'ancienne clé peuvent rester en base.
 
 ### Dette et finitions
-- i18n partielle : l'accueil est traduit, mais la caméra, les ingrédients, les favoris, la génération et l'auth ont encore des textes en anglais écrits en dur ; les titres des onglets aussi.
-- `generateFallbackRecipe` n'est jamais appelée (code mort) ; les recettes sont générées l'une après l'autre avec une pause de 500 ms (lent pour 3 recettes).
-- Le modèle Clarifai renvoie des noms en anglais : les ingrédients scannés restent en anglais, même en FR.
-- `user_preferences` n'est jamais modifiée par l'utilisateur (hors langue) : pas d'écran pour les régimes par défaut.
-- `app.json` a encore le nom du template (`bolt-expo-nativewind`, scheme `myapp`), et `package.json` s'appelle `bolt-expo-starter`.
-- Pas de tests, pas de README.
+- Vérification des régimes par mots-clés : faux positifs (« lait de coco » refusé en vegan). Remplacement prévu en phase 3.
+- i18n partielle : caméra, ingrédients, favoris, génération, auth et titres des onglets ont des textes écrits en dur.
+- `generateFallbackRecipe` est du code mort ; recettes générées l'une après l'autre avec une pause de 500 ms.
+- Clarifai renvoie des noms en anglais, même en FR.
+- Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`).
+- Pas de README ; seuls tests : `matching.test.ts`.
 
-## 6. Pistes pour la suite
-1. Commiter l'étape 2, puis corriger les bugs 1, 2 et 4.
-2. Sécuriser les Edge Functions (vérification du JWT, clé Pollinations côté serveur ou proxy).
-3. Terminer l'i18n sur tous les écrans.
-4. Écran de préférences (régimes, exclusions, temps max), puis les utiliser dans la génération.
-5. Gestion du garde-manger : dates de péremption, pour prioriser les aliments à consommer (le cœur de l'« anti-gaspi »).
-6. Renommer l'app, préparer le build EAS.
+## 6. Prochaine étape
+Phase 0.5 : passage à Expo SDK 57 (Expo Go du Play Store), puis phase 1. Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash
@@ -118,5 +116,6 @@ npm run dev                  # Expo (scanner le QR code avec Expo Go)
 npx supabase db push         # appliquer les migrations sur le projet lié
 npx supabase functions deploy analyze-image
 npx supabase functions deploy generate-recipes
+deno test --no-config supabase/functions/generate-recipes/matching.test.ts   # tests de la comparaison des ingrédients
 npm run export               # régénère l'export complet du projet (voir scripts/export-project.mjs)
 ```

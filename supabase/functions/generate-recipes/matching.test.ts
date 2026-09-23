@@ -1,4 +1,4 @@
-// deno test supabase/functions/generate-recipes/matching.test.ts
+// deno test --no-config supabase/functions/generate-recipes/matching.test.ts
 import { ingredientsMatch, sameIngredient } from './matching.ts';
 
 function assertEquals(actual: unknown, expected: unknown, label: string) {
