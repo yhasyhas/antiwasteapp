@@ -46,9 +46,41 @@ interface Recipe {
   missing_ingredients?: string[];
   instructions: string[];
   tips: string[];
+  suggestion?: string;
   image_prompt: string;
   image_url?: string;
 }
+
+// Causes d'échec distinguées dans la réponse envoyée à l'app
+type FailureReason = 'api_error' | 'invalid_json' | 'dietary_refusal';
+
+type GenerationResult =
+  | { ok: true; recipe: Recipe }
+  | { ok: false; reason: FailureReason };
+
+const FAILURE_MESSAGES: Record<string, Record<FailureReason, string>> = {
+  'fr': {
+    api_error: 'Le service de génération de recettes est momentanément indisponible. Réessayez dans quelques instants.',
+    invalid_json: 'La réponse de l\'IA était illisible. Réessayez.',
+    dietary_refusal: 'Impossible de créer une recette qui respecte vos régimes alimentaires avec ces ingrédients. Ajoutez des ingrédients ou retirez un régime.'
+  },
+  'en': {
+    api_error: 'The recipe generation service is temporarily unavailable. Please try again in a moment.',
+    invalid_json: 'The AI response could not be read. Please try again.',
+    dietary_refusal: 'No recipe can respect your dietary restrictions with these ingredients. Add ingredients or remove a restriction.'
+  },
+  'es': {
+    api_error: 'El servicio de generación de recetas no está disponible en este momento. Inténtalo de nuevo en unos instantes.',
+    invalid_json: 'No se pudo leer la respuesta de la IA. Inténtalo de nuevo.',
+    dietary_refusal: 'No es posible crear una receta que respete tus restricciones alimentarias con estos ingredientes. Añade ingredientes o quita una restricción.'
+  }
+};
+
+const FAILURE_STATUS: Record<FailureReason, number> = {
+  api_error: 502,
+  invalid_json: 502,
+  dietary_refusal: 422,
+};
 
 // Styles de cuisine par langue
 const CUISINE_STYLES: Record<string, string[]> = {
@@ -151,28 +183,36 @@ function buildDietaryRules(dietary: string[], language: string): string {
   return rules.join('\n') || (language === 'fr' ? 'Aucune restriction diététique' : 'No dietary restrictions');
 }
 
-function buildMealTypeRules(mealType: string, language: string): string {
+// Minuscules, sans accents ni espaces superflus : "Œufs " et "oeufs" se comparent correctement
+function normalizeName(name: string): string {
+  return name.toLowerCase().replace(/œ/g, 'oe').normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
+}
+
+function getMealTypeName(mealType: string, language: string): string {
   const mealTypes = getTranslation('mealTypes', language);
-  const mealName = mealTypes[mealType] || mealType;
-  
+  return mealTypes[mealType] || mealType;
+}
+
+// Le type de repas est une préférence : ces descriptions orientent la recette sans l'interdire
+function buildMealTypePreference(mealType: string, language: string): string {
   const rules: Record<string, Record<string, string>> = {
     'fr': {
-      breakfast: 'Repas du matin. DOIT être: rapide (15-20min), léger, énergisant, compatible café/thé/jus. Éviter: plats lourds, viandes grasses, friture.',
-      lunch: 'Repas de midi. DOIT être: équilibré, sustentant, peut être préparé en avance (meal-prep friendly). Inclure: protéine + légume + féculent.',
-      dinner: 'Repas du soir. DOIT être: plus léger que le déjeuner, digeste, pas trop épicé ni gras. Éviter: friture, sauces lourdes, café.',
-      snack: 'Encas rapide. DOIT être: très rapide (5-10min), sucré OU salé léger, peu ou pas de cuisson. Idéal: fruit, yaourt, tartine, smoothie.'
+      breakfast: 'Repas du matin. Idéalement : rapide (15-20 min), léger, énergisant, compatible café/thé/jus. De préférence éviter : plats lourds, viandes grasses, friture.',
+      lunch: 'Repas de midi. Idéalement : équilibré, rassasiant, peut être préparé à l\'avance. De préférence : protéine + légume + féculent.',
+      dinner: 'Repas du soir. Idéalement : plus léger que le déjeuner, digeste, pas trop épicé ni gras. De préférence éviter : friture, sauces lourdes, café.',
+      snack: 'Encas rapide. Idéalement : très rapide (5-10 min), sucré OU salé léger, peu ou pas de cuisson. Par exemple : fruit, yaourt, tartine, smoothie.'
     },
     'en': {
-      breakfast: 'Morning meal. MUST be: quick (15-20min), light, energizing, compatible with coffee/tea/juice. Avoid: heavy dishes, fatty meats, fried food.',
-      lunch: 'Midday meal. MUST be: balanced, sustaining, can be meal-prep friendly. Include: protein + vegetable + carb.',
-      dinner: 'Evening meal. MUST be: lighter than lunch, easy to digest, not too spicy or fatty. Avoid: fried food, heavy sauces, coffee.',
-      snack: 'Quick bite. MUST be: very quick (5-10min), sweet OR light savory, little or no cooking. Ideal: fruit, yogurt, toast, smoothie.'
+      breakfast: 'Morning meal. Ideally: quick (15-20 min), light, energizing, compatible with coffee/tea/juice. Preferably avoid: heavy dishes, fatty meats, fried food.',
+      lunch: 'Midday meal. Ideally: balanced, filling, can be prepared ahead. Preferably: protein + vegetable + carb.',
+      dinner: 'Evening meal. Ideally: lighter than lunch, easy to digest, not too spicy or fatty. Preferably avoid: fried food, heavy sauces, coffee.',
+      snack: 'Quick bite. Ideally: very quick (5-10 min), sweet OR light savory, little or no cooking. For example: fruit, yogurt, toast, smoothie.'
     },
     'es': {
-      breakfast: 'Comida de la mañana. DEBE ser: rápida (15-20min), ligera, energizante, compatible con café/té/zumo. Evitar: platos pesados, carnes grasas, frituras.',
-      lunch: 'Comida del mediodía. DEBE ser: equilibrada, sustentadora, puede prepararse con antelación. Incluir: proteína + verdura + carbohidrato.',
-      dinner: 'Comida de la noche. DEBE ser: más ligera que el almuerzo, fácil de digerir, no muy picante ni grasa. Evitar: frituras, salsas pesadas, café.',
-      snack: 'Bocado rápido. DEBE ser: muy rápido (5-10min), dulce O salado ligero, poca o ninguna cocción. Ideal: fruta, yogur, tostada, batido.'
+      breakfast: 'Comida de la mañana. Idealmente: rápida (15-20 min), ligera, energizante, compatible con café/té/zumo. Preferiblemente evitar: platos pesados, carnes grasas, frituras.',
+      lunch: 'Comida del mediodía. Idealmente: equilibrada, saciante, puede prepararse con antelación. Preferiblemente: proteína + verdura + carbohidrato.',
+      dinner: 'Comida de la noche. Idealmente: más ligera que el almuerzo, fácil de digerir, no muy picante ni grasa. Preferiblemente evitar: frituras, salsas pesadas, café.',
+      snack: 'Bocado rápido. Idealmente: muy rápido (5-10 min), dulce O salado ligero, poca o ninguna cocción. Por ejemplo: fruta, yogur, tostada, batido.'
     }
   };
   
@@ -237,24 +277,34 @@ async function generateRecipeWithGroq(
   preferences: any, 
   recipeIndex: number,
   totalRecipes: number
-): Promise<Recipe | null> {
+): Promise<GenerationResult> {
   const difficulty = preferences.difficulty || 'easy';
   const maxTime = preferences.maxCookTime || 60;
-  const dietary = preferences.dietary || [];
+  const dietary: string[] = preferences.dietary || [];
+  const hasDietary = dietary.length > 0;
   const mealType = preferences.mealType || 'lunch';
   const language = preferences.language || 'français';
-  
+
   const dietaryRules = buildDietaryRules(dietary, language);
-  const mealRules = buildMealTypeRules(mealType, language);
+  const mealName = getMealTypeName(mealType, language);
+  const mealPreference = buildMealTypePreference(mealType, language);
   const variationRules = totalRecipes > 1 ? generateRecipeVariation(recipeIndex, totalRecipes, ingredients, language) : '';
-  
+
+  // Seuls les régimes alimentaires autorisent un refus ; sans régime, le modèle doit toujours proposer une recette
+  const refusalRule = hasDietary
+    ? `SEUL CAS DE REFUS: si les régimes alimentaires ci-dessus empêchent d'utiliser le moindre ingrédient fourni, retourne UNIQUEMENT {"error": "dietary_impossible", "reason": "explication courte"}. Aucun autre motif de refus n'est accepté.`
+    : `Tu dois TOUJOURS retourner une recette. Ne retourne jamais d'erreur.`;
+
   const systemPrompt = `Tu es un chef expert anti-gaspi. Tu crées des recettes précises dans la langue: ${language}.
 
-RÈGLES ABSOLUES DE SÉCURITÉ ALIMENTAIRE:
+RÈGLES ABSOLUES DE SÉCURITÉ ALIMENTAIRE (les seules règles strictes):
 ${dietaryRules}
 
-RÈGLES DU TYPE DE REPAS (${mealType}):
-${mealRules}
+PRÉFÉRENCE DE TYPE DE REPAS (${mealName}) — c'est une préférence, PAS une règle:
+${mealPreference}
+- Si les ingrédients se prêtent mal à ce type de repas, propose QUAND MÊME la recette la plus adaptée possible, en complétant si besoin avec des ingrédients courants listés dans "missing_ingredients".
+- Dans ce cas, ajoute le champ "suggestion": une phrase courte, dans la langue ${language}, qui indique le moment où la recette est idéale (ex: "Idéal aussi en petit-déjeuner"). Sinon, n'ajoute pas ce champ.
+- Ne refuse JAMAIS une recette à cause du type de repas.
 ${variationRules}
 
 RÈGLES DE FORMATAGE STRICT:
@@ -275,13 +325,13 @@ RÈGLES INSTRUCTIONS - OBLIGATOIRE:
 - Action spécifique (ex: "Faites revenir", "Faites dorer", "Mijotez", "Sautez", "Pochez", "Grillez")
 - Temps exact ou test de cuisson précis
 
-Si les ingrédients fournis ne permettent PAS de respecter les restrictions diététiques, retourne UNIQUEMENT un objet avec "error": "Impossible de créer une recette respectant [restriction] avec ces ingrédients"`;
+${refusalRule}`;
 
   const userPrompt = `Ingrédients disponibles: ${ingredients.join(', ')}
 
 PARAMÈTRES:
 - Difficulté: ${difficulty}
-- Type de repas: ${mealType}
+- Type de repas (préférence): ${mealName}
 - Temps max: ${maxTime} minutes
 - Langue: ${language}
 
@@ -306,14 +356,16 @@ FORMAT JSON STRICT:
     "..."
   ],
   "tips": ["Astuce pratique spécifique à cette recette"],
+  "suggestion": "(optionnel) Idéal aussi en petit-déjeuner",
   "image_prompt": "Professional food photography, [style] [plat], [texture], studio lighting, appetizing, 4k"
 }
 
-IMPORTANT: 
-- Respecte STRICTEMENT les restrictions diététiques et le type de repas
+IMPORTANT:
+- Respecte STRICTEMENT les restrictions diététiques ; le type de repas est seulement une préférence
 - Le titre doit être UNIQUE et refléter le style/technique
 - Les instructions doivent être PRÉCISES et ACTIONNABLES`;
 
+  let content: string;
   try {
     const response = await fetch(GROQ_API_URL, {
       method: 'POST',
@@ -335,46 +387,80 @@ IMPORTANT:
     });
 
     if (!response.ok) {
-      throw new Error(`Groq API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error(`Groq API error ${response.status}:`, errorText);
+      // En mode json_object, Groq renvoie une 400 "json_validate_failed" quand le modèle produit un JSON invalide
+      return { ok: false, reason: errorText.includes('json_validate_failed') ? 'invalid_json' : 'api_error' };
     }
 
     const data = await response.json();
-    const content = data.choices[0].message.content;
-    
-    if (content.includes('"error"')) {
-      console.log('Recipe impossible with restrictions:', content);
-      return null;
+    const choice = data.choices?.[0];
+    if (!choice?.message?.content || choice.finish_reason === 'length') {
+      console.error('Groq response empty or truncated:', choice?.finish_reason);
+      return { ok: false, reason: 'invalid_json' };
     }
-    
-    const recipeData = JSON.parse(content);
-    
-    const cleanIngredients = (recipeData.ingredients_used || []).map((ing: any) => ({
-      name: ing.name || 'Ingrédient',
-      quantity: String(ing.quantity || '1').replace(/[a-zA-ZÀ-ÿ\s]/g, '').trim() || '1',
-      unit: (ing.unit || 'pièce').toString().trim()
-    }));
-
-    return {
-      title: recipeData.title || 'Recette',
-      description: recipeData.description || '',
-      difficulty: recipeData.difficulty || difficulty,
-      prep_time: recipeData.prep_time || 15,
-      cook_time: recipeData.cook_time || 20,
-      total_time: recipeData.total_time || 35,
-      servings: recipeData.servings || 2,
-      meal_type: mealType,
-      dietary_tags: recipeData.dietary_tags || dietary,
-      ingredients_used: cleanIngredients,
-      ingredients_from_list: recipeData.ingredients_from_list || [],
-      missing_ingredients: recipeData.missing_ingredients || [],
-      instructions: recipeData.instructions || [],
-      tips: recipeData.tips || [],
-      image_prompt: recipeData.image_prompt || `Professional food photography, ${recipeData.title}, appetizing`,
-    };
+    content = choice.message.content;
   } catch (error) {
     console.error('Error calling Groq:', error);
-    return null;
+    return { ok: false, reason: 'api_error' };
   }
+
+  let recipeData: any;
+  try {
+    recipeData = JSON.parse(content);
+  } catch {
+    console.error('Unreadable JSON from Groq:', content.slice(0, 500));
+    return { ok: false, reason: 'invalid_json' };
+  }
+
+  if (recipeData.error) {
+    console.log('Recipe refused by the model:', content);
+    // Un refus n'est légitime que si un régime est sélectionné ; sinon la réponse est inexploitable
+    return { ok: false, reason: hasDietary ? 'dietary_refusal' : 'invalid_json' };
+  }
+
+  const cleanIngredients = (recipeData.ingredients_used || []).map((ing: any) => ({
+    name: ing.name || 'Ingrédient',
+    quantity: String(ing.quantity || '1').replace(/[a-zA-ZÀ-ÿ\s]/g, '').trim() || '1',
+    unit: (ing.unit || 'pièce').toString().trim()
+  }));
+
+  // Le modèle range parfois des ingrédients ajoutés dans ingredients_from_list :
+  // on recalcule le tri à partir de la liste réellement fournie par l'utilisateur
+  const provided = ingredients.map(normalizeName);
+  const isProvided = (name: string) => {
+    const n = normalizeName(name);
+    return provided.some((p) => n.includes(p) || p.includes(n));
+  };
+  const usedNames = cleanIngredients.map((i: { name: string }) => i.name);
+  const fromList = usedNames.filter(isProvided);
+  const missing = [...usedNames, ...(recipeData.missing_ingredients || [])]
+    .filter((name: unknown): name is string => typeof name === 'string' && name.trim() !== '')
+    .filter((name: string) => !isProvided(name))
+    .filter((name: string, i: number, all: string[]) =>
+      all.findIndex((other) => normalizeName(other) === normalizeName(name)) === i);
+
+  const suggestion = typeof recipeData.suggestion === 'string' ? recipeData.suggestion.trim() : '';
+
+  const recipe: Recipe = {
+    title: recipeData.title || 'Recette',
+    description: recipeData.description || '',
+    difficulty: recipeData.difficulty || difficulty,
+    prep_time: recipeData.prep_time || 15,
+    cook_time: recipeData.cook_time || 20,
+    total_time: recipeData.total_time || 35,
+    servings: recipeData.servings || 2,
+    meal_type: mealType,
+    dietary_tags: recipeData.dietary_tags || dietary,
+    ingredients_used: cleanIngredients,
+    ingredients_from_list: fromList,
+    missing_ingredients: missing,
+    instructions: recipeData.instructions || [],
+    tips: recipeData.tips || [],
+    ...(suggestion && { suggestion }),
+    image_prompt: recipeData.image_prompt || `Professional food photography, ${recipeData.title}, appetizing`,
+  };
+  return { ok: true, recipe };
 }
 
 function generateFallbackRecipe(ingredients: string[], preferences: any): Recipe {
@@ -472,41 +558,51 @@ Deno.serve(async (req: Request) => {
       numRecipes = 3;
     }
 
+    const dietary = preferences.dietary || [];
     const recipes: Recipe[] = [];
+    const failures: FailureReason[] = [];
     let attempts = 0;
     const maxAttempts = numRecipes * 2;
 
     while (recipes.length < numRecipes && attempts < maxAttempts) {
       attempts++;
-      
-      const recipe = await generateRecipeWithGroq(
-        ingredients, 
-        preferences, 
-        recipes.length, 
+
+      const result = await generateRecipeWithGroq(
+        ingredients,
+        preferences,
+        recipes.length,
         numRecipes
       );
-      
-      if (recipe) {
-        const hasForbidden = checkForbiddenIngredients(recipe, preferences.dietary);
-        
-        if (!hasForbidden) {
-          if (generateImage !== false && POLLINATIONS_API_KEY && recipe.image_prompt) {
-            recipe.image_url = generatePollinationsUrl(recipe.image_prompt);
-          }
-          recipes.push(recipe);
+
+      if (!result.ok) {
+        failures.push(result.reason);
+      } else if (checkForbiddenIngredients(result.recipe, dietary)) {
+        // Ne peut se produire que si un régime est sélectionné
+        failures.push('dietary_refusal');
+      } else {
+        const recipe = result.recipe;
+        if (generateImage !== false && POLLINATIONS_API_KEY && recipe.image_prompt) {
+          recipe.image_url = generatePollinationsUrl(recipe.image_prompt);
         }
+        recipes.push(recipe);
       }
-      
-      if (attempts < maxAttempts) await new Promise(r => setTimeout(r, 500));
+
+      if (recipes.length < numRecipes && attempts < maxAttempts) await new Promise(r => setTimeout(r, 500));
     }
 
     if (recipes.length === 0) {
+      // Le message sur les régimes n'est utilisé que si un régime est sélectionné
+      const reason: FailureReason =
+        dietary.length > 0 && failures.includes('dietary_refusal') ? 'dietary_refusal'
+        : failures.includes('api_error') ? 'api_error'
+        : 'invalid_json';
+      const langCode = preferences.language.substring(0, 2).toLowerCase();
+      const messages = FAILURE_MESSAGES[langCode] || FAILURE_MESSAGES['en'];
+
+      console.error('No recipe generated. Failures:', failures.join(', '));
       return new Response(
-        JSON.stringify({ 
-          error: 'Aucune recette possible',
-          message: 'Les ingrédients fournis ne permettent pas de respecter les restrictions diététiques demandées.'
-        }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: reason, message: messages[reason] }),
+        { status: FAILURE_STATUS[reason], headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
