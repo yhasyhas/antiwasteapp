@@ -1,4 +1,5 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
+import { ingredientsMatch, sameIngredient } from './matching.ts';
 
 const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') || '';
 const POLLINATIONS_API_KEY = Deno.env.get('POLLINATIONS_API_KEY') || '';
@@ -183,11 +184,6 @@ function buildDietaryRules(dietary: string[], language: string): string {
   return rules.join('\n') || (language === 'fr' ? 'Aucune restriction diététique' : 'No dietary restrictions');
 }
 
-// Minuscules, sans accents ni espaces superflus : "Œufs " et "oeufs" se comparent correctement
-function normalizeName(name: string): string {
-  return name.toLowerCase().replace(/œ/g, 'oe').normalize('NFD').replace(/[̀-ͯ]/g, '').trim();
-}
-
 function getMealTypeName(mealType: string, language: string): string {
   const mealTypes = getTranslation('mealTypes', language);
   return mealTypes[mealType] || mealType;
@@ -312,6 +308,7 @@ RÈGLES DE FORMATAGE STRICT:
 - "unit": unité standard abrégée: g, kg, ml, cl, l, c. à soupe, c. à café, pièce, tranche, gousse, feuille, pincée
 - JAMAIS de répétition entre quantity et unit
 - JAMAIS d'unité dans le champ quantity
+- "name": pour un ingrédient de la liste fournie, recopie son nom EXACTEMENT tel qu'il est écrit dans la liste (même orthographe, sans reformuler)
 
 RÈGLES INSTRUCTIONS - INTERDIT (trop générique):
 - "Ajoutez [ingrédient] et faites cuire"
@@ -427,18 +424,14 @@ IMPORTANT:
 
   // Le modèle range parfois des ingrédients ajoutés dans ingredients_from_list :
   // on recalcule le tri à partir de la liste réellement fournie par l'utilisateur
-  const provided = ingredients.map(normalizeName);
-  const isProvided = (name: string) => {
-    const n = normalizeName(name);
-    return provided.some((p) => n.includes(p) || p.includes(n));
-  };
+  const isProvided = (name: string) => ingredients.some((p) => ingredientsMatch(p, name));
   const usedNames = cleanIngredients.map((i: { name: string }) => i.name);
   const fromList = usedNames.filter(isProvided);
   const missing = [...usedNames, ...(recipeData.missing_ingredients || [])]
     .filter((name: unknown): name is string => typeof name === 'string' && name.trim() !== '')
     .filter((name: string) => !isProvided(name))
     .filter((name: string, i: number, all: string[]) =>
-      all.findIndex((other) => normalizeName(other) === normalizeName(name)) === i);
+      all.findIndex((other) => sameIngredient(other, name)) === i);
 
   const suggestion = typeof recipeData.suggestion === 'string' ? recipeData.suggestion.trim() : '';
 
