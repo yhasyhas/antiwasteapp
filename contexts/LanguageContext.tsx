@@ -12,7 +12,7 @@ interface LanguageContextType {
   loading: boolean;
 }
 
-const translations = {
+const translations: Record<Language, Record<string, string>> = {
   fr: {
     welcome: 'Bienvenue',
     welcomeBack: 'Bon retour !',
