@@ -1,0 +1,249 @@
+import React from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { Globe, ChevronRight, User, LogOut } from 'lucide-react-native';
+import { router } from 'expo-router';
+
+const languages = [
+  { code: 'fr', label: 'Français', flag: '🇫🇷' },
+  { code: 'en', label: 'English', flag: '🇬🇧' },
+  { code: 'es', label: 'Español', flag: '🇪🇸' },
+] as const;
+
+export default function SettingsScreen() {
+  const { language, setLanguage, t, loading } = useLanguage();
+  const { user, signOut } = useAuth();
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#10b981" />
+      </View>
+    );
+  }
+
+  const handleLanguageChange = async (newLang: 'fr' | 'en' | 'es') => {
+    await setLanguage(newLang);
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>{t('settings')}</Text>
+      </View>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Section Langue */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Globe size={20} color="#10b981" />
+            <Text style={styles.sectionTitle}>{t('language')}</Text>
+          </View>
+
+          {languages.map((lang) => (
+            <TouchableOpacity
+              key={lang.code}
+              style={[
+                styles.languageCard,
+                language === lang.code && styles.languageCardActive,
+              ]}
+              onPress={() => handleLanguageChange(lang.code)}
+            >
+              <Text style={styles.flag}>{lang.flag}</Text>
+              <Text
+                style={[
+                  styles.languageLabel,
+                  language === lang.code && styles.languageLabelActive,
+                ]}
+              >
+                {lang.label}
+              </Text>
+              {language === lang.code && (
+                <View style={styles.checkmark}>
+                  <Text style={styles.checkmarkText}>✓</Text>
+                </View>
+              )}
+              <ChevronRight
+                size={20}
+                color={language === lang.code ? '#10b981' : '#9ca3af'}
+                style={styles.chevron}
+              />
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Section Compte */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <User size={20} color="#10b981" />
+            <Text style={styles.sectionTitle}>Compte</Text>
+          </View>
+
+          <View style={styles.infoCard}>
+            <Text style={styles.infoLabel}>Email</Text>
+            <Text style={styles.infoValue}>{user?.email || 'Non connecté'}</Text>
+          </View>
+
+          <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
+            <LogOut size={20} color="#ef4444" />
+            <Text style={styles.logoutText}>Se déconnecter</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Section Info */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Anti-Waste Recipe App v1.0</Text>
+          <Text style={styles.footerSubtext}>
+            Réduisez le gaspillage alimentaire, une recette à la fois.
+          </Text>
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#f9fafb',
+  },
+  header: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#111827',
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  section: {
+    marginBottom: 24,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+    paddingHorizontal: 4,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#374151',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  languageCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  languageCardActive: {
+    borderColor: '#10b981',
+    backgroundColor: '#f0fdf4',
+  },
+  flag: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  languageLabel: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#374151',
+  },
+  languageLabelActive: {
+    color: '#10b981',
+    fontWeight: '600',
+  },
+  checkmark: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#10b981',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  checkmarkText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  chevron: {
+    marginLeft: 'auto',
+  },
+  infoCard: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  infoLabel: {
+    fontSize: 12,
+    color: '#9ca3af',
+    marginBottom: 4,
+    textTransform: 'uppercase',
+  },
+  infoValue: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#111827',
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  logoutText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ef4444',
+  },
+  footer: {
+    alignItems: 'center',
+    paddingVertical: 32,
+  },
+  footerText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#9ca3af',
+    marginBottom: 4,
+  },
+  footerSubtext: {
+    fontSize: 12,
+    color: '#9ca3af',
+    textAlign: 'center',
+  },
+});
