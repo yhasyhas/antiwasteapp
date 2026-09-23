@@ -26,6 +26,7 @@ import {
   Moon,
   Cookie,
   Globe,
+  Lightbulb,
 } from 'lucide-react-native';
 
 interface Recipe {
@@ -43,6 +44,7 @@ interface Recipe {
   meal_type: string;
   dietary_tags: string[];
   tips: string[];
+  suggestion?: string;
   image_url?: string;
 }
 
@@ -383,6 +385,12 @@ export default function GenerateRecipeScreen() {
                     <Text style={styles.recipeDescription} numberOfLines={2}>
                       {recipe.description}
                     </Text>
+                    {recipe.suggestion && (
+                      <View style={styles.suggestionBox}>
+                        <Lightbulb size={14} color="#b45309" />
+                        <Text style={styles.suggestionText}>{recipe.suggestion}</Text>
+                      </View>
+                    )}
                     <View style={styles.recipeFooter}>
                       <View style={styles.recipeTime}>
                         <Clock size={16} color="#6b7280" />
@@ -608,6 +616,13 @@ export default function GenerateRecipeScreen() {
                   <Text style={styles.modalDescription}>
                     {selectedRecipe.description}
                   </Text>
+
+                  {selectedRecipe.suggestion && (
+                    <View style={styles.suggestionBox}>
+                      <Lightbulb size={16} color="#b45309" />
+                      <Text style={styles.suggestionText}>{selectedRecipe.suggestion}</Text>
+                    </View>
+                  )}
 
                   <View style={styles.modalMeta}>
                     <View style={styles.metaItem}>
@@ -888,6 +903,22 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     marginBottom: 12,
     lineHeight: 20,
+  },
+  suggestionBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#fef3c7',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginBottom: 12,
+  },
+  suggestionText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#92400e',
+    fontWeight: '500',
   },
   recipeFooter: {
     flexDirection: 'row',
