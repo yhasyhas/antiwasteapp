@@ -35,12 +35,12 @@ Dernière mise à jour : 23/09/2026
 
 ## Phase 0 — Remettre l'app en marche
 
-- [ ] Vérifier dans le dashboard Supabase que le projet n'est pas en pause (le réactiver si besoin)
-- [ ] Ajouter `supabase/.temp/` au `.gitignore`
-- [ ] Commiter tout le travail en cours **tel quel** (sauvegarde, aucune correction)
-- [ ] Remplacer `llama-3.3-70b-versatile` par `openai/gpt-oss-120b`, lu depuis le secret `GROQ_MODEL` (valeur par défaut : `openai/gpt-oss-120b`), puis redéployer `generate-recipes`
-- [ ] `tsconfig.json` : ajouter `"exclude": ["supabase/functions"]`
-- [ ] `LanguageContext.tsx` : typer `translations` en `Record<Language, Record<string, string>>`
+- [x] Vérifier dans le dashboard Supabase que le projet n'est pas en pause (le réactiver si besoin) — actif : Auth et REST répondent 200 (vérifié le 23/09/2026)
+- [x] Ajouter `supabase/.temp/` au `.gitignore`
+- [x] Commiter tout le travail en cours **tel quel** (sauvegarde, aucune correction)
+- [ ] Remplacer `llama-3.3-70b-versatile` par `openai/gpt-oss-120b`, lu depuis le secret `GROQ_MODEL` (valeur par défaut : `openai/gpt-oss-120b`), puis redéployer `generate-recipes` — code fait ; **reste le déploiement** (CLI Supabase non connecté)
+- [x] `tsconfig.json` : ajouter `"exclude": ["supabase/functions"]`
+- [x] `LanguageContext.tsx` : typer `translations` en `Record<Language, Record<string, string>>`
 - [ ] **Action manuelle (toi)** : révoquer la clé Pollinations actuelle sur enter.pollinations.ai et en créer une nouvelle (l'ancienne a pu fuiter via les URL enregistrées en base)
 
 **Terminé quand** : une recette se génère de bout en bout depuis l'app, et `npm run typecheck` passe.
@@ -133,4 +133,5 @@ Dernière mise à jour : 23/09/2026
 | 23/09/2026 | Rester sur Expo SDK 54 jusqu'à la phase 7 | Expo Go (App Store) bloqué en SDK 54 |
 | 23/09/2026 | Remplacer Pollinations par Cloudflare Workers AI | Clé exposée dans les URL ; offre gratuite quotidienne ; clé côté serveur |
 | 23/09/2026 | Images générées à la demande seulement | Divise la consommation par ~3 |
+| 23/09/2026 | gpt-oss : `reasoning_effort: 'low'` et `max_tokens` 4096 | Le raisonnement compte dans la limite de tokens et pourrait tronquer le JSON |
 | | *(résultat du test Gemini vs Clarifai)* | |
