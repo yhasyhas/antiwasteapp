@@ -9,8 +9,9 @@ import {
   Modal,
 } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
-import { ChefHat, Sparkles, Filter, Clock, TrendingUp } from 'lucide-react-native';
+import { ChefHat, Sparkles, Clock, TrendingUp } from 'lucide-react-native';
 import { router } from 'expo-router';
 
 interface Recipe {
@@ -26,10 +27,10 @@ interface Recipe {
 
 export default function HomeScreen() {
   const { user, signOut } = useAuth();
+  const { t } = useLanguage();
   const [ingredients, setIngredients] = useState<any[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
   useEffect(() => {
@@ -77,11 +78,11 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>Welcome back!</Text>
+          <Text style={styles.greeting}>{t('welcomeBack')}</Text>
           <Text style={styles.email}>{user?.email}</Text>
         </View>
         <TouchableOpacity onPress={signOut} style={styles.logoutButton}>
-          <Text style={styles.logoutText}>Sign Out</Text>
+          <Text style={styles.logoutText}>{t('signOut')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -90,9 +91,9 @@ export default function HomeScreen() {
           <View style={styles.heroIcon}>
             <ChefHat size={40} color="#10b981" strokeWidth={2} />
           </View>
-          <Text style={styles.heroTitle}>Ready to Cook?</Text>
+          <Text style={styles.heroTitle}>{t('readyToCook')}</Text>
           <Text style={styles.heroSubtitle}>
-            You have {ingredients.length} ingredient{ingredients.length !== 1 ? 's' : ''} ready
+            {t('youHave')} {ingredients.length} {ingredients.length !== 1 ? t('ingredients') : t('ingredient')} {t('ready')}
           </Text>
           <TouchableOpacity
             style={[
@@ -103,11 +104,11 @@ export default function HomeScreen() {
             disabled={ingredients.length === 0}
           >
             <Sparkles size={20} color="#fff" strokeWidth={2} />
-            <Text style={styles.generateButtonText}>Generate Recipes</Text>
+            <Text style={styles.generateButtonText}>{t('generateRecipes')}</Text>
           </TouchableOpacity>
           {ingredients.length === 0 && (
             <Text style={styles.helpText}>
-              Add ingredients to get started!
+              {t('addIngredientsFirst')}
             </Text>
           )}
         </View>
@@ -120,8 +121,8 @@ export default function HomeScreen() {
             <View style={styles.actionIconContainer}>
               <ChefHat size={24} color="#10b981" />
             </View>
-            <Text style={styles.actionTitle}>Scan Food</Text>
-            <Text style={styles.actionSubtitle}>Take a photo</Text>
+            <Text style={styles.actionTitle}>{t('scanFood')}</Text>
+            <Text style={styles.actionSubtitle}>{t('takePhoto')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -131,17 +132,17 @@ export default function HomeScreen() {
             <View style={styles.actionIconContainer}>
               <TrendingUp size={24} color="#10b981" />
             </View>
-            <Text style={styles.actionTitle}>My Pantry</Text>
-            <Text style={styles.actionSubtitle}>{ingredients.length} items</Text>
+            <Text style={styles.actionTitle}>{t('myPantry')}</Text>
+            <Text style={styles.actionSubtitle}>{ingredients.length} {t('ingredients')}</Text>
           </TouchableOpacity>
         </View>
 
         {recipes.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Recent Recipes</Text>
+              <Text style={styles.sectionTitle}>{t('recentRecipes')}</Text>
               <TouchableOpacity onPress={() => router.push('/(tabs)/saved')}>
-                <Text style={styles.seeAllText}>See All</Text>
+                <Text style={styles.seeAllText}>{t('seeAll')}</Text>
               </TouchableOpacity>
             </View>
 
@@ -199,7 +200,7 @@ export default function HomeScreen() {
               <View style={styles.modalHeader}>
                 <Text style={styles.modalTitle}>{selectedRecipe.title}</Text>
                 <TouchableOpacity onPress={() => setSelectedRecipe(null)}>
-                  <Text style={styles.modalClose}>Close</Text>
+                  <Text style={styles.modalClose}>{t('close')}</Text>
                 </TouchableOpacity>
               </View>
               <ScrollView>

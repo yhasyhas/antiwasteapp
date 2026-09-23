@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, Camera, List, Heart } from 'lucide-react-native';
+import { Home, Camera, List, Heart, Settings } from 'lucide-react-native';
 
 export default function TabsLayout() {
   return (
@@ -17,7 +17,7 @@ export default function TabsLayout() {
           height: 64,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: '600',
         },
       }}
@@ -48,6 +48,13 @@ export default function TabsLayout() {
         options={{
           title: 'Saved',
           tabBarIcon: ({ size, color }) => <Heart size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ size, color }) => <Settings size={size} color={color} />,
         }}
       />
     </Tabs>

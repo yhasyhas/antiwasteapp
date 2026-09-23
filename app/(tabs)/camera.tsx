@@ -11,6 +11,8 @@ import {
   ScrollView,
 } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
+import * as ImageManipulator from 'expo-image-manipulator';
+//import * as FileSystem from 'expo-file-system';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Camera, FlipHorizontal, X, Check, Plus } from 'lucide-react-native';
@@ -29,6 +31,10 @@ export default function CameraScreen() {
   const [newIngredientName, setNewIngredientName] = useState('');
   const [newIngredientQuantity, setNewIngredientQuantity] = useState('');
   const cameraRef = useRef<any>(null);
+  
+  // Nouveaux states pour la confirmation
+  const [detectedIngredients, setDetectedIngredients] = useState<Array<{ name: string; quantity: string; confirmed: boolean }>>([]);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   if (!permission) {
     return (
@@ -83,35 +89,61 @@ export default function CameraScreen() {
   const analyzeImage = async (imageUri: string) => {
     setAnalyzing(true);
 
-    const mockIngredients = [
-      'Tomatoes',
-      'Onions',
-      'Garlic',
-      'Olive Oil',
-      'Basil',
-    ];
+    try {
+      // 1. Compresser et convertir en base64 avec expo-image-manipulator
+      const manipulatedImage = await ImageManipulator.manipulateAsync(
+        imageUri,
+        [{ resize: { width: 800 } }], // Redimensionne pour réduire la taille
+        {
+          compress: 0.7,
+          format: ImageManipulator.SaveFormat.JPEG,
+          base64: true // ← Important : retourne le base64
+        }
+      );
 
-    setTimeout(async () => {
-      const selectedIngredients = mockIngredients
-        .sort(() => 0.5 - Math.random())
-        .slice(0, Math.floor(Math.random() * 3) + 2);
+      if (!manipulatedImage.base64) {
+        throw new Error('Failed to convert image to base64');
+      }
 
-      await saveIngredients(selectedIngredients);
+      // 2. Appeler l'Edge Function
+      const apiUrl = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/analyze-image`;
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          image_base64: manipulatedImage.base64,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.ingredients && data.ingredients.length > 0) {
+        setDetectedIngredients(data.ingredients.map((name: string) => ({
+          name,
+          quantity: '',
+          confirmed: true,
+        })));
+        setShowConfirmation(true);
+      } else {
+        Alert.alert(
+          'No ingredients detected',
+          'Try taking a clearer photo or add ingredients manually.',
+          [
+            { text: 'Add Manually', onPress: () => setShowManualAdd(true) },
+            { text: 'Retry', style: 'cancel' }
+          ]
+        );
+      }
+    } catch (error) {
+      console.error('Error analyzing image:', error);
+      Alert.alert('Error', 'Failed to analyze image. Please try again or add manually.');
+    } finally {
       setAnalyzing(false);
       setCapturedImage(null);
-
-      Alert.alert(
-        'Ingredients Added!',
-        `Found ${selectedIngredients.length} ingredients: ${selectedIngredients.join(', ')}`,
-        [
-          {
-            text: 'View Pantry',
-            onPress: () => router.push('/(tabs)/ingredients'),
-          },
-          { text: 'Scan More', style: 'cancel' },
-        ]
-      );
-    }, 2000);
+    }
   };
 
   const saveIngredients = async (ingredientNames: string[]) => {
@@ -235,6 +267,7 @@ export default function CameraScreen() {
         </View>
       </View>
 
+      {/* Modal Ajout Manuel */}
       <Modal
         visible={showManualAdd}
         animationType="slide"
@@ -317,6 +350,76 @@ export default function CameraScreen() {
               <Text style={styles.saveButtonText}>
                 Save {manualIngredients.length} Ingredient
                 {manualIngredients.length !== 1 ? 's' : ''}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* 👉 NOUVEAU MODAL DE CONFIRMATION */}
+      <Modal
+        visible={showConfirmation}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowConfirmation(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Confirm Ingredients</Text>
+              <TouchableOpacity onPress={() => setShowConfirmation(false)}>
+                <X size={24} color="#6b7280" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.confirmationSubtitle}>
+              We detected these ingredients. Uncheck any you don't want to add:
+            </Text>
+
+            <ScrollView style={styles.confirmationList}>
+              {detectedIngredients.map((ing, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.confirmationItem}
+                  onPress={() => {
+                    const updated = [...detectedIngredients];
+                    updated[index].confirmed = !updated[index].confirmed;
+                    setDetectedIngredients(updated);
+                  }}
+                >
+                  <View style={[styles.checkbox, ing.confirmed && styles.checkboxChecked]}>
+                    {ing.confirmed && <Check size={16} color="#fff" />}
+                  </View>
+                  <Text style={[styles.confirmationText, !ing.confirmed && styles.confirmationTextUnchecked]}>
+                    {ing.name}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            <TouchableOpacity
+              style={styles.confirmButton}
+              onPress={async () => {
+                const confirmed = detectedIngredients.filter(i => i.confirmed);
+                if (confirmed.length > 0) {
+                  await saveIngredients(confirmed.map(i => i.name));
+                  setShowConfirmation(false);
+                  setDetectedIngredients([]);
+                  Alert.alert(
+                    'Ingredients Added!',
+                    `Added ${confirmed.length} ingredients to your pantry.`,
+                    [
+                      { text: 'View Pantry', onPress: () => router.push('/(tabs)/ingredients') },
+                      { text: 'Scan More', style: 'cancel' }
+                    ]
+                  );
+                } else {
+                  Alert.alert('No ingredients selected', 'Please select at least one ingredient to add.');
+                }
+              }}
+            >
+              <Text style={styles.confirmButtonText}>
+                Add {detectedIngredients.filter(i => i.confirmed).length} Ingredients
               </Text>
             </TouchableOpacity>
           </View>
@@ -597,5 +700,59 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  
+  // 👉 NOUVEAUX STYLES POUR LE MODAL DE CONFIRMATION
+  confirmationSubtitle: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  confirmationList: {
+    maxHeight: 300,
+    marginBottom: 16,
+  },
+  confirmationItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: '#d1d5db',
+    marginRight: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: '#10b981',
+    borderColor: '#10b981',
+  },
+  confirmationText: {
+    fontSize: 16,
+    color: '#111827',
+    flex: 1,
+  },
+  confirmationTextUnchecked: {
+    color: '#9ca3af',
+    textDecorationLine: 'line-through',
+  },
+  confirmButton: {
+    backgroundColor: '#10b981',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  confirmButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });
