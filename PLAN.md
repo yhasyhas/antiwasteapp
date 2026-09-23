@@ -41,7 +41,7 @@ Dernière mise à jour : 23/09/2026
 - [x] Remplacer `llama-3.3-70b-versatile` par `openai/gpt-oss-120b`, lu depuis le secret `GROQ_MODEL` (valeur par défaut : `openai/gpt-oss-120b`), puis redéployer `generate-recipes` — déployé et testé avec curl le 23/09/2026
 - [x] `tsconfig.json` : ajouter `"exclude": ["supabase/functions"]`
 - [x] `LanguageContext.tsx` : typer `translations` en `Record<Language, Record<string, string>>`
-- [ ] **Action manuelle (toi)** : révoquer la clé Pollinations actuelle sur enter.pollinations.ai (l'ancienne a pu fuiter via les URL enregistrées en base). **Ne pas en créer de nouvelle** : images désactivées jusqu'à la phase 3 (voir journal)
+- [x] **Action manuelle (toi)** : révoquer la clé Pollinations actuelle sur enter.pollinations.ai (l'ancienne a pu fuiter via les URL enregistrées en base). **Ne pas en créer de nouvelle** : images désactivées jusqu'à la phase 3 (voir journal) — révoquée (confirmé le 23/09/2026)
 
 **Terminé quand** : une recette se génère de bout en bout depuis l'app, et `npm run typecheck` passe.
 
@@ -92,6 +92,7 @@ Dernière mise à jour : 23/09/2026
 - [ ] Ajouter un mode « ticket de caisse » à `analyze-image`
 - [ ] Réécrire `generate-recipes` avec sortie structurée (schéma JSON) ; générer les 3 recettes en un appel ou en parallèle (supprimer la pause de 500 ms)
 - [ ] Remplacer la vérification des ingrédients interdits par mots-clés (`checkForbiddenIngredients`, faux positifs comme « lait de coco » en vegan) : dans la sortie structurée, le modèle indique pour chaque ingrédient s'il respecte chaque régime sélectionné, et le serveur garde une liste d'exceptions (lait de coco, lait d'amande, beurre de cacahuète…)
+- [ ] Le modèle renvoie, pour chaque ingrédient de la recette, l'identifiant de l'ingrédient du garde-manger correspondant (ou "manquant"), ce qui remplace la comparaison de texte (`matching.ts`)
 - [ ] Nouvelle fonction `generate-recipe-image` : Cloudflare Workers AI (FLUX), appelée **seulement** à l'ouverture ou à la sauvegarde d'une recette
 - [ ] Bucket Supabase Storage `recipe-images` ; enregistrer uniquement l'URL Storage dans `recipes.image_url`
 - [ ] Retirer Clarifai et Pollinations : code, secrets, dépendances
