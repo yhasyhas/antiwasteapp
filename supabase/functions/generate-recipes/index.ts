@@ -3,6 +3,10 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') || '';
 const POLLINATIONS_API_KEY = Deno.env.get('POLLINATIONS_API_KEY') || '';
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+// Modèle configurable par secret : les fournisseurs retirent régulièrement des modèles
+const GROQ_MODEL = Deno.env.get('GROQ_MODEL') || 'openai/gpt-oss-120b';
+// Les modèles gpt-oss raisonnent avant de répondre : on limite l'effort pour ne pas tronquer le JSON
+const IS_REASONING_MODEL = GROQ_MODEL.includes('gpt-oss');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -318,13 +322,14 @@ IMPORTANT:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
+        model: GROQ_MODEL,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
         ],
         temperature: 0.8, // Augmenté pour plus de créativité
-        max_tokens: 2048,
+        max_tokens: IS_REASONING_MODEL ? 4096 : 2048, // le raisonnement compte dans la limite
+        ...(IS_REASONING_MODEL && { reasoning_effort: 'low' }),
         response_format: { type: 'json_object' }
       }),
     });
