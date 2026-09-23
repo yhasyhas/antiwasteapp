@@ -91,15 +91,14 @@ export default function CameraScreen() {
 
     try {
       // 1. Compresser et convertir en base64 avec expo-image-manipulator
-      const manipulatedImage = await ImageManipulator.manipulateAsync(
-        imageUri,
-        [{ resize: { width: 800 } }], // Redimensionne pour réduire la taille
-        {
-          compress: 0.7,
-          format: ImageManipulator.SaveFormat.JPEG,
-          base64: true // ← Important : retourne le base64
-        }
-      );
+      const context = ImageManipulator.ImageManipulator.manipulate(imageUri);
+      context.resize({ width: 800 }); // Redimensionne pour réduire la taille
+      const rendered = await context.renderAsync();
+      const manipulatedImage = await rendered.saveAsync({
+        compress: 0.7,
+        format: ImageManipulator.SaveFormat.JPEG,
+        base64: true // ← Important : retourne le base64
+      });
 
       if (!manipulatedImage.base64) {
         throw new Error('Failed to convert image to base64');
