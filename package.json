@@ -7,7 +7,8 @@
     "dev": "expo start",
     "build:web": "expo export --platform web",
     "lint": "expo lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "export": "node scripts/export-project.mjs"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
