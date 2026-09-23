@@ -1,0 +1,136 @@
+# PLAN.md — Feuille de route de l'app anti-gaspi
+
+> **Pour Claude Code** : ce fichier est la source de vérité du projet. Lis-le au début de chaque session.
+> Travaille uniquement sur la phase en cours, coche les cases (`[x]`) au fur et à mesure,
+> et note toute décision importante dans le « Journal des décisions » en bas du fichier.
+> Ne commence jamais une phase sans que la précédente respecte ses critères « Terminé quand ».
+
+Dernière mise à jour : 23/09/2026
+
+---
+
+## Règles de travail
+
+- **Une branche par phase** : `phase-0`, `phase-1`, etc. Fusion dans `master` quand la phase est terminée.
+- **Un commit par tâche**, avec un message clair en français.
+- **`npm run typecheck` doit passer avant chaque commit** (à partir de la fin de la phase 0).
+- **Aucune clé secrète dans le code ni dans les réponses envoyées à l'app.** Les secrets vont dans `supabase secrets set`.
+- **Noms de modèles IA toujours dans des secrets** (`GROQ_MODEL`, `GEMINI_MODEL`…), jamais en dur : les fournisseurs retirent des modèles régulièrement.
+- **Ne pas mettre à jour Expo avant la phase 7** : Expo Go sur l'App Store est bloqué en SDK 54.
+- En fin de phase : mettre à jour `PROJECT_CONTEXT.md` et régénérer l'export (`npm run export`).
+
+## Stack cible
+
+| Rôle | Aujourd'hui | Cible |
+|---|---|---|
+| App | Expo SDK 54, expo-router 6 | Idem jusqu'à la phase 7, puis SDK 57 + build EAS |
+| Backend | Supabase (clés `anon`, legacy) | Supabase (clés `sb_publishable_` / `sb_secret_`) |
+| Vision | Clarifai `food-item-recognition` | Gemini Flash-Lite (sortie structurée), si le test de la phase 3 le confirme |
+| Recettes | Groq `llama-3.3-70b-versatile` (**retiré le 16/08/2026**) | Gemini (principal) + Groq `openai/gpt-oss-120b` (secours) |
+| Images | Pollinations, clé dans l'URL | Cloudflare Workers AI (FLUX), à la demande, stockées dans Supabase Storage |
+| Traductions | i18n maison | i18next + expo-localization |
+| Erreurs | aucun suivi | Sentry (offre gratuite) |
+
+---
+
+## Phase 0 — Remettre l'app en marche
+
+- [ ] Vérifier dans le dashboard Supabase que le projet n'est pas en pause (le réactiver si besoin)
+- [ ] Ajouter `supabase/.temp/` au `.gitignore`
+- [ ] Commiter tout le travail en cours **tel quel** (sauvegarde, aucune correction)
+- [ ] Remplacer `llama-3.3-70b-versatile` par `openai/gpt-oss-120b`, lu depuis le secret `GROQ_MODEL` (valeur par défaut : `openai/gpt-oss-120b`), puis redéployer `generate-recipes`
+- [ ] `tsconfig.json` : ajouter `"exclude": ["supabase/functions"]`
+- [ ] `LanguageContext.tsx` : typer `translations` en `Record<Language, Record<string, string>>`
+- [ ] **Action manuelle (toi)** : révoquer la clé Pollinations actuelle sur enter.pollinations.ai et en créer une nouvelle (l'ancienne a pu fuiter via les URL enregistrées en base)
+
+**Terminé quand** : une recette se génère de bout en bout depuis l'app, et `npm run typecheck` passe.
+
+## Phase 1 — Bugs et données
+
+- [ ] Recettes en double : récupérer les `id` renvoyés par l'insert dans `saveRecipesToHistory`, et faire uniquement l'insert dans `favorites` dans `saveRecipe`
+- [ ] `setLanguage` : ajouter `onConflict: 'user_id'` à l'upsert de `user_preferences`
+- [ ] Migration : colonnes `servings` (integer) et `tips` (jsonb) sur `recipes`, et les enregistrer à la sauvegarde
+- [ ] Supprimer le code mort (`generateFallbackRecipe`)
+- [ ] Renommer l'app : `name`, `slug`, `scheme` dans `app.json`, `name` dans `package.json`
+
+**Terminé quand** : sauvegarder une recette ne crée qu'une seule ligne dans `recipes`, et on peut changer de langue trois fois de suite sans erreur.
+
+## Phase 2 — Sécurité
+
+- [ ] Créer les clés `sb_publishable_…` / `sb_secret_…` dans le dashboard, mettre la clé publishable dans le `.env` de l'app
+- [ ] Dans les fonctions, lire les clés depuis `SUPABASE_PUBLISHABLE_KEYS` / `SUPABASE_SECRET_KEYS`
+- [ ] Créer `supabase/functions/_shared/auth.ts` : vérifie l'utilisateur connecté à partir du token, renvoie 401 sinon
+- [ ] `supabase/config.toml` : `verify_jwt = false` pour chaque fonction (la vérification se fait dans le code)
+- [ ] Migration : table `usage_counters` (user_id, date, scans, generations, images) avec RLS
+- [ ] Quotas dans les fonctions : 10 générations, 20 scans par jour et par utilisateur, erreur 429 au-delà (valeurs dans des secrets)
+- [ ] Restreindre CORS aux origines utiles
+- [ ] Désactiver les anciennes clés `anon` / `service_role` une fois que tout fonctionne
+
+**Terminé quand** : un appel sans utilisateur connecté renvoie 401, la 11e génération de la journée renvoie 429, et l'app fonctionne avec les anciennes clés désactivées.
+
+## Phase 3 — Nouvelle stack IA
+
+- [ ] Créer `supabase/functions/_shared/ai.ts` : une interface unique (`analyzeImage`, `generateRecipes`) avec fournisseur principal + secours, configurés par secrets
+- [ ] **Test comparatif** : 10 à 15 vraies photos (frigo, placard, plan de travail), Gemini contre Clarifai. Noter les résultats dans le journal des décisions
+- [ ] Réécrire `analyze-image` avec Gemini et un schéma JSON : nom (dans la langue de l'utilisateur), quantité estimée, catégorie, niveau de confiance
+- [ ] Ajouter un mode « ticket de caisse » à `analyze-image`
+- [ ] Réécrire `generate-recipes` avec sortie structurée (schéma JSON) ; générer les 3 recettes en un appel ou en parallèle (supprimer la pause de 500 ms)
+- [ ] Nouvelle fonction `generate-recipe-image` : Cloudflare Workers AI (FLUX), appelée **seulement** à l'ouverture ou à la sauvegarde d'une recette
+- [ ] Bucket Supabase Storage `recipe-images` ; enregistrer uniquement l'URL Storage dans `recipes.image_url`
+- [ ] Retirer Clarifai et Pollinations : code, secrets, dépendances
+
+**Terminé quand** : un scan en français renvoie des noms en français, aucune clé n'apparaît dans les réponses envoyées à l'app, et couper le fournisseur principal fait basculer automatiquement sur le secours.
+
+## Phase 4 — Nettoyage du code et traductions
+
+- [ ] Découper `app/recipe/generate.tsx` : `components/recipe/Filters.tsx`, `RecipeCard.tsx`, `RecipeDetail.tsx`, `hooks/useRecipeGeneration.ts`
+- [ ] Remplacer l'i18n maison par i18next + react-i18next + expo-localization (langue du téléphone par défaut)
+- [ ] Traduire **tous** les écrans : auth, caméra, ingrédients, favoris, génération, titres des onglets
+- [ ] Brancher Sentry (`@sentry/react-native`)
+- [ ] Écrire le `README.md` : installation, secrets nécessaires, déploiement des fonctions et des migrations
+
+**Terminé quand** : aucun texte affiché n'est écrit en dur, aucun fichier ne dépasse ~400 lignes, et une erreur volontaire remonte dans Sentry.
+
+## Phase 5 — Le cœur anti-gaspi
+
+- [ ] Migration : colonnes `expires_at` (date) et `category` (text) sur `ingredients`
+- [ ] Au scan, l'IA propose une date de péremption selon la catégorie ; l'utilisateur la modifie avec des boutons rapides (+3 j, +1 sem., +1 mois)
+- [ ] Garde-manger trié par urgence, avec badges de couleur (expiré / bientôt / OK)
+- [ ] Le prompt de génération donne la priorité aux ingrédients qui expirent bientôt
+- [ ] Notifications locales avec `expo-notifications` : rappel la veille de la péremption
+- [ ] Bouton « J'ai cuisiné ça » : retire du garde-manger les ingrédients utilisés (avec confirmation)
+- [ ] Scan de code-barres (`expo-camera`) + recherche du produit sur Open Food Facts
+
+**Terminé quand** : un aliment ajouté avec une date proche déclenche une notification, et la recette proposée l'utilise en premier.
+
+## Phase 6 — Donner envie de revenir
+
+- [ ] Liste de courses construite à partir de `missing_ingredients`
+- [ ] Compteur de gaspillage évité (kg, et éventuellement argent économisé) sur l'accueil
+- [ ] Écran de préférences : régimes, ingrédients exclus, temps max ; utilisé par la génération
+- [ ] Connexion anonyme Supabase pour tester sans compte, avec conversion en compte plus tard
+
+**Terminé quand** : un nouvel utilisateur peut scanner et générer une recette sans créer de compte, puis garder ses données en créant son compte.
+
+## Phase 7 — Préparer le lancement
+
+- [ ] Passer à Expo SDK 57 et créer un build de développement EAS
+- [ ] Icône, écran de démarrage, nom définitif
+- [ ] Passer Gemini en offre payante (les données de l'offre gratuite servent à améliorer les produits Google)
+- [ ] Rédiger la politique de confidentialité (photos, données du garde-manger)
+- [ ] Bêta fermée : TestFlight (iOS) et tests internes Google Play, avec quelques proches
+- [ ] Fiches des stores : captures d'écran, description
+
+**Terminé quand** : au moins 5 testeurs utilisent l'app pendant une semaine sans plantage bloquant.
+
+---
+
+## Journal des décisions
+
+| Date | Décision | Raison |
+|---|---|---|
+| 23/09/2026 | Groq `llama-3.3-70b-versatile` → `openai/gpt-oss-120b` | Modèle retiré par Groq le 16/08/2026 |
+| 23/09/2026 | Rester sur Expo SDK 54 jusqu'à la phase 7 | Expo Go (App Store) bloqué en SDK 54 |
+| 23/09/2026 | Remplacer Pollinations par Cloudflare Workers AI | Clé exposée dans les URL ; offre gratuite quotidienne ; clé côté serveur |
+| 23/09/2026 | Images générées à la demande seulement | Divise la consommation par ~3 |
+| | *(résultat du test Gemini vs Clarifai)* | |

@@ -33,3 +33,9 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# export du projet (scripts/export-project.mjs)
+export/
+
+# supabase CLI (état local)
+supabase/.temp/
