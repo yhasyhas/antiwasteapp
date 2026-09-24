@@ -2,9 +2,17 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { getAuthenticatedUser } from '../_shared/auth.ts';
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || '';
-// Modèle configurable par secret : les fournisseurs retirent régulièrement des modèles
-const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-3.5-flash-lite';
+// Modèles configurables par secret : les fournisseurs retirent régulièrement des modèles
+const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-3.1-flash-lite';
+const GEMINI_FALLBACK_MODEL = Deno.env.get('GEMINI_FALLBACK_MODEL') || 'gemini-3.5-flash-lite';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/interactions';
+
+// Les modèles Flash-Lite renvoient souvent 503 (« high demand ») : on réessaie en alternant
+// modèle principal et modèle de secours, avec un délai maximal par appel
+const ATTEMPT_MODELS = [GEMINI_MODEL, GEMINI_FALLBACK_MODEL, GEMINI_MODEL];
+const RETRY_DELAYS_MS = [0, 1000, 2000];
+const ATTEMPT_TIMEOUT_MS = 30_000;
+const RETRYABLE_STATUSES = new Set([429, 500, 503, 504]);
 
 // En dessous de ce niveau de confiance, l'ingrédient n'est pas proposé à l'utilisateur
 const MIN_CONFIDENCE = 0.5;
@@ -134,6 +142,40 @@ Liste les aliments et ingrédients de cuisine visibles.
 - S'il n'y a aucun aliment, renvoie une liste vide.`;
 }
 
+type GeminiResult = { ok: true; interaction: any } | { ok: false; details: string };
+
+// Appelle Gemini avec nouvel essai sur les erreurs passagères (surcharge, quota, délai dépassé)
+async function callGemini(request: Record<string, unknown>): Promise<GeminiResult> {
+  let lastError = '';
+
+  for (let attempt = 0; attempt < ATTEMPT_MODELS.length; attempt++) {
+    if (RETRY_DELAYS_MS[attempt]) await new Promise((r) => setTimeout(r, RETRY_DELAYS_MS[attempt]));
+    const model = ATTEMPT_MODELS[attempt];
+
+    try {
+      const response = await fetch(GEMINI_API_URL, {
+        method: 'POST',
+        headers: { 'x-goog-api-key': GEMINI_API_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model, ...request }),
+        signal: AbortSignal.timeout(ATTEMPT_TIMEOUT_MS),
+      });
+
+      if (response.ok) return { ok: true, interaction: await response.json() };
+
+      const errorText = await response.text();
+      lastError = `Gemini ${response.status} (${model}): ${errorText.slice(0, 300)}`;
+      console.error(`Attempt ${attempt + 1} failed:`, lastError);
+      // Une erreur 400 (requête invalide) ne se corrigera pas en réessayant
+      if (!RETRYABLE_STATUSES.has(response.status)) break;
+    } catch (error) {
+      lastError = `Gemini (${model}): ${error instanceof Error ? error.name + ' ' + error.message : String(error)}`;
+      console.error(`Attempt ${attempt + 1} failed:`, lastError);
+    }
+  }
+
+  return { ok: false, details: lastError };
+}
+
 // Réponse de l'Interactions API : le texte est dans steps[type=model_output].content[type=text]
 function extractText(interaction: any): string {
   return (interaction?.steps || [])
@@ -195,32 +237,23 @@ Deno.serve(async (req: Request) => {
       return errorResponse('not_configured', language, 500, 'GEMINI_API_KEY missing');
     }
 
-    const response = await fetch(GEMINI_API_URL, {
-      method: 'POST',
-      headers: {
-        'x-goog-api-key': GEMINI_API_KEY,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: GEMINI_MODEL,
-        // Ne pas conserver les photos des utilisateurs chez Google
-        store: false,
-        input: [
-          { type: 'text', text: buildPrompt(language, mode) },
-          { type: 'image', data: image_base64, mime_type: mime_type || 'image/jpeg' },
-        ],
-        response_format: { type: 'text', mime_type: 'application/json', schema: RESPONSE_SCHEMA },
-        generation_config: { temperature: 0.2 },
-      }),
+    const result = await callGemini({
+      // Ne pas conserver les photos des utilisateurs chez Google
+      store: false,
+      input: [
+        { type: 'text', text: buildPrompt(language, mode) },
+        { type: 'image', data: image_base64, mime_type: mime_type || 'image/jpeg' },
+      ],
+      response_format: { type: 'text', mime_type: 'application/json', schema: RESPONSE_SCHEMA },
+      // Reconnaître des aliments ne demande pas de réflexion : réponse plus rapide
+      generation_config: { temperature: 0.2, thinking_level: 'minimal' },
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`Gemini API error ${response.status}:`, errorText);
-      return errorResponse('ai_error', language, 502, `Gemini ${response.status}: ${errorText.slice(0, 300)}`);
+    if (!result.ok) {
+      return errorResponse('ai_error', language, 502, result.details);
     }
 
-    const interaction = await response.json();
+    const interaction = result.interaction;
     if (interaction.status !== 'completed') {
       console.error('Gemini interaction not completed:', interaction.status);
       return errorResponse('invalid_response', language, 502, `status ${interaction.status}`);
