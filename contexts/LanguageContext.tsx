@@ -252,7 +252,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         .from('user_preferences')
         .select('default_language')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle(); // pas encore de préférences pour un nouveau compte : ce n'est pas une erreur
 
       if (data?.default_language && data.default_language !== language) {
         setLanguageState(data.default_language as Language);
@@ -276,7 +276,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
             user_id: user.id,
             default_language: newLang,
             updated_at: new Date().toISOString(),
-          });
+          }, { onConflict: 'user_id' }); // une seule ligne par utilisateur (contrainte unique sur user_id)
         if (error) alertWriteError(t, 'saving language', error);
       }
     } catch (error) {
