@@ -1,6 +1,6 @@
 # Contexte du projet : app mobile anti-gaspi de recettes IA
 
-> Analyse rédigée le 2026-09-23, mise à jour à la fin de la phase 0. La feuille de route est dans `PLAN.md`.
+> Analyse rédigée le 2026-09-23, mise à jour à la fin de la phase 0.5. La feuille de route est dans `PLAN.md`.
 
 ## 1. Le produit
 
@@ -18,10 +18,10 @@ Langues : français (par défaut), anglais, espagnol.
 
 | Couche | Techno |
 |---|---|
-| App | Expo SDK 54, React Native 0.81, React 19, expo-router 6 (routes par fichiers), TypeScript |
+| App | Expo SDK 57, React Native 0.86, React 19.2, expo-router 57 (routes par fichiers), TypeScript 6 |
 | UI | StyleSheet natif, icônes `lucide-react-native`, couleur principale `#10b981` (vert) |
 | Backend | Supabase (projet `iqzjonmjlscuckdmiehk`) : Auth, Postgres avec RLS, Edge Functions (Deno) |
-| Vision | Clarifai, modèle `food-item-recognition` (fonction `analyze-image`) |
+| Vision | Clarifai (fonction `analyze-image`) — **hors service** : Clarifai a fermé le 17/07/2026, remplacement par Gemini en phase 0.6 |
 | Génération de recettes | Groq, modèle lu depuis le secret `GROQ_MODEL` (par défaut `openai/gpt-oss-120b`), sortie JSON (fonction `generate-recipes`) |
 | Images des recettes | **Désactivées** jusqu'à la phase 3 (Pollinations mettait sa clé dans l'URL) ; Cloudflare Workers AI prévu |
 
@@ -49,7 +49,7 @@ lib/supabase.ts          Client Supabase (SecureStore sur mobile, localStorage s
 supabase/
   migrations/            Schéma SQL (2 migrations)
   functions/
-    analyze-image/       Clarifai → liste d'ingrédients filtrée (confiance > 0.7, max 8)
+    analyze-image/       Clarifai (fermé) → liste d'ingrédients ; à réécrire avec Gemini (phase 0.6)
     generate-recipes/    Groq → N recettes (1 si ≤2 ingrédients, 2 si ≤5, sinon 3)
       matching.ts        Comparaison des noms d'ingrédients (+ matching.test.ts, tests Deno)
 ```
@@ -86,6 +86,13 @@ supabase/
 - `ingredients_from_list` / `missing_ingredients` recalculés côté serveur, comparaison mot par mot (pluriels, accents, majuscules).
 - `npm run typecheck` passe ; `PLAN.md` et ce document ajoutés, script `npm run export`.
 
+### Phase 0.5 — passage à Expo SDK 57 (branche `phase-0.5`, validée sur Android avec l'ajout manuel)
+- SDK 54 → 57 : React Native 0.86, React 19.2, expo-router 57, reanimated 4.5 + `react-native-worklets`, TypeScript 6 ; `newArchEnabled` retiré ; expo-doctor 21/21.
+- Retirés car jamais importés : `@react-navigation/*` (expo-router n'en dépend plus depuis le SDK 56), `@lucide/lab`, `@expo/vector-icons`.
+- Caméra : nouvelle API d'`expo-image-manipulator` ; cadre de visée superposé à `CameraView` ; les erreurs d'`analyze-image` sont affichées telles quelles (logs temporaires `[scan]`).
+- Connexion : la connexion réussie ne naviguait jamais (spinner sans fin) ; `AuthContext` remet toujours `loading` à false et nettoie un jeton de rafraîchissement invalide ; supabase-js 2.58 → 2.117.1.
+- Constat : **Clarifai est fermé** (domaine introuvable) ; le scan est repris en phase 0.6.
+
 ## 5. État actuel et problèmes connus
 
 ### Bugs (prévus en phase 1)
@@ -95,19 +102,19 @@ supabase/
 4. Écritures en base dont l'erreur n'est pas vérifiée ; données non rechargées au retour sur un onglet ; onglets accessibles sans session ; inscription et email non confirmé mal gérés.
 
 ### Sécurité (phase 2)
-- Les Edge Functions ne vérifient pas l'utilisateur (appel avec la clé anon) et acceptent toutes les origines (CORS `*`) : n'importe qui ayant la clé anon peut consommer les quotas Groq et Clarifai.
+- Les Edge Functions ne vérifient pas l'utilisateur (appel avec la clé anon) et acceptent toutes les origines (CORS `*`) : n'importe qui ayant la clé anon peut consommer le quota Groq.
 - Des URL d'images Pollinations contenant l'ancienne clé peuvent rester en base.
 
 ### Dette et finitions
 - Vérification des régimes par mots-clés : faux positifs (« lait de coco » refusé en vegan). Remplacement prévu en phase 3.
 - i18n partielle : caméra, ingrédients, favoris, génération, auth et titres des onglets ont des textes écrits en dur.
 - `generateFallbackRecipe` est du code mort ; recettes générées l'une après l'autre avec une pause de 500 ms.
-- Clarifai renvoie des noms en anglais, même en FR.
+- Scan hors service tant qu'`analyze-image` utilise Clarifai (fermé).
 - Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`).
 - Pas de README ; seuls tests : `matching.test.ts`.
 
 ## 6. Prochaine étape
-Phase 0.5 : passage à Expo SDK 57 (Expo Go du Play Store), puis phase 1. Détails dans `PLAN.md`.
+Phase 0.6 : scan avec Gemini (réécriture d'`analyze-image`), puis phase 1. Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash
