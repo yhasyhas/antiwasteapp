@@ -11,10 +11,10 @@ const GROQ_VISION_MODEL = Deno.env.get('GROQ_VISION_MODEL') || 'qwen/qwen3.8-27b
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 // Gemini est essayé une seule fois : ses modèles saturent tous en même temps, réessayer ne fait
-// que consommer le quota. En cas de surcharge, quota, délai dépassé ou modèle retiré → Groq.
+// que consommer le quota. N'importe quel échec (erreur HTTP, délai dépassé, JSON invalide, réponse
+// vide ou non conforme au schéma) fait passer directement à Groq.
 const GEMINI_TIMEOUT_MS = 20_000;
 const GROQ_TIMEOUT_MS = 30_000;
-const FALLBACK_STATUSES = new Set([404, 429, 500, 502, 503, 504]);
 
 // En dessous de ce niveau de confiance, l'ingrédient n'est pas proposé à l'utilisateur
 const MIN_CONFIDENCE = 0.5;
@@ -157,10 +157,10 @@ interface VisionRequest {
   mimeType: string;
 }
 
-// text : le JSON renvoyé par le modèle ; fallback : l'échec justifie de passer au fournisseur suivant
+// text : le JSON brut renvoyé par le modèle (lu et validé ensuite, identique pour tous les fournisseurs)
 type ProviderResult =
   | { ok: true; text: string }
-  | { ok: false; fallback: boolean; details: string };
+  | { ok: false; status?: number; details: string };
 
 interface VisionProvider {
   name: string;
@@ -195,17 +195,13 @@ async function callGemini({ prompt, imageBase64, mimeType }: VisionRequest): Pro
 
     if (!response.ok) {
       const errorText = await response.text();
-      return {
-        ok: false,
-        fallback: FALLBACK_STATUSES.has(response.status),
-        details: `Gemini ${response.status}: ${errorText.slice(0, 300)}`,
-      };
+      return { ok: false, status: response.status, details: `Gemini ${response.status}: ${errorText.slice(0, 300)}` };
     }
 
     // Interactions API : le texte est dans steps[type=model_output].content[type=text]
     const interaction = await response.json();
     if (interaction.status !== 'completed') {
-      return { ok: false, fallback: true, details: `Gemini status ${interaction.status}` };
+      return { ok: false, details: `Gemini status ${interaction.status}` };
     }
     const text = (interaction.steps || [])
       .filter((step: any) => step.type === 'model_output')
@@ -216,7 +212,7 @@ async function callGemini({ prompt, imageBase64, mimeType }: VisionRequest): Pro
     return { ok: true, text };
   } catch (error) {
     // Délai dépassé ou erreur réseau
-    return { ok: false, fallback: true, details: `Gemini: ${describeError(error)}` };
+    return { ok: false, details: `Gemini: ${describeError(error)}` };
   }
 }
 
@@ -238,7 +234,7 @@ async function callGroq({ prompt, imageBase64, mimeType }: VisionRequest): Promi
           type: 'json_schema',
           json_schema: { name: 'detected_ingredients', strict: true, schema: RESPONSE_SCHEMA },
         },
-        temperature: 0.2,
+        temperature: 0,
         // Mode sans réflexion : réponse plus rapide
         reasoning_effort: 'none',
         // L'offre gratuite de Groq limite ce modèle à 1 000 tokens de sortie par minute : une valeur plus
@@ -250,17 +246,17 @@ async function callGroq({ prompt, imageBase64, mimeType }: VisionRequest): Promi
 
     if (!response.ok) {
       const errorText = await response.text();
-      return { ok: false, fallback: false, details: `Groq ${response.status}: ${errorText.slice(0, 300)}` };
+      return { ok: false, status: response.status, details: `Groq ${response.status}: ${errorText.slice(0, 300)}` };
     }
 
     const data = await response.json();
     const text = data.choices?.[0]?.message?.content;
     if (typeof text !== 'string') {
-      return { ok: false, fallback: false, details: `Groq: réponse sans contenu (${data.choices?.[0]?.finish_reason})` };
+      return { ok: false, details: `Groq: réponse sans contenu (${data.choices?.[0]?.finish_reason})` };
     }
     return { ok: true, text };
   } catch (error) {
-    return { ok: false, fallback: false, details: `Groq: ${describeError(error)}` };
+    return { ok: false, details: `Groq: ${describeError(error)}` };
   }
 }
 
@@ -269,6 +265,24 @@ const PROVIDERS: VisionProvider[] = [
   { name: 'gemini', model: GEMINI_MODEL, configured: GEMINI_API_KEY !== '', call: callGemini },
   { name: 'groq', model: GROQ_VISION_MODEL, configured: GROQ_API_KEY !== '', call: callGroq },
 ];
+
+// Vérifie que la réponse respecte RESPONSE_SCHEMA. Renvoie la raison du refus, ou null si elle est conforme.
+// Une liste vide est valide (aucun aliment sur la photo).
+function schemaViolation(parsed: any): string | null {
+  if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.ingredients)) {
+    return 'champ "ingredients" absent ou pas un tableau';
+  }
+  for (const [index, item] of parsed.ingredients.entries()) {
+    if (!item || typeof item !== 'object') return `ingrédient ${index} : pas un objet`;
+    if (typeof item.name !== 'string' || item.name.trim() === '') return `ingrédient ${index} : "name" invalide`;
+    if (typeof item.quantity !== 'string') return `ingrédient ${index} : "quantity" invalide`;
+    if (!CATEGORIES.includes(item.category)) return `ingrédient ${index} : catégorie inconnue "${item.category}"`;
+    if (typeof item.confidence !== 'number' || item.confidence < 0 || item.confidence > 1) {
+      return `ingrédient ${index} : "confidence" invalide`;
+    }
+  }
+  return null;
+}
 
 function cleanIngredients(raw: unknown): DetectedIngredient[] {
   const list = Array.isArray(raw) ? raw : [];
@@ -329,34 +343,55 @@ Deno.serve(async (req: Request) => {
       mimeType: mime_type || 'image/jpeg',
     };
     let lastFailure = '';
+    let lastFailureCode = 'ai_error';
 
     for (const provider of providers) {
       const started = Date.now();
       const result = await provider.call(visionRequest);
       const elapsed = Date.now() - started;
+      const label = `[analyze-image] ${provider.name} (${provider.model})`;
+
+      // Tout échec d'un fournisseur (réseau, HTTP, JSON, schéma) fait passer au suivant
+      let failure: string | null = null;
+      let parsed: any;
 
       if (!result.ok) {
-        console.error(`[analyze-image] ${provider.name} (${provider.model}) échec en ${elapsed} ms : ${result.details}`);
-        lastFailure = result.details;
-        if (result.fallback) continue;
-        break;
+        failure = result.details;
+        lastFailureCode = 'ai_error';
+        if (result.status === 401 || result.status === 403) {
+          // Pas une panne passagère : la clé est à corriger. On bascule quand même pour ne pas bloquer l'utilisateur.
+          console.error(`${label} CLÉ ${provider.name.toUpperCase()} INVALIDE (HTTP ${result.status}) : vérifier le secret de sa clé API`);
+        }
+      } else if (result.text.trim() === '') {
+        failure = `${provider.name} : réponse vide`;
+        lastFailureCode = 'invalid_response';
+      } else {
+        try {
+          parsed = JSON.parse(result.text);
+        } catch {
+          failure = `${provider.name} : JSON invalide (${result.text.slice(0, 120)})`;
+          lastFailureCode = 'invalid_response';
+        }
+        const violation = failure ? null : schemaViolation(parsed);
+        if (violation) {
+          failure = `${provider.name} : réponse non conforme au schéma, ${violation}`;
+          lastFailureCode = 'invalid_response';
+        }
       }
 
-      let parsed: any;
-      try {
-        parsed = JSON.parse(result.text);
-      } catch {
-        console.error(`[analyze-image] ${provider.name} (${provider.model}) JSON illisible en ${elapsed} ms :`, result.text.slice(0, 500));
-        return errorResponse('invalid_response', language, 502);
+      if (failure) {
+        console.error(`${label} échec en ${elapsed} ms : ${failure}`);
+        lastFailure = failure;
+        continue;
       }
 
-      const ingredients = cleanIngredients(parsed?.ingredients);
-      console.log(`[analyze-image] ${provider.name} (${provider.model}) OK en ${elapsed} ms, ${ingredients.length} ingrédient(s), mode ${mode}, langue ${language}`);
+      const ingredients = cleanIngredients(parsed.ingredients);
+      console.log(`${label} OK en ${elapsed} ms, ${ingredients.length} ingrédient(s), mode ${mode}, langue ${language}`);
       // fallback_reason : pourquoi le fournisseur précédent a échoué (utile dans les logs [scan] de l'app)
       return jsonResponse({ ingredients, provider: provider.name, ...(lastFailure && { fallback_reason: lastFailure }) }, 200);
     }
 
-    return errorResponse('ai_error', language, 502, lastFailure);
+    return errorResponse(lastFailureCode, language, 502, lastFailure);
   } catch (error) {
     console.error('Error analyzing image:', error);
     return errorResponse('ai_error', language, 500, error instanceof Error ? error.message : String(error));
