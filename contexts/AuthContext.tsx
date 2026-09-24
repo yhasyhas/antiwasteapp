@@ -1,6 +1,15 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Session, User } from '@supabase/supabase-js';
+import { AuthError, Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+
+// Jeton de rafraîchissement absent, expiré ou déjà utilisé : la session enregistrée est inutilisable
+function isInvalidRefreshToken(error: AuthError) {
+  return (
+    error.code === 'refresh_token_not_found' ||
+    error.code === 'refresh_token_already_used' ||
+    /refresh token/i.test(error.message)
+  );
+}
 
 interface AuthContextType {
   user: User | null;
@@ -19,45 +28,78 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    const loadSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+
+        if (error) {
+          console.error('Error loading session:', error);
+          if (isInvalidRefreshToken(error)) {
+            // Nettoie la session enregistrée sur cet appareil ; user reste null → écran de connexion
+            await supabase.auth.signOut({ scope: 'local' });
+          }
+          setSession(null);
+          setUser(null);
+          return;
+        }
+
+        setSession(data.session);
+        setUser(data.session?.user ?? null);
+      } catch (e) {
+        console.error('Error loading session:', e);
+        setSession(null);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSession();
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      (async () => {
-        setSession(session);
-        setUser(session?.user ?? null);
+      setSession(session);
+      setUser(session?.user ?? null);
 
-        if (session?.user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .maybeSingle();
-
-          if (!profile) {
-            await supabase.from('profiles').insert({
-              id: session.user.id,
-              email: session.user.email!,
-            });
-          }
-        }
-      })();
+      if (session?.user) {
+        // Appel Supabase différé : en faire un dans ce callback peut bloquer supabase-js
+        const { id, email } = session.user;
+        setTimeout(() => ensureProfile(id, email), 0);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
+  const ensureProfile = async (id: string, email: string | undefined) => {
+    try {
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', id)
+        .maybeSingle();
+      if (error) throw error;
+
+      if (!profile) {
+        const { error: insertError } = await supabase.from('profiles').insert({ id, email: email! });
+        if (insertError) throw insertError;
+      }
+    } catch (e) {
+      console.error('Error creating profile:', e);
+    }
+  };
+
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error };
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      return { error };
+    } catch (e) {
+      return { error: e };
+    }
   };
 
   const signUp = async (email: string, password: string) => {

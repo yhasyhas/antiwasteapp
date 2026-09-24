@@ -23,7 +23,7 @@ Dernière mise à jour : 23/09/2026
 
 | Rôle | Aujourd'hui | Cible |
 |---|---|---|
-| App | Expo SDK 54, expo-router 6 | SDK 57 dès la phase 0.5 (tests sur Android), build EAS en phase 7 |
+| App | Expo SDK 57, expo-router 57, RN 0.86 | SDK 57 dès la phase 0.5 (tests sur Android), build EAS en phase 7 |
 | Backend | Supabase (clés `anon`, legacy) | Supabase (clés `sb_publishable_` / `sb_secret_`) |
 | Vision | Clarifai `food-item-recognition` | Gemini Flash-Lite (sortie structurée), si le test de la phase 3 le confirme |
 | Recettes | Groq `llama-3.3-70b-versatile` (**retiré le 16/08/2026**) | Gemini (principal) + Groq `openai/gpt-oss-120b` (secours) |
@@ -47,14 +47,18 @@ Dernière mise à jour : 23/09/2026
 
 ## Phase 0.5 — Passage à Expo SDK 57
 
-- [ ] Lire les changements incompatibles des SDK 55, 56 et 57 (notes de version Expo) et lister ceux qui touchent l'app
-- [ ] Mettre à jour Expo vers le SDK 57, puis aligner les dépendances avec `npx expo install --fix`
-- [ ] `npx expo-doctor` passe sans erreur
-- [ ] Corriger ce qui casse (expo-router, expo-camera, expo-image-manipulator, reanimated…) ; `npm run typecheck` passe
-- [ ] Tester sur Android avec Expo Go du Play Store (SDK 57) : connexion, scan, garde-manger, génération, favoris, paramètres
+- [x] Lire les changements incompatibles des SDK 55, 56 et 57 (notes de version Expo) et lister ceux qui touchent l'app
+  - SDK 55 : RN 0.83, ancienne architecture supprimée (`newArchEnabled` retiré d'`app.json`), bord à bord obligatoire sur Android 16+, Node ≥ 20.19.4 / 22.13 / 24.3
+  - SDK 56 : RN 0.85, **expo-router ne dépend plus de react-navigation**, `expo/fetch` remplace `fetch`, `@expo/vector-icons` déprécié, TypeScript 6.0.3 ; pas d'Expo Go SDK 56 sur les stores
+  - SDK 57 : RN 0.86 sans rupture annoncée ; reanimated 4.5 / worklets 0.10 (corrige la régression mémoire Hermes du SDK 56)
+  - Dans l'app : aucun import direct de `@react-navigation/*`, `@lucide/lab` ou `@expo/vector-icons` (retirés) ; `manipulateAsync` déprécié (remplacé)
+- [x] Mettre à jour Expo vers le SDK 57, puis aligner les dépendances avec `npx expo install --fix`
+- [x] `npx expo-doctor` passe sans erreur (21/21)
+- [x] Corriger ce qui casse (expo-router, expo-camera, expo-image-manipulator, reanimated…) ; `npm run typecheck` passe ; le bundle Android se construit (`npx expo export --platform android`)
+- [x] Tester sur Android avec Expo Go du Play Store (SDK 57) : connexion, scan, garde-manger, génération, favoris, paramètres — validé le 24/09/2026 avec l'ajout manuel : l'app envoie bien la photo, seul Clarifai (fermé) bloque le scan, repris en phase 0.6
 - [ ] Désinstaller l'Expo Go SDK 54 installé temporairement
 
-**Terminé quand** : l'app tourne dans Expo Go SDK 57 sur Android, un scan et une génération fonctionnent, et `npx expo-doctor` et `npm run typecheck` passent.
+**Terminé quand** : l'app tourne dans Expo Go SDK 57 sur Android, un scan et une génération fonctionnent, et `npx expo-doctor` et `npm run typecheck` passent. *(Validée le 24/09/2026 avec l'ajout manuel à la place du scan, voir journal.)*
 
 ## Phase 1 — Bugs et données
 
@@ -159,4 +163,12 @@ Dernière mise à jour : 23/09/2026
 | 23/09/2026 | Ne pas remettre de clé Pollinations ; images désactivées volontairement jusqu'à la phase 3 | Le code actuel met la clé dans l'URL des images : toute nouvelle clé fuiterait aussi. Remplacement par Cloudflare en phase 3 |
 | 23/09/2026 | Passage à Expo SDK 57 avancé en phase 0.5 (remplace la décision de rester en SDK 54 jusqu'à la phase 7) | Expo Go du Play Store est en SDK 57 et les tests se font sur Android (Expo Go SDK 54 installé temporairement) |
 | 23/09/2026 | Confirmation d'email désactivée dans Supabase pendant le développement | Simplifie les tests ; à réactiver en phase 7 |
+| 23/09/2026 | Retrait de `@react-navigation/*`, `@lucide/lab` et `@expo/vector-icons` | Jamais importés ; expo-router ne dépend plus de react-navigation depuis le SDK 56 ; `@expo/vector-icons` déprécié. Icônes : `lucide-react-native` seul (compatible avec `react-native-svg` 15.15) |
+| 23/09/2026 | `react-native-worklets` installé directement | Dépendance native requise par reanimated 4 (signalé par expo-doctor) |
+| 23/09/2026 | Caméra : `ImageManipulator.manipulate()` au lieu de `manipulateAsync` | `manipulateAsync` est déprécié |
+| 24/09/2026 | Connexion : `login.tsx` navigue vers les onglets après succès | Le spinner tournait sans fin : la redirection reposait sur l'écran `index`, qui n'est plus monté (bug présent depuis bolt.new, masqué par la session enregistrée) |
+| 24/09/2026 | supabase-js 2.58 → 2.117.1 ; aucun appel Supabase directement dans `onAuthStateChange` | Avant 2.110.1, un appel d'authentification depuis ce callback peut bloquer supabase-js |
+| 24/09/2026 | Logs `[auth]` temporaires dans `AuthContext` | Diagnostic de la connexion sur Android ; retirés à la fin de la phase 0.5 |
+| 24/09/2026 | **Constat : Clarifai est hors service** — le scan ne peut pas fonctionner tant que `analyze-image` l'utilise | `api.clarifai.com` et `docs.clarifai.com` ne se résolvent plus (DNS), depuis Supabase comme en local ; des sources tierces signalent la fermeture de Clarifai (été 2026) et le rachat de son équipe par Nebius. Le test comparatif Gemini / Clarifai de la phase 3 n'est plus possible. **Décision (24/09/2026)** : phase 0.5 validée avec l'ajout manuel ; le scan est repris en phase 0.6 avec Gemini |
+| 24/09/2026 | Logs `[scan]` temporaires dans `camera.tsx` ; erreurs d'`analyze-image` affichées telles quelles | « No ingredients detected » masquait l'erreur du serveur |
 | | *(résultat du test Gemini vs Clarifai)* | |

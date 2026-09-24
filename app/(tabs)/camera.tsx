@@ -18,6 +18,9 @@ import { supabase } from '@/lib/supabase';
 import { Camera, FlipHorizontal, X, Check, Plus } from 'lucide-react-native';
 import { router } from 'expo-router';
 
+// TEMPORAIRE (phase 0.5) : logs pour diagnostiquer le scan. À retirer une fois le problème réglé.
+const log = (...args: unknown[]) => console.log('[scan]', ...args);
+
 export default function CameraScreen() {
   const { user } = useAuth();
   const [permission, requestPermission] = useCameraPermissions();
@@ -91,19 +94,24 @@ export default function CameraScreen() {
 
     try {
       // 1. Compresser et convertir en base64 avec expo-image-manipulator
-      const manipulatedImage = await ImageManipulator.manipulateAsync(
-        imageUri,
-        [{ resize: { width: 800 } }], // Redimensionne pour réduire la taille
-        {
-          compress: 0.7,
-          format: ImageManipulator.SaveFormat.JPEG,
-          base64: true // ← Important : retourne le base64
-        }
-      );
+      const context = ImageManipulator.ImageManipulator.manipulate(imageUri);
+      context.resize({ width: 800 }); // Redimensionne pour réduire la taille
+      const rendered = await context.renderAsync();
+      const manipulatedImage = await rendered.saveAsync({
+        compress: 0.7,
+        format: ImageManipulator.SaveFormat.JPEG,
+        base64: true // ← Important : retourne le base64
+      });
 
       if (!manipulatedImage.base64) {
         throw new Error('Failed to convert image to base64');
       }
+
+      const base64 = manipulatedImage.base64;
+      log(
+        `base64 : ${Math.round(base64.length / 1024)} Ko (${base64.length} caractères),`,
+        base64.startsWith('data:') ? `PRÉFIXE PRÉSENT : ${base64.slice(0, 30)}` : `sans préfixe, commence par ${base64.slice(0, 12)}`
+      );
 
       // 2. Appeler l'Edge Function
       const apiUrl = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/analyze-image`;
@@ -114,11 +122,27 @@ export default function CameraScreen() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          image_base64: manipulatedImage.base64,
+          image_base64: base64,
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
+      log(`réponse HTTP ${response.status}`, {
+        error: data?.error,
+        details: data?.details,
+        ingredients: data?.ingredients,
+        raw_concepts: data?.raw_concepts,
+      });
+
+      // Une erreur du serveur n'est pas un « aucun ingrédient détecté » : on affiche le vrai message
+      if (!response.ok || !data || data.error) {
+        const message = [data?.error, data?.details].filter(Boolean).join('\n') || `HTTP ${response.status}`;
+        Alert.alert('Analysis failed', message, [
+          { text: 'Add Manually', onPress: () => setShowManualAdd(true) },
+          { text: 'OK', style: 'cancel' },
+        ]);
+        return;
+      }
 
       if (data.ingredients && data.ingredients.length > 0) {
         setDetectedIngredients(data.ingredients.map((name: string) => ({
@@ -138,8 +162,8 @@ export default function CameraScreen() {
         );
       }
     } catch (error) {
-      console.error('Error analyzing image:', error);
-      Alert.alert('Error', 'Failed to analyze image. Please try again or add manually.');
+      log('exception', error);
+      Alert.alert('Error', `Failed to analyze image: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setAnalyzing(false);
       setCapturedImage(null);
@@ -228,11 +252,11 @@ export default function CameraScreen() {
       </View>
 
       <View style={styles.cameraContainer}>
-        <CameraView style={styles.camera} facing={facing} ref={cameraRef}>
-          <View style={styles.cameraOverlay}>
-            <View style={styles.scanFrame} />
-          </View>
-        </CameraView>
+        <CameraView style={styles.camera} facing={facing} ref={cameraRef} />
+        {/* CameraView n'accepte pas d'enfants : le cadre est superposé en position absolue */}
+        <View style={styles.cameraOverlay} pointerEvents="none">
+          <View style={styles.scanFrame} />
+        </View>
 
         {analyzing && (
           <View style={styles.analyzingOverlay}>
@@ -518,7 +542,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cameraOverlay: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
