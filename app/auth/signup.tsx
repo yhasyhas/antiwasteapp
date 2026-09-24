@@ -12,16 +12,19 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
-import { ChefHat } from 'lucide-react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { ChefHat, Mail } from 'lucide-react-native';
 
 export default function SignUpScreen() {
   const { signUp } = useAuth();
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
 
   const handleSignUp = async () => {
     if (!email || !password || !confirmPassword) {
@@ -42,19 +45,44 @@ export default function SignUpScreen() {
     setLoading(true);
     setError('');
 
-    const { error: signUpError } = await signUp(email, password);
+    const { error: signUpError, needsEmailConfirmation } = await signUp(email, password);
+    setLoading(false);
 
     if (signUpError) {
       setError(signUpError.message);
-      setLoading(false);
-    } else {
-      setSuccess(true);
-      setLoading(false);
-      setTimeout(() => {
-        router.replace('/(tabs)');
-      }, 1000);
+      return;
     }
+
+    if (needsEmailConfirmation) {
+      // Pas de session tant que l'email n'est pas confirmé : les onglets seraient inutilisables
+      setAwaitingConfirmation(true);
+      return;
+    }
+
+    setSuccess(true);
+    setTimeout(() => {
+      router.replace('/(tabs)');
+    }, 1000);
   };
+
+  if (awaitingConfirmation) {
+    return (
+      <View style={[styles.container, styles.scrollContent]}>
+        <View style={styles.header}>
+          <View style={styles.iconContainer}>
+            <Mail size={48} color="#10b981" strokeWidth={2} />
+          </View>
+          <Text style={styles.title}>{t('checkYourEmail')}</Text>
+          <Text style={[styles.subtitle, styles.confirmationText]}>
+            {t('checkYourEmailText').replace('{email}', email)}
+          </Text>
+        </View>
+        <TouchableOpacity style={styles.button} onPress={() => router.replace('/auth/login')}>
+          <Text style={styles.buttonText}>{t('backToLogin')}</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -177,6 +205,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#6b7280',
     textAlign: 'center',
+  },
+  confirmationText: {
+    marginTop: 12,
+    lineHeight: 24,
   },
   form: {
     width: '100%',

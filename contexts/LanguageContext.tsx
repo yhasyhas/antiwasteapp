@@ -69,6 +69,9 @@ const translations: Record<Language, Record<string, string>> = {
     saveIngredients: 'Sauvegarder les ingrédients',
     analyzingPhoto: 'Analyse de ta photo…',
     analyzingHint: 'Cela peut prendre quelques secondes',
+    checkYourEmail: 'Vérifie ta boîte mail',
+    checkYourEmailText: 'Nous avons envoyé un lien de confirmation à {email}. Ouvre-le pour activer ton compte, puis connecte-toi.',
+    backToLogin: 'Retour à la connexion',
   },
   en: {
     welcome: 'Welcome',
@@ -126,6 +129,9 @@ const translations: Record<Language, Record<string, string>> = {
     saveIngredients: 'Save Ingredients',
     analyzingPhoto: 'Analyzing your photo…',
     analyzingHint: 'This can take a few seconds',
+    checkYourEmail: 'Check your inbox',
+    checkYourEmailText: 'We sent a confirmation link to {email}. Open it to activate your account, then sign in.',
+    backToLogin: 'Back to sign in',
   },
   es: {
     welcome: 'Bienvenido',
@@ -183,6 +189,9 @@ const translations: Record<Language, Record<string, string>> = {
     saveIngredients: 'Guardar ingredientes',
     analyzingPhoto: 'Analizando tu foto…',
     analyzingHint: 'Puede tardar unos segundos',
+    checkYourEmail: 'Revisa tu correo',
+    checkYourEmailText: 'Enviamos un enlace de confirmación a {email}. Ábrelo para activar tu cuenta y luego inicia sesión.',
+    backToLogin: 'Volver al inicio de sesión',
   },
 };
 
