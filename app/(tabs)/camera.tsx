@@ -227,11 +227,11 @@ export default function CameraScreen() {
       </View>
 
       <View style={styles.cameraContainer}>
-        <CameraView style={styles.camera} facing={facing} ref={cameraRef}>
-          <View style={styles.cameraOverlay}>
-            <View style={styles.scanFrame} />
-          </View>
-        </CameraView>
+        <CameraView style={styles.camera} facing={facing} ref={cameraRef} />
+        {/* CameraView n'accepte pas d'enfants : le cadre est superposé en position absolue */}
+        <View style={styles.cameraOverlay} pointerEvents="none">
+          <View style={styles.scanFrame} />
+        </View>
 
         {analyzing && (
           <View style={styles.analyzingOverlay}>
@@ -517,7 +517,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cameraOverlay: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
   },
