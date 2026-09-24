@@ -12,10 +12,12 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { ChefHat } from 'lucide-react-native';
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -34,7 +36,8 @@ export default function LoginScreen() {
     setLoading(false);
 
     if (signInError) {
-      setError(signInError.message);
+      // Compte créé mais lien de confirmation pas encore ouvert : message explicite plutôt que l'erreur brute
+      setError(signInError.code === 'email_not_confirmed' ? t('emailNotConfirmed') : signInError.message);
       return;
     }
 

@@ -72,6 +72,7 @@ const translations: Record<Language, Record<string, string>> = {
     checkYourEmail: 'Vérifie ta boîte mail',
     checkYourEmailText: 'Nous avons envoyé un lien de confirmation à {email}. Ouvre-le pour activer ton compte, puis connecte-toi.',
     backToLogin: 'Retour à la connexion',
+    emailNotConfirmed: "Ton adresse email n'est pas encore confirmée. Ouvre le lien reçu par email lors de l'inscription, puis réessaie.",
   },
   en: {
     welcome: 'Welcome',
@@ -132,6 +133,7 @@ const translations: Record<Language, Record<string, string>> = {
     checkYourEmail: 'Check your inbox',
     checkYourEmailText: 'We sent a confirmation link to {email}. Open it to activate your account, then sign in.',
     backToLogin: 'Back to sign in',
+    emailNotConfirmed: 'Your email address is not confirmed yet. Open the link we emailed you when you signed up, then try again.',
   },
   es: {
     welcome: 'Bienvenido',
@@ -192,6 +194,7 @@ const translations: Record<Language, Record<string, string>> = {
     checkYourEmail: 'Revisa tu correo',
     checkYourEmailText: 'Enviamos un enlace de confirmación a {email}. Ábrelo para activar tu cuenta y luego inicia sesión.',
     backToLogin: 'Volver al inicio de sesión',
+    emailNotConfirmed: 'Tu correo aún no está confirmado. Abre el enlace que te enviamos al registrarte y vuelve a intentarlo.',
   },
 };
 
