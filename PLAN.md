@@ -25,7 +25,7 @@ Dernière mise à jour : 23/09/2026
 |---|---|---|
 | App | Expo SDK 57, expo-router 57, RN 0.86 | SDK 57 dès la phase 0.5 (tests sur Android), build EAS en phase 7 |
 | Backend | Supabase (clés `anon`, legacy) | Supabase (clés `sb_publishable_` / `sb_secret_`) |
-| Vision | Clarifai `food-item-recognition` (**fermé le 17/07/2026**) | Gemini Flash-Lite (`GEMINI_MODEL`, sortie structurée), dès la phase 0.6 |
+| Vision | Gemini Flash-Lite (`GEMINI_MODEL`) + secours Groq `qwen/qwen3.8-27b` (`GROQ_VISION_MODEL`), sortie structurée (phase 0.6) ; Clarifai fermé le 17/07/2026 | Idem, avec un temps d'analyse < 5 s pour 90 % des scans (phase 3) |
 | Recettes | Groq `llama-3.3-70b-versatile` (**retiré le 16/08/2026**) | Gemini (principal) + Groq `openai/gpt-oss-120b` (secours) |
 | Images | Pollinations, clé dans l'URL | Cloudflare Workers AI (FLUX), à la demande, stockées dans Supabase Storage |
 | Traductions | i18n maison | i18next + expo-localization |
@@ -73,8 +73,9 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 - [x] App : message d'attente « Analyse de ta photo… » pendant l'analyse
 - [x] Déployer, régler `GROQ_VISION_MODEL`, supprimer le secret `GEMINI_FALLBACK_MODEL`, puis tester Groq seul (échec de Gemini forcé) sur 3-4 photos et comparer avec Gemini (voir journal)
 - [x] Tester avec curl et une vraie photo d'aliments — 401 sans utilisateur ; avec un utilisateur de test (supprimé ensuite) : noms en français (« banane », « pastèque », « fraise »…) et en espagnol sur demande, quantités et catégories cohérentes
+- [x] Groq : un nouvel essai, logué, en cas de `json_validate_failed` (constaté pendant le test depuis l'app)
 
-**Terminé quand** : un scan depuis l'app affiche des ingrédients en français dans le modal de confirmation.
+**Terminé quand** : un scan depuis l'app affiche des ingrédients en français dans le modal de confirmation. *(Validée depuis l'app le 24/09/2026.)*
 
 ## Phase 1 — Bugs et données
 
@@ -113,6 +114,15 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 - [ ] Nouvelle fonction `generate-recipe-image` : Cloudflare Workers AI (FLUX), appelée **seulement** à l'ouverture ou à la sauvegarde d'une recette
 - [ ] Bucket Supabase Storage `recipe-images` ; enregistrer uniquement l'URL Storage dans `recipes.image_url`
 - [ ] Retirer Pollinations : code, secrets, dépendances (Clarifai : retiré en phase 0.6)
+
+### Point d'attention — Temps d'analyse des photos
+
+Objectif : **moins de 5 s pour 90 % des scans**. Mesuré le 24/09/2026 : Gemini 15,7 s pour un seul ingrédient, Groq 1 à 6 s.
+
+- [ ] Régler la réflexion (thinking) de Gemini au minimum pour la vision — `thinking_level: 'minimal'` est déjà envoyé depuis la phase 0.6 : vérifier qu'il est bien pris en compte par le modèle
+- [ ] Lancer Groq en parallèle si Gemini n'a pas répondu après 5 s, et garder la première réponse valide
+- [ ] Tester des photos de 640 px au lieu de 800 px (temps, qualité de la reconnaissance)
+- [ ] Afficher la photo prise pendant l'analyse
 
 **Terminé quand** : un scan en français renvoie des noms en français, aucune clé n'apparaît dans les réponses envoyées à l'app, et couper le fournisseur principal fait basculer automatiquement sur le secours.
 
@@ -194,4 +204,6 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 | 24/09/2026 | Limites de l'offre gratuite de Groq pour `qwen/qwen3.8-27b` : 7 000 tokens d'entrée et 1 000 tokens de sortie par minute ; une photo ≈ 2 270 tokens d'entrée | ≈ 3 scans par minute **pour toute l'app** quand Gemini est saturé ; `max_completion_tokens` réduit à 800 ; modèle en preview. À revoir avant la bêta (offres payantes, phase 7) |
 | 24/09/2026 | Codes de catégorie décrits en français dans le prompt | Groq rangeait les légumes dans `legume` (légumineuses) et les œufs dans `dairy` ; corrigé et vérifié |
 | 24/09/2026 | Tout échec de Gemini (HTTP, délai, JSON invalide, réponse vide ou hors schéma) bascule sur Groq ; 401/403 logués « clé invalide » mais basculent aussi ; Groq à température 0 | L'utilisateur ne doit jamais être bloqué par un problème d'un seul fournisseur ; la raison reste visible dans `fallback_reason` et les logs |
+| 24/09/2026 | Ingrédients mal formés écartés un par un ; la réponse n'est un échec que si aucun ingrédient proposé n'est valide | Un seul ingrédient invalide ne doit pas faire perdre tout le scan |
+| 24/09/2026 | **Phase 0.6 validée depuis l'app**, avec deux constats : Gemini 15,7 s pour un seul ingrédient ; après un 503 de Gemini, Groq a échoué en 472 ms avec `json_validate_failed` (`failed_generation` : « { conto ») | Nouvel essai unique de Groq sur `json_validate_failed` (rapide, presque gratuit) ; temps d'analyse repris en phase 3 (point d'attention) |
 | | *(résultat du test Gemini vs Clarifai)* | |
