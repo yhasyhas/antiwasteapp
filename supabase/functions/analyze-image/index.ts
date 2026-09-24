@@ -50,10 +50,14 @@ const RESPONSE_SCHEMA = {
   required: ['ingredients'],
 };
 
+// photo : frigo, placard, plan de travail ; receipt : ticket de caisse
+type AnalyzeMode = 'photo' | 'receipt';
+
 interface AnalyzeImageRequest {
   image_base64: string;
   mime_type?: string;
   language?: string;
+  mode?: AnalyzeMode;
 }
 
 interface DetectedIngredient {
@@ -102,8 +106,22 @@ function errorResponse(code: string, language: string, status: number, details?:
   return jsonResponse({ error: code, message: messages[code] || code, ...(details && { details }) }, status);
 }
 
-function buildPrompt(language: string): string {
+function buildPrompt(language: string, mode: AnalyzeMode): string {
   const languageName = LANGUAGE_NAMES[language] || LANGUAGE_NAMES['en'];
+
+  if (mode === 'receipt') {
+    return `Tu analyses la photo d'un ticket de caisse prise par un utilisateur d'une application anti-gaspi.
+
+Liste uniquement les produits alimentaires achetés.
+- "name" : nom courant et générique en ${languageName}, en décodant les libellés abrégés (ex. "TOM GRAPPE 1KG" → "tomate", "LAIT DEMI-ECR" → "lait"), sans marque.
+- "quantity" : quantité d'après le ticket, avec son unité (ex. "1 kg", "6", "1 l") ; chaîne vide si elle n'est pas indiquée.
+- "category" : une des catégories autorisées.
+- "confidence" : entre 0 et 1, selon la lisibilité de la ligne et ta certitude sur le produit.
+- Un même produit n'apparaît qu'une fois : additionne les quantités.
+- Ignore les produits non alimentaires (hygiène, entretien…), les totaux, remises, moyens de paiement et TVA.
+- Si l'image n'est pas un ticket lisible, renvoie une liste vide.`;
+  }
+
   return `Tu analyses une photo prise par un utilisateur d'une application anti-gaspi (frigo, placard, plan de travail, courses).
 
 Liste les aliments et ingrédients de cuisine visibles.
@@ -157,8 +175,9 @@ Deno.serve(async (req: Request) => {
   let language = 'fr';
 
   try {
-    const { image_base64, mime_type, language: requestedLanguage }: AnalyzeImageRequest = await req.json();
+    const { image_base64, mime_type, language: requestedLanguage, mode: requestedMode }: AnalyzeImageRequest = await req.json();
     language = (requestedLanguage || 'fr').substring(0, 2).toLowerCase();
+    const mode: AnalyzeMode = requestedMode === 'receipt' ? 'receipt' : 'photo';
 
     // Chaque analyse consomme le quota Gemini : réservé aux utilisateurs connectés
     const user = await getAuthenticatedUser(req);
@@ -187,7 +206,7 @@ Deno.serve(async (req: Request) => {
         // Ne pas conserver les photos des utilisateurs chez Google
         store: false,
         input: [
-          { type: 'text', text: buildPrompt(language) },
+          { type: 'text', text: buildPrompt(language, mode) },
           { type: 'image', data: image_base64, mime_type: mime_type || 'image/jpeg' },
         ],
         response_format: { type: 'text', mime_type: 'application/json', schema: RESPONSE_SCHEMA },
