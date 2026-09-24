@@ -151,6 +151,7 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 
 - [ ] Créer un build de développement EAS
 - [ ] Réactiver la confirmation d'email dans Supabase (Authentication → Sign In / Providers → Email)
+- [ ] Revoir les limites de Groq (~3 scans/min en secours, modèle en preview) et de Gemini avant la bêta : offre payante ou autre modèle
 - [ ] Icône, écran de démarrage, nom définitif
 - [ ] Passer Gemini en offre payante (les données de l'offre gratuite servent à améliorer les produits Google)
 - [ ] Rédiger la politique de confidentialité (photos, données du garde-manger)
@@ -192,4 +193,5 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 | 24/09/2026 | **Comparaison Groq / Gemini** (photos de 800 px ; Groq testé seul en forçant l'échec de Gemini) | **Fruits variés** : Gemini 3.1 → 10 fruits en ~7 s (raisin « 1 grappe ») ; Groq → 10-11 fruits en 2-6 s, noms identiques, mais raisin compté « 10 » et confiance toujours à 1 (moins nuancée). **Banane seule** : résultat identique (« banane », 1), Groq en ~1 s. **Bac à légumes** (Groq seul, Gemini en 503) : courgette, aubergine, brocoli, tomate — stable d'un essai à l'autre. **Frigo encombré** (Groq seul) : œuf, jus, eau, lait, yaourt, fromage, pain… mais la liste change d'un essai à l'autre. Bilan : Groq est un bon secours, plus rapide, un peu moins précis sur les scènes chargées |
 | 24/09/2026 | Limites de l'offre gratuite de Groq pour `qwen/qwen3.8-27b` : 7 000 tokens d'entrée et 1 000 tokens de sortie par minute ; une photo ≈ 2 270 tokens d'entrée | ≈ 3 scans par minute **pour toute l'app** quand Gemini est saturé ; `max_completion_tokens` réduit à 800 ; modèle en preview. À revoir avant la bêta (offres payantes, phase 7) |
 | 24/09/2026 | Codes de catégorie décrits en français dans le prompt | Groq rangeait les légumes dans `legume` (légumineuses) et les œufs dans `dairy` ; corrigé et vérifié |
+| 24/09/2026 | Tout échec de Gemini (HTTP, délai, JSON invalide, réponse vide ou hors schéma) bascule sur Groq ; 401/403 logués « clé invalide » mais basculent aussi ; Groq à température 0 | L'utilisateur ne doit jamais être bloqué par un problème d'un seul fournisseur ; la raison reste visible dans `fallback_reason` et les logs |
 | | *(résultat du test Gemini vs Clarifai)* | |
