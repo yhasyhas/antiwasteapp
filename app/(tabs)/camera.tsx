@@ -32,7 +32,7 @@ interface ScannedIngredient {
 
 export default function CameraScreen() {
   const { user } = useAuth();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<CameraType>('back');
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
@@ -147,7 +147,7 @@ export default function CameraScreen() {
       });
 
       const data = await response.json().catch(() => null);
-      log(`réponse HTTP ${response.status} (langue ${language})`, {
+      log(`réponse HTTP ${response.status} (langue ${language}, fournisseur ${data?.provider ?? '-'})`, {
         error: data?.error,
         message: data?.message,
         details: data?.details,
@@ -281,7 +281,8 @@ export default function CameraScreen() {
         {analyzing && (
           <View style={styles.analyzingOverlay}>
             <ActivityIndicator size="large" color="#fff" />
-            <Text style={styles.analyzingText}>Analyzing ingredients...</Text>
+            <Text style={styles.analyzingText}>{t('analyzingPhoto')}</Text>
+            <Text style={styles.analyzingHint}>{t('analyzingHint')}</Text>
           </View>
         )}
       </View>
@@ -596,6 +597,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginTop: 16,
+  },
+  analyzingHint: {
+    color: '#d1d5db',
+    fontSize: 14,
+    marginTop: 6,
   },
   controls: {
     backgroundColor: '#fff',
