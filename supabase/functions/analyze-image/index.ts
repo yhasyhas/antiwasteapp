@@ -1,23 +1,25 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { getAuthenticatedUser } from '../_shared/auth.ts';
 
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || '';
 // Modèles configurables par secret : les fournisseurs retirent régulièrement des modèles
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || '';
 const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-3.1-flash-lite';
-const GEMINI_FALLBACK_MODEL = Deno.env.get('GEMINI_FALLBACK_MODEL') || 'gemini-3.5-flash-lite';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/interactions';
 
-// Les modèles Flash-Lite renvoient souvent 503 (« high demand ») : on réessaie en alternant
-// modèle principal et modèle de secours, avec un délai maximal par appel
-const ATTEMPT_MODELS = [GEMINI_MODEL, GEMINI_FALLBACK_MODEL, GEMINI_MODEL];
-const RETRY_DELAYS_MS = [0, 1000, 2000];
-const ATTEMPT_TIMEOUT_MS = 30_000;
-const RETRYABLE_STATUSES = new Set([429, 500, 503, 504]);
+const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') || '';
+const GROQ_VISION_MODEL = Deno.env.get('GROQ_VISION_MODEL') || 'qwen/qwen3.8-27b';
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+
+// Gemini est essayé une seule fois : ses modèles saturent tous en même temps, réessayer ne fait
+// que consommer le quota. En cas de surcharge, quota, délai dépassé ou modèle retiré → Groq.
+const GEMINI_TIMEOUT_MS = 20_000;
+const GROQ_TIMEOUT_MS = 30_000;
+const FALLBACK_STATUSES = new Set([404, 429, 500, 502, 503, 504]);
 
 // En dessous de ce niveau de confiance, l'ingrédient n'est pas proposé à l'utilisateur
 const MIN_CONFIDENCE = 0.5;
 const MAX_INGREDIENTS = 20;
-// Gemini limite la requête entière à 20 Mo ; l'app envoie des photos d'environ 100-300 Ko
+// Gemini et Groq limitent la requête à 20 Mo ; l'app envoie des photos d'environ 100-300 Ko
 const MAX_IMAGE_BASE64_LENGTH = 15 * 1024 * 1024;
 
 const corsHeaders = {
@@ -37,7 +39,8 @@ const CATEGORIES = [
   'bakery', 'condiment', 'spice', 'beverage', 'snack', 'frozen', 'other',
 ];
 
-// Sortie structurée : Gemini doit renvoyer exactement ce schéma
+// Sortie structurée, identique pour Gemini et Groq (additionalProperties: false est exigé par le
+// mode strict de Groq). La réponse est de toute façon revalidée par cleanIngredients.
 const RESPONSE_SCHEMA = {
   type: 'object',
   properties: {
@@ -52,10 +55,12 @@ const RESPONSE_SCHEMA = {
           confidence: { type: 'number', minimum: 0, maximum: 1 },
         },
         required: ['name', 'quantity', 'category', 'confidence'],
+        additionalProperties: false,
       },
     },
   },
   required: ['ingredients'],
+  additionalProperties: false,
 };
 
 // photo : frigo, placard, plan de travail ; receipt : ticket de caisse
@@ -142,49 +147,122 @@ Liste les aliments et ingrédients de cuisine visibles.
 - S'il n'y a aucun aliment, renvoie une liste vide.`;
 }
 
-type GeminiResult = { ok: true; interaction: any } | { ok: false; details: string };
+interface VisionRequest {
+  prompt: string;
+  imageBase64: string;
+  mimeType: string;
+}
 
-// Appelle Gemini avec nouvel essai sur les erreurs passagères (surcharge, quota, délai dépassé)
-async function callGemini(request: Record<string, unknown>): Promise<GeminiResult> {
-  let lastError = '';
+// text : le JSON renvoyé par le modèle ; fallback : l'échec justifie de passer au fournisseur suivant
+type ProviderResult =
+  | { ok: true; text: string }
+  | { ok: false; fallback: boolean; details: string };
 
-  for (let attempt = 0; attempt < ATTEMPT_MODELS.length; attempt++) {
-    if (RETRY_DELAYS_MS[attempt]) await new Promise((r) => setTimeout(r, RETRY_DELAYS_MS[attempt]));
-    const model = ATTEMPT_MODELS[attempt];
+interface VisionProvider {
+  name: string;
+  model: string;
+  configured: boolean;
+  call: (request: VisionRequest) => Promise<ProviderResult>;
+}
 
-    try {
-      const response = await fetch(GEMINI_API_URL, {
-        method: 'POST',
-        headers: { 'x-goog-api-key': GEMINI_API_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, ...request }),
-        signal: AbortSignal.timeout(ATTEMPT_TIMEOUT_MS),
-      });
+function describeError(error: unknown): string {
+  return error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+}
 
-      if (response.ok) return { ok: true, interaction: await response.json() };
+async function callGemini({ prompt, imageBase64, mimeType }: VisionRequest): Promise<ProviderResult> {
+  try {
+    const response = await fetch(GEMINI_API_URL, {
+      method: 'POST',
+      headers: { 'x-goog-api-key': GEMINI_API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: GEMINI_MODEL,
+        // Ne pas conserver les photos des utilisateurs chez Google
+        store: false,
+        input: [
+          { type: 'text', text: prompt },
+          { type: 'image', data: imageBase64, mime_type: mimeType },
+        ],
+        response_format: { type: 'text', mime_type: 'application/json', schema: RESPONSE_SCHEMA },
+        // Reconnaître des aliments ne demande pas de réflexion : réponse plus rapide
+        generation_config: { temperature: 0.2, thinking_level: 'minimal' },
+      }),
+      signal: AbortSignal.timeout(GEMINI_TIMEOUT_MS),
+    });
 
+    if (!response.ok) {
       const errorText = await response.text();
-      lastError = `Gemini ${response.status} (${model}): ${errorText.slice(0, 300)}`;
-      console.error(`Attempt ${attempt + 1} failed:`, lastError);
-      // Une erreur 400 (requête invalide) ne se corrigera pas en réessayant
-      if (!RETRYABLE_STATUSES.has(response.status)) break;
-    } catch (error) {
-      lastError = `Gemini (${model}): ${error instanceof Error ? error.name + ' ' + error.message : String(error)}`;
-      console.error(`Attempt ${attempt + 1} failed:`, lastError);
+      return {
+        ok: false,
+        fallback: FALLBACK_STATUSES.has(response.status),
+        details: `Gemini ${response.status}: ${errorText.slice(0, 300)}`,
+      };
     }
+
+    // Interactions API : le texte est dans steps[type=model_output].content[type=text]
+    const interaction = await response.json();
+    if (interaction.status !== 'completed') {
+      return { ok: false, fallback: true, details: `Gemini status ${interaction.status}` };
+    }
+    const text = (interaction.steps || [])
+      .filter((step: any) => step.type === 'model_output')
+      .flatMap((step: any) => step.content || [])
+      .filter((item: any) => item.type === 'text' && typeof item.text === 'string')
+      .map((item: any) => item.text)
+      .join('');
+    return { ok: true, text };
+  } catch (error) {
+    // Délai dépassé ou erreur réseau
+    return { ok: false, fallback: true, details: `Gemini: ${describeError(error)}` };
   }
-
-  return { ok: false, details: lastError };
 }
 
-// Réponse de l'Interactions API : le texte est dans steps[type=model_output].content[type=text]
-function extractText(interaction: any): string {
-  return (interaction?.steps || [])
-    .filter((step: any) => step.type === 'model_output')
-    .flatMap((step: any) => step.content || [])
-    .filter((item: any) => item.type === 'text' && typeof item.text === 'string')
-    .map((item: any) => item.text)
-    .join('');
+async function callGroq({ prompt, imageBase64, mimeType }: VisionRequest): Promise<ProviderResult> {
+  try {
+    const response = await fetch(GROQ_API_URL, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${GROQ_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: GROQ_VISION_MODEL,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'text', text: prompt },
+            { type: 'image_url', image_url: { url: `data:${mimeType};base64,${imageBase64}` } },
+          ],
+        }],
+        response_format: {
+          type: 'json_schema',
+          json_schema: { name: 'detected_ingredients', strict: true, schema: RESPONSE_SCHEMA },
+        },
+        temperature: 0.2,
+        // Mode sans réflexion : réponse plus rapide
+        reasoning_effort: 'none',
+        max_completion_tokens: 2048,
+      }),
+      signal: AbortSignal.timeout(GROQ_TIMEOUT_MS),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return { ok: false, fallback: false, details: `Groq ${response.status}: ${errorText.slice(0, 300)}` };
+    }
+
+    const data = await response.json();
+    const text = data.choices?.[0]?.message?.content;
+    if (typeof text !== 'string') {
+      return { ok: false, fallback: false, details: `Groq: réponse sans contenu (${data.choices?.[0]?.finish_reason})` };
+    }
+    return { ok: true, text };
+  } catch (error) {
+    return { ok: false, fallback: false, details: `Groq: ${describeError(error)}` };
+  }
 }
+
+// Ordre des tentatives : Gemini, puis Groq
+const PROVIDERS: VisionProvider[] = [
+  { name: 'gemini', model: GEMINI_MODEL, configured: GEMINI_API_KEY !== '', call: callGemini },
+  { name: 'groq', model: GROQ_VISION_MODEL, configured: GROQ_API_KEY !== '', call: callGroq },
+];
 
 function cleanIngredients(raw: unknown): DetectedIngredient[] {
   const list = Array.isArray(raw) ? raw : [];
@@ -221,7 +299,7 @@ Deno.serve(async (req: Request) => {
     language = (requestedLanguage || 'fr').substring(0, 2).toLowerCase();
     const mode: AnalyzeMode = requestedMode === 'receipt' ? 'receipt' : 'photo';
 
-    // Chaque analyse consomme le quota Gemini : réservé aux utilisateurs connectés
+    // Chaque analyse consomme les quotas Gemini / Groq : réservé aux utilisateurs connectés
     const user = await getAuthenticatedUser(req);
     if (!user) {
       return errorResponse('unauthorized', language, 401);
@@ -233,41 +311,45 @@ Deno.serve(async (req: Request) => {
     if (image_base64.length > MAX_IMAGE_BASE64_LENGTH) {
       return errorResponse('image_too_large', language, 413);
     }
-    if (!GEMINI_API_KEY) {
-      return errorResponse('not_configured', language, 500, 'GEMINI_API_KEY missing');
+
+    const providers = PROVIDERS.filter((provider) => provider.configured);
+    if (providers.length === 0) {
+      return errorResponse('not_configured', language, 500, 'GEMINI_API_KEY and GROQ_API_KEY missing');
     }
 
-    const result = await callGemini({
-      // Ne pas conserver les photos des utilisateurs chez Google
-      store: false,
-      input: [
-        { type: 'text', text: buildPrompt(language, mode) },
-        { type: 'image', data: image_base64, mime_type: mime_type || 'image/jpeg' },
-      ],
-      response_format: { type: 'text', mime_type: 'application/json', schema: RESPONSE_SCHEMA },
-      // Reconnaître des aliments ne demande pas de réflexion : réponse plus rapide
-      generation_config: { temperature: 0.2, thinking_level: 'minimal' },
-    });
+    const visionRequest: VisionRequest = {
+      prompt: buildPrompt(language, mode),
+      imageBase64: image_base64,
+      mimeType: mime_type || 'image/jpeg',
+    };
+    let lastFailure = '';
 
-    if (!result.ok) {
-      return errorResponse('ai_error', language, 502, result.details);
+    for (const provider of providers) {
+      const started = Date.now();
+      const result = await provider.call(visionRequest);
+      const elapsed = Date.now() - started;
+
+      if (!result.ok) {
+        console.error(`[analyze-image] ${provider.name} (${provider.model}) échec en ${elapsed} ms : ${result.details}`);
+        lastFailure = result.details;
+        if (result.fallback) continue;
+        break;
+      }
+
+      let parsed: any;
+      try {
+        parsed = JSON.parse(result.text);
+      } catch {
+        console.error(`[analyze-image] ${provider.name} (${provider.model}) JSON illisible en ${elapsed} ms :`, result.text.slice(0, 500));
+        return errorResponse('invalid_response', language, 502);
+      }
+
+      const ingredients = cleanIngredients(parsed?.ingredients);
+      console.log(`[analyze-image] ${provider.name} (${provider.model}) OK en ${elapsed} ms, ${ingredients.length} ingrédient(s), mode ${mode}, langue ${language}`);
+      return jsonResponse({ ingredients, provider: provider.name }, 200);
     }
 
-    const interaction = result.interaction;
-    if (interaction.status !== 'completed') {
-      console.error('Gemini interaction not completed:', interaction.status);
-      return errorResponse('invalid_response', language, 502, `status ${interaction.status}`);
-    }
-
-    let parsed: any;
-    try {
-      parsed = JSON.parse(extractText(interaction));
-    } catch {
-      console.error('Unreadable JSON from Gemini:', extractText(interaction).slice(0, 500));
-      return errorResponse('invalid_response', language, 502);
-    }
-
-    return jsonResponse({ ingredients: cleanIngredients(parsed?.ingredients) }, 200);
+    return errorResponse('ai_error', language, 502, lastFailure);
   } catch (error) {
     console.error('Error analyzing image:', error);
     return errorResponse('ai_error', language, 500, error instanceof Error ? error.message : String(error));
