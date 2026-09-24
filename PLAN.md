@@ -64,11 +64,11 @@ Dernière mise à jour : 23/09/2026
 
 Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 3, est avancé ici.
 
-- [ ] Réécrire `analyze-image` avec Gemini Flash-Lite (modèle dans le secret `GEMINI_MODEL`, clé dans `GEMINI_API_KEY`) et un schéma JSON : nom (dans la langue de l'utilisateur), quantité estimée, catégorie, niveau de confiance
-- [ ] L'app envoie la langue de l'utilisateur et affiche les quantités estimées dans le modal de confirmation
-- [ ] Vérifier l'utilisateur connecté dans la fonction (`supabase/functions/_shared/auth.ts`), 401 sinon ; l'app envoie le jeton de l'utilisateur
-- [ ] Ajouter un mode « ticket de caisse » à `analyze-image` (côté fonction)
-- [ ] Supprimer Clarifai : code et secret `CLARIFAI_PAT`
+- [x] Réécrire `analyze-image` avec Gemini Flash-Lite (modèle dans le secret `GEMINI_MODEL`, clé dans `GEMINI_API_KEY`) et un schéma JSON : nom (dans la langue de l'utilisateur), quantité estimée, catégorie, niveau de confiance
+- [x] L'app envoie la langue de l'utilisateur et affiche les quantités estimées dans le modal de confirmation
+- [x] Vérifier l'utilisateur connecté dans la fonction (`supabase/functions/_shared/auth.ts`), 401 sinon ; l'app envoie le jeton de l'utilisateur
+- [x] Ajouter un mode « ticket de caisse » à `analyze-image` (côté fonction, `mode: 'receipt'`)
+- [ ] Supprimer Clarifai : code (fait) et secret `CLARIFAI_PAT` (reste à faire, CLI Supabase à reconnecter)
 - [ ] Tester avec curl et une vraie photo d'aliments
 
 **Terminé quand** : un scan depuis l'app affiche des ingrédients en français dans le modal de confirmation.
