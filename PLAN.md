@@ -64,11 +64,14 @@ Dernière mise à jour : 23/09/2026
 
 Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 3, est avancé ici.
 
-- [x] Réécrire `analyze-image` avec Gemini Flash-Lite (modèles dans les secrets `GEMINI_MODEL` et `GEMINI_FALLBACK_MODEL`, clé dans `GEMINI_API_KEY`) et un schéma JSON : nom (dans la langue de l'utilisateur), quantité estimée, catégorie, niveau de confiance
+- [x] Réécrire `analyze-image` avec Gemini Flash-Lite (modèle dans le secret `GEMINI_MODEL`, clé dans `GEMINI_API_KEY`) et un schéma JSON : nom (dans la langue de l'utilisateur), quantité estimée, catégorie, niveau de confiance
 - [x] L'app envoie la langue de l'utilisateur et affiche les quantités estimées dans le modal de confirmation
 - [x] Vérifier l'utilisateur connecté dans la fonction (`supabase/functions/_shared/auth.ts`), 401 sinon ; l'app envoie le jeton de l'utilisateur
 - [x] Ajouter un mode « ticket de caisse » à `analyze-image` (côté fonction, `mode: 'receipt'`)
 - [x] Supprimer Clarifai : code et secret `CLARIFAI_PAT`
+- [x] Secours par un autre fournisseur : Gemini une seule fois (20 s max), puis le modèle de vision de Groq (`GROQ_VISION_MODEL`) en cas de 429, 5xx, 404 ou délai dépassé ; même schéma JSON et même validation ; logs du fournisseur et de la durée ; `GEMINI_FALLBACK_MODEL` retiré du code
+- [x] App : message d'attente « Analyse de ta photo… » pendant l'analyse
+- [ ] Déployer, régler `GROQ_VISION_MODEL`, supprimer le secret `GEMINI_FALLBACK_MODEL`, puis tester Groq seul (échec de Gemini forcé) sur 3-4 photos et comparer avec Gemini
 - [x] Tester avec curl et une vraie photo d'aliments — 401 sans utilisateur ; avec un utilisateur de test (supprimé ensuite) : noms en français (« banane », « pastèque », « fraise »…) et en espagnol sur demande, quantités et catégories cohérentes
 
 **Terminé quand** : un scan depuis l'app affiche des ingrédients en français dans le modal de confirmation.
@@ -185,4 +188,5 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 | 24/09/2026 | Gemini via l'Interactions API avec `store: false` | Doc Google : Interactions API recommandée pour les nouveaux projets (`generateContent` qualifiée de legacy) ; `store: false` évite que Google conserve les photos (1 jour en gratuit, 55 jours en payant) |
 | 24/09/2026 | Modèle principal `gemini-3.1-flash-lite`, secours `gemini-3.5-flash-lite` (secrets `GEMINI_MODEL` / `GEMINI_FALLBACK_MODEL`) ; 3 essais max en alternant, 30 s max par appel, `thinking_level: 'minimal'` | Mesuré le 24/09 sur des photos de 800 px : 3.5 = 37 à 95 s par photo, 3.1 ≈ 7 s quand il répond ; les deux renvoient souvent 503 « high demand » |
 | 24/09/2026 | Surcharge de Gemini constatée les 23-24/09/2026 (503 à répétition, aussi signalée sur le forum développeurs Google) | Les 503 semblent décompter le quota journalier de l'offre gratuite : les nouveaux essais peuvent l'épuiser plus vite. À surveiller ; offre payante prévue en phase 7 |
+| 24/09/2026 | Secours de Gemini = Groq `qwen/qwen3.8-27b` (seul modèle de vision de Groq, en preview) au lieu d'un second modèle Gemini ; Gemini essayé une seule fois (20 s) | Les deux Flash-Lite saturent en même temps : alterner entre eux consommait le quota sans rien apporter. Remplace la décision précédente (3.5 en secours, 3 essais) |
 | | *(résultat du test Gemini vs Clarifai)* | |
