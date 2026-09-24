@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from './AuthContext';
 import { supabase } from '@/lib/supabase';
+import { alertWriteError } from '@/lib/alertWriteError';
 
 type Language = 'fr' | 'en' | 'es';
 
@@ -72,6 +73,8 @@ const translations: Record<Language, Record<string, string>> = {
     checkYourEmail: 'Vérifie ta boîte mail',
     checkYourEmailText: 'Nous avons envoyé un lien de confirmation à {email}. Ouvre-le pour activer ton compte, puis connecte-toi.',
     backToLogin: 'Retour à la connexion',
+    writeErrorTitle: 'Enregistrement impossible',
+    writeErrorText: "La modification n'a pas été enregistrée. Vérifie ta connexion et réessaie.",
     emailNotConfirmed: "Ton adresse email n'est pas encore confirmée. Ouvre le lien reçu par email lors de l'inscription, puis réessaie.",
   },
   en: {
@@ -133,6 +136,8 @@ const translations: Record<Language, Record<string, string>> = {
     checkYourEmail: 'Check your inbox',
     checkYourEmailText: 'We sent a confirmation link to {email}. Open it to activate your account, then sign in.',
     backToLogin: 'Back to sign in',
+    writeErrorTitle: 'Could not save',
+    writeErrorText: 'Your change was not saved. Check your connection and try again.',
     emailNotConfirmed: 'Your email address is not confirmed yet. Open the link we emailed you when you signed up, then try again.',
   },
   es: {
@@ -194,6 +199,8 @@ const translations: Record<Language, Record<string, string>> = {
     checkYourEmail: 'Revisa tu correo',
     checkYourEmailText: 'Enviamos un enlace de confirmación a {email}. Ábrelo para activar tu cuenta y luego inicia sesión.',
     backToLogin: 'Volver al inicio de sesión',
+    writeErrorTitle: 'No se pudo guardar',
+    writeErrorText: 'El cambio no se guardó. Revisa tu conexión e inténtalo de nuevo.',
     emailNotConfirmed: 'Tu correo aún no está confirmado. Abre el enlace que te enviamos al registrarte y vuelve a intentarlo.',
   },
 };
@@ -262,16 +269,18 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       await AsyncStorage.setItem('app_language', newLang);
 
       if (user) {
-        await supabase
+        // upsert ne lève pas d'exception : l'erreur est renvoyée et doit être vérifiée
+        const { error } = await supabase
           .from('user_preferences')
           .upsert({
             user_id: user.id,
             default_language: newLang,
             updated_at: new Date().toISOString(),
           });
+        if (error) alertWriteError(t, 'saving language', error);
       }
     } catch (error) {
-      console.error('Error saving language:', error);
+      alertWriteError(t, 'saving language', error);
     }
   };
 

@@ -9,6 +9,8 @@ import {
   Modal,
 } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { alertWriteError } from '@/lib/alertWriteError';
 import { supabase } from '@/lib/supabase';
 import { Heart, Clock, ChefHat, X } from 'lucide-react-native';
 
@@ -27,6 +29,7 @@ interface Recipe {
 
 export default function SavedScreen() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
@@ -69,17 +72,21 @@ export default function SavedScreen() {
     const recipe = recipes.find((r) => r.id === recipeId);
     if (!recipe) return;
 
-    if (recipe.is_favorite) {
-      await supabase
-        .from('favorites')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('recipe_id', recipeId);
-    } else {
-      await supabase.from('favorites').insert({
-        user_id: user.id,
-        recipe_id: recipeId,
-      });
+    const { error } = recipe.is_favorite
+      ? await supabase
+          .from('favorites')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('recipe_id', recipeId)
+      : await supabase.from('favorites').insert({
+          user_id: user.id,
+          recipe_id: recipeId,
+        });
+
+    // Le cœur ne change d'état que si l'écriture a réussi
+    if (error) {
+      alertWriteError(t, 'toggling favorite', error);
+      return;
     }
 
     setRecipes(

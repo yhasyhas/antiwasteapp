@@ -10,6 +10,8 @@ import {
   Alert,
 } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { alertWriteError } from '@/lib/alertWriteError';
 import { supabase } from '@/lib/supabase';
 import { Search, Trash2, Plus, Package } from 'lucide-react-native';
 import { router } from 'expo-router';
@@ -24,6 +26,7 @@ interface Ingredient {
 
 export default function IngredientsScreen() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [filteredIngredients, setFilteredIngredients] = useState<Ingredient[]>(
     []
@@ -80,7 +83,9 @@ export default function IngredientsScreen() {
               .delete()
               .eq('id', id);
 
-            if (!error) {
+            if (error) {
+              alertWriteError(t, 'deleting ingredient', error);
+            } else {
               setIngredients(ingredients.filter((ing) => ing.id !== id));
             }
             setDeleting(null);
@@ -108,7 +113,9 @@ export default function IngredientsScreen() {
               .delete()
               .eq('user_id', user.id);
 
-            if (!error) {
+            if (error) {
+              alertWriteError(t, 'clearing ingredients', error);
+            } else {
               setIngredients([]);
               setFilteredIngredients([]);
             }

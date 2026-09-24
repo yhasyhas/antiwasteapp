@@ -11,6 +11,8 @@ import {
   Image
 } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { alertWriteError } from '@/lib/alertWriteError';
 import { supabase } from '@/lib/supabase';
 import { router, Stack } from 'expo-router';
 import {
@@ -83,6 +85,7 @@ const difficultyOptions = ['easy', 'medium', 'expert'];
 
 export default function GenerateRecipeScreen() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [ingredients, setIngredients] = useState<any[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
@@ -206,7 +209,7 @@ export default function GenerateRecipeScreen() {
     }));
 
     const { error } = await supabase.from('recipes').insert(recipesToInsert);
-    if (error) console.error('Error saving recipes:', error);
+    if (error) alertWriteError(t, 'saving recipes to history', error);
   };
 
   const saveRecipe = async (recipe: Recipe) => {
@@ -234,24 +237,31 @@ export default function GenerateRecipeScreen() {
       .select()
       .single();
 
-    if (data) {
-      await supabase.from('favorites').insert({
-        user_id: user.id,
-        recipe_id: data.id,
-      });
-
-      Alert.alert(
-        'Recipe Saved!',
-        'Your recipe has been saved to favorites.',
-        [
-          {
-            text: 'View Saved',
-            onPress: () => router.push('/(tabs)/saved'),
-          },
-          { text: 'OK', style: 'cancel' },
-        ]
-      );
+    if (error || !data) {
+      alertWriteError(t, 'saving recipe', error);
+      return;
     }
+
+    const { error: favoriteError } = await supabase.from('favorites').insert({
+      user_id: user.id,
+      recipe_id: data.id,
+    });
+    if (favoriteError) {
+      alertWriteError(t, 'adding recipe to favorites', favoriteError);
+      return;
+    }
+
+    Alert.alert(
+      'Recipe Saved!',
+      'Your recipe has been saved to favorites.',
+      [
+        {
+          text: 'View Saved',
+          onPress: () => router.push('/(tabs)/saved'),
+        },
+        { text: 'OK', style: 'cancel' },
+      ]
+    );
   };
 
   const toggleDietaryFilter = (option: string) => {
