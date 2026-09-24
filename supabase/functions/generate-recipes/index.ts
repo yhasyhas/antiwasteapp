@@ -456,60 +456,6 @@ IMPORTANT:
   return { ok: true, recipe };
 }
 
-function generateFallbackRecipe(ingredients: string[], preferences: any): Recipe {
-  const language = preferences?.language || 'fr';
-  const mealType = preferences?.mealType || 'lunch';
-  
-  const titles: Record<string, any> = {
-    'fr': {
-      breakfast: 'Petit-déjeuner express',
-      lunch: 'Déjeuner rapide',
-      dinner: 'Dîner léger',
-      snack: 'Goûter simple'
-    },
-    'en': {
-      breakfast: 'Quick breakfast',
-      lunch: 'Quick lunch',
-      dinner: 'Light dinner',
-      snack: 'Simple snack'
-    },
-    'es': {
-      breakfast: 'Desayuno rápido',
-      lunch: 'Almuerzo rápido',
-      dinner: 'Cena ligera',
-      snack: 'Merienda simple'
-    }
-  };
-  
-  const lang = language.substring(0, 2).toLowerCase();
-  
-  return {
-    title: titles[lang]?.[mealType] || titles['en'][mealType],
-    description: language === 'fr' ? 'Recette simple anti-gaspi' : 'Simple anti-waste recipe',
-    difficulty: preferences?.difficulty || 'easy',
-    prep_time: 10,
-    cook_time: 15,
-    total_time: 25,
-    servings: 2,
-    meal_type: mealType,
-    dietary_tags: preferences?.dietary || [],
-    ingredients_used: ingredients.slice(0, 3).map(name => ({ 
-      name, 
-      quantity: '1', 
-      unit: lang === 'fr' ? 'pièce' : lang === 'es' ? 'pieza' : 'piece'
-    })),
-    ingredients_from_list: ingredients.slice(0, 3),
-    missing_ingredients: [],
-    instructions: language === 'fr' 
-      ? ['Préparer les ingrédients', 'Cuire selon votre préférence', 'Servir']
-      : language === 'es'
-      ? ['Preparar los ingredientes', 'Cocinar según su preferencia', 'Servir']
-      : ['Prepare ingredients', 'Cook to your preference', 'Serve'],
-    tips: language === 'fr' ? ['Bonne appétit !'] : language === 'es' ? ['¡Buen provecho!'] : ['Enjoy!'],
-    image_prompt: `Professional food photography, simple homemade dish, appetizing, warm lighting`
-  };
-}
-
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 200, headers: corsHeaders });
