@@ -216,7 +216,7 @@ async function callGemini({ prompt, imageBase64, mimeType }: VisionRequest): Pro
   }
 }
 
-async function callGroq({ prompt, imageBase64, mimeType }: VisionRequest): Promise<ProviderResult> {
+async function requestGroq({ prompt, imageBase64, mimeType }: VisionRequest): Promise<ProviderResult> {
   try {
     const response = await fetch(GROQ_API_URL, {
       method: 'POST',
@@ -258,6 +258,18 @@ async function callGroq({ prompt, imageBase64, mimeType }: VisionRequest): Promi
   } catch (error) {
     return { ok: false, details: `Groq: ${describeError(error)}` };
   }
+}
+
+// Groq refuse parfois sa propre sortie en mode JSON Schema strict (400 json_validate_failed, JSON coupé
+// du type "{ conto"). C'est aléatoire, rapide (< 1 s) et presque gratuit : on réessaie une fois.
+async function callGroq(request: VisionRequest): Promise<ProviderResult> {
+  const first = await requestGroq(request);
+  if (first.ok || first.status !== 400 || !first.details.includes('json_validate_failed')) return first;
+
+  console.warn(`[analyze-image] groq (${GROQ_VISION_MODEL}) json_validate_failed, nouvel essai : ${first.details.slice(0, 200)}`);
+  const second = await requestGroq(request);
+  console.log(`[analyze-image] groq (${GROQ_VISION_MODEL}) nouvel essai après json_validate_failed : ${second.ok ? 'réussi' : 'échec'}`);
+  return second.ok ? second : { ...second, details: `${second.details} (après un nouvel essai sur json_validate_failed)` };
 }
 
 // Ordre des tentatives : Gemini, puis Groq
