@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { supabase } from '@/lib/supabase';
 import { Search, Trash2, Plus, Package } from 'lucide-react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 
 interface Ingredient {
   id: string;
@@ -35,9 +35,12 @@ export default function IngredientsScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [deleting, setDeleting] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadIngredients();
-  }, []);
+  // Rechargé à chaque retour sur l'onglet (ingrédients ajoutés depuis la caméra, par exemple)
+  useFocusEffect(
+    useCallback(() => {
+      loadIngredients();
+    }, [user])
+  );
 
   useEffect(() => {
     if (searchQuery.trim() === '') {
@@ -53,7 +56,8 @@ export default function IngredientsScreen() {
   const loadIngredients = async () => {
     if (!user) return;
 
-    setLoading(true);
+    // Pas de setLoading(true) : le spinner plein écran ne s'affiche qu'au premier chargement,
+    // les rechargements au retour sur l'onglet se font en arrière-plan
     const { data, error } = await supabase
       .from('ingredients')
       .select('*')

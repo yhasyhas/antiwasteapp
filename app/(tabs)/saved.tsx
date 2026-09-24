@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { alertWriteError } from '@/lib/alertWriteError';
+import { useFocusEffect } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Heart, Clock, ChefHat, X } from 'lucide-react-native';
 
@@ -34,15 +35,17 @@ export default function SavedScreen() {
   const [loading, setLoading] = useState(true);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
-  useEffect(() => {
-    loadRecipes();
-  }, []);
+  // Rechargé à chaque retour sur l'onglet (recettes sauvegardées depuis l'écran de génération)
+  useFocusEffect(
+    useCallback(() => {
+      loadRecipes();
+    }, [user])
+  );
 
   const loadRecipes = async () => {
     if (!user) return;
 
-    setLoading(true);
-
+    // Pas de setLoading(true) : le spinner plein écran ne s'affiche qu'au premier chargement
     const { data: allRecipes } = await supabase
       .from('recipes')
       .select('*')
