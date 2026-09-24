@@ -119,6 +119,10 @@ function errorResponse(code: string, language: string, status: number, details?:
   return jsonResponse({ error: code, message: messages[code] || code, ...(details && { details }) }, status);
 }
 
+// Les codes de catégorie sont en anglais : on précise leur sens pour éviter les confusions
+// (ex. un modèle qui range les légumes dans "legume" à cause du mot français « légume »)
+const CATEGORY_GUIDE = `un de ces codes : fruit (fruits frais), vegetable (légumes, y compris tomates, pommes de terre, salades), meat (viande, charcuterie), fish (poisson, fruits de mer), dairy (lait, fromage, yaourt, beurre, crème), egg (œufs), grain (pâtes, riz, céréales, farine), legume (légumineuses : lentilles, pois chiches, haricots secs), bakery (pain, viennoiseries, biscuits), condiment (sauces, huile, vinaigre, confiture), spice (épices, herbes séchées), beverage (boissons, y compris jus de fruits), snack (gâteaux apéritif, chocolat, confiseries), frozen (surgelés), other.`;
+
 function buildPrompt(language: string, mode: AnalyzeMode): string {
   const languageName = LANGUAGE_NAMES[language] || LANGUAGE_NAMES['en'];
 
@@ -128,7 +132,7 @@ function buildPrompt(language: string, mode: AnalyzeMode): string {
 Liste uniquement les produits alimentaires achetés.
 - "name" : nom courant et générique en ${languageName}, en décodant les libellés abrégés (ex. "TOM GRAPPE 1KG" → "tomate", "LAIT DEMI-ECR" → "lait"), sans marque.
 - "quantity" : quantité d'après le ticket, avec son unité (ex. "1 kg", "6", "1 l") ; chaîne vide si elle n'est pas indiquée.
-- "category" : une des catégories autorisées.
+- "category" : ${CATEGORY_GUIDE}
 - "confidence" : entre 0 et 1, selon la lisibilité de la ligne et ta certitude sur le produit.
 - Un même produit n'apparaît qu'une fois : additionne les quantités.
 - Ignore les produits non alimentaires (hygiène, entretien…), les totaux, remises, moyens de paiement et TVA.
@@ -140,7 +144,7 @@ Liste uniquement les produits alimentaires achetés.
 Liste les aliments et ingrédients de cuisine visibles.
 - "name" : nom courant et générique en ${languageName} (ex. "tomate", "lait", "poulet"), sans marque ni emballage.
 - "quantity" : quantité estimée avec son unité (ex. "3", "500 g", "1 l", "1 botte") ; chaîne vide si impossible à estimer.
-- "category" : une des catégories autorisées.
+- "category" : ${CATEGORY_GUIDE}
 - "confidence" : entre 0 et 1, ta certitude que l'aliment est bien présent.
 - Un même aliment n'apparaît qu'une fois : additionne les quantités.
 - Ignore ce qui n'est pas comestible (ustensiles, meubles, emballages vides).
@@ -237,7 +241,9 @@ async function callGroq({ prompt, imageBase64, mimeType }: VisionRequest): Promi
         temperature: 0.2,
         // Mode sans réflexion : réponse plus rapide
         reasoning_effort: 'none',
-        max_completion_tokens: 2048,
+        // L'offre gratuite de Groq limite ce modèle à 1 000 tokens de sortie par minute : une valeur plus
+        // haute fait refuser la requête. 20 ingrédients tiennent dans ~600 tokens.
+        max_completion_tokens: 800,
       }),
       signal: AbortSignal.timeout(GROQ_TIMEOUT_MS),
     });
@@ -346,7 +352,8 @@ Deno.serve(async (req: Request) => {
 
       const ingredients = cleanIngredients(parsed?.ingredients);
       console.log(`[analyze-image] ${provider.name} (${provider.model}) OK en ${elapsed} ms, ${ingredients.length} ingrédient(s), mode ${mode}, langue ${language}`);
-      return jsonResponse({ ingredients, provider: provider.name }, 200);
+      // fallback_reason : pourquoi le fournisseur précédent a échoué (utile dans les logs [scan] de l'app)
+      return jsonResponse({ ingredients, provider: provider.name, ...(lastFailure && { fallback_reason: lastFailure }) }, 200);
     }
 
     return errorResponse('ai_error', language, 502, lastFailure);

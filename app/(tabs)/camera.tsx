@@ -151,6 +151,7 @@ export default function CameraScreen() {
         error: data?.error,
         message: data?.message,
         details: data?.details,
+        fallback_reason: data?.fallback_reason,
         ingredients: data?.ingredients,
       });
 
