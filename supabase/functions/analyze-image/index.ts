@@ -1,4 +1,5 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
+import { getAuthenticatedUser } from '../_shared/auth.ts';
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || '';
 // Modèle configurable par secret : les fournisseurs retirent régulièrement des modèles
@@ -64,6 +65,7 @@ interface DetectedIngredient {
 
 const MESSAGES: Record<string, Record<string, string>> = {
   fr: {
+    unauthorized: 'Vous devez être connecté pour analyser une photo.',
     no_image: 'Aucune image reçue.',
     image_too_large: 'L\'image est trop lourde.',
     not_configured: 'Le service d\'analyse n\'est pas configuré.',
@@ -71,6 +73,7 @@ const MESSAGES: Record<string, Record<string, string>> = {
     invalid_response: 'La réponse de l\'IA était illisible. Réessayez.',
   },
   en: {
+    unauthorized: 'You must be signed in to analyze a photo.',
     no_image: 'No image received.',
     image_too_large: 'The image is too large.',
     not_configured: 'The analysis service is not configured.',
@@ -78,6 +81,7 @@ const MESSAGES: Record<string, Record<string, string>> = {
     invalid_response: 'The AI response could not be read. Please try again.',
   },
   es: {
+    unauthorized: 'Debes iniciar sesión para analizar una foto.',
     no_image: 'No se recibió ninguna imagen.',
     image_too_large: 'La imagen es demasiado pesada.',
     not_configured: 'El servicio de análisis no está configurado.',
@@ -155,6 +159,12 @@ Deno.serve(async (req: Request) => {
   try {
     const { image_base64, mime_type, language: requestedLanguage }: AnalyzeImageRequest = await req.json();
     language = (requestedLanguage || 'fr').substring(0, 2).toLowerCase();
+
+    // Chaque analyse consomme le quota Gemini : réservé aux utilisateurs connectés
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
+      return errorResponse('unauthorized', language, 401);
+    }
 
     if (!image_base64) {
       return errorResponse('no_image', language, 400);
