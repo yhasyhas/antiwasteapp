@@ -31,11 +31,15 @@ export default function LoginScreen() {
     setError('');
 
     const { error: signInError } = await signIn(email, password);
+    setLoading(false);
 
     if (signInError) {
       setError(signInError.message);
-      setLoading(false);
+      return;
     }
+
+    // L'écran index (qui redirige selon la session) n'est plus monté ici : on navigue nous-mêmes
+    router.replace('/(tabs)');
   };
 
   return (
