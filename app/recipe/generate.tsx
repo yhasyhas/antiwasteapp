@@ -32,6 +32,8 @@ import {
 } from 'lucide-react-native';
 
 interface Recipe {
+  // Identifiant de la ligne dans la table recipes, une fois la recette enregistrée dans l'historique
+  id?: string;
   title: string;
   description: string;
   ingredients_used: Array<{name: string; quantity: string; unit: string}>;
@@ -171,9 +173,9 @@ export default function GenerateRecipeScreen() {
       const data = await response.json();
 
       if (data.recipes) {
-        setRecipes(data.recipes);
-        // Sauvegarder les recettes dans Supabase
-        await saveRecipesToHistory(data.recipes);
+        // Enregistrées dans l'historique avant l'affichage, pour que chaque recette ait déjà son id
+        // quand l'utilisateur la sauvegarde (sinon elle serait insérée une seconde fois)
+        setRecipes(await saveRecipesToHistory(data.recipes));
       } else if (data.error) {
         Alert.alert('Error', data.message || 'Failed to generate recipes');
       } else {
@@ -187,66 +189,75 @@ export default function GenerateRecipeScreen() {
     }
   };
 
-  const saveRecipesToHistory = async (newRecipes: Recipe[]) => {
-    if (!user) return;
+  // Ligne de la table recipes correspondant à une recette générée
+  const toRecipeRow = (recipe: Recipe) => ({
+    user_id: user!.id,
+    title: recipe.title,
+    description: recipe.description,
+    ingredients_used: recipe.ingredients_used,
+    ingredients_from_list: recipe.ingredients_from_list,
+    missing_ingredients: recipe.missing_ingredients || [],
+    instructions: recipe.instructions,
+    prep_time: recipe.prep_time,
+    cook_time: recipe.cook_time,
+    total_time: recipe.total_time,
+    difficulty: recipe.difficulty,
+    meal_type: recipe.meal_type,
+    dietary_tags: recipe.dietary_tags,
+    image_url: recipe.image_url,
+    language: filters.language,
+  });
 
-    const recipesToInsert = newRecipes.map(recipe => ({
-      user_id: user.id,
-      title: recipe.title,
-      description: recipe.description,
-      ingredients_used: recipe.ingredients_used,
-      ingredients_from_list: recipe.ingredients_from_list,
-      missing_ingredients: recipe.missing_ingredients || [],
-      instructions: recipe.instructions,
-      prep_time: recipe.prep_time,
-      cook_time: recipe.cook_time,
-      total_time: recipe.total_time,
-      difficulty: recipe.difficulty,
-      meal_type: recipe.meal_type,
-      dietary_tags: recipe.dietary_tags,
-      image_url: recipe.image_url,
-      language: filters.language,
-    }));
-
-    const { error } = await supabase.from('recipes').insert(recipesToInsert);
-    if (error) alertWriteError(t, 'saving recipes to history', error);
-  };
-
-  const saveRecipe = async (recipe: Recipe) => {
-    if (!user) return;
+  // Enregistre les recettes générées dans l'historique et renvoie les recettes avec leur id.
+  // En cas d'échec, les recettes sont renvoyées sans id (saveRecipe les insérera à la sauvegarde).
+  const saveRecipesToHistory = async (newRecipes: Recipe[]): Promise<Recipe[]> => {
+    if (!user) return newRecipes;
 
     const { data, error } = await supabase
       .from('recipes')
-      .insert({
-        user_id: user.id,
-        title: recipe.title,
-        description: recipe.description,
-        ingredients_used: recipe.ingredients_used,
-        ingredients_from_list: recipe.ingredients_from_list,
-        missing_ingredients: recipe.missing_ingredients,
-        instructions: recipe.instructions,
-        prep_time: recipe.prep_time,
-        cook_time: recipe.cook_time,
-        total_time: recipe.total_time,
-        difficulty: recipe.difficulty,
-        meal_type: recipe.meal_type,
-        dietary_tags: recipe.dietary_tags,
-        image_url: recipe.image_url,
-        language: filters.language,
-      })
-      .select()
-      .single();
+      .insert(newRecipes.map(toRecipeRow))
+      .select('id, title');
 
-    if (error || !data) {
-      alertWriteError(t, 'saving recipe', error);
-      return;
+    if (error || !data || data.length !== newRecipes.length) {
+      alertWriteError(t, 'saving recipes to history', error);
+      return newRecipes;
+    }
+
+    // Correspondance par titre (l'ordre des lignes renvoyées n'est pas garanti) ; chaque id n'est utilisé qu'une fois
+    const unused = [...data];
+    return newRecipes.map((recipe) => {
+      const index = unused.findIndex((row) => row.title === recipe.title);
+      return index === -1 ? recipe : { ...recipe, id: unused.splice(index, 1)[0].id as string };
+    });
+  };
+
+  // Sauvegarder = ajouter aux favoris la recette déjà présente dans l'historique
+  const saveRecipe = async (recipe: Recipe) => {
+    if (!user) return;
+
+    let recipeId = recipe.id;
+    if (!recipeId) {
+      // L'enregistrement dans l'historique avait échoué : on insère la recette maintenant
+      const { data, error } = await supabase
+        .from('recipes')
+        .insert(toRecipeRow(recipe))
+        .select('id')
+        .single();
+
+      if (error || !data) {
+        alertWriteError(t, 'saving recipe', error);
+        return;
+      }
+      recipeId = data.id as string;
+      setRecipes((current) => current.map((r) => (r === recipe ? { ...r, id: recipeId } : r)));
     }
 
     const { error: favoriteError } = await supabase.from('favorites').insert({
       user_id: user.id,
-      recipe_id: data.id,
+      recipe_id: recipeId,
     });
-    if (favoriteError) {
+    // 23505 : déjà en favori (contrainte unique user_id + recipe_id), la sauvegarde est donc acquise
+    if (favoriteError && favoriteError.code !== '23505') {
       alertWriteError(t, 'adding recipe to favorites', favoriteError);
       return;
     }
