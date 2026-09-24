@@ -266,22 +266,40 @@ const PROVIDERS: VisionProvider[] = [
   { name: 'groq', model: GROQ_VISION_MODEL, configured: GROQ_API_KEY !== '', call: callGroq },
 ];
 
-// Vérifie que la réponse respecte RESPONSE_SCHEMA. Renvoie la raison du refus, ou null si elle est conforme.
-// Une liste vide est valide (aucun aliment sur la photo).
-function schemaViolation(parsed: any): string | null {
-  if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.ingredients)) {
-    return 'champ "ingredients" absent ou pas un tableau';
-  }
-  for (const [index, item] of parsed.ingredients.entries()) {
-    if (!item || typeof item !== 'object') return `ingrédient ${index} : pas un objet`;
-    if (typeof item.name !== 'string' || item.name.trim() === '') return `ingrédient ${index} : "name" invalide`;
-    if (typeof item.quantity !== 'string') return `ingrédient ${index} : "quantity" invalide`;
-    if (!CATEGORIES.includes(item.category)) return `ingrédient ${index} : catégorie inconnue "${item.category}"`;
-    if (typeof item.confidence !== 'number' || item.confidence < 0 || item.confidence > 1) {
-      return `ingrédient ${index} : "confidence" invalide`;
-    }
-  }
+// Raison pour laquelle un ingrédient ne respecte pas RESPONSE_SCHEMA, ou null s'il est valide
+function ingredientViolation(item: any): string | null {
+  if (!item || typeof item !== 'object') return 'pas un objet';
+  if (typeof item.name !== 'string' || item.name.trim() === '') return '"name" invalide';
+  if (typeof item.quantity !== 'string') return '"quantity" invalide';
+  if (!CATEGORIES.includes(item.category)) return `catégorie inconnue "${item.category}"`;
+  if (typeof item.confidence !== 'number' || item.confidence < 0 || item.confidence > 1) return '"confidence" invalide';
   return null;
+}
+
+type ValidationResult =
+  | { ok: true; valid: unknown[]; invalid: string[] }
+  | { ok: false; reason: string };
+
+// Écarte les ingrédients mal formés et garde les autres. La réponse n'est un échec que si elle n'a pas
+// de liste d'ingrédients, ou si elle en proposait et qu'aucun n'est valide. Une liste vide dès le
+// départ reste valide (aucun aliment sur la photo).
+function validateResponse(parsed: any): ValidationResult {
+  if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.ingredients)) {
+    return { ok: false, reason: 'champ "ingredients" absent ou pas un tableau' };
+  }
+
+  const valid: unknown[] = [];
+  const invalid: string[] = [];
+  parsed.ingredients.forEach((item: unknown, index: number) => {
+    const violation = ingredientViolation(item);
+    if (violation) invalid.push(`n°${index} ${violation}`);
+    else valid.push(item);
+  });
+
+  if (valid.length === 0 && invalid.length > 0) {
+    return { ok: false, reason: `aucun ingrédient valide sur ${invalid.length} (${invalid.slice(0, 3).join(' ; ')})` };
+  }
+  return { ok: true, valid, invalid };
 }
 
 function cleanIngredients(raw: unknown): DetectedIngredient[] {
@@ -351,9 +369,9 @@ Deno.serve(async (req: Request) => {
       const elapsed = Date.now() - started;
       const label = `[analyze-image] ${provider.name} (${provider.model})`;
 
-      // Tout échec d'un fournisseur (réseau, HTTP, JSON, schéma) fait passer au suivant
+      // Tout échec d'un fournisseur (réseau, HTTP, JSON, aucun ingrédient valide) fait passer au suivant
       let failure: string | null = null;
-      let parsed: any;
+      let validation: ValidationResult | null = null;
 
       if (!result.ok) {
         failure = result.details;
@@ -367,25 +385,28 @@ Deno.serve(async (req: Request) => {
         lastFailureCode = 'invalid_response';
       } else {
         try {
-          parsed = JSON.parse(result.text);
+          validation = validateResponse(JSON.parse(result.text));
+          if (!validation.ok) {
+            failure = `${provider.name} : réponse non conforme au schéma, ${validation.reason}`;
+            lastFailureCode = 'invalid_response';
+          }
         } catch {
           failure = `${provider.name} : JSON invalide (${result.text.slice(0, 120)})`;
           lastFailureCode = 'invalid_response';
         }
-        const violation = failure ? null : schemaViolation(parsed);
-        if (violation) {
-          failure = `${provider.name} : réponse non conforme au schéma, ${violation}`;
-          lastFailureCode = 'invalid_response';
-        }
       }
 
-      if (failure) {
+      if (failure || !validation?.ok) {
         console.error(`${label} échec en ${elapsed} ms : ${failure}`);
-        lastFailure = failure;
+        lastFailure = failure || 'échec inconnu';
         continue;
       }
 
-      const ingredients = cleanIngredients(parsed.ingredients);
+      if (validation.invalid.length > 0) {
+        console.warn(`${label} ${validation.invalid.length} ingrédient(s) mal formé(s) écarté(s) : ${validation.invalid.slice(0, 5).join(' ; ')}`);
+      }
+
+      const ingredients = cleanIngredients(validation.valid);
       console.log(`${label} OK en ${elapsed} ms, ${ingredients.length} ingrédient(s), mode ${mode}, langue ${language}`);
       // fallback_reason : pourquoi le fournisseur précédent a échoué (utile dans les logs [scan] de l'app)
       return jsonResponse({ ingredients, provider: provider.name, ...(lastFailure && { fallback_reason: lastFailure }) }, 200);
