@@ -14,15 +14,25 @@ import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as ImageManipulator from 'expo-image-manipulator';
 //import * as FileSystem from 'expo-file-system';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { Camera, FlipHorizontal, X, Check, Plus } from 'lucide-react-native';
 import { router } from 'expo-router';
 
-// TEMPORAIRE (phase 0.5) : logs pour diagnostiquer le scan. À retirer une fois le problème réglé.
+// TEMPORAIRE (phases 0.5-0.6) : logs pour diagnostiquer le scan. À retirer une fois le scan validé.
 const log = (...args: unknown[]) => console.log('[scan]', ...args);
+
+// Ingrédient renvoyé par l'Edge Function analyze-image
+interface ScannedIngredient {
+  name: string;
+  quantity: string;
+  category: string;
+  confidence: number;
+}
 
 export default function CameraScreen() {
   const { user } = useAuth();
+  const { language, t } = useLanguage();
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<CameraType>('back');
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
@@ -113,30 +123,41 @@ export default function CameraScreen() {
         base64.startsWith('data:') ? `PRÉFIXE PRÉSENT : ${base64.slice(0, 30)}` : `sans préfixe, commence par ${base64.slice(0, 12)}`
       );
 
-      // 2. Appeler l'Edge Function
+      // 2. Appeler l'Edge Function avec le jeton de l'utilisateur (la fonction refuse les appels anonymes)
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        Alert.alert('Session expired', 'Please sign in again.');
+        return;
+      }
+
       const apiUrl = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/analyze-image`;
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer ${session.access_token}`,
+          'apikey': process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           image_base64: base64,
+          mime_type: 'image/jpeg',
+          language,
+          mode: 'photo',
         }),
       });
 
       const data = await response.json().catch(() => null);
-      log(`réponse HTTP ${response.status}`, {
+      log(`réponse HTTP ${response.status} (langue ${language}, fournisseur ${data?.provider ?? '-'})`, {
         error: data?.error,
+        message: data?.message,
         details: data?.details,
+        fallback_reason: data?.fallback_reason,
         ingredients: data?.ingredients,
-        raw_concepts: data?.raw_concepts,
       });
 
       // Une erreur du serveur n'est pas un « aucun ingrédient détecté » : on affiche le vrai message
       if (!response.ok || !data || data.error) {
-        const message = [data?.error, data?.details].filter(Boolean).join('\n') || `HTTP ${response.status}`;
+        const message = [data?.message || data?.error, data?.details].filter(Boolean).join('\n') || `HTTP ${response.status}`;
         Alert.alert('Analysis failed', message, [
           { text: 'Add Manually', onPress: () => setShowManualAdd(true) },
           { text: 'OK', style: 'cancel' },
@@ -145,9 +166,9 @@ export default function CameraScreen() {
       }
 
       if (data.ingredients && data.ingredients.length > 0) {
-        setDetectedIngredients(data.ingredients.map((name: string) => ({
-          name,
-          quantity: '',
+        setDetectedIngredients(data.ingredients.map((ingredient: ScannedIngredient) => ({
+          name: ingredient.name,
+          quantity: ingredient.quantity,
           confirmed: true,
         })));
         setShowConfirmation(true);
@@ -170,13 +191,13 @@ export default function CameraScreen() {
     }
   };
 
-  const saveIngredients = async (ingredientNames: string[]) => {
+  const saveIngredients = async (ingredients: Array<{ name: string; quantity: string }>) => {
     if (!user) return;
 
-    const ingredientsToInsert = ingredientNames.map((name) => ({
+    const ingredientsToInsert = ingredients.map(({ name, quantity }) => ({
       user_id: user.id,
       name,
-      quantity: '',
+      quantity,
       added_via: 'camera',
     }));
 
@@ -261,7 +282,8 @@ export default function CameraScreen() {
         {analyzing && (
           <View style={styles.analyzingOverlay}>
             <ActivityIndicator size="large" color="#fff" />
-            <Text style={styles.analyzingText}>Analyzing ingredients...</Text>
+            <Text style={styles.analyzingText}>{t('analyzingPhoto')}</Text>
+            <Text style={styles.analyzingHint}>{t('analyzingHint')}</Text>
           </View>
         )}
       </View>
@@ -417,6 +439,9 @@ export default function CameraScreen() {
                   <Text style={[styles.confirmationText, !ing.confirmed && styles.confirmationTextUnchecked]}>
                     {ing.name}
                   </Text>
+                  {ing.quantity !== '' && (
+                    <Text style={styles.confirmationQuantity}>{ing.quantity}</Text>
+                  )}
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -426,7 +451,7 @@ export default function CameraScreen() {
               onPress={async () => {
                 const confirmed = detectedIngredients.filter(i => i.confirmed);
                 if (confirmed.length > 0) {
-                  await saveIngredients(confirmed.map(i => i.name));
+                  await saveIngredients(confirmed);
                   setShowConfirmation(false);
                   setDetectedIngredients([]);
                   Alert.alert(
@@ -573,6 +598,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginTop: 16,
+  },
+  analyzingHint: {
+    color: '#d1d5db',
+    fontSize: 14,
+    marginTop: 6,
   },
   controls: {
     backgroundColor: '#fff',
@@ -771,6 +801,11 @@ const styles = StyleSheet.create({
   confirmationTextUnchecked: {
     color: '#9ca3af',
     textDecorationLine: 'line-through',
+  },
+  confirmationQuantity: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginLeft: 8,
   },
   confirmButton: {
     backgroundColor: '#10b981',

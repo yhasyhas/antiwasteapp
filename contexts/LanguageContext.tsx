@@ -67,6 +67,8 @@ const translations: Record<Language, Record<string, string>> = {
     confirmIngredients: 'Confirmer les ingrédients',
     addManually: 'Ajouter manuellement',
     saveIngredients: 'Sauvegarder les ingrédients',
+    analyzingPhoto: 'Analyse de ta photo…',
+    analyzingHint: 'Cela peut prendre quelques secondes',
   },
   en: {
     welcome: 'Welcome',
@@ -122,6 +124,8 @@ const translations: Record<Language, Record<string, string>> = {
     confirmIngredients: 'Confirm Ingredients',
     addManually: 'Add Manually',
     saveIngredients: 'Save Ingredients',
+    analyzingPhoto: 'Analyzing your photo…',
+    analyzingHint: 'This can take a few seconds',
   },
   es: {
     welcome: 'Bienvenido',
@@ -177,6 +181,8 @@ const translations: Record<Language, Record<string, string>> = {
     confirmIngredients: 'Confirmar ingredientes',
     addManually: 'Añadir manualmente',
     saveIngredients: 'Guardar ingredientes',
+    analyzingPhoto: 'Analizando tu foto…',
+    analyzingHint: 'Puede tardar unos segundos',
   },
 };
 
