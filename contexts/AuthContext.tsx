@@ -2,9 +2,6 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { AuthError, Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 
-// TEMPORAIRE (phase 0.5) : logs pour diagnostiquer la connexion. À retirer une fois le problème réglé.
-const log = (...args: unknown[]) => console.log('[auth]', ...args);
-
 // Jeton de rafraîchissement absent, expiré ou déjà utilisé : la session enregistrée est inutilisable
 function isInvalidRefreshToken(error: AuthError) {
   return (
@@ -32,15 +29,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const loadSession = async () => {
-      log('lecture de la session enregistrée…');
       try {
         const { data, error } = await supabase.auth.getSession();
 
         if (error) {
-          log('getSession : erreur', error.code, error.message);
+          console.error('Error loading session:', error);
           if (isInvalidRefreshToken(error)) {
             // Nettoie la session enregistrée sur cet appareil ; user reste null → écran de connexion
-            log('jeton de rafraîchissement invalide : signOut local');
             await supabase.auth.signOut({ scope: 'local' });
           }
           setSession(null);
@@ -48,11 +43,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        log('getSession :', data.session ? `connecté (${data.session.user.email})` : 'aucune session');
         setSession(data.session);
         setUser(data.session?.user ?? null);
       } catch (e) {
-        log('getSession : exception', e);
+        console.error('Error loading session:', e);
         setSession(null);
         setUser(null);
       } finally {
@@ -64,8 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      log('changement d\'état :', event, session ? `(${session.user.email})` : '(pas de session)');
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
 
@@ -89,30 +82,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) throw error;
 
       if (!profile) {
-        log('création du profil');
         const { error: insertError } = await supabase.from('profiles').insert({ id, email: email! });
         if (insertError) throw insertError;
       }
     } catch (e) {
-      log('profil : erreur', e);
+      console.error('Error creating profile:', e);
     }
   };
 
   const signIn = async (email: string, password: string) => {
-    log('signInWithPassword : envoi…');
-    const started = Date.now();
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      log(
-        `signInWithPassword : réponse en ${Date.now() - started} ms`,
-        error ? `erreur ${error.code} ${error.message}` : `ok, session ${data.session ? 'présente' : 'absente'}`
-      );
       return { error };
     } catch (e) {
-      log('signInWithPassword : exception', e);
       return { error: e };
     }
   };
