@@ -23,7 +23,7 @@ Dernière mise à jour : 23/09/2026
 
 | Rôle | Aujourd'hui | Cible |
 |---|---|---|
-| App | Expo SDK 57, expo-router 57, RN 0.86 (phase 0.5, test Android en cours) | SDK 57 dès la phase 0.5 (tests sur Android), build EAS en phase 7 |
+| App | Expo SDK 57, expo-router 57, RN 0.86 | SDK 57 dès la phase 0.5 (tests sur Android), build EAS en phase 7 |
 | Backend | Supabase (clés `anon`, legacy) | Supabase (clés `sb_publishable_` / `sb_secret_`) |
 | Vision | Clarifai `food-item-recognition` | Gemini Flash-Lite (sortie structurée), si le test de la phase 3 le confirme |
 | Recettes | Groq `llama-3.3-70b-versatile` (**retiré le 16/08/2026**) | Gemini (principal) + Groq `openai/gpt-oss-120b` (secours) |
@@ -55,10 +55,10 @@ Dernière mise à jour : 23/09/2026
 - [x] Mettre à jour Expo vers le SDK 57, puis aligner les dépendances avec `npx expo install --fix`
 - [x] `npx expo-doctor` passe sans erreur (21/21)
 - [x] Corriger ce qui casse (expo-router, expo-camera, expo-image-manipulator, reanimated…) ; `npm run typecheck` passe ; le bundle Android se construit (`npx expo export --platform android`)
-- [ ] Tester sur Android avec Expo Go du Play Store (SDK 57) : connexion, scan, garde-manger, génération, favoris, paramètres
+- [x] Tester sur Android avec Expo Go du Play Store (SDK 57) : connexion, scan, garde-manger, génération, favoris, paramètres — validé le 24/09/2026 avec l'ajout manuel : l'app envoie bien la photo, seul Clarifai (fermé) bloque le scan, repris en phase 0.6
 - [ ] Désinstaller l'Expo Go SDK 54 installé temporairement
 
-**Terminé quand** : l'app tourne dans Expo Go SDK 57 sur Android, un scan et une génération fonctionnent, et `npx expo-doctor` et `npm run typecheck` passent.
+**Terminé quand** : l'app tourne dans Expo Go SDK 57 sur Android, un scan et une génération fonctionnent, et `npx expo-doctor` et `npm run typecheck` passent. *(Validée le 24/09/2026 avec l'ajout manuel à la place du scan, voir journal.)*
 
 ## Phase 1 — Bugs et données
 
@@ -168,7 +168,7 @@ Dernière mise à jour : 23/09/2026
 | 23/09/2026 | Caméra : `ImageManipulator.manipulate()` au lieu de `manipulateAsync` | `manipulateAsync` est déprécié |
 | 24/09/2026 | Connexion : `login.tsx` navigue vers les onglets après succès | Le spinner tournait sans fin : la redirection reposait sur l'écran `index`, qui n'est plus monté (bug présent depuis bolt.new, masqué par la session enregistrée) |
 | 24/09/2026 | supabase-js 2.58 → 2.117.1 ; aucun appel Supabase directement dans `onAuthStateChange` | Avant 2.110.1, un appel d'authentification depuis ce callback peut bloquer supabase-js |
-| 24/09/2026 | Logs `[auth]` temporaires dans `AuthContext` | Diagnostic de la connexion sur Android ; à retirer à la fin de la phase 0.5 |
-| 24/09/2026 | **Constat : Clarifai est hors service** — le scan ne peut pas fonctionner tant que `analyze-image` l'utilise | `api.clarifai.com` et `docs.clarifai.com` ne se résolvent plus (DNS), depuis Supabase comme en local ; des sources tierces signalent la fermeture de Clarifai (été 2026) et le rachat de son équipe par Nebius. Le test comparatif Gemini / Clarifai de la phase 3 n'est plus possible. **Décision à prendre** : avancer le remplacement de la vision ou assouplir le critère « un scan fonctionne » de la phase 0.5 |
+| 24/09/2026 | Logs `[auth]` temporaires dans `AuthContext` | Diagnostic de la connexion sur Android ; retirés à la fin de la phase 0.5 |
+| 24/09/2026 | **Constat : Clarifai est hors service** — le scan ne peut pas fonctionner tant que `analyze-image` l'utilise | `api.clarifai.com` et `docs.clarifai.com` ne se résolvent plus (DNS), depuis Supabase comme en local ; des sources tierces signalent la fermeture de Clarifai (été 2026) et le rachat de son équipe par Nebius. Le test comparatif Gemini / Clarifai de la phase 3 n'est plus possible. **Décision (24/09/2026)** : phase 0.5 validée avec l'ajout manuel ; le scan est repris en phase 0.6 avec Gemini |
 | 24/09/2026 | Logs `[scan]` temporaires dans `camera.tsx` ; erreurs d'`analyze-image` affichées telles quelles | « No ingredients detected » masquait l'erreur du serveur |
 | | *(résultat du test Gemini vs Clarifai)* | |
