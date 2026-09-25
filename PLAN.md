@@ -105,8 +105,8 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 
 ## Phase 2 — Sécurité
 
-- [ ] Créer les clés `sb_publishable_…` / `sb_secret_…` dans le dashboard, mettre la clé publishable dans le `.env` de l'app
-- [ ] Dans les fonctions, lire les clés depuis `SUPABASE_PUBLISHABLE_KEYS` / `SUPABASE_SECRET_KEYS`
+- [x] Créer les clés `sb_publishable_…` / `sb_secret_…` dans le dashboard, mettre la clé publishable dans le `.env` de l'app (clés `default` déjà créées par Supabase ; variable `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`)
+- [x] Dans les fonctions, lire les clés depuis `SUPABASE_PUBLISHABLE_KEYS` / `SUPABASE_SECRET_KEYS`
 - [ ] Créer `supabase/functions/_shared/auth.ts` : vérifie l'utilisateur connecté à partir du token, renvoie 401 sinon (créé en phase 0.6 pour `analyze-image` ; reste à l'utiliser dans `generate-recipes`)
 - [ ] `supabase/config.toml` : `verify_jwt = false` pour chaque fonction (la vérification se fait dans le code)
 - [ ] Migration : table `usage_counters` (user_id, date, scans, generations, images) avec RLS

@@ -13,6 +13,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { alertWriteError } from '@/lib/alertWriteError';
+import { callEdgeFunction } from '@/lib/callEdgeFunction';
 import { supabase } from '@/lib/supabase';
 import { router, Stack } from 'expo-router';
 import {
@@ -150,33 +151,23 @@ export default function GenerateRecipeScreen() {
     setGenerating(true);
 
     try {
-      const apiUrl = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/generate-recipes`;
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json',
+      const { data } = await callEdgeFunction('generate-recipes', {
+        ingredients: ingredients.map((i) => i.name),
+        preferences: {
+          dietary: filters.dietary,
+          difficulty: filters.difficulty,
+          maxCookTime: filters.maxCookTime,
+          mealType: filters.mealType,
+          language: filters.language,
         },
-        body: JSON.stringify({
-          ingredients: ingredients.map((i) => i.name),
-          preferences: {
-            dietary: filters.dietary,
-            difficulty: filters.difficulty,
-            maxCookTime: filters.maxCookTime,
-            mealType: filters.mealType,
-            language: filters.language,
-          },
-          generateImage: true,
-        }),
+        generateImage: true,
       });
 
-      const data = await response.json();
-
-      if (data.recipes) {
+      if (data?.recipes) {
         // Enregistrées dans l'historique avant l'affichage, pour que chaque recette ait déjà son id
         // quand l'utilisateur la sauvegarde (sinon elle serait insérée une seconde fois)
         setRecipes(await saveRecipesToHistory(data.recipes));
-      } else if (data.error) {
+      } else if (data?.error) {
         Alert.alert('Error', data.message || 'Failed to generate recipes');
       } else {
         Alert.alert('Error', 'Failed to generate recipes');

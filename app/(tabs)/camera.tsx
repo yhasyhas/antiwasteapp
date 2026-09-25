@@ -17,6 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { alertWriteError } from '@/lib/alertWriteError';
+import { callEdgeFunction, SessionExpiredError } from '@/lib/callEdgeFunction';
 import { Camera, FlipHorizontal, X, Check, Plus } from 'lucide-react-native';
 import { router } from 'expo-router';
 
@@ -125,29 +126,20 @@ export default function CameraScreen() {
       );
 
       // 2. Appeler l'Edge Function avec le jeton de l'utilisateur (la fonction refuse les appels anonymes)
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        Alert.alert('Session expired', 'Please sign in again.');
-        return;
-      }
-
-      const apiUrl = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/analyze-image`;
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'apikey': process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      let result;
+      try {
+        result = await callEdgeFunction('analyze-image', {
           image_base64: base64,
           mime_type: 'image/jpeg',
           language,
           mode: 'photo',
-        }),
-      });
-
-      const data = await response.json().catch(() => null);
+        });
+      } catch (error) {
+        if (!(error instanceof SessionExpiredError)) throw error;
+        Alert.alert('Session expired', 'Please sign in again.');
+        return;
+      }
+      const { response, data } = result;
       log(`réponse HTTP ${response.status} (langue ${language}, fournisseur ${data?.provider ?? '-'})`, {
         error: data?.error,
         message: data?.message,

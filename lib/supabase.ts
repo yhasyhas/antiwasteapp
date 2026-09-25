@@ -3,8 +3,9 @@ import { createClient } from '@supabase/supabase-js';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
+export const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
+// Clé publishable (sb_publishable_…) : remplace l'ancienne clé anon, sans droit particulier
+export const supabasePublishableKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
 
 const ExpoSecureStoreAdapter = {
   getItem: (key: string) => {
@@ -36,7 +37,7 @@ const ExpoSecureStoreAdapter = {
   },
 };
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
   auth: {
     storage: ExpoSecureStoreAdapter as any,
     autoRefreshToken: true,
