@@ -54,9 +54,9 @@ type FailureReason = 'api_error' | 'invalid_json' | 'dietary_refusal';
 
 const FAILURE_MESSAGES: Record<string, Record<FailureReason, string>> = {
   fr: {
-    api_error: 'Le service de génération de recettes est momentanément indisponible. Réessayez dans quelques instants.',
-    invalid_json: 'La réponse de l\'IA était illisible. Réessayez.',
-    dietary_refusal: 'Impossible de créer une recette qui respecte vos régimes alimentaires avec ces ingrédients. Ajoutez des ingrédients ou retirez un régime.',
+    api_error: 'Le service de génération de recettes est momentanément indisponible. Réessaie dans quelques instants.',
+    invalid_json: 'La réponse de l\'IA était illisible. Réessaie.',
+    dietary_refusal: 'Impossible de créer une recette qui respecte tes régimes alimentaires avec ces ingrédients. Ajoute des ingrédients ou retire un régime.',
   },
   en: {
     api_error: 'The recipe generation service is temporarily unavailable. Please try again in a moment.',
@@ -81,8 +81,8 @@ type RequestError = 'unauthorized' | 'quota_exceeded';
 
 const REQUEST_ERROR_MESSAGES: Record<string, Record<RequestError, string>> = {
   fr: {
-    unauthorized: 'Vous devez être connecté pour générer des recettes.',
-    quota_exceeded: 'Vous avez atteint la limite de {limit} générations de recettes par jour. Réessayez demain.',
+    unauthorized: 'Tu dois être connecté pour générer des recettes.',
+    quota_exceeded: 'Tu as atteint la limite de {limit} générations de recettes par jour. Réessaie demain.',
   },
   en: {
     unauthorized: 'You must be signed in to generate recipes.',

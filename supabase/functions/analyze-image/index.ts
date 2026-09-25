@@ -44,13 +44,13 @@ interface AnalyzeImageRequest {
 
 const MESSAGES: Record<string, Record<string, string>> = {
   fr: {
-    unauthorized: 'Vous devez être connecté pour analyser une photo.',
+    unauthorized: 'Tu dois être connecté pour analyser une photo.',
     no_image: 'Aucune image reçue.',
     image_too_large: 'L\'image est trop lourde.',
     not_configured: 'Le service d\'analyse n\'est pas configuré.',
-    ai_error: 'Le service d\'analyse d\'image est momentanément indisponible. Réessayez dans quelques instants.',
-    invalid_response: 'La réponse de l\'IA était illisible. Réessayez.',
-    quota_exceeded: 'Vous avez atteint la limite de {limit} analyses de photos par jour. Réessayez demain, ou ajoutez vos ingrédients à la main.',
+    ai_error: 'Le service d\'analyse d\'image est momentanément indisponible. Réessaie dans quelques instants.',
+    invalid_response: 'La réponse de l\'IA était illisible. Réessaie.',
+    quota_exceeded: 'Tu as atteint la limite de {limit} analyses de photos par jour. Réessaie demain, ou ajoute tes ingrédients à la main.',
   },
   en: {
     unauthorized: 'You must be signed in to analyze a photo.',

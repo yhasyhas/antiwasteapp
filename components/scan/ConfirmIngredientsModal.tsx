@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import { Check, X } from 'lucide-react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
 import type { DetectedIngredient } from '@/hooks/useScan';
 import { scanModalStyles } from './scanModalStyles';
 
@@ -14,6 +15,8 @@ interface Props {
 
 // Ingrédients détectés sur la photo : l'utilisateur décoche ceux qu'il ne veut pas ajouter
 export function ConfirmIngredientsModal({ visible, ingredients, onToggle, onConfirm, onClose }: Props) {
+  const { t } = useLanguage();
+
   return (
     <Modal
       visible={visible}
@@ -24,14 +27,14 @@ export function ConfirmIngredientsModal({ visible, ingredients, onToggle, onConf
       <View style={scanModalStyles.modalOverlay}>
         <View style={scanModalStyles.modalContent}>
           <View style={scanModalStyles.modalHeader}>
-            <Text style={scanModalStyles.modalTitle}>Confirm Ingredients</Text>
+            <Text style={scanModalStyles.modalTitle}>{t('scan.confirmTitle')}</Text>
             <TouchableOpacity onPress={onClose}>
               <X size={24} color="#6b7280" />
             </TouchableOpacity>
           </View>
 
           <Text style={styles.confirmationSubtitle}>
-            We detected these ingredients. Uncheck any you don't want to add:
+            {t('scan.confirmSubtitle')}
           </Text>
 
           <ScrollView style={styles.confirmationList}>
@@ -59,7 +62,7 @@ export function ConfirmIngredientsModal({ visible, ingredients, onToggle, onConf
             onPress={onConfirm}
           >
             <Text style={styles.confirmButtonText}>
-              Add {ingredients.filter(i => i.confirmed).length} Ingredients
+              {t('scan.addCount', { count: ingredients.filter(i => i.confirmed).length })}
             </Text>
           </TouchableOpacity>
         </View>

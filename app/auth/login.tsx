@@ -13,6 +13,7 @@ import {
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { authErrorMessage } from '@/lib/authErrors';
 import { ChefHat } from 'lucide-react-native';
 
 export default function LoginScreen() {
@@ -25,7 +26,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      setError('Please fill in all fields');
+      setError(t('auth.fillAllFields'));
       return;
     }
 
@@ -37,7 +38,7 @@ export default function LoginScreen() {
 
     if (signInError) {
       // Compte créé mais lien de confirmation pas encore ouvert : message explicite plutôt que l'erreur brute
-      setError(signInError.code === 'email_not_confirmed' ? t('emailNotConfirmed') : signInError.message);
+      setError(authErrorMessage(t, signInError));
       return;
     }
 
@@ -60,16 +61,16 @@ export default function LoginScreen() {
           </View>
           <Text style={styles.title}>FreshPlate</Text>
           <Text style={styles.subtitle}>
-            Turn your ingredients into delicious meals
+            {t('auth.tagline')}
           </Text>
         </View>
 
         <View style={styles.form}>
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>{t('auth.email')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="your@email.com"
+              placeholder={t('auth.emailPlaceholder')}
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -79,7 +80,7 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Password</Text>
+            <Text style={styles.label}>{t('auth.password')}</Text>
             <TextInput
               style={styles.input}
               placeholder="••••••••"
@@ -100,7 +101,7 @@ export default function LoginScreen() {
             {loading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.buttonText}>Sign In</Text>
+              <Text style={styles.buttonText}>{t('auth.signIn')}</Text>
             )}
           </TouchableOpacity>
 
@@ -109,7 +110,7 @@ export default function LoginScreen() {
             disabled={loading}
           >
             <Text style={styles.linkText}>
-              Don't have an account? <Text style={styles.linkBold}>Sign Up</Text>
+              {t('auth.noAccount')}<Text style={styles.linkBold}>{t('auth.signUp')}</Text>
             </Text>
           </TouchableOpacity>
         </View>

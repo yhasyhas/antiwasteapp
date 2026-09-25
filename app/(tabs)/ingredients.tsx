@@ -66,12 +66,12 @@ export default function IngredientsScreen() {
 
   const deleteIngredient = async (id: string) => {
     Alert.alert(
-      'Delete Ingredient',
-      'Are you sure you want to remove this ingredient?',
+      t('pantry.deleteTitle'),
+      t('pantry.deleteText'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             setDeleting(id);
@@ -94,12 +94,12 @@ export default function IngredientsScreen() {
 
   const clearAllIngredients = () => {
     Alert.alert(
-      'Clear All Ingredients',
-      'Are you sure you want to remove all ingredients from your pantry?',
+      t('pantry.clearTitle'),
+      t('pantry.clearText'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Clear All',
+          text: t('pantry.clearTitle'),
           style: 'destructive',
           onPress: async () => {
             if (!user) return;
@@ -135,9 +135,9 @@ export default function IngredientsScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.headerTitle}>My Pantry</Text>
+          <Text style={styles.headerTitle}>{t('pantry.title')}</Text>
           <Text style={styles.headerSubtitle}>
-            {ingredients.length} ingredient{ingredients.length !== 1 ? 's' : ''}
+            {t('ingredientCount', { count: ingredients.length })}
           </Text>
         </View>
         {ingredients.length > 0 && (
@@ -154,7 +154,7 @@ export default function IngredientsScreen() {
         <Search size={20} color="#9ca3af" style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search ingredients..."
+          placeholder={t('pantry.searchPlaceholder')}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -165,16 +165,16 @@ export default function IngredientsScreen() {
           <View style={styles.emptyIconContainer}>
             <Package size={64} color="#d1d5db" strokeWidth={1.5} />
           </View>
-          <Text style={styles.emptyTitle}>No Ingredients Yet</Text>
+          <Text style={styles.emptyTitle}>{t('pantry.emptyTitle')}</Text>
           <Text style={styles.emptyText}>
-            Start adding ingredients to generate delicious recipes
+            {t('pantry.emptyText')}
           </Text>
           <TouchableOpacity
             style={styles.addButton}
             onPress={() => router.push('/(tabs)/camera')}
           >
             <Plus size={20} color="#fff" />
-            <Text style={styles.addButtonText}>Add Ingredients</Text>
+            <Text style={styles.addButtonText}>{t('pantry.addIngredients')}</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -185,7 +185,7 @@ export default function IngredientsScreen() {
           >
             {filteredIngredients.length === 0 ? (
               <View style={styles.noResults}>
-                <Text style={styles.noResultsText}>No ingredients found</Text>
+                <Text style={styles.noResultsText}>{t('pantry.noResults')}</Text>
               </View>
             ) : (
               filteredIngredients.map((ingredient) => (
@@ -205,7 +205,7 @@ export default function IngredientsScreen() {
               onPress={() => router.push('/(tabs)/camera')}
             >
               <Plus size={20} color="#10b981" />
-              <Text style={styles.addMoreButtonText}>Add More Ingredients</Text>
+              <Text style={styles.addMoreButtonText}>{t('pantry.addMore')}</Text>
             </TouchableOpacity>
           </View>
         </>

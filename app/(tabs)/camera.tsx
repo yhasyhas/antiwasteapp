@@ -71,13 +71,13 @@ export default function CameraScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Scan Ingredients</Text>
+        <Text style={styles.headerTitle}>{t('scan.title')}</Text>
         <TouchableOpacity
           style={styles.manualButton}
           onPress={() => setShowManualAdd(true)}
         >
           <Plus size={20} color="#10b981" />
-          <Text style={styles.manualButtonText}>Add Manually</Text>
+          <Text style={styles.manualButtonText}>{t('scan.addManually')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -95,15 +95,15 @@ export default function CameraScreen() {
         {analyzing && (
           <View style={styles.analyzingOverlay}>
             <ActivityIndicator size="large" color="#fff" />
-            <Text style={styles.analyzingText}>{t('analyzingPhoto')}</Text>
-            <Text style={styles.analyzingHint}>{t('analyzingHint')}</Text>
+            <Text style={styles.analyzingText}>{t('scan.analyzingPhoto')}</Text>
+            <Text style={styles.analyzingHint}>{t('scan.analyzingHint')}</Text>
           </View>
         )}
       </View>
 
       <View style={styles.controls}>
         <Text style={styles.instructionText}>
-          Point your camera at ingredients
+          {t('scan.pointCamera')}
         </Text>
 
         <View style={styles.buttonRow}>

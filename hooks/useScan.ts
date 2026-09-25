@@ -73,7 +73,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
         });
       } catch (error) {
         if (!(error instanceof SessionExpiredError)) throw error;
-        Alert.alert('Session expired', 'Please sign in again.');
+        Alert.alert(t('common.sessionExpiredTitle'), t('common.sessionExpiredText'));
         return;
       }
       const { response, data } = result;
@@ -89,9 +89,9 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
       if (!response.ok || !data || data.error) {
         const message = [data?.message || data?.error, data?.details].filter(Boolean).join('\n') || `HTTP ${response.status}`;
         // 429 : limite du jour atteinte, le message du serveur l'explique et l'ajout manuel reste possible
-        Alert.alert(response.status === 429 ? t('dailyLimitTitle') : 'Analysis failed', message, [
-          { text: 'Add Manually', onPress: onManualAdd },
-          { text: 'OK', style: 'cancel' },
+        Alert.alert(response.status === 429 ? t('errors.dailyLimitTitle') : t('scan.analysisFailed'), message, [
+          { text: t('scan.addManually'), onPress: onManualAdd },
+          { text: t('common.ok'), style: 'cancel' },
         ]);
         return;
       }
@@ -105,17 +105,17 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
         setShowConfirmation(true);
       } else {
         Alert.alert(
-          'No ingredients detected',
-          'Try taking a clearer photo or add ingredients manually.',
+          t('scan.noIngredientsTitle'),
+          t('scan.noIngredientsText'),
           [
-            { text: 'Add Manually', onPress: onManualAdd },
-            { text: 'Retry', style: 'cancel' }
+            { text: t('scan.addManually'), onPress: onManualAdd },
+            { text: t('common.retry'), style: 'cancel' }
           ]
         );
       }
     } catch (error) {
       log('exception', error);
-      Alert.alert('Error', `Failed to analyze image: ${error instanceof Error ? error.message : String(error)}`);
+      Alert.alert(t('common.error'), t('scan.analyzeError', { message: error instanceof Error ? error.message : String(error) }));
     } finally {
       setAnalyzing(false);
       setCapturedImage(null);
@@ -158,15 +158,15 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
       setShowConfirmation(false);
       setDetectedIngredients([]);
       Alert.alert(
-        'Ingredients Added!',
-        `Added ${confirmed.length} ingredients to your pantry.`,
+        t('scan.ingredientsAdded'),
+        t('scan.addedToPantry', { count: confirmed.length }),
         [
-          { text: 'View Pantry', onPress: () => router.push('/(tabs)/ingredients') },
-          { text: 'Scan More', style: 'cancel' }
+          { text: t('scan.viewPantry'), onPress: () => router.push('/(tabs)/ingredients') },
+          { text: t('scan.scanMore'), style: 'cancel' }
         ]
       );
     } else {
-      Alert.alert('No ingredients selected', 'Please select at least one ingredient to add.');
+      Alert.alert(t('scan.noneSelectedTitle'), t('scan.noneSelectedText'));
     }
   };
 

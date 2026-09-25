@@ -158,8 +158,8 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 ## Phase 4 — Nettoyage du code et traductions
 
 - [x] Découper `app/recipe/generate.tsx` : `components/recipe/Filters.tsx`, `RecipeCard.tsx`, `RecipeDetail.tsx`, `hooks/useRecipeGeneration.ts` — ainsi que caméra, favoris, accueil et garde-manger (`components/`, `hooks/`) ; plus aucun fichier au-delà de 400 lignes
-- [ ] Remplacer l'i18n maison par i18next + react-i18next + expo-localization (langue du téléphone par défaut)
-- [ ] Traduire **tous** les écrans : auth, caméra, ingrédients, favoris, génération, titres des onglets
+- [x] Remplacer l'i18n maison par i18next + react-i18next + expo-localization (langue du téléphone par défaut) — clés typées (`i18n/locales/fr.ts` fait référence), langue gardée sur le téléphone et synchronisée avec Supabase dès que possible
+- [x] Traduire **tous** les écrans : auth, caméra, ingrédients, favoris, génération, titres des onglets — ainsi que les alertes, les erreurs de Supabase Auth et les messages des fonctions (fr : tutoiement)
 - [ ] Brancher Sentry (`@sentry/react-native`)
 - [ ] Écrire le `README.md` : installation, secrets nécessaires, déploiement des fonctions et des migrations
 
@@ -269,4 +269,7 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 | 25/09/2026 | Bucket `recipe-images` public en lecture, écriture réservée à la fonction (clé secrète) | L'URL enregistrée dans `recipes.image_url` s'affiche sans URL signée (qui expirerait). Noms de fichiers aléatoires, bucket impossible à lister. Testé via l'API Storage : un utilisateur ne peut ni déposer, ni supprimer, ni lister ; lecture publique OK |
 | 25/09/2026 | Images : Cloudflare `@cf/black-forest-labs/flux-1-schnell`, 4 étapes, une seule image par recette | Testé de bout en bout : 3,8 à 5,5 s par image, image existante renvoyée en 0,7 s sans quota. Images de 1024×1024 px et 600 à 770 Ko (le modèle ne propose pas d'autre taille) : **à surveiller** pour les données mobiles. Coût estimé d'après la grille Cloudflare : environ 60 neurones par image, soit ~150 images par jour dans l'offre gratuite (10 000 neurones) pour tout le compte ; à vérifier dans le dashboard Cloudflare (Workers AI → utilisation) |
 | 25/09/2026 | Phase 3 validée dans l'app : scan (photo affichée, noms en français), génération avec cuisine, refus clair pour un régime impossible, image à l'ouverture (et dans Favoris) | Tests de fin de phase passés tels que décrits |
+| 25/09/2026 | Traductions : i18next + react-i18next + expo-localization, clés typées (une clé absente d'une langue ou mal écrite est une erreur de typecheck), 183 clés en fr / en / es | Langue du téléphone au premier lancement (français si elle n'est pas prise en charge). Polyfill `intl-pluralrules` pour les pluriels sur Hermes. Libellés des valeurs enregistrées (difficulté, régimes, types de repas) traduits à l'affichage, codes inchangés en base |
+| 25/09/2026 | Changement de langue hors connexion : appliqué et gardé sur le téléphone, envoyé à Supabase plus tard (connexion, retour dans l'app), sans alerte | Corrige le test 9 de la phase 1 : l'alerte « Enregistrement impossible » laissait croire que le changement avait échoué. Un choix en attente l'emporte sur la langue enregistrée dans le compte |
+| 25/09/2026 | Tutoiement dans toute l'app en français, y compris les messages des fonctions | Les textes déjà validés (« Vérifie ta boîte mail ») tutoyaient ; les fonctions vouvoyaient |
 | | *(résultat du test Gemini vs Clarifai)* | |

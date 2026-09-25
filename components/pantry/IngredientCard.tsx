@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Trash2 } from 'lucide-react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export interface PantryIngredient {
   id: string;
@@ -18,6 +19,8 @@ interface Props {
 
 // Ingrédient du garde-manger : nom, quantité, origine (scan ou ajout manuel), suppression
 export function IngredientCard({ ingredient, deleting, onDelete }: Props) {
+  const { t } = useLanguage();
+
   return (
     <View style={styles.ingredientCard}>
       <View style={styles.ingredientInfo}>
@@ -45,8 +48,8 @@ export function IngredientCard({ ingredient, deleting, onDelete }: Props) {
               ]}
             >
               {ingredient.added_via === 'camera'
-                ? 'Scanned'
-                : 'Manual'}
+                ? t('pantry.scanned')
+                : t('pantry.manual')}
             </Text>
           </View>
         </View>

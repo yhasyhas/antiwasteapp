@@ -7,12 +7,14 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Heart } from 'lucide-react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useSavedRecipes } from '@/hooks/useSavedRecipes';
 import { SavedRecipeCard } from '@/components/saved/SavedRecipeCard';
 import { SavedRecipeDetailModal } from '@/components/saved/SavedRecipeDetailModal';
 
 export default function SavedScreen() {
   const { recipes, loading, selectedRecipe, setSelectedRecipe, imageLoading, openRecipe, toggleFavorite } = useSavedRecipes();
+  const { t } = useLanguage();
 
   const favoriteRecipes = recipes.filter((r) => r.is_favorite);
 
@@ -27,10 +29,9 @@ export default function SavedScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Saved Recipes</Text>
+        <Text style={styles.headerTitle}>{t('saved.title')}</Text>
         <Text style={styles.headerSubtitle}>
-          {favoriteRecipes.length} favorite
-          {favoriteRecipes.length !== 1 ? 's' : ''}
+          {t('saved.favoritesCount', { count: favoriteRecipes.length })}
         </Text>
       </View>
 
@@ -39,9 +40,9 @@ export default function SavedScreen() {
           <View style={styles.emptyIconContainer}>
             <Heart size={64} color="#d1d5db" strokeWidth={1.5} />
           </View>
-          <Text style={styles.emptyTitle}>No Saved Recipes</Text>
+          <Text style={styles.emptyTitle}>{t('saved.emptyTitle')}</Text>
           <Text style={styles.emptyText}>
-            Generate recipes and save your favorites here
+            {t('saved.emptyText')}
           </Text>
         </View>
       ) : (
@@ -50,7 +51,7 @@ export default function SavedScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Your Favorites</Text>
+            <Text style={styles.sectionTitle}>{t('saved.yourFavorites')}</Text>
             {favoriteRecipes.map((recipe) => (
               <SavedRecipeCard
                 key={recipe.id}
@@ -64,7 +65,7 @@ export default function SavedScreen() {
 
           {recipes.filter((r) => !r.is_favorite).length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>All Recipes</Text>
+              <Text style={styles.sectionTitle}>{t('saved.allRecipes')}</Text>
               {recipes
                 .filter((r) => !r.is_favorite)
                 .map((recipe) => (

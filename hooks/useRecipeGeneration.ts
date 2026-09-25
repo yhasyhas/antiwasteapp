@@ -12,7 +12,7 @@ import type { Filters, Recipe } from '@/components/recipe/types';
 // État et actions de l'écran de génération : garde-manger, filtres, génération, historique, favoris, images
 export function useRecipeGeneration() {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [ingredients, setIngredients] = useState<any[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +26,8 @@ export function useRecipeGeneration() {
     maxCookTime: 60,
     mealType: 'lunch',
     cuisine: 'any',
-    language: 'fr',
+    // Recettes dans la langue de l'app, sauf préférence enregistrée
+    language,
   });
 
   useEffect(() => {
@@ -64,14 +65,14 @@ export function useRecipeGeneration() {
         difficulty: data.default_difficulty || 'easy',
         maxCookTime: data.max_cook_time || 60,
         mealType: data.default_meal_type || 'lunch',
-        language: data.default_language || 'fr',
+        language: data.default_language || language,
       }));
     }
   };
 
   const generateRecipes = async () => {
     if (ingredients.length === 0) {
-      Alert.alert('No Ingredients', 'Please add ingredients first');
+      Alert.alert(t('generate.noIngredientsTitle'), t('generate.noIngredientsText'));
       return;
     }
 
@@ -96,13 +97,13 @@ export function useRecipeGeneration() {
         // quand l'utilisateur la sauvegarde (sinon elle serait insérée une seconde fois)
         setRecipes(await saveRecipesToHistory(data.recipes));
       } else if (data?.error) {
-        Alert.alert(data.error === 'quota_exceeded' ? t('dailyLimitTitle') : 'Error', data.message || 'Failed to generate recipes');
+        Alert.alert(data.error === 'quota_exceeded' ? t('errors.dailyLimitTitle') : t('common.error'), data.message || t('generate.failed'));
       } else {
-        Alert.alert('Error', 'Failed to generate recipes');
+        Alert.alert(t('common.error'), t('generate.failed'));
       }
     } catch (error) {
       console.error('Error generating recipes:', error);
-      Alert.alert('Error', 'Failed to generate recipes. Please try again.');
+      Alert.alert(t('common.error'), t('generate.failed'));
     } finally {
       setGenerating(false);
     }
@@ -203,14 +204,14 @@ export function useRecipeGeneration() {
     requestImage(recipeId, recipe.image_url);
 
     Alert.alert(
-      'Recipe Saved!',
-      'Your recipe has been saved to favorites.',
+      t('generate.savedTitle'),
+      t('generate.savedText'),
       [
         {
-          text: 'View Saved',
+          text: t('generate.viewSaved'),
           onPress: () => router.push('/(tabs)/saved'),
         },
-        { text: 'OK', style: 'cancel' },
+        { text: t('common.ok'), style: 'cancel' },
       ]
     );
   };

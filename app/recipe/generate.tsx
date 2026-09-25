@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Stack } from 'expo-router';
 import { ChefHat, Sparkles } from 'lucide-react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useRecipeGeneration } from '@/hooks/useRecipeGeneration';
 import { FilterSummary } from '@/components/recipe/FilterSummary';
 import { FiltersModal } from '@/components/recipe/FiltersModal';
@@ -31,6 +32,7 @@ export default function GenerateRecipeScreen() {
     saveRecipe,
     toggleDietaryFilter,
   } = useRecipeGeneration();
+  const { t } = useLanguage();
   const [showFilters, setShowFilters] = useState(false);
 
   if (loading) {
@@ -46,7 +48,7 @@ export default function GenerateRecipeScreen() {
       <Stack.Screen
         options={{
           headerShown: true,
-          title: 'Generate Recipes',
+          title: t('generate.screenTitle'),
           headerStyle: { backgroundColor: '#fff' },
           headerTintColor: '#111827',
         }}
@@ -54,7 +56,7 @@ export default function GenerateRecipeScreen() {
       <View style={styles.container}>
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Your Ingredients</Text>
+            <Text style={styles.sectionTitle}>{t('generate.yourIngredients')}</Text>
             <View style={styles.ingredientGrid}>
               {ingredients.slice(0, 6).map((ingredient) => (
                 <View key={ingredient.id} style={styles.ingredientChip}>
@@ -66,7 +68,7 @@ export default function GenerateRecipeScreen() {
               {ingredients.length > 6 && (
                 <View style={styles.ingredientChip}>
                   <Text style={styles.ingredientChipText}>
-                    +{ingredients.length - 6} more
+                    {t('generate.more', { count: ingredients.length - 6 })}
                   </Text>
                 </View>
               )}
@@ -80,14 +82,14 @@ export default function GenerateRecipeScreen() {
               <View style={styles.emptyIconContainer}>
                 <ChefHat size={64} color="#d1d5db" strokeWidth={1.5} />
               </View>
-              <Text style={styles.emptyTitle}>Ready to Cook?</Text>
+              <Text style={styles.emptyTitle}>{t('generate.emptyTitle')}</Text>
               <Text style={styles.emptyText}>
-                Generate personalized recipes based on your ingredients
+                {t('generate.emptyText')}
               </Text>
             </View>
           ) : (
             <View style={styles.recipesSection}>
-              <Text style={styles.sectionTitle}>Generated Recipes</Text>
+              <Text style={styles.sectionTitle}>{t('generate.generatedRecipes')}</Text>
               {recipes.map((recipe, index) => (
                 <RecipeCard key={index} recipe={recipe} onPress={() => openRecipe(recipe)} />
               ))}
@@ -110,7 +112,7 @@ export default function GenerateRecipeScreen() {
               <>
                 <Sparkles size={20} color="#fff" />
                 <Text style={styles.generateButtonText}>
-                  {recipes.length > 0 ? 'Generate More' : 'Generate Recipes'}
+                  {recipes.length > 0 ? t('generate.generateMore') : t('generate.generate')}
                 </Text>
               </>
             )}

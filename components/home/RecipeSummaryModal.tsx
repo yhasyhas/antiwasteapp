@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { difficultyLabel } from '@/lib/labels';
 import type { RecentRecipe } from './RecentRecipeCard';
 
 // Résumé d'une recette récente (accueil)
@@ -19,7 +20,7 @@ export function RecipeSummaryModal({ recipe, onClose }: { recipe: RecentRecipe; 
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>{recipe.title}</Text>
             <TouchableOpacity onPress={onClose}>
-              <Text style={styles.modalClose}>{t('close')}</Text>
+              <Text style={styles.modalClose}>{t('common.close')}</Text>
             </TouchableOpacity>
           </View>
           <ScrollView>
@@ -27,13 +28,12 @@ export function RecipeSummaryModal({ recipe, onClose }: { recipe: RecentRecipe; 
               {recipe.description}
             </Text>
             <View style={styles.modalSection}>
-              <Text style={styles.modalSectionTitle}>Time & Difficulty</Text>
+              <Text style={styles.modalSectionTitle}>{t('home.timeAndDifficulty')}</Text>
               <Text style={styles.modalText}>
-                Prep: {recipe.prep_time} min | Cook:{' '}
-                {recipe.cook_time} min
+                {t('home.prepAndCook', { prep: recipe.prep_time, cook: recipe.cook_time })}
               </Text>
               <Text style={styles.modalText}>
-                Difficulty: {recipe.difficulty}
+                {t('home.difficultyValue', { difficulty: difficultyLabel(t, recipe.difficulty) })}
               </Text>
             </View>
           </ScrollView>

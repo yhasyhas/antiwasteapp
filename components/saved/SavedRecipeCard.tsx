@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Clock, Heart } from 'lucide-react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { difficultyLabel } from '@/lib/labels';
 import type { SavedRecipe } from '@/hooks/useSavedRecipes';
 
 interface Props {
@@ -12,6 +14,8 @@ interface Props {
 }
 
 export function SavedRecipeCard({ recipe, inFavorites, onPress, onToggleFavorite }: Props) {
+  const { t } = useLanguage();
+
   return (
     <TouchableOpacity
       style={styles.recipeCard}
@@ -46,12 +50,12 @@ export function SavedRecipeCard({ recipe, inFavorites, onPress, onToggleFavorite
         <View style={styles.recipeTime}>
           <Clock size={16} color="#6b7280" />
           <Text style={styles.recipeTimeText}>
-            {recipe.prep_time + recipe.cook_time} min
+            {t('common.minutes', { count: recipe.prep_time + recipe.cook_time })}
           </Text>
         </View>
         <View style={styles.difficultyBadge}>
           <Text style={styles.difficultyText}>
-            {recipe.difficulty}
+            {difficultyLabel(t, recipe.difficulty)}
           </Text>
         </View>
       </View>

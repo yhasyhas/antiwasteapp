@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Clock } from 'lucide-react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { difficultyLabel } from '@/lib/labels';
 
 export interface RecentRecipe {
   id: string;
@@ -15,6 +17,8 @@ export interface RecentRecipe {
 
 // Carte d'une recette récente (accueil)
 export function RecentRecipeCard({ recipe, onPress }: { recipe: RecentRecipe; onPress: () => void }) {
+  const { t } = useLanguage();
+
   return (
     <TouchableOpacity
       style={styles.recipeCard}
@@ -24,7 +28,7 @@ export function RecentRecipeCard({ recipe, onPress }: { recipe: RecentRecipe; on
         <Text style={styles.recipeTitle}>{recipe.title}</Text>
         <View style={styles.difficultyBadge}>
           <Text style={styles.difficultyText}>
-            {recipe.difficulty}
+            {difficultyLabel(t, recipe.difficulty)}
           </Text>
         </View>
       </View>
@@ -35,7 +39,7 @@ export function RecentRecipeCard({ recipe, onPress }: { recipe: RecentRecipe; on
         <View style={styles.recipeTime}>
           <Clock size={16} color="#6b7280" />
           <Text style={styles.recipeTimeText}>
-            {recipe.prep_time + recipe.cook_time} min
+            {t('common.minutes', { count: recipe.prep_time + recipe.cook_time })}
           </Text>
         </View>
         {recipe.dietary_tags.length > 0 && (

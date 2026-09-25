@@ -56,14 +56,14 @@ export function ManualAddModal({ visible, onClose }: { visible: boolean; onClose
       setManualIngredients([]);
       onClose();
       Alert.alert(
-        'Success!',
-        `Added ${ingredientsToInsert.length} ingredients to your pantry.`,
+        t('manual.successTitle'),
+        t('scan.addedToPantry', { count: ingredientsToInsert.length }),
         [
           {
-            text: 'View Pantry',
+            text: t('scan.viewPantry'),
             onPress: () => router.push('/(tabs)/ingredients'),
           },
-          { text: 'OK', style: 'cancel' },
+          { text: t('common.ok'), style: 'cancel' },
         ]
       );
     }
@@ -79,7 +79,7 @@ export function ManualAddModal({ visible, onClose }: { visible: boolean; onClose
       <View style={scanModalStyles.modalOverlay}>
         <View style={scanModalStyles.modalContent}>
           <View style={scanModalStyles.modalHeader}>
-            <Text style={scanModalStyles.modalTitle}>Add Ingredients</Text>
+            <Text style={scanModalStyles.modalTitle}>{t('manual.title')}</Text>
             <TouchableOpacity onPress={onClose}>
               <X size={24} color="#6b7280" />
             </TouchableOpacity>
@@ -87,20 +87,20 @@ export function ManualAddModal({ visible, onClose }: { visible: boolean; onClose
 
           <ScrollView style={styles.modalBody}>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Ingredient Name</Text>
+              <Text style={styles.inputLabel}>{t('manual.nameLabel')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="e.g., Tomatoes"
+                placeholder={t('manual.namePlaceholder')}
                 value={newIngredientName}
                 onChangeText={setNewIngredientName}
               />
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Quantity (optional)</Text>
+              <Text style={styles.inputLabel}>{t('manual.quantityLabel')}</Text>
               <TextInput
                 style={styles.input}
-                placeholder="e.g., 3 pieces"
+                placeholder={t('manual.quantityPlaceholder')}
                 value={newIngredientQuantity}
                 onChangeText={setNewIngredientQuantity}
               />
@@ -111,12 +111,12 @@ export function ManualAddModal({ visible, onClose }: { visible: boolean; onClose
               onPress={addManualIngredient}
             >
               <Plus size={20} color="#10b981" />
-              <Text style={styles.addButtonText}>Add to List</Text>
+              <Text style={styles.addButtonText}>{t('manual.addToList')}</Text>
             </TouchableOpacity>
 
             {manualIngredients.length > 0 && (
               <View style={styles.ingredientList}>
-                <Text style={styles.listTitle}>Added Ingredients:</Text>
+                <Text style={styles.listTitle}>{t('manual.addedList')}</Text>
                 {manualIngredients.map((ingredient, index) => (
                   <View key={index} style={styles.ingredientItem}>
                     <View style={styles.ingredientInfo}>
@@ -150,8 +150,7 @@ export function ManualAddModal({ visible, onClose }: { visible: boolean; onClose
           >
             <Check size={20} color="#fff" />
             <Text style={styles.saveButtonText}>
-              Save {manualIngredients.length} Ingredient
-              {manualIngredients.length !== 1 ? 's' : ''}
+              {t('manual.saveCount', { count: manualIngredients.length })}
             </Text>
           </TouchableOpacity>
         </View>

@@ -70,11 +70,11 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>{t('welcomeBack')}</Text>
+          <Text style={styles.greeting}>{t('home.welcomeBack')}</Text>
           <Text style={styles.email}>{user?.email}</Text>
         </View>
         <TouchableOpacity onPress={signOut} style={styles.logoutButton}>
-          <Text style={styles.logoutText}>{t('signOut')}</Text>
+          <Text style={styles.logoutText}>{t('home.signOut')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -83,9 +83,9 @@ export default function HomeScreen() {
           <View style={styles.heroIcon}>
             <ChefHat size={40} color="#10b981" strokeWidth={2} />
           </View>
-          <Text style={styles.heroTitle}>{t('readyToCook')}</Text>
+          <Text style={styles.heroTitle}>{t('home.readyToCook')}</Text>
           <Text style={styles.heroSubtitle}>
-            {t('youHave')} {ingredients.length} {ingredients.length !== 1 ? t('ingredients') : t('ingredient')} {t('ready')}
+            {t('home.ingredientsReady', { count: ingredients.length })}
           </Text>
           <TouchableOpacity
             style={[
@@ -96,11 +96,11 @@ export default function HomeScreen() {
             disabled={ingredients.length === 0}
           >
             <Sparkles size={20} color="#fff" strokeWidth={2} />
-            <Text style={styles.generateButtonText}>{t('generateRecipes')}</Text>
+            <Text style={styles.generateButtonText}>{t('home.generateRecipes')}</Text>
           </TouchableOpacity>
           {ingredients.length === 0 && (
             <Text style={styles.helpText}>
-              {t('addIngredientsFirst')}
+              {t('home.addIngredientsFirst')}
             </Text>
           )}
         </View>
@@ -113,8 +113,8 @@ export default function HomeScreen() {
             <View style={styles.actionIconContainer}>
               <ChefHat size={24} color="#10b981" />
             </View>
-            <Text style={styles.actionTitle}>{t('scanFood')}</Text>
-            <Text style={styles.actionSubtitle}>{t('takePhoto')}</Text>
+            <Text style={styles.actionTitle}>{t('home.scanFood')}</Text>
+            <Text style={styles.actionSubtitle}>{t('home.takePhoto')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -124,17 +124,17 @@ export default function HomeScreen() {
             <View style={styles.actionIconContainer}>
               <TrendingUp size={24} color="#10b981" />
             </View>
-            <Text style={styles.actionTitle}>{t('myPantry')}</Text>
-            <Text style={styles.actionSubtitle}>{ingredients.length} {t('ingredients')}</Text>
+            <Text style={styles.actionTitle}>{t('home.myPantry')}</Text>
+            <Text style={styles.actionSubtitle}>{t('ingredientCount', { count: ingredients.length })}</Text>
           </TouchableOpacity>
         </View>
 
         {recipes.length > 0 && (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>{t('recentRecipes')}</Text>
+              <Text style={styles.sectionTitle}>{t('home.recentRecipes')}</Text>
               <TouchableOpacity onPress={() => router.push('/(tabs)/saved')}>
-                <Text style={styles.seeAllText}>{t('seeAll')}</Text>
+                <Text style={styles.seeAllText}>{t('home.seeAll')}</Text>
               </TouchableOpacity>
             </View>
 

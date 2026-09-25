@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Modal, Image } from 'react-native';
 import { Heart, X } from 'lucide-react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { difficultyLabel } from '@/lib/labels';
 import type { SavedRecipe } from '@/hooks/useSavedRecipes';
 
 interface Props {
@@ -13,6 +15,8 @@ interface Props {
 
 // Détail d'une recette de l'historique, avec le bouton favori
 export function SavedRecipeDetailModal({ recipe, imageLoading, onClose, onToggleFavorite }: Props) {
+  const { t } = useLanguage();
+
   return (
     <Modal
       visible={!!recipe}
@@ -43,28 +47,28 @@ export function SavedRecipeDetailModal({ recipe, imageLoading, onClose, onToggle
 
             <View style={styles.modalMeta}>
               <View style={styles.metaItem}>
-                <Text style={styles.metaLabel}>Prep Time</Text>
+                <Text style={styles.metaLabel}>{t('recipe.prepTime')}</Text>
                 <Text style={styles.metaValue}>
-                  {recipe.prep_time} min
+                  {t('common.minutes', { count: recipe.prep_time })}
                 </Text>
               </View>
               <View style={styles.metaItem}>
-                <Text style={styles.metaLabel}>Cook Time</Text>
+                <Text style={styles.metaLabel}>{t('recipe.cookTime')}</Text>
                 <Text style={styles.metaValue}>
-                  {recipe.cook_time} min
+                  {t('common.minutes', { count: recipe.cook_time })}
                 </Text>
               </View>
               <View style={styles.metaItem}>
-                <Text style={styles.metaLabel}>Difficulty</Text>
+                <Text style={styles.metaLabel}>{t('recipe.difficulty')}</Text>
                 <Text style={styles.metaValue}>
-                  {recipe.difficulty}
+                  {difficultyLabel(t, recipe.difficulty)}
                 </Text>
               </View>
             </View>
 
             {recipe.dietary_tags.length > 0 && (
               <View style={styles.modalSection}>
-                <Text style={styles.modalSectionTitle}>Dietary Info</Text>
+                <Text style={styles.modalSectionTitle}>{t('recipe.dietaryInfo')}</Text>
                 <View style={styles.tagContainer}>
                   {recipe.dietary_tags.map((tag, index) => (
                     <View key={index} style={styles.dietaryTag}>
@@ -78,7 +82,7 @@ export function SavedRecipeDetailModal({ recipe, imageLoading, onClose, onToggle
             {Array.isArray(recipe.ingredients_used) &&
               recipe.ingredients_used.length > 0 && (
                 <View style={styles.modalSection}>
-                  <Text style={styles.modalSectionTitle}>Ingredients</Text>
+                  <Text style={styles.modalSectionTitle}>{t('recipe.ingredients')}</Text>
                   {recipe.ingredients_used.map((ing, index) => (
                     <View key={index} style={styles.ingredientItem}>
                       <View style={styles.bullet} />
@@ -93,7 +97,7 @@ export function SavedRecipeDetailModal({ recipe, imageLoading, onClose, onToggle
             {Array.isArray(recipe.instructions) &&
               recipe.instructions.length > 0 && (
                 <View style={styles.modalSection}>
-                  <Text style={styles.modalSectionTitle}>Instructions</Text>
+                  <Text style={styles.modalSectionTitle}>{t('recipe.instructions')}</Text>
                   {recipe.instructions.map((step, index) => (
                     <View key={index} style={styles.instructionItem}>
                       <View style={styles.stepNumber}>
@@ -131,8 +135,8 @@ export function SavedRecipeDetailModal({ recipe, imageLoading, onClose, onToggle
               ]}
             >
               {recipe.is_favorite
-                ? 'Remove from Favorites'
-                : 'Save to Favorites'}
+                ? t('saved.removeFavorite')
+                : t('recipe.saveToFavorites')}
             </Text>
           </TouchableOpacity>
         </View>

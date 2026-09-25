@@ -23,13 +23,13 @@ type ErrorCode = 'unauthorized' | 'bad_request' | 'not_found' | 'not_configured'
 
 const MESSAGES: Record<string, Record<ErrorCode, string>> = {
   fr: {
-    unauthorized: 'Vous devez être connecté pour générer une image.',
+    unauthorized: 'Tu dois être connecté pour générer une image.',
     bad_request: 'Recette manquante.',
     not_found: 'Recette introuvable.',
     not_configured: 'La génération d\'images n\'est pas configurée.',
-    quota_exceeded: 'Vous avez atteint la limite de {limit} images de recettes par jour. Réessayez demain.',
-    ai_error: 'Le service d\'images est momentanément indisponible. Réessayez plus tard.',
-    storage_error: 'L\'image n\'a pas pu être enregistrée. Réessayez plus tard.',
+    quota_exceeded: 'Tu as atteint la limite de {limit} images de recettes par jour. Réessaie demain.',
+    ai_error: 'Le service d\'images est momentanément indisponible. Réessaie plus tard.',
+    storage_error: 'L\'image n\'a pas pu être enregistrée. Réessaie plus tard.',
   },
   en: {
     unauthorized: 'You must be signed in to generate an image.',

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Modal, Image } from 'react-native';
 import { Heart, Lightbulb, X } from 'lucide-react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { modalStyles, suggestionStyles } from './modalStyles';
 import type { Recipe } from './types';
 
@@ -14,6 +15,8 @@ interface Props {
 
 // Détail d'une recette générée, avec le bouton de sauvegarde
 export function RecipeDetailModal({ recipe, imageLoading, onClose, onSave }: Props) {
+  const { t } = useLanguage();
+
   return (
     <Modal
       visible={!!recipe}
@@ -43,7 +46,7 @@ export function RecipeDetailModal({ recipe, imageLoading, onClose, onSave }: Pro
                   style={styles.recipeImage}
                   resizeMode="cover"
                 />
-                <Text style={styles.imageCaption}>Voici à quoi votre plat devrait ressembler</Text>
+                <Text style={styles.imageCaption}>{t('recipe.imageCaption')}</Text>
               </View>
             )}
 
@@ -60,19 +63,19 @@ export function RecipeDetailModal({ recipe, imageLoading, onClose, onSave }: Pro
 
             <View style={styles.modalMeta}>
               <View style={styles.metaItem}>
-                <Text style={styles.metaLabel}>Prep</Text>
-                <Text style={styles.metaValue}>{recipe.prep_time} min</Text>
+                <Text style={styles.metaLabel}>{t('recipe.prepTime')}</Text>
+                <Text style={styles.metaValue}>{t('common.minutes', { count: recipe.prep_time })}</Text>
               </View>
               <View style={styles.metaItem}>
-                <Text style={styles.metaLabel}>Cook</Text>
-                <Text style={styles.metaValue}>{recipe.cook_time} min</Text>
+                <Text style={styles.metaLabel}>{t('recipe.cookTime')}</Text>
+                <Text style={styles.metaValue}>{t('common.minutes', { count: recipe.cook_time })}</Text>
               </View>
               <View style={styles.metaItem}>
-                <Text style={styles.metaLabel}>Total</Text>
-                <Text style={styles.metaValue}>{recipe.total_time} min</Text>
+                <Text style={styles.metaLabel}>{t('recipe.totalTime')}</Text>
+                <Text style={styles.metaValue}>{t('common.minutes', { count: recipe.total_time })}</Text>
               </View>
               <View style={styles.metaItem}>
-                <Text style={styles.metaLabel}>Servings</Text>
+                <Text style={styles.metaLabel}>{t('recipe.servings')}</Text>
                 <Text style={styles.metaValue}>{recipe.servings}</Text>
               </View>
             </View>
@@ -80,7 +83,7 @@ export function RecipeDetailModal({ recipe, imageLoading, onClose, onSave }: Pro
             {/* Ingrédients utilisés de la liste */}
             {recipe.ingredients_from_list && recipe.ingredients_from_list.length > 0 && (
               <View style={styles.modalSection}>
-                <Text style={styles.modalSectionTitle}>Ingrédients de votre liste utilisés</Text>
+                <Text style={styles.modalSectionTitle}>{t('recipe.fromPantry')}</Text>
                 <View style={styles.tagContainer}>
                   {recipe.ingredients_from_list.map((ing, index) => (
                     <View key={index} style={styles.ingredientTag}>
@@ -94,7 +97,7 @@ export function RecipeDetailModal({ recipe, imageLoading, onClose, onSave }: Pro
             {/* Ingrédients manquants suggérés */}
             {recipe.missing_ingredients && recipe.missing_ingredients.length > 0 && (
               <View style={styles.modalSection}>
-                <Text style={styles.modalSectionTitle}>Ingrédients suggérés (non dans votre liste)</Text>
+                <Text style={styles.modalSectionTitle}>{t('recipe.missing')}</Text>
                 <View style={styles.tagContainer}>
                   {recipe.missing_ingredients.map((ing, index) => (
                     <View key={index} style={styles.missingIngredientTag}>
@@ -107,7 +110,7 @@ export function RecipeDetailModal({ recipe, imageLoading, onClose, onSave }: Pro
 
             {/* Tous les ingrédients avec quantités */}
             <View style={styles.modalSection}>
-              <Text style={styles.modalSectionTitle}>Ingrédients complets</Text>
+              <Text style={styles.modalSectionTitle}>{t('recipe.allIngredients')}</Text>
               {recipe.ingredients_used.map((ing, index) => (
                 <View key={index} style={styles.ingredientItem}>
                   <View style={styles.bullet} />
@@ -120,7 +123,7 @@ export function RecipeDetailModal({ recipe, imageLoading, onClose, onSave }: Pro
 
             {/* Instructions */}
             <View style={styles.modalSection}>
-              <Text style={styles.modalSectionTitle}>Instructions</Text>
+              <Text style={styles.modalSectionTitle}>{t('recipe.instructions')}</Text>
               {recipe.instructions.map((step, index) => (
                 <View key={index} style={styles.instructionItem}>
                   <View style={styles.stepNumber}>
@@ -134,7 +137,7 @@ export function RecipeDetailModal({ recipe, imageLoading, onClose, onSave }: Pro
             {/* Conseils */}
             {recipe.tips.length > 0 && (
               <View style={styles.modalSection}>
-                <Text style={styles.modalSectionTitle}>Astuces du chef</Text>
+                <Text style={styles.modalSectionTitle}>{t('recipe.tips')}</Text>
                 {recipe.tips.map((tip, index) => (
                   <View key={index} style={styles.tipItem}>
                     <Text style={styles.tipText}>💡 {tip}</Text>
@@ -150,7 +153,7 @@ export function RecipeDetailModal({ recipe, imageLoading, onClose, onSave }: Pro
           >
             <Heart size={20} color="#fff" />
             <Text style={styles.saveRecipeButtonText}>
-              Save to Favorites
+              {t('recipe.saveToFavorites')}
             </Text>
           </TouchableOpacity>
         </View>

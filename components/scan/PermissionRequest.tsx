@@ -1,28 +1,31 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Camera } from 'lucide-react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 // Écran affiché tant que l'accès à la caméra n'est pas accordé
 export function PermissionRequest({ onRequest, onManualAdd }: { onRequest: () => void; onManualAdd: () => void }) {
+  const { t } = useLanguage();
+
   return (
     <View style={styles.permissionContainer}>
       <View style={styles.permissionContent}>
         <Camera size={64} color="#10b981" strokeWidth={2} />
-        <Text style={styles.permissionTitle}>Camera Access Required</Text>
+        <Text style={styles.permissionTitle}>{t('scan.permissionTitle')}</Text>
         <Text style={styles.permissionText}>
-          We need access to your camera to scan ingredients from photos.
+          {t('scan.permissionText')}
         </Text>
         <TouchableOpacity
           style={styles.permissionButton}
           onPress={onRequest}
         >
-          <Text style={styles.permissionButtonText}>Grant Permission</Text>
+          <Text style={styles.permissionButtonText}>{t('scan.grantPermission')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.skipButton}
           onPress={onManualAdd}
         >
-          <Text style={styles.skipButtonText}>Add Manually Instead</Text>
+          <Text style={styles.skipButtonText}>{t('scan.addManuallyInstead')}</Text>
         </TouchableOpacity>
       </View>
     </View>

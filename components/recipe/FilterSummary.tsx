@@ -2,10 +2,11 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Filter, Globe } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { difficultyLabel } from '@/lib/labels';
 import { cuisineOptions, getMealTypeIcon, getMealTypeLabel, mealTypes } from './options';
 import type { Filters } from './types';
 
-// Bouton « Preferences » et aperçu des filtres actifs
+// Bouton « Préférences » et aperçu des filtres actifs
 export function FilterSummary({ filters, onOpen }: { filters: Filters; onOpen: () => void }) {
   const { t } = useLanguage();
 
@@ -16,7 +17,7 @@ export function FilterSummary({ filters, onOpen }: { filters: Filters; onOpen: (
         onPress={onOpen}
       >
         <Filter size={20} color="#10b981" />
-        <Text style={styles.filterButtonText}>Preferences</Text>
+        <Text style={styles.filterButtonText}>{t('generate.preferences')}</Text>
         <View style={styles.filterBadge}>
           <Text style={styles.filterBadgeText}>
             {filters.dietary.length + 2} {/* +2 pour mealType et difficulty */}
@@ -28,10 +29,10 @@ export function FilterSummary({ filters, onOpen }: { filters: Filters; onOpen: (
       <View style={styles.activeFilters}>
         <View style={[styles.activeFilterChip, { backgroundColor: mealTypes.find(m => m.value === filters.mealType)?.color || '#10b981' }]}>
           {React.createElement(getMealTypeIcon(filters.mealType), { size: 14, color: '#fff' })}
-          <Text style={styles.activeFilterText}>{getMealTypeLabel(filters.mealType)}</Text>
+          <Text style={styles.activeFilterText}>{getMealTypeLabel(t, filters.mealType)}</Text>
         </View>
         <View style={styles.activeFilterChip}>
-          <Text style={styles.activeFilterText}>{filters.difficulty}</Text>
+          <Text style={styles.activeFilterText}>{difficultyLabel(t, filters.difficulty)}</Text>
         </View>
         <View style={styles.activeFilterChip}>
           <Globe size={14} color="#fff" />
@@ -40,7 +41,7 @@ export function FilterSummary({ filters, onOpen }: { filters: Filters; onOpen: (
         {filters.cuisine !== 'any' && (
           <View style={styles.activeFilterChip}>
             <Text style={styles.activeFilterText}>
-              {t(cuisineOptions.find((c) => c.value === filters.cuisine)?.labelKey || 'cuisineAny')}
+              {t(cuisineOptions.find((c) => c.value === filters.cuisine)?.labelKey ?? 'cuisine.any')}
             </Text>
           </View>
         )}

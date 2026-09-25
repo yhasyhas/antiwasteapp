@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { Check, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { difficultyLabel } from '@/lib/labels';
 import { cuisineOptions, dietaryOptions, difficultyOptions, languages, mealTypes } from './options';
 import { modalStyles } from './modalStyles';
 import type { Filters } from './types';
@@ -28,16 +29,16 @@ export function FiltersModal({ visible, filters, onChange, onToggleDietary, onCl
       <View style={modalStyles.modalOverlay}>
         <View style={modalStyles.modalContent}>
           <View style={modalStyles.modalHeader}>
-            <Text style={modalStyles.modalTitle}>Recipe Preferences</Text>
+            <Text style={modalStyles.modalTitle}>{t('generate.filtersTitle')}</Text>
             <TouchableOpacity onPress={onClose}>
               <X size={24} color="#6b7280" />
             </TouchableOpacity>
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false}>
-            {/* Type de repas - NOUVEAU */}
+            {/* Type de repas */}
             <View style={styles.filterGroup}>
-              <Text style={styles.filterGroupTitle}>Type de repas</Text>
+              <Text style={styles.filterGroupTitle}>{t('generate.mealType')}</Text>
               <View style={styles.mealTypeGrid}>
                 {mealTypes.map((meal) => (
                   <TouchableOpacity
@@ -47,7 +48,7 @@ export function FiltersModal({ visible, filters, onChange, onToggleDietary, onCl
                       filters.mealType === meal.value && styles.mealTypeCardSelected,
                       { borderColor: meal.color }
                     ]}
-                    onPress={() => onChange({ ...filters, mealType: meal.value as any })}
+                    onPress={() => onChange({ ...filters, mealType: meal.value })}
                   >
                     <View style={[styles.mealTypeIcon, { backgroundColor: meal.color + '20' }]}>
                       <meal.icon size={24} color={meal.color} />
@@ -56,7 +57,7 @@ export function FiltersModal({ visible, filters, onChange, onToggleDietary, onCl
                       styles.mealTypeLabel,
                       filters.mealType === meal.value && styles.mealTypeLabelSelected
                     ]}>
-                      {meal.label}
+                      {t(meal.labelKey)}
                     </Text>
                     {filters.mealType === meal.value && (
                       <View style={[styles.checkBadge, { backgroundColor: meal.color }]}>
@@ -70,7 +71,7 @@ export function FiltersModal({ visible, filters, onChange, onToggleDietary, onCl
 
             {/* Cuisines du monde */}
             <View style={styles.filterGroup}>
-              <Text style={styles.filterGroupTitle}>{t('cuisine')}</Text>
+              <Text style={styles.filterGroupTitle}>{t('cuisine.title')}</Text>
               <View style={styles.optionGrid}>
                 {cuisineOptions.map((option) => (
                   <TouchableOpacity
@@ -97,9 +98,9 @@ export function FiltersModal({ visible, filters, onChange, onToggleDietary, onCl
               </View>
             </View>
 
-            {/* Langue - NOUVEAU */}
+            {/* Langue des recettes */}
             <View style={styles.filterGroup}>
-              <Text style={styles.filterGroupTitle}>Langue / Language</Text>
+              <Text style={styles.filterGroupTitle}>{t('generate.recipeLanguage')}</Text>
               <View style={styles.languageRow}>
                 {languages.map((lang) => (
                   <TouchableOpacity
@@ -124,29 +125,29 @@ export function FiltersModal({ visible, filters, onChange, onToggleDietary, onCl
 
             {/* Préférences diététiques */}
             <View style={styles.filterGroup}>
-              <Text style={styles.filterGroupTitle}>Dietary Preferences</Text>
+              <Text style={styles.filterGroupTitle}>{t('generate.dietary')}</Text>
               <View style={styles.optionGrid}>
                 {dietaryOptions.map((option) => (
                   <TouchableOpacity
-                    key={option}
+                    key={option.value}
                     style={[
                       styles.optionChip,
-                      filters.dietary.includes(option) &&
+                      filters.dietary.includes(option.value) &&
                         styles.optionChipSelected,
                     ]}
-                    onPress={() => onToggleDietary(option)}
+                    onPress={() => onToggleDietary(option.value)}
                   >
-                    {filters.dietary.includes(option) && (
+                    {filters.dietary.includes(option.value) && (
                       <Check size={16} color="#fff" />
                     )}
                     <Text
                       style={[
                         styles.optionChipText,
-                        filters.dietary.includes(option) &&
+                        filters.dietary.includes(option.value) &&
                           styles.optionChipTextSelected,
                       ]}
                     >
-                      {option}
+                      {t(option.labelKey)}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -155,7 +156,7 @@ export function FiltersModal({ visible, filters, onChange, onToggleDietary, onCl
 
             {/* Difficulté */}
             <View style={styles.filterGroup}>
-              <Text style={styles.filterGroupTitle}>Difficulty Level</Text>
+              <Text style={styles.filterGroupTitle}>{t('generate.difficulty')}</Text>
               <View style={styles.optionGrid}>
                 {difficultyOptions.map((option) => (
                   <TouchableOpacity
@@ -166,7 +167,7 @@ export function FiltersModal({ visible, filters, onChange, onToggleDietary, onCl
                         styles.optionChipSelected,
                     ]}
                     onPress={() =>
-                      onChange({ ...filters, difficulty: option as any })
+                      onChange({ ...filters, difficulty: option })
                     }
                   >
                     {filters.difficulty === option && (
@@ -179,7 +180,7 @@ export function FiltersModal({ visible, filters, onChange, onToggleDietary, onCl
                           styles.optionChipTextSelected,
                       ]}
                     >
-                      {option.charAt(0).toUpperCase() + option.slice(1)}
+                      {difficultyLabel(t, option)}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -191,7 +192,7 @@ export function FiltersModal({ visible, filters, onChange, onToggleDietary, onCl
             style={styles.applyButton}
             onPress={onClose}
           >
-            <Text style={styles.applyButtonText}>Apply Filters</Text>
+            <Text style={styles.applyButtonText}>{t('generate.apply')}</Text>
           </TouchableOpacity>
         </View>
       </View>

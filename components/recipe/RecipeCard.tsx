@@ -1,12 +1,16 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Clock, Lightbulb } from 'lucide-react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { difficultyLabel } from '@/lib/labels';
 import { getMealTypeIcon } from './options';
 import { suggestionStyles } from './modalStyles';
 import type { Recipe } from './types';
 
 // Carte d'une recette générée (liste de l'écran de génération)
 export function RecipeCard({ recipe, onPress }: { recipe: Recipe; onPress: () => void }) {
+  const { t } = useLanguage();
+
   return (
     <TouchableOpacity
       style={styles.recipeCard}
@@ -30,7 +34,7 @@ export function RecipeCard({ recipe, onPress }: { recipe: Recipe; onPress: () =>
             styles.expertBadge
           ]}>
             <Text style={styles.difficultyText}>
-              {recipe.difficulty}
+              {difficultyLabel(t, recipe.difficulty)}
             </Text>
           </View>
         </View>
@@ -47,13 +51,13 @@ export function RecipeCard({ recipe, onPress }: { recipe: Recipe; onPress: () =>
           <View style={styles.recipeTime}>
             <Clock size={16} color="#6b7280" />
             <Text style={styles.recipeTimeText}>
-              {recipe.total_time} min
+              {t('common.minutes', { count: recipe.total_time })}
             </Text>
           </View>
           <View style={styles.recipeMeta}>
             {React.createElement(getMealTypeIcon(recipe.meal_type), { size: 14, color: '#6b7280' })}
             <Text style={styles.recipeMetaText}>
-              {recipe.ingredients_from_list?.length || 0} ingr.
+              {t('recipe.ingredientsShort', { count: recipe.ingredients_from_list?.length || 0 })}
             </Text>
           </View>
         </View>

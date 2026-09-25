@@ -13,6 +13,7 @@ import {
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { authErrorMessage } from '@/lib/authErrors';
 import { ChefHat, Mail } from 'lucide-react-native';
 
 export default function SignUpScreen() {
@@ -28,17 +29,17 @@ export default function SignUpScreen() {
 
   const handleSignUp = async () => {
     if (!email || !password || !confirmPassword) {
-      setError('Please fill in all fields');
+      setError(t('auth.fillAllFields'));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('auth.passwordsDontMatch'));
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError(t('auth.passwordTooShort'));
       return;
     }
 
@@ -49,7 +50,7 @@ export default function SignUpScreen() {
     setLoading(false);
 
     if (signUpError) {
-      setError(signUpError.message);
+      setError(authErrorMessage(t, signUpError));
       return;
     }
 
@@ -72,13 +73,13 @@ export default function SignUpScreen() {
           <View style={styles.iconContainer}>
             <Mail size={48} color="#10b981" strokeWidth={2} />
           </View>
-          <Text style={styles.title}>{t('checkYourEmail')}</Text>
+          <Text style={styles.title}>{t('auth.checkYourEmail')}</Text>
           <Text style={[styles.subtitle, styles.confirmationText]}>
-            {t('checkYourEmailText').replace('{email}', email)}
+            {t('auth.checkYourEmailText', { email })}
           </Text>
         </View>
         <TouchableOpacity style={styles.button} onPress={() => router.replace('/auth/login')}>
-          <Text style={styles.buttonText}>{t('backToLogin')}</Text>
+          <Text style={styles.buttonText}>{t('auth.backToLogin')}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -97,18 +98,18 @@ export default function SignUpScreen() {
           <View style={styles.iconContainer}>
             <ChefHat size={48} color="#10b981" strokeWidth={2} />
           </View>
-          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.title}>{t('auth.createAccount')}</Text>
           <Text style={styles.subtitle}>
-            Start reducing food waste today
+            {t('auth.signUpSubtitle')}
           </Text>
         </View>
 
         <View style={styles.form}>
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>{t('auth.email')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="your@email.com"
+              placeholder={t('auth.emailPlaceholder')}
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -118,7 +119,7 @@ export default function SignUpScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Password</Text>
+            <Text style={styles.label}>{t('auth.password')}</Text>
             <TextInput
               style={styles.input}
               placeholder="••••••••"
@@ -130,7 +131,7 @@ export default function SignUpScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Confirm Password</Text>
+            <Text style={styles.label}>{t('auth.confirmPassword')}</Text>
             <TextInput
               style={styles.input}
               placeholder="••••••••"
@@ -143,7 +144,7 @@ export default function SignUpScreen() {
 
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
           {success ? (
-            <Text style={styles.successText}>Account created successfully!</Text>
+            <Text style={styles.successText}>{t('auth.accountCreated')}</Text>
           ) : null}
 
           <TouchableOpacity
@@ -154,7 +155,7 @@ export default function SignUpScreen() {
             {loading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.buttonText}>Create Account</Text>
+              <Text style={styles.buttonText}>{t('auth.createAccount')}</Text>
             )}
           </TouchableOpacity>
 
@@ -163,7 +164,7 @@ export default function SignUpScreen() {
             disabled={loading}
           >
             <Text style={styles.linkText}>
-              Already have an account? <Text style={styles.linkBold}>Sign In</Text>
+              {t('auth.haveAccount')}<Text style={styles.linkBold}>{t('auth.signIn')}</Text>
             </Text>
           </TouchableOpacity>
         </View>

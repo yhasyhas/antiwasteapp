@@ -37,7 +37,7 @@ export default function SettingsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t('settings')}</Text>
+        <Text style={styles.headerTitle}>{t('settings.title')}</Text>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -45,7 +45,7 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Globe size={20} color="#10b981" />
-            <Text style={styles.sectionTitle}>{t('language')}</Text>
+            <Text style={styles.sectionTitle}>{t('settings.language')}</Text>
           </View>
 
           {languages.map((lang) => (
@@ -84,25 +84,25 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <User size={20} color="#10b981" />
-            <Text style={styles.sectionTitle}>Compte</Text>
+            <Text style={styles.sectionTitle}>{t('settings.account')}</Text>
           </View>
 
           <View style={styles.infoCard}>
-            <Text style={styles.infoLabel}>Email</Text>
-            <Text style={styles.infoValue}>{user?.email || 'Non connecté'}</Text>
+            <Text style={styles.infoLabel}>{t('settings.email')}</Text>
+            <Text style={styles.infoValue}>{user?.email || t('settings.notSignedIn')}</Text>
           </View>
 
           <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
             <LogOut size={20} color="#ef4444" />
-            <Text style={styles.logoutText}>Se déconnecter</Text>
+            <Text style={styles.logoutText}>{t('settings.signOut')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Section Info */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Anti-Waste Recipe App v1.0</Text>
+          <Text style={styles.footerText}>{t('settings.appVersion', { version: '1.0' })}</Text>
           <Text style={styles.footerSubtext}>
-            Réduisez le gaspillage alimentaire, une recette à la fois.
+            {t('settings.tagline')}
           </Text>
         </View>
       </ScrollView>
