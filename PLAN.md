@@ -162,7 +162,7 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 - [x] Traduire **tous** les écrans : auth, caméra, ingrédients, favoris, génération, titres des onglets — ainsi que les alertes, les erreurs de Supabase Auth et les messages des fonctions (fr : tutoiement)
 - [x] Poids des images : compression avant stockage (800 px, JPEG qualité 75, 80 à 150 Ko) et recompression des images existantes (`scripts/recompress-recipe-images.ts`)
 - [ ] Brancher Sentry (`@sentry/react-native`)
-- [ ] Écrire le `README.md` : installation, secrets nécessaires, déploiement des fonctions et des migrations
+- [x] Écrire le `README.md` : installation, secrets nécessaires, déploiement des fonctions et des migrations, tests, règles de travail ; `.env.example`
 
 **Terminé quand** : aucun texte affiché n'est écrit en dur, aucun fichier ne dépasse ~400 lignes, et une erreur volontaire remonte dans Sentry.
 
