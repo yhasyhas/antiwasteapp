@@ -137,7 +137,7 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 - [x] Le modèle renvoie, pour chaque ingrédient de la recette, l'identifiant de l'ingrédient du garde-manger correspondant (ou "manquant"), ce qui remplace la comparaison de texte (`matching.ts`)
 - [x] Nouvelle fonction `generate-recipe-image` : Cloudflare Workers AI (FLUX), appelée **seulement** à l'ouverture ou à la sauvegarde d'une recette — quota `QUOTA_DAILY_IMAGES` (10/jour), secrets `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_IMAGE_MODEL`
 - [x] Bucket Supabase Storage `recipe-images` ; enregistrer uniquement l'URL Storage dans `recipes.image_url` — migration `20260925160000`, tests `supabase/tests/recipe_images.sql`
-- [ ] Retirer Pollinations : code, secrets, dépendances (Clarifai : retiré en phase 0.6)
+- [x] Retirer Pollinations : code, secrets, dépendances (Clarifai : retiré en phase 0.6) — plus aucune trace dans le code, les secrets, la base ni la documentation (hors journal)
 - [x] `analyze-image` : champ `storage_tip` (conseil de conservation) pour chaque aliment — voir « Ce qui distingue l'app »
 - [x] `analyze-image` : champ `kind` (`ingredient` ou `dish`) pour distinguer les restes de plats
 - [x] `generate-recipes` : paramètre `cuisine` (cuisines du monde) et filtre correspondant sur l'écran de génération (africaine, maghrébine, asiatique, latino, méditerranéenne, française, peu importe)
