@@ -134,7 +134,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - CORS limité à `ALLOWED_ORIGINS` (par défaut Expo web en local).
 - Tests SQL dans `supabase/tests/` ; règles d'autonomie ajoutées à `PLAN.md`.
 
-### Phase 3 — nouvelle stack IA (branche `phase-3`)
+### Phase 3 — nouvelle stack IA (branche `phase-3`, validée depuis l'app)
 - Scan : Groq lancé en parallèle de Gemini après 2,5 s, première réponse valide retenue ; jeton vérifié sur place. Temps de scan : médiane 6,3 s → 4,2 s, p90 9,7 s → 5,4 s (mesures au journal). Photo affichée pendant l'analyse ; `storage_tip` et `kind` dans la réponse (affichés en phase 5).
 - `_shared/ai.ts` : interface unique pour les deux fournisseurs, utilisée par le scan et la génération.
 - Génération : sortie structurée stricte, N recettes en un appel, Groq puis Gemini ; identifiants du garde-manger (alias en liste fermée) à la place de la comparaison de texte ; régimes vérifiés par ingrédient avec exceptions côté serveur ; paramètre et filtre « Cuisine ».
