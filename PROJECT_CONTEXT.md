@@ -1,6 +1,6 @@
 # Contexte du projet : app mobile anti-gaspi de recettes IA
 
-> Analyse rédigée le 2026-09-23, mise à jour à la fin de la phase 1. La feuille de route est dans `PLAN.md`.
+> Analyse rédigée le 2026-09-23, mise à jour à la fin de la phase 2. La feuille de route est dans `PLAN.md`.
 
 ## 1. Le produit
 
@@ -20,7 +20,7 @@ Langues : français (par défaut), anglais, espagnol.
 |---|---|
 | App | Expo SDK 57, React Native 0.86, React 19.2, expo-router 57 (routes par fichiers), TypeScript 6 |
 | UI | StyleSheet natif, icônes `lucide-react-native`, couleur principale `#10b981` (vert) |
-| Backend | Supabase (projet `iqzjonmjlscuckdmiehk`) : Auth, Postgres avec RLS, Edge Functions (Deno) |
+| Backend | Supabase (projet `iqzjonmjlscuckdmiehk`) : Auth, Postgres avec RLS, Edge Functions (Deno) ; nouvelles clés d'API (publishable / secrète) |
 | Vision | Gemini Flash-Lite (`GEMINI_MODEL`, par défaut `gemini-3.1-flash-lite`, Interactions API, `store: false`), secours Groq `qwen/qwen3.8-27b` (`GROQ_VISION_MODEL`) ; sortie JSON structurée (fonction `analyze-image`). Clarifai a fermé le 17/07/2026 |
 | Génération de recettes | Groq, modèle lu depuis le secret `GROQ_MODEL` (par défaut `openai/gpt-oss-120b`), sortie JSON (fonction `generate-recipes`) |
 | Images des recettes | **Désactivées** jusqu'à la phase 3 (Pollinations mettait sa clé dans l'URL) ; Cloudflare Workers AI prévu |
@@ -45,27 +45,36 @@ app/
 contexts/
   AuthContext.tsx        Session Supabase, crée la ligne `profiles` au premier login
   LanguageContext.tsx    i18n maison (fr/en/es), AsyncStorage + sync user_preferences
-lib/supabase.ts          Client Supabase (SecureStore sur mobile, localStorage sur web)
+lib/supabase.ts          Client Supabase (clé publishable ; SecureStore sur mobile, localStorage sur web)
+lib/callEdgeFunction.ts  Appel d'une Edge Function avec le jeton de l'utilisateur
 lib/alertWriteError.ts   Alerte traduite quand une écriture en base échoue
 supabase/
-  migrations/            Schéma SQL (3 migrations)
+  config.toml            verify_jwt = false pour chaque fonction (vérification dans le code)
+  migrations/            Schéma SQL (5 migrations)
+  tests/                 Tests SQL des règles de sécurité (foyers, quotas), en transaction annulée
   functions/
     _shared/auth.ts      Vérifie l'utilisateur connecté à partir du jeton (401 sinon)
+    _shared/keys.ts      Nouvelles clés (SUPABASE_PUBLISHABLE_KEYS / SUPABASE_SECRET_KEYS)
+    _shared/quota.ts     Quotas par jour et par utilisateur (429 au-delà)
+    _shared/cors.ts      CORS limité aux origines autorisées
     analyze-image/       Photo ou ticket de caisse → ingrédients (nom dans la langue, quantité, catégorie, confiance) ; Gemini puis Groq
     generate-recipes/    Groq → N recettes (1 si ≤2 ingrédients, 2 si ≤5, sinon 3)
       matching.ts        Comparaison des noms d'ingrédients (+ matching.test.ts, tests Deno)
 ```
 
-### Base de données (toutes les tables en RLS, « chaque utilisateur ne voit que ses données »)
+### Base de données (toutes les tables en RLS)
+Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes, favoris et préférences restent par utilisateur.
 - `profiles` (id = auth.users.id, email)
-- `ingredients` (name, quantity, added_via, image_url)
+- `households` (name, created_by, is_personal) et `household_members` (role owner/member, joined_at) : foyer personnel créé à l'inscription
+- `ingredients` (household_id, user_id = qui l'a ajouté, name, quantity, added_via, image_url)
 - `recipes` (title, description, ingredients_used, instructions, prep/cook/total_time, difficulty, dietary_tags, meal_type, language, ingredients_from_list, missing_ingredients, image_url, servings, tips, suggestion)
 - `favorites` (user_id, recipe_id, unique)
 - `user_preferences` (dietary_preferences, excluded_ingredients, default_difficulty, max_cook_time, default_meal_type, default_language)
+- `usage_counters` (user_id, day UTC, scans, generations, images) : écrite seulement par les fonctions
 
 ### Configuration requise
-- `.env` (client) : `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`
-- Secrets des Edge Functions (`supabase secrets set ...`) : `GROQ_API_KEY`, `GEMINI_API_KEY` ; facultatifs (valeurs par défaut dans le code) : `GROQ_MODEL`, `GEMINI_MODEL`, `GROQ_VISION_MODEL`. `POLLINATIONS_API_KEY` volontairement absent (voir PLAN.md)
+- `.env` (client) : `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (relancer Expo avec `-c` après un changement)
+- Secrets des Edge Functions (`supabase secrets set ...`) : `GROQ_API_KEY`, `GEMINI_API_KEY` ; facultatifs (valeurs par défaut dans le code) : `GROQ_MODEL`, `GEMINI_MODEL`, `GROQ_VISION_MODEL`, `QUOTA_DAILY_GENERATIONS` (10), `QUOTA_DAILY_SCANS` (20), `ALLOWED_ORIGINS`. `POLLINATIONS_API_KEY` volontairement absent (voir PLAN.md)
 
 ## 4. Historique : ce qui a été réalisé
 
@@ -112,11 +121,19 @@ supabase/
 - `generateFallbackRecipe` (code mort) supprimé de `generate-recipes`.
 - Section « Ce qui distingue l'app » ajoutée à `PLAN.md` (garde-manger partagé, conservation, restes, cuisines du monde) ; le modèle de données passe à la notion de foyer en phase 2.
 
+### Phase 2 — sécurité et foyers (branche `phase-2`)
+- Nouvelles clés d'API : clé publishable dans l'app, `SUPABASE_PUBLISHABLE_KEYS` / `SUPABASE_SECRET_KEYS` dans les fonctions ; anciennes clés `anon` / `service_role` désactivées.
+- Les deux fonctions vérifient l'utilisateur (`_shared/auth.ts`, `verify_jwt = false`) : 401 sans jeton d'utilisateur, même avec une clé d'API.
+- Quotas : 10 générations et 20 scans par jour (UTC) et par utilisateur, comptés avant l'appel à l'IA et rendus si l'IA échoue ; 429 et « Limite du jour atteinte » dans l'app.
+- Foyers : tables `households` / `household_members`, `household_id` sur `ingredients`, RLS par appartenance au foyer, foyer personnel à l'inscription ; données existantes migrées (sauvegarde dans `backups/`). Aucun changement visible.
+- CORS limité à `ALLOWED_ORIGINS` (par défaut Expo web en local).
+- Tests SQL dans `supabase/tests/` ; règles d'autonomie ajoutées à `PLAN.md`.
+
 ## 5. État actuel et problèmes connus
 
-### Sécurité (phase 2)
-- `generate-recipes` ne vérifie pas l'utilisateur (appel avec la clé anon) : n'importe qui ayant la clé anon peut consommer le quota Groq. `analyze-image` est protégée depuis la phase 0.6. Les deux fonctions acceptent toutes les origines (CORS `*`).
+### Sécurité
 - Des URL d'images Pollinations contenant l'ancienne clé peuvent rester en base.
+- L'app filtre encore ses ingrédients par `user_id` (équivalent tant qu'il n'y a qu'un foyer personnel) : à passer à `household_id` en phase 6, avec `user_id` non modifiable.
 
 ### Dette et finitions
 - Vérification des régimes par mots-clés : faux positifs (« lait de coco » refusé en vegan). Remplacement prévu en phase 3.
@@ -127,10 +144,10 @@ supabase/
 - Phase 1 validée avec des tests partiels (scan + génération, doublons, langue) : inscription, déconnexion, alertes d'écriture et rechargement des onglets restent à tester sur appareil.
 - Confirmation d'email désactivée dans Supabase pendant le développement (à réactiver en phase 7).
 - Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`) : renommage en phase 7, nom pas encore choisi.
-- Pas de README ; seuls tests : `matching.test.ts`.
+- Pas de README ; tests : `matching.test.ts` (Deno) et `supabase/tests/*.sql`.
 
 ## 6. Prochaine étape
-Phase 2 : sécurité, et passage du modèle de données à la notion de foyer (`households`, `household_members`, `household_id`, RLS). Détails dans `PLAN.md`.
+Phase 3 : nouvelle stack IA (`_shared/ai.ts`, sortie structurée, vérification des régimes, images, conservation, cuisines du monde). Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash
@@ -140,5 +157,6 @@ npx supabase db push         # appliquer les migrations sur le projet lié
 npx supabase functions deploy analyze-image
 npx supabase functions deploy generate-recipes
 deno test --no-config supabase/functions/generate-recipes/matching.test.ts   # tests de la comparaison des ingrédients
+PGPASSWORD="$SUPABASE_DB_PASSWORD" psql "$(cat supabase/.temp/pooler-url)" -v ON_ERROR_STOP=1 -f supabase/tests/household_rls.sql   # tests de sécurité (idem usage_counters.sql)
 npm run export               # régénère l'export complet du projet (voir scripts/export-project.mjs)
 ```
