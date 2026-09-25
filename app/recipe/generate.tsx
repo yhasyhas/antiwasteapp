@@ -37,7 +37,8 @@ interface Recipe {
   id?: string;
   title: string;
   description: string;
-  ingredients_used: Array<{name: string; quantity: string; unit: string}>;
+  // pantry_id : identifiant de l'ingrédient du garde-manger utilisé, null s'il manque (depuis la phase 3)
+  ingredients_used: Array<{name: string; quantity: string; unit: string; pantry_id?: string | null}>;
   ingredients_from_list: string[];
   missing_ingredients?: string[];
   instructions: string[];
@@ -48,6 +49,7 @@ interface Recipe {
   difficulty: string;
   meal_type: string;
   dietary_tags: string[];
+  cuisine?: string;
   tips: string[];
   suggestion?: string;
   image_url?: string;
@@ -58,6 +60,7 @@ interface Filters {
   difficulty: 'easy' | 'medium' | 'expert';
   maxCookTime: number;
   mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+  cuisine: Cuisine;
   language: string;
 }
 
@@ -86,6 +89,18 @@ const dietaryOptions = [
 
 const difficultyOptions = ['easy', 'medium', 'expert'];
 
+// Cuisines du monde (paramètre cuisine de generate-recipes) ; libellés dans LanguageContext
+type Cuisine = 'any' | 'african' | 'maghreb' | 'asian' | 'latin' | 'mediterranean' | 'french';
+const cuisineOptions: Array<{ value: Cuisine; labelKey: string }> = [
+  { value: 'any', labelKey: 'cuisineAny' },
+  { value: 'african', labelKey: 'cuisineAfrican' },
+  { value: 'maghreb', labelKey: 'cuisineMaghreb' },
+  { value: 'asian', labelKey: 'cuisineAsian' },
+  { value: 'latin', labelKey: 'cuisineLatin' },
+  { value: 'mediterranean', labelKey: 'cuisineMediterranean' },
+  { value: 'french', labelKey: 'cuisineFrench' },
+];
+
 export default function GenerateRecipeScreen() {
   const { user } = useAuth();
   const { t } = useLanguage();
@@ -100,6 +115,7 @@ export default function GenerateRecipeScreen() {
     difficulty: 'easy',
     maxCookTime: 60,
     mealType: 'lunch',
+    cuisine: 'any',
     language: 'fr',
   });
 
@@ -132,13 +148,14 @@ export default function GenerateRecipeScreen() {
       .single();
 
     if (data) {
-      setFilters({
+      setFilters((current) => ({
+        ...current,
         dietary: data.dietary_preferences || [],
         difficulty: data.default_difficulty || 'easy',
         maxCookTime: data.max_cook_time || 60,
         mealType: data.default_meal_type || 'lunch',
         language: data.default_language || 'fr',
-      });
+      }));
     }
   };
 
@@ -152,15 +169,16 @@ export default function GenerateRecipeScreen() {
 
     try {
       const { data } = await callEdgeFunction('generate-recipes', {
-        ingredients: ingredients.map((i) => i.name),
+        // Avec leur identifiant : le modèle indique quel ingrédient du garde-manger chaque recette utilise
+        ingredients: ingredients.map((i) => ({ id: i.id, name: i.name, quantity: i.quantity || '' })),
         preferences: {
           dietary: filters.dietary,
           difficulty: filters.difficulty,
           maxCookTime: filters.maxCookTime,
           mealType: filters.mealType,
+          cuisine: filters.cuisine,
           language: filters.language,
         },
-        generateImage: true,
       });
 
       if (data?.recipes) {
@@ -353,6 +371,13 @@ export default function GenerateRecipeScreen() {
                 <Globe size={14} color="#fff" />
                 <Text style={styles.activeFilterText}>{filters.language.toUpperCase()}</Text>
               </View>
+              {filters.cuisine !== 'any' && (
+                <View style={styles.activeFilterChip}>
+                  <Text style={styles.activeFilterText}>
+                    {t(cuisineOptions.find((c) => c.value === filters.cuisine)?.labelKey || 'cuisineAny')}
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
 
@@ -494,6 +519,35 @@ export default function GenerateRecipeScreen() {
                             <Check size={12} color="#fff" />
                           </View>
                         )}
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+
+                {/* Cuisines du monde */}
+                <View style={styles.filterGroup}>
+                  <Text style={styles.filterGroupTitle}>{t('cuisine')}</Text>
+                  <View style={styles.optionGrid}>
+                    {cuisineOptions.map((option) => (
+                      <TouchableOpacity
+                        key={option.value}
+                        style={[
+                          styles.optionChip,
+                          filters.cuisine === option.value && styles.optionChipSelected,
+                        ]}
+                        onPress={() => setFilters({ ...filters, cuisine: option.value })}
+                      >
+                        {filters.cuisine === option.value && (
+                          <Check size={16} color="#fff" />
+                        )}
+                        <Text
+                          style={[
+                            styles.optionChipText,
+                            filters.cuisine === option.value && styles.optionChipTextSelected,
+                          ]}
+                        >
+                          {t(option.labelKey)}
+                        </Text>
                       </TouchableOpacity>
                     ))}
                   </View>

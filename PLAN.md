@@ -140,7 +140,7 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 - [ ] Retirer Pollinations : code, secrets, dépendances (Clarifai : retiré en phase 0.6)
 - [x] `analyze-image` : champ `storage_tip` (conseil de conservation) pour chaque aliment — voir « Ce qui distingue l'app »
 - [x] `analyze-image` : champ `kind` (`ingredient` ou `dish`) pour distinguer les restes de plats
-- [ ] `generate-recipes` : paramètre `cuisine` (cuisines du monde) et filtre correspondant sur l'écran de génération
+- [x] `generate-recipes` : paramètre `cuisine` (cuisines du monde) et filtre correspondant sur l'écran de génération (africaine, maghrébine, asiatique, latino, méditerranéenne, française, peu importe)
 
 ### Point d'attention — Temps d'analyse des photos
 
