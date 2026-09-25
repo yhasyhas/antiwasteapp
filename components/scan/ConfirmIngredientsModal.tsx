@@ -1,21 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import { Check, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { DetectedIngredient } from '@/hooks/useScan';
+import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
+import { ExpiryPicker } from '@/components/expiry/ExpiryPicker';
 import { scanModalStyles } from './scanModalStyles';
 
 interface Props {
   visible: boolean;
   ingredients: DetectedIngredient[];
   onToggle: (index: number) => void;
+  onExpiryChange: (index: number, expiresAt: string) => void;
   onConfirm: () => void;
   onClose: () => void;
 }
 
-// Ingrédients détectés sur la photo : l'utilisateur décoche ceux qu'il ne veut pas ajouter
-export function ConfirmIngredientsModal({ visible, ingredients, onToggle, onConfirm, onClose }: Props) {
+// Ingrédients détectés sur la photo : l'utilisateur décoche ceux qu'il ne veut pas ajouter et peut
+// changer la date de péremption proposée (toucher le badge de date)
+export function ConfirmIngredientsModal({ visible, ingredients, onToggle, onExpiryChange, onConfirm, onClose }: Props) {
   const { t } = useLanguage();
+  // Ingrédient dont la date est en cours de modification
+  const [editing, setEditing] = useState<number | null>(null);
 
   return (
     <Modal
@@ -39,21 +45,36 @@ export function ConfirmIngredientsModal({ visible, ingredients, onToggle, onConf
 
           <ScrollView style={styles.confirmationList}>
             {ingredients.map((ing, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.confirmationItem}
-                onPress={() => onToggle(index)}
-              >
-                <View style={[styles.checkbox, ing.confirmed && styles.checkboxChecked]}>
-                  {ing.confirmed && <Check size={16} color="#fff" />}
-                </View>
-                <Text style={[styles.confirmationText, !ing.confirmed && styles.confirmationTextUnchecked]}>
-                  {ing.name}
-                </Text>
-                {ing.quantity !== '' && (
-                  <Text style={styles.confirmationQuantity}>{ing.quantity}</Text>
+              <View key={index} style={styles.confirmationItem}>
+                <TouchableOpacity style={styles.confirmationRow} onPress={() => onToggle(index)}>
+                  <View style={[styles.checkbox, ing.confirmed && styles.checkboxChecked]}>
+                    {ing.confirmed && <Check size={16} color="#fff" />}
+                  </View>
+                  <Text style={[styles.confirmationText, !ing.confirmed && styles.confirmationTextUnchecked]}>
+                    {ing.name}
+                  </Text>
+                  {ing.quantity !== '' && (
+                    <Text style={styles.confirmationQuantity}>{ing.quantity}</Text>
+                  )}
+                </TouchableOpacity>
+                {ing.confirmed && (
+                  <View style={styles.details}>
+                    <View style={styles.badges}>
+                      <ExpiryBadge expiresAt={ing.expires_at} onPress={() => setEditing(editing === index ? null : index)} />
+                      {ing.kind === 'dish' && (
+                        <View style={styles.leftoverBadge}>
+                          <Text style={styles.leftoverText}>{t('pantry.leftover')}</Text>
+                        </View>
+                      )}
+                    </View>
+                    {editing === index && (
+                      <View style={styles.picker}>
+                        <ExpiryPicker value={ing.expires_at} onChange={(iso) => onExpiryChange(index, iso)} />
+                      </View>
+                    )}
+                  </View>
                 )}
-              </TouchableOpacity>
+              </View>
             ))}
           </ScrollView>
 
@@ -79,16 +100,40 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   confirmationList: {
-    maxHeight: 300,
+    maxHeight: 420,
     marginBottom: 16,
   },
   confirmationItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#f3f4f6',
+  },
+  confirmationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  details: {
+    marginLeft: 36,
+    marginTop: 8,
+  },
+  badges: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  leftoverBadge: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+    backgroundColor: '#fef3c7',
+  },
+  leftoverText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#b45309',
+  },
+  picker: {
+    marginTop: 10,
   },
   checkbox: {
     width: 24,

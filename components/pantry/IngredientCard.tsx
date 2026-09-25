@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { Trash2 } from 'lucide-react-native';
+import { Lightbulb, Trash2 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
+import type { FoodKind } from '@/lib/expiry';
 
 export interface PantryIngredient {
   id: string;
@@ -9,17 +11,31 @@ export interface PantryIngredient {
   quantity: string;
   added_via: string;
   created_at: string;
+  expires_at: string | null;
+  category: string | null;
+  kind: FoodKind;
+  storage_tip: string | null;
+  barcode: string | null;
 }
 
 interface Props {
   ingredient: PantryIngredient;
   deleting: boolean;
   onDelete: () => void;
+  onEditExpiry: () => void;
 }
 
-// Ingrédient du garde-manger : nom, quantité, origine (scan ou ajout manuel), suppression
-export function IngredientCard({ ingredient, deleting, onDelete }: Props) {
+const ORIGIN_STYLES: Record<string, { background: string; text: string; labelKey: 'pantry.scanned' | 'pantry.manual' | 'pantry.barcode' }> = {
+  camera: { background: '#ede9fe', text: '#7c3aed', labelKey: 'pantry.scanned' },
+  barcode: { background: '#e0e7ff', text: '#4338ca', labelKey: 'pantry.barcode' },
+  manual: { background: '#dbeafe', text: '#2563eb', labelKey: 'pantry.manual' },
+};
+
+// Ingrédient du garde-manger : nom, quantité, date de péremption (badge de couleur, modifiable),
+// reste de plat, origine, conseil de conservation, suppression
+export function IngredientCard({ ingredient, deleting, onDelete, onEditExpiry }: Props) {
   const { t } = useLanguage();
+  const origin = ORIGIN_STYLES[ingredient.added_via] ?? ORIGIN_STYLES.manual;
 
   return (
     <View style={styles.ingredientCard}>
@@ -31,28 +47,22 @@ export function IngredientCard({ ingredient, deleting, onDelete }: Props) {
           </Text>
         ) : null}
         <View style={styles.ingredientMeta}>
-          <View
-            style={[
-              styles.badge,
-              ingredient.added_via === 'camera'
-                ? styles.badgeCamera
-                : styles.badgeManual,
-            ]}
-          >
-            <Text
-              style={[
-                styles.badgeText,
-                ingredient.added_via === 'camera'
-                  ? styles.badgeTextCamera
-                  : styles.badgeTextManual,
-              ]}
-            >
-              {ingredient.added_via === 'camera'
-                ? t('pantry.scanned')
-                : t('pantry.manual')}
-            </Text>
+          <ExpiryBadge expiresAt={ingredient.expires_at} onPress={onEditExpiry} />
+          {ingredient.kind === 'dish' && (
+            <View style={[styles.badge, styles.badgeLeftover]}>
+              <Text style={[styles.badgeText, styles.badgeTextLeftover]}>{t('pantry.leftover')}</Text>
+            </View>
+          )}
+          <View style={[styles.badge, { backgroundColor: origin.background }]}>
+            <Text style={[styles.badgeText, { color: origin.text }]}>{t(origin.labelKey)}</Text>
           </View>
         </View>
+        {ingredient.storage_tip ? (
+          <View style={styles.tip}>
+            <Lightbulb size={14} color="#6b7280" />
+            <Text style={styles.tipText}>{ingredient.storage_tip}</Text>
+          </View>
+        ) : null}
       </View>
       <TouchableOpacity
         onPress={onDelete}
@@ -100,28 +110,36 @@ const styles = StyleSheet.create({
   },
   ingredientMeta: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
+    gap: 6,
   },
   badge: {
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 6,
   },
-  badgeCamera: {
-    backgroundColor: '#ede9fe',
-  },
-  badgeManual: {
-    backgroundColor: '#dbeafe',
-  },
   badgeText: {
     fontSize: 12,
     fontWeight: '600',
   },
-  badgeTextCamera: {
-    color: '#7c3aed',
+  badgeLeftover: {
+    backgroundColor: '#fef3c7',
   },
-  badgeTextManual: {
-    color: '#2563eb',
+  badgeTextLeftover: {
+    color: '#b45309',
+  },
+  tip: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 6,
+    marginTop: 8,
+  },
+  tipText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#6b7280',
+    lineHeight: 18,
   },
   deleteButton: {
     padding: 8,

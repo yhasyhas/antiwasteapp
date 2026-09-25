@@ -29,6 +29,7 @@ export default function CameraScreen() {
     setShowConfirmation,
     analyzeImage,
     toggleDetected,
+    setDetectedExpiry,
     confirmDetected,
   } = useScan({ onManualAdd: () => setShowManualAdd(true) });
 
@@ -132,6 +133,7 @@ export default function CameraScreen() {
         visible={showConfirmation}
         ingredients={detectedIngredients}
         onToggle={toggleDetected}
+        onExpiryChange={setDetectedExpiry}
         onConfirm={confirmDetected}
         onClose={() => setShowConfirmation(false)}
       />

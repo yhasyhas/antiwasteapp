@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { callEdgeFunction, SessionExpiredError } from '@/lib/callEdgeFunction';
+import { expiryFromShelfLife, type FoodKind } from '@/lib/expiry';
 
 // Ingrédient renvoyé par l'Edge Function analyze-image
 interface ScannedIngredient {
@@ -14,14 +15,20 @@ interface ScannedIngredient {
   quantity: string;
   category: string;
   confidence: number;
-  // Reçus depuis la phase 3, affichés en phase 5
-  kind?: 'ingredient' | 'dish';
+  kind?: FoodKind;
   storage_tip?: string;
+  // Durée de conservation estimée par l'IA, en jours
+  shelf_life_days?: number;
 }
 
 export interface DetectedIngredient {
   name: string;
   quantity: string;
+  category: string;
+  kind: FoodKind;
+  storage_tip: string;
+  // Date proposée à partir de shelf_life_days, modifiable dans la confirmation
+  expires_at: string;
   confirmed: boolean;
 }
 
@@ -83,11 +90,18 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
       }
 
       if (data.ingredients && data.ingredients.length > 0) {
-        setDetectedIngredients(data.ingredients.map((ingredient: ScannedIngredient) => ({
-          name: ingredient.name,
-          quantity: ingredient.quantity,
-          confirmed: true,
-        })));
+        setDetectedIngredients(data.ingredients.map((ingredient: ScannedIngredient) => {
+          const kind: FoodKind = ingredient.kind === 'dish' ? 'dish' : 'ingredient';
+          return {
+            name: ingredient.name,
+            quantity: ingredient.quantity,
+            category: ingredient.category,
+            kind,
+            storage_tip: ingredient.storage_tip ?? '',
+            expires_at: expiryFromShelfLife(ingredient.shelf_life_days, kind),
+            confirmed: true,
+          };
+        }));
         setShowConfirmation(true);
       } else {
         Alert.alert(
@@ -109,19 +123,25 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
   };
 
   const toggleDetected = (index: number) => {
-    const updated = [...detectedIngredients];
-    updated[index].confirmed = !updated[index].confirmed;
-    setDetectedIngredients(updated);
+    setDetectedIngredients(detectedIngredients.map((item, i) => i === index ? { ...item, confirmed: !item.confirmed } : item));
+  };
+
+  const setDetectedExpiry = (index: number, expires_at: string) => {
+    setDetectedIngredients(detectedIngredients.map((item, i) => i === index ? { ...item, expires_at } : item));
   };
 
   // Renvoie true si les ingrédients ont bien été enregistrés
-  const saveIngredients = async (ingredients: Array<{ name: string; quantity: string }>) => {
+  const saveIngredients = async (ingredients: DetectedIngredient[]) => {
     if (!user) return false;
 
-    const ingredientsToInsert = ingredients.map(({ name, quantity }) => ({
+    const ingredientsToInsert = ingredients.map(({ name, quantity, category, kind, storage_tip, expires_at }) => ({
       user_id: user.id,
       name,
       quantity,
+      category,
+      kind,
+      storage_tip: storage_tip || null,
+      expires_at,
       added_via: 'camera',
     }));
 
@@ -164,6 +184,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
     setShowConfirmation,
     analyzeImage,
     toggleDetected,
+    setDetectedExpiry,
     confirmDetected,
   };
 }

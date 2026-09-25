@@ -1,22 +1,44 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, Modal, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, Modal, ScrollView, Switch } from 'react-native';
 import { router } from 'expo-router';
 import { Check, Plus, X } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { alertWriteError } from '@/lib/alertWriteError';
+import { expiryFromShelfLife, type FoodKind } from '@/lib/expiry';
+import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
+import { ExpiryPicker } from '@/components/expiry/ExpiryPicker';
 import { scanModalStyles } from './scanModalStyles';
+
+interface ManualIngredient {
+  name: string;
+  quantity: string;
+  kind: FoodKind;
+  expires_at: string;
+}
 
 // Ajout manuel d'ingrédients. La saisie est conservée quand la fenêtre est fermée sans enregistrer.
 export function ManualAddModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const { user } = useAuth();
   const { t } = useLanguage();
-  const [manualIngredients, setManualIngredients] = useState<
-    Array<{ name: string; quantity: string }>
-  >([]);
+  const [manualIngredients, setManualIngredients] = useState<ManualIngredient[]>([]);
   const [newIngredientName, setNewIngredientName] = useState('');
   const [newIngredientQuantity, setNewIngredientQuantity] = useState('');
+  // Date proposée : 7 jours, 3 pour un reste ; tant que l'utilisateur ne l'a pas changée, elle suit le type
+  const [isLeftover, setIsLeftover] = useState(false);
+  const [newExpiry, setNewExpiry] = useState(() => expiryFromShelfLife(undefined));
+  const [expiryChanged, setExpiryChanged] = useState(false);
+
+  const toggleLeftover = (value: boolean) => {
+    setIsLeftover(value);
+    if (!expiryChanged) setNewExpiry(expiryFromShelfLife(undefined, value ? 'dish' : 'ingredient'));
+  };
+
+  const changeExpiry = (iso: string) => {
+    setNewExpiry(iso);
+    setExpiryChanged(true);
+  };
 
   const addManualIngredient = () => {
     if (!newIngredientName.trim()) return;
@@ -26,10 +48,15 @@ export function ManualAddModal({ visible, onClose }: { visible: boolean; onClose
       {
         name: newIngredientName.trim(),
         quantity: newIngredientQuantity.trim(),
+        kind: isLeftover ? 'dish' : 'ingredient',
+        expires_at: newExpiry,
       },
     ]);
     setNewIngredientName('');
     setNewIngredientQuantity('');
+    setIsLeftover(false);
+    setNewExpiry(expiryFromShelfLife(undefined));
+    setExpiryChanged(false);
   };
 
   const removeManualIngredient = (index: number) => {
@@ -43,6 +70,8 @@ export function ManualAddModal({ visible, onClose }: { visible: boolean; onClose
       user_id: user.id,
       name: ingredient.name,
       quantity: ingredient.quantity,
+      kind: ingredient.kind,
+      expires_at: ingredient.expires_at,
       added_via: 'manual',
     }));
 
@@ -106,6 +135,21 @@ export function ManualAddModal({ visible, onClose }: { visible: boolean; onClose
               />
             </View>
 
+            <View style={styles.switchRow}>
+              <Text style={styles.switchLabel}>{t('manual.isLeftover')}</Text>
+              <Switch
+                value={isLeftover}
+                onValueChange={toggleLeftover}
+                trackColor={{ true: '#6ee7b7', false: '#d1d5db' }}
+                thumbColor={isLeftover ? '#10b981' : '#f9fafb'}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>{t('expiry.label')}</Text>
+              <ExpiryPicker value={newExpiry} onChange={changeExpiry} />
+            </View>
+
             <TouchableOpacity
               style={styles.addButton}
               onPress={addManualIngredient}
@@ -128,6 +172,12 @@ export function ManualAddModal({ visible, onClose }: { visible: boolean; onClose
                           {ingredient.quantity}
                         </Text>
                       ) : null}
+                      <View style={styles.itemBadges}>
+                        <ExpiryBadge expiresAt={ingredient.expires_at} />
+                        {ingredient.kind === 'dish' && (
+                          <Text style={styles.leftoverText}>{t('pantry.leftover')}</Text>
+                        )}
+                      </View>
                     </View>
                     <TouchableOpacity
                       onPress={() => removeManualIngredient(index)}
@@ -178,6 +228,29 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
+  },
+  switchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  switchLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+    flex: 1,
+  },
+  itemBadges: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 6,
+  },
+  leftoverText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#b45309',
   },
   addButton: {
     flexDirection: 'row',
