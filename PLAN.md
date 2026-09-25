@@ -19,6 +19,12 @@ Dernière mise à jour : 23/09/2026
 - En fin de phase : mettre à jour `PROJECT_CONTEXT.md` et régénérer l'export (`npm run export`).
 - En fin de phase, après la fusion dans `master` : pousser sur GitHub (`git push`). Le dépôt distant est github.com/yhasyhas/antiwasteapp.
 
+**Autonomie de Claude** (depuis la phase 2)
+- **Avance seul pour** : le code, les commits, le déploiement des fonctions, les secrets de configuration (quotas, noms de modèles), et les migrations, à condition que chacune soit testée en transaction annulée sur la base distante, avec des tests de sécurité qui passent.
+- **Avant toute migration qui modifie ou supprime des données existantes** : sauvegarde avec `npx supabase db dump --data-only` dans `backups/` (hors de git, dans le `.gitignore`).
+- **S'arrête et demande** : pour toute action irréversible (suppression de tables ou de colonnes contenant des données, désactivation des anciennes clés), toute action qui coûte de l'argent, tout ce qui nécessite l'accès au dashboard ou aux comptes, et tout choix produit qui change ce que l'utilisateur voit ou vit dans l'app.
+- **En fin de phase, avant de fusionner** : un rapport court (ce qui a été fait, les décisions prises, ce qui reste à surveiller) et une liste de tests limitée à l'essentiel. La fusion dans `master` attend le retour sur ces tests.
+
 ## Stack cible
 
 | Rôle | Aujourd'hui | Cible |
@@ -179,6 +185,7 @@ Objectif : **moins de 5 s pour 90 % des scans**. Mesuré le 24/09/2026 : Gemini 
 - [ ] Écran de préférences : régimes, ingrédients exclus, temps max ; utilisé par la génération
 - [ ] Connexion anonyme Supabase pour tester sans compte, avec conversion en compte plus tard
 - [ ] Garde-manger partagé : inviter un membre, rejoindre un foyer, voir qui a ajouté quoi
+- [ ] Garde-manger partagé : empêcher la modification de `user_id` sur un ingrédient existant (l'auteur ne doit pas pouvoir être changé par un autre membre)
 - [ ] Cuisines du monde : préférence de cuisine enregistrée et utilisée par défaut
 
 **Terminé quand** : un nouvel utilisateur peut scanner et générer une recette sans créer de compte, puis garder ses données en créant son compte.
