@@ -169,16 +169,16 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 
 ## Phase 5 — Le cœur anti-gaspi
 
-- [ ] Migration : colonnes `expires_at` (date) et `category` (text) sur `ingredients`
-- [ ] Au scan, l'IA propose une date de péremption selon la catégorie ; l'utilisateur la modifie avec des boutons rapides (+3 j, +1 sem., +1 mois)
-- [ ] Garde-manger trié par urgence, avec badges de couleur (expiré / bientôt / OK)
-- [ ] Le prompt de génération donne la priorité aux ingrédients qui expirent bientôt
-- [ ] Notifications locales avec `expo-notifications` : rappel la veille de la péremption
-- [ ] Bouton « J'ai cuisiné ça » : retire du garde-manger les ingrédients utilisés (avec confirmation)
-- [ ] Scan de code-barres (`expo-camera`) + recherche du produit sur Open Food Facts
-- [ ] Conserver avant de cuisiner : enregistrer `storage_tip` et l'afficher sur chaque ingrédient
-- [ ] Restes de plats : date de péremption courte automatique pour les éléments `kind = dish`
-- [ ] Restes de plats : mode de génération « Transformer mes restes »
+- [x] Migration : colonnes `expires_at` (date), `category`, `kind`, `storage_tip` et `barcode` sur `ingredients`
+- [x] Au scan, l'IA estime la durée de conservation (`shelf_life_days`) ; date proposée au scan et à l'ajout manuel, modifiable avec des boutons rapides (+3 j, +1 sem., +1 mois) ou un calendrier
+- [x] Garde-manger trié par urgence, avec badges de couleur (expiré / bientôt / OK) ; date modifiable en touchant le badge
+- [x] Le prompt de génération donne la priorité aux ingrédients qui expirent bientôt (et à ceux que l'utilisateur choisit)
+- [x] Notifications locales avec `expo-notifications` : une seule par jour à 9 h, qui regroupe les aliments expirant aujourd'hui ou demain ; autorisation demandée au premier ajout d'une date ; la notification ouvre la génération avec ces aliments présélectionnés
+- [x] Bouton « J'ai cuisiné ça » : ingrédients du garde-manger utilisés, tous cochés ; l'utilisateur décoche ce qu'il lui reste, le reste est retiré
+- [x] Scan de code-barres (`expo-camera`) + recherche du produit sur Open Food Facts (User-Agent de l'app) ; produit inconnu : ajout manuel avec le code prérempli
+- [x] Conserver avant de cuisiner : enregistrer `storage_tip` et l'afficher sur chaque ingrédient
+- [x] Restes de plats : date de péremption courte automatique (2 à 3 jours) pour les éléments `kind = dish`, identifiés « Reste »
+- [x] Restes de plats : mode de génération « Transformer mes restes »
 
 **Terminé quand** : un aliment ajouté avec une date proche déclenche une notification, et la recette proposée l'utilise en premier.
 
@@ -277,4 +277,14 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 | 25/09/2026 | Images des recettes : 800 px de large, JPEG qualité 75 (ImageScript dans la fonction) | Essais sur deux images FLUX : 1024 px q75 = 135 à 190 Ko ; 800 px q75 = 96 à 131 Ko sans perte visible sur un téléphone ; 720 px et 640 px plus légers mais moins nets sur les grands écrans. En production : 81 et 111 Ko, temps de génération inchangé (5 à 6 s). Les 2 images existantes recompressées (677 et 697 Ko → 120 et 116 Ko), originaux dans `backups/recipe-images/`, URL inchangées |
 | 25/09/2026 | Sentry, offre gratuite (Developer), données hébergées dans l'UE (`ingest.de.sentry.io`) ; `@sentry/react-native` ~7.11, DSN dans `.env` (`EXPO_PUBLIC_SENTRY_DSN`) | Dans Expo Go, seules les erreurs JavaScript remontent (pas les plantages natifs ni la mise en file hors connexion) : un build EAS sera nécessaire pour le reste. `sendDefaultPii: false`, seul l'uuid de l'utilisateur est joint (ni e-mail ni IP). Événement de test envoyé à l'API de Sentry : accepté (200). Bouton d'erreur volontaire dans Réglages, visible seulement en développement |
 | 25/09/2026 | Phase 4 validée dans l'app : Sentry (erreur de test reçue), langue du téléphone au premier lancement, parcours complet dans les trois langues ; anciens tests de la phase 1 faits sur appareil (inscription, déconnexion, mode avion, rechargement des onglets) | La validation partielle de la phase 1 est levée. Règle ajoutée : rapports et messages en français |
+| 26/09/2026 | Durée de conservation estimée par l'IA du scan (`shelf_life_days`), bornée côté serveur : 2 à 3 jours pour un plat cuisiné, 1 à 730 jours sinon, valeur par défaut par catégorie si le modèle n'en donne pas. Le conseil de conservation ne contient plus de durée | La date porte la durée ; le conseil plus court compense les tokens ajoutés (limite de 1 000 tokens de sortie par minute de Groq). Testé sur 3 photos : œufs 21 j, fraises 3 j, pain 3 j, restes 2 j |
+| 26/09/2026 | Dates proposées sans IA : ajout manuel 7 jours (3 pour un reste), produit scanné par code-barres selon sa catégorie (laitier 10 j, pâtes 365 j…) avec l'invitation à recopier la date imprimée | Point de départ modifiable ; aucune estimation fiable n'est possible sans l'IA ou la date de l'emballage |
+| 26/09/2026 | « Bientôt » = aujourd'hui, demain ou après-demain (badge orange) ; expiré en rouge ; sans date à la fin de la liste | Même seuil pour les badges, la priorité de la génération et le tri |
+| 26/09/2026 | Génération : l'app envoie les jours restants (calculés dans le fuseau du téléphone), le type et les ingrédients choisis ; le serveur trie par urgence avant d'attribuer les alias et marque [URGENT], [reste de plat], [date dépassée] dans le prompt. Les produits frais à date dépassée ne sont pas utilisés | Testé : courgettes (demain) et crème (aujourd'hui) utilisées dans les 3 recettes sur 10 ingrédients ; lait choisi utilisé dans les 3 recettes |
+| 26/09/2026 | Présélection : les ingrédients de l'écran de génération se touchent pour être utilisés en priorité (ceux d'une notification sont déjà choisis) | Façon de rendre visible la présélection demandée pour les notifications ; **choix d'interface à valider** |
+| 26/09/2026 | « Transformer mes restes » : bouton visible quand le garde-manger contient un plat cuisiné ; recette sans reste écartée côté serveur ; sans reste, refus 400 avant de compter le quota | Testé : chaque recette de 3 essais part d'un reste (riz sauté, croquettes, arancini, gratin…) |
+| 26/09/2026 | Notifications locales (aucun serveur) : rappels des 14 prochains jours programmés à l'avance, recalculés à chaque changement du garde-manger, à l'ouverture de l'app et au changement de langue ; texte sous la forme « Aujourd'hui : crème. Demain : tomates et reste de riz. 3 recettes t'attendent. » | Fonctionne dans Expo Go (seules les notifications distantes en sont retirées). Pas de « tes / ton » devant les noms : l'accord (genre, nombre) n'est pas fiable pour des noms saisis librement. Nombre de recettes : même règle que la génération (1 à 3). Un changement fait depuis un autre téléphone du foyer n'est pris en compte qu'à la prochaine ouverture |
+| 26/09/2026 | Autorisation des notifications : explication puis demande du système au premier ajout d'une date (scan, ajout manuel, date modifiée), une seule fois ; jamais au lancement | Android 12 et avant autorise d'office : pas de question |
+| 26/09/2026 | « J'ai cuisiné ça » : retire entièrement les ingrédients cochés (pas de quantité partielle) ; bouton visible seulement pour les recettes liées au garde-manger par identifiants (depuis la phase 3) | Une gestion des quantités restantes demanderait des quantités structurées ; l'utilisateur décoche ce qu'il garde |
+| 26/09/2026 | Code-barres : Open Food Facts appelé directement depuis l'app (base publique, sans clé), User-Agent « AntiGaspiRecettes/1.0 (adresse du dépôt GitHub) » plutôt qu'une adresse e-mail | Aucune donnée personnelle envoyée ; aucun quota à gérer côté serveur. Catégories Open Food Facts converties en catégories de l'app |
 | | *(résultat du test Gemini vs Clarifai)* | |
