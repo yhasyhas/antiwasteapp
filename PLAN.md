@@ -121,11 +121,11 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 - [ ] Désactiver les anciennes clés `anon` / `service_role` une fois que tout fonctionne
 
 **Garde-manger partagé (préparation, sans changement visible)** — voir « Ce qui distingue l'app »
-- [ ] Migration : tables `households` et `household_members` (rôle, date d'arrivée), avec RLS
-- [ ] Migration : colonne `household_id` sur `ingredients` et les autres tables concernées (à décider : `recipes`, `favorites`…)
-- [ ] Règles de sécurité (RLS) basées sur l'appartenance au foyer, à la place de `auth.uid() = user_id`
-- [ ] Foyer personnel créé automatiquement à l'inscription ; migration des données existantes vers le foyer personnel de chaque utilisateur
-- [ ] Vérifier qu'aucun écran ne change pour l'utilisateur
+- [x] Migration : tables `households` et `household_members` (rôle, date d'arrivée), avec RLS
+- [x] Migration : colonne `household_id` sur `ingredients` (seule table partagée : recettes, favoris et préférences restent par utilisateur) — migration `20260925110000`
+- [x] Règles de sécurité (RLS) basées sur l'appartenance au foyer, à la place de `auth.uid() = user_id`
+- [x] Foyer personnel créé automatiquement à l'inscription ; migration des données existantes vers le foyer personnel de chaque utilisateur
+- [x] Vérifier qu'aucun écran ne change pour l'utilisateur (l'app n'est pas modifiée ; tests de sécurité : `supabase/tests/household_rls.sql`)
 
 **Terminé quand** : un appel sans utilisateur connecté renvoie 401, la 11e génération de la journée renvoie 429, et l'app fonctionne avec les anciennes clés désactivées.
 
@@ -185,6 +185,7 @@ Objectif : **moins de 5 s pour 90 % des scans**. Mesuré le 24/09/2026 : Gemini 
 - [ ] Écran de préférences : régimes, ingrédients exclus, temps max ; utilisé par la génération
 - [ ] Connexion anonyme Supabase pour tester sans compte, avec conversion en compte plus tard
 - [ ] Garde-manger partagé : inviter un membre, rejoindre un foyer, voir qui a ajouté quoi
+- [ ] Garde-manger partagé : l'app filtre ses ingrédients par `household_id` (aujourd'hui par `user_id`, équivalent tant qu'il n'y a qu'un foyer personnel) ; gérer le départ ou la suppression du compte du propriétaire d'un foyer partagé (aujourd'hui, supprimer un compte supprime son foyer)
 - [ ] Garde-manger partagé : empêcher la modification de `user_id` sur un ingrédient existant (l'auteur ne doit pas pouvoir être changé par un autre membre)
 - [ ] Cuisines du monde : préférence de cuisine enregistrée et utilisée par défaut
 
@@ -247,4 +248,5 @@ Objectif : **moins de 5 s pour 90 % des scans**. Mesuré le 24/09/2026 : Gemini 
 | 25/09/2026 | Renommage de l'app déplacé en phase 7 | Nom pas encore choisi (pistes : Miette, Glana, Frigoscope) |
 | 25/09/2026 | Le modèle de données passe à la notion de foyer dès la phase 2, pour éviter de refaire les phases 3 à 5 | Le garde-manger partagé touche toutes les tables et règles de sécurité : mieux vaut le poser avant de construire dessus |
 | 25/09/2026 | Phase 1 validée avec des tests partiels : 12, 14 et 17 | Faute de temps. Validés dans l'app : scan + génération, pas de doublon à la sauvegarde, trois changements de langue sans erreur. Non testés sur appareil : inscription / email non confirmé, déconnexion et onglets protégés, alertes d'écriture (mode avion), rechargement des onglets, colonnes servings / tips / suggestion (vérifiées directement en base) |
+| 25/09/2026 | Foyers : seul le garde-manger est partagé ; favoris, historique des recettes et préférences restent par utilisateur | Le partage porte sur ce qui est physiquement commun (le frigo) ; les goûts et l'historique restent personnels. Foyer personnel créé par trigger sur `auth.users` ; sans `household_id`, un ingrédient va dans le foyer personnel de son auteur, donc aucun changement dans l'app |
 | | *(résultat du test Gemini vs Clarifai)* | |
