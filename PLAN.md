@@ -19,6 +19,12 @@ Dernière mise à jour : 23/09/2026
 - En fin de phase : mettre à jour `PROJECT_CONTEXT.md` et régénérer l'export (`npm run export`).
 - En fin de phase, après la fusion dans `master` : pousser sur GitHub (`git push`). Le dépôt distant est github.com/yhasyhas/antiwasteapp.
 
+**Autonomie de Claude** (depuis la phase 2)
+- **Avance seul pour** : le code, les commits, le déploiement des fonctions, les secrets de configuration (quotas, noms de modèles), et les migrations, à condition que chacune soit testée en transaction annulée sur la base distante, avec des tests de sécurité qui passent.
+- **Avant toute migration qui modifie ou supprime des données existantes** : sauvegarde avec `npx supabase db dump --data-only` dans `backups/` (hors de git, dans le `.gitignore`).
+- **S'arrête et attend un accord explicite** : pour toute action irréversible (suppression de tables ou de colonnes contenant des données, désactivation des anciennes clés), toute action qui coûte de l'argent, tout ce qui nécessite l'accès au dashboard ou aux comptes, et tout choix produit qui change ce que l'utilisateur voit ou vit dans l'app.
+- **En fin de phase, avant de fusionner** : un rapport court (ce qui a été fait, les décisions prises, ce qui reste à surveiller) et une liste de tests limitée à l'essentiel. La fusion dans `master` attend le retour sur ces tests.
+
 ## Stack cible
 
 | Rôle | Aujourd'hui | Cible |
@@ -105,21 +111,21 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 
 ## Phase 2 — Sécurité
 
-- [ ] Créer les clés `sb_publishable_…` / `sb_secret_…` dans le dashboard, mettre la clé publishable dans le `.env` de l'app
-- [ ] Dans les fonctions, lire les clés depuis `SUPABASE_PUBLISHABLE_KEYS` / `SUPABASE_SECRET_KEYS`
-- [ ] Créer `supabase/functions/_shared/auth.ts` : vérifie l'utilisateur connecté à partir du token, renvoie 401 sinon (créé en phase 0.6 pour `analyze-image` ; reste à l'utiliser dans `generate-recipes`)
-- [ ] `supabase/config.toml` : `verify_jwt = false` pour chaque fonction (la vérification se fait dans le code)
-- [ ] Migration : table `usage_counters` (user_id, date, scans, generations, images) avec RLS
-- [ ] Quotas dans les fonctions : 10 générations, 20 scans par jour et par utilisateur, erreur 429 au-delà (valeurs dans des secrets)
-- [ ] Restreindre CORS aux origines utiles
-- [ ] Désactiver les anciennes clés `anon` / `service_role` une fois que tout fonctionne
+- [x] Créer les clés `sb_publishable_…` / `sb_secret_…` dans le dashboard, mettre la clé publishable dans le `.env` de l'app (clés `default` déjà créées par Supabase ; variable `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`)
+- [x] Dans les fonctions, lire les clés depuis `SUPABASE_PUBLISHABLE_KEYS` / `SUPABASE_SECRET_KEYS`
+- [x] Créer `supabase/functions/_shared/auth.ts` : vérifie l'utilisateur connecté à partir du token, renvoie 401 sinon (créé en phase 0.6 pour `analyze-image` ; reste à l'utiliser dans `generate-recipes`)
+- [x] `supabase/config.toml` : `verify_jwt = false` pour chaque fonction (la vérification se fait dans le code)
+- [x] Migration : table `usage_counters` (user_id, date, scans, generations, images) avec RLS — migration `20260925100000`, tests `supabase/tests/usage_counters.sql`
+- [x] Quotas dans les fonctions : 10 générations, 20 scans par jour et par utilisateur, erreur 429 au-delà (valeurs dans des secrets : `QUOTA_DAILY_GENERATIONS`, `QUOTA_DAILY_SCANS`)
+- [x] Restreindre CORS aux origines utiles (`_shared/cors.ts` ; secret facultatif `ALLOWED_ORIGINS`, par défaut le serveur web d'Expo en local `localhost:8081` ; l'app mobile n'envoie pas d'Origin)
+- [x] Désactiver les anciennes clés `anon` / `service_role` une fois que tout fonctionne (désactivées le 25/09/2026, réactivables dans le dashboard)
 
 **Garde-manger partagé (préparation, sans changement visible)** — voir « Ce qui distingue l'app »
-- [ ] Migration : tables `households` et `household_members` (rôle, date d'arrivée), avec RLS
-- [ ] Migration : colonne `household_id` sur `ingredients` et les autres tables concernées (à décider : `recipes`, `favorites`…)
-- [ ] Règles de sécurité (RLS) basées sur l'appartenance au foyer, à la place de `auth.uid() = user_id`
-- [ ] Foyer personnel créé automatiquement à l'inscription ; migration des données existantes vers le foyer personnel de chaque utilisateur
-- [ ] Vérifier qu'aucun écran ne change pour l'utilisateur
+- [x] Migration : tables `households` et `household_members` (rôle, date d'arrivée), avec RLS
+- [x] Migration : colonne `household_id` sur `ingredients` (seule table partagée : recettes, favoris et préférences restent par utilisateur) — migration `20260925110000`
+- [x] Règles de sécurité (RLS) basées sur l'appartenance au foyer, à la place de `auth.uid() = user_id`
+- [x] Foyer personnel créé automatiquement à l'inscription ; migration des données existantes vers le foyer personnel de chaque utilisateur
+- [x] Vérifier qu'aucun écran ne change pour l'utilisateur (l'app n'est pas modifiée ; tests de sécurité : `supabase/tests/household_rls.sql`)
 
 **Terminé quand** : un appel sans utilisateur connecté renvoie 401, la 11e génération de la journée renvoie 429, et l'app fonctionne avec les anciennes clés désactivées.
 
@@ -179,6 +185,8 @@ Objectif : **moins de 5 s pour 90 % des scans**. Mesuré le 24/09/2026 : Gemini 
 - [ ] Écran de préférences : régimes, ingrédients exclus, temps max ; utilisé par la génération
 - [ ] Connexion anonyme Supabase pour tester sans compte, avec conversion en compte plus tard
 - [ ] Garde-manger partagé : inviter un membre, rejoindre un foyer, voir qui a ajouté quoi
+- [ ] Garde-manger partagé : l'app filtre ses ingrédients par `household_id` (aujourd'hui par `user_id`, équivalent tant qu'il n'y a qu'un foyer personnel) ; gérer le départ ou la suppression du compte du propriétaire d'un foyer partagé (aujourd'hui, supprimer un compte supprime son foyer)
+- [ ] Garde-manger partagé : empêcher la modification de `user_id` sur un ingrédient existant (l'auteur ne doit pas pouvoir être changé par un autre membre)
 - [ ] Cuisines du monde : préférence de cuisine enregistrée et utilisée par défaut
 
 **Terminé quand** : un nouvel utilisateur peut scanner et générer une recette sans créer de compte, puis garder ses données en créant son compte.
@@ -240,4 +248,8 @@ Objectif : **moins de 5 s pour 90 % des scans**. Mesuré le 24/09/2026 : Gemini 
 | 25/09/2026 | Renommage de l'app déplacé en phase 7 | Nom pas encore choisi (pistes : Miette, Glana, Frigoscope) |
 | 25/09/2026 | Le modèle de données passe à la notion de foyer dès la phase 2, pour éviter de refaire les phases 3 à 5 | Le garde-manger partagé touche toutes les tables et règles de sécurité : mieux vaut le poser avant de construire dessus |
 | 25/09/2026 | Phase 1 validée avec des tests partiels : 12, 14 et 17 | Faute de temps. Validés dans l'app : scan + génération, pas de doublon à la sauvegarde, trois changements de langue sans erreur. Non testés sur appareil : inscription / email non confirmé, déconnexion et onglets protégés, alertes d'écriture (mode avion), rechargement des onglets, colonnes servings / tips / suggestion (vérifiées directement en base) |
+| 25/09/2026 | Foyers : seul le garde-manger est partagé ; favoris, historique des recettes et préférences restent par utilisateur | Le partage porte sur ce qui est physiquement commun (le frigo) ; les goûts et l'historique restent personnels. Foyer personnel créé par trigger sur `auth.users` ; sans `household_id`, un ingrédient va dans le foyer personnel de son auteur, donc aucun changement dans l'app |
+| 25/09/2026 | Quotas comptés par jour UTC, avant l'appel à l'IA (fonction SQL atomique), rendus si l'IA échoue ; un refus lié au régime reste compté | Pas de dépassement en cas d'appels simultanés ; une panne de fournisseur ne doit pas coûter de quota à l'utilisateur. Remise à zéro à 1 h ou 2 h du matin, heure de Paris |
+| 25/09/2026 | CORS : liste d'origines autorisées (`ALLOWED_ORIGINS`), par défaut `http://localhost:8081` et `http://127.0.0.1:8081` | L'app est mobile ; seule la version web en local en a besoin. À compléter avec le domaine de production si une version web est publiée |
+| 25/09/2026 | Anciennes clés `anon` / `service_role` désactivées le 25/09/2026 à 13:28 UTC (15:28 heure de Paris), depuis le dashboard, avec l'accord explicite de l'utilisateur | L'app testée avec la clé publishable, puis vérification après désactivation : anciennes clés refusées (401), fonctions, quotas et tests SQL OK. Réactivables dans le dashboard (Project Settings → API Keys) |
 | | *(résultat du test Gemini vs Clarifai)* | |

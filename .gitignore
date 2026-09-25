@@ -39,3 +39,6 @@ export/
 
 # supabase CLI (état local)
 supabase/.temp/
+
+# sauvegardes de la base (npx supabase db dump), jamais dans git
+backups/

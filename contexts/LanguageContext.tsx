@@ -76,6 +76,7 @@ const translations: Record<Language, Record<string, string>> = {
     writeErrorTitle: 'Enregistrement impossible',
     writeErrorText: "La modification n'a pas été enregistrée. Vérifie ta connexion et réessaie.",
     emailNotConfirmed: "Ton adresse email n'est pas encore confirmée. Ouvre le lien reçu par email lors de l'inscription, puis réessaie.",
+    dailyLimitTitle: 'Limite du jour atteinte',
   },
   en: {
     welcome: 'Welcome',
@@ -139,6 +140,7 @@ const translations: Record<Language, Record<string, string>> = {
     writeErrorTitle: 'Could not save',
     writeErrorText: 'Your change was not saved. Check your connection and try again.',
     emailNotConfirmed: 'Your email address is not confirmed yet. Open the link we emailed you when you signed up, then try again.',
+    dailyLimitTitle: 'Daily limit reached',
   },
   es: {
     welcome: 'Bienvenido',
@@ -202,6 +204,7 @@ const translations: Record<Language, Record<string, string>> = {
     writeErrorTitle: 'No se pudo guardar',
     writeErrorText: 'El cambio no se guardó. Revisa tu conexión e inténtalo de nuevo.',
     emailNotConfirmed: 'Tu correo aún no está confirmado. Abre el enlace que te enviamos al registrarte y vuelve a intentarlo.',
+    dailyLimitTitle: 'Límite diario alcanzado',
   },
 };
 

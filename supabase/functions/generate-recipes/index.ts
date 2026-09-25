@@ -1,5 +1,8 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { ingredientsMatch, sameIngredient } from './matching.ts';
+import { getAuthenticatedUser } from '../_shared/auth.ts';
+import { consumeQuota, DAILY_LIMITS, refundQuota } from '../_shared/quota.ts';
+import { withCors } from '../_shared/cors.ts';
 
 const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') || '';
 const POLLINATIONS_API_KEY = Deno.env.get('POLLINATIONS_API_KEY') || '';
@@ -8,12 +11,6 @@ const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = Deno.env.get('GROQ_MODEL') || 'openai/gpt-oss-120b';
 // Les modèles gpt-oss raisonnent avant de répondre : on limite l'effort pour ne pas tronquer le JSON
 const IS_REASONING_MODEL = GROQ_MODEL.includes('gpt-oss');
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Client-Info, Apikey',
-};
 
 interface GenerateRecipeRequest {
   ingredients: string[];
@@ -76,6 +73,38 @@ const FAILURE_MESSAGES: Record<string, Record<FailureReason, string>> = {
     dietary_refusal: 'No es posible crear una receta que respete tus restricciones alimentarias con estos ingredientes. Añade ingredientes o quita una restricción.'
   }
 };
+
+// Erreurs de la requête elle-même (avant toute génération)
+type RequestError = 'unauthorized' | 'quota_exceeded';
+
+const REQUEST_ERROR_MESSAGES: Record<string, Record<RequestError, string>> = {
+  fr: {
+    unauthorized: 'Vous devez être connecté pour générer des recettes.',
+    quota_exceeded: 'Vous avez atteint la limite de {limit} générations de recettes par jour. Réessayez demain.',
+  },
+  en: {
+    unauthorized: 'You must be signed in to generate recipes.',
+    quota_exceeded: 'You have reached the limit of {limit} recipe generations per day. Try again tomorrow.',
+  },
+  es: {
+    unauthorized: 'Debes iniciar sesión para generar recetas.',
+    quota_exceeded: 'Has alcanzado el límite de {limit} generaciones de recetas por día. Vuelve a intentarlo mañana.',
+  },
+};
+
+const REQUEST_ERROR_STATUS: Record<RequestError, number> = {
+  unauthorized: 401,
+  quota_exceeded: 429,
+};
+
+function requestErrorResponse(code: RequestError, language: string, limit?: number): Response {
+  const messages = REQUEST_ERROR_MESSAGES[language] || REQUEST_ERROR_MESSAGES['en'];
+  const message = messages[code].replace('{limit}', String(limit));
+  return new Response(
+    JSON.stringify({ error: code, message, ...(limit !== undefined && { limit }) }),
+    { status: REQUEST_ERROR_STATUS[code], headers: { 'Content-Type': 'application/json' } }
+  );
+}
 
 const FAILURE_STATUS: Record<FailureReason, number> = {
   api_error: 502,
@@ -456,34 +485,47 @@ IMPORTANT:
   return { ok: true, recipe };
 }
 
-Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers: corsHeaders });
-  }
+Deno.serve(withCors(async (req: Request) => {
+  // Utilisateur dont le quota a été compté : rendu si la génération échoue
+  let quotaUserId: string | null = null;
 
   try {
     const { ingredients, preferences, generateImage }: GenerateRecipeRequest = await req.json();
+    const language = (preferences?.language || 'fr').substring(0, 2).toLowerCase();
+
+    // Chaque génération consomme le quota Groq : réservé aux utilisateurs connectés
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
+      return requestErrorResponse('unauthorized', language);
+    }
 
     if (!ingredients || ingredients.length === 0) {
       return new Response(
         JSON.stringify({ error: 'Aucun ingrédient fourni' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
     if (!preferences?.mealType) {
       return new Response(
         JSON.stringify({ error: 'Type de repas requis (mealType)' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
     if (!preferences?.language) {
       return new Response(
         JSON.stringify({ error: 'Langue requise (language)' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
+
+    // Une génération = un appel de l'app, quel que soit le nombre de recettes renvoyées
+    if (!await consumeQuota(user.id, 'generations')) {
+      console.warn(`[generate-recipes] quota atteint (${DAILY_LIMITS.generations} générations/jour) pour ${user.id}`);
+      return requestErrorResponse('quota_exceeded', language, DAILY_LIMITS.generations);
+    }
+    quotaUserId = user.id;
 
     // Déterminer le nombre de recettes selon les ingrédients
     const numIngredients = ingredients.length;
@@ -539,24 +581,27 @@ Deno.serve(async (req: Request) => {
       const messages = FAILURE_MESSAGES[langCode] || FAILURE_MESSAGES['en'];
 
       console.error('No recipe generated. Failures:', failures.join(', '));
+      // Panne de l'IA : la génération n'est pas comptée. Un refus lié au régime reste compté.
+      if (reason !== 'dietary_refusal') await refundQuota(user.id, 'generations');
       return new Response(
         JSON.stringify({ error: reason, message: messages[reason] }),
-        { status: FAILURE_STATUS[reason], headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: FAILURE_STATUS[reason], headers: { 'Content-Type': 'application/json' } }
       );
     }
 
     return new Response(
       JSON.stringify({ recipes, totalGenerated: recipes.length, requested: numRecipes }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     console.error('Error generating recipes:', error);
+    if (quotaUserId) await refundQuota(quotaUserId, 'generations');
     return new Response(
-      JSON.stringify({ error: 'Erreur lors de la génération', details: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: 'Erreur lors de la génération', details: error instanceof Error ? error.message : String(error) }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
-});
+}));
 
 function checkForbiddenIngredients(recipe: Recipe, dietary: string[]): boolean {
   const allText = [
