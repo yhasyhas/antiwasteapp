@@ -16,6 +16,7 @@ Dernière mise à jour : 23/09/2026
 - **`npm run typecheck` doit passer avant chaque commit** (à partir de la fin de la phase 0).
 - **Aucune clé secrète dans le code ni dans les réponses envoyées à l'app.** Les secrets vont dans `supabase secrets set`.
 - **Noms de modèles IA toujours dans des secrets** (`GROQ_MODEL`, `GEMINI_MODEL`…), jamais en dur : les fournisseurs retirent des modèles régulièrement.
+- **Rapports et messages en français.**
 - En fin de phase : mettre à jour `PROJECT_CONTEXT.md` et régénérer l'export (`npm run export`).
 - En fin de phase, après la fusion dans `master` : pousser sur GitHub (`git push`). Le dépôt distant est github.com/yhasyhas/antiwasteapp.
 
@@ -164,7 +165,7 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 - [x] Brancher Sentry (`@sentry/react-native`) : erreurs JavaScript dans Expo Go, identifiant de l'utilisateur seulement ; inactif sans `EXPO_PUBLIC_SENTRY_DSN`
 - [x] Écrire le `README.md` : installation, secrets nécessaires, déploiement des fonctions et des migrations, tests, règles de travail ; `.env.example`
 
-**Terminé quand** : aucun texte affiché n'est écrit en dur, aucun fichier ne dépasse ~400 lignes, et une erreur volontaire remonte dans Sentry.
+**Terminé quand** : aucun texte affiché n'est écrit en dur, aucun fichier ne dépasse ~400 lignes, et une erreur volontaire remonte dans Sentry. *(Validée le 25/09/2026 dans l'app, en fr / en / es.)*
 
 ## Phase 5 — Le cœur anti-gaspi
 
@@ -275,4 +276,5 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 | 25/09/2026 | Tutoiement dans toute l'app en français, y compris les messages des fonctions | Les textes déjà validés (« Vérifie ta boîte mail ») tutoyaient ; les fonctions vouvoyaient |
 | 25/09/2026 | Images des recettes : 800 px de large, JPEG qualité 75 (ImageScript dans la fonction) | Essais sur deux images FLUX : 1024 px q75 = 135 à 190 Ko ; 800 px q75 = 96 à 131 Ko sans perte visible sur un téléphone ; 720 px et 640 px plus légers mais moins nets sur les grands écrans. En production : 81 et 111 Ko, temps de génération inchangé (5 à 6 s). Les 2 images existantes recompressées (677 et 697 Ko → 120 et 116 Ko), originaux dans `backups/recipe-images/`, URL inchangées |
 | 25/09/2026 | Sentry, offre gratuite (Developer), données hébergées dans l'UE (`ingest.de.sentry.io`) ; `@sentry/react-native` ~7.11, DSN dans `.env` (`EXPO_PUBLIC_SENTRY_DSN`) | Dans Expo Go, seules les erreurs JavaScript remontent (pas les plantages natifs ni la mise en file hors connexion) : un build EAS sera nécessaire pour le reste. `sendDefaultPii: false`, seul l'uuid de l'utilisateur est joint (ni e-mail ni IP). Événement de test envoyé à l'API de Sentry : accepté (200). Bouton d'erreur volontaire dans Réglages, visible seulement en développement |
+| 25/09/2026 | Phase 4 validée dans l'app : Sentry (erreur de test reçue), langue du téléphone au premier lancement, parcours complet dans les trois langues ; anciens tests de la phase 1 faits sur appareil (inscription, déconnexion, mode avion, rechargement des onglets) | La validation partielle de la phase 1 est levée. Règle ajoutée : rapports et messages en français |
 | | *(résultat du test Gemini vs Clarifai)* | |

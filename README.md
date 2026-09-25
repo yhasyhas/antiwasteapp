@@ -139,7 +139,7 @@ Les tests SQL tournent sur la base distante dans une transaction annulée à la 
 Le détail est dans [`PLAN.md`](PLAN.md) ; en résumé :
 
 - Une branche par phase (`phase-N`), fusionnée dans `master` quand la phase est validée, puis poussée sur GitHub.
-- Un commit par tâche, message en français ; `npm run typecheck` doit passer avant chaque commit.
+- Rapports et messages en français ; un commit par tâche, message en français ; `npm run typecheck` doit passer avant chaque commit.
 - Aucun secret dans le code ni dans les réponses envoyées à l'app ; les secrets vont dans `supabase secrets set`.
 - Noms de modèles d'IA toujours dans des secrets.
 - Chaque migration est testée en transaction annulée, avec des tests de sécurité qui passent ; sauvegarde avant toute migration qui modifie des données.

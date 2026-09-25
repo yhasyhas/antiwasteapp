@@ -152,11 +152,12 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Images : Cloudflare Workers AI (FLUX schnell), une par recette, à l'ouverture ou à la sauvegarde, quota de 10 par jour ; bucket `recipe-images`. Pollinations entièrement retiré.
 - Tests : 28 tests Deno (`deno test --no-config supabase/functions/`), tests SQL des images.
 
-### Phase 4 — nettoyage du code et traductions (branche `phase-4`, en attente de validation)
+### Phase 4 — nettoyage du code et traductions (branche `phase-4`, validée depuis l'app en fr / en / es)
 - Découpage : `generate.tsx` (1 364 → 228 lignes), caméra, favoris, accueil et garde-manger en composants (`components/`) et hooks (`hooks/`), sans changement de comportement ; plus gros fichier : 349 lignes. Bouton « Ajouter à la main » de l'écran de permission de la caméra réparé.
 - Traductions : i18next, clés typées, 184 clés en fr / en / es ; tous les écrans, onglets, alertes et erreurs de Supabase Auth ; tutoiement partout en français, y compris dans les fonctions. Langue du téléphone par défaut ; changement hors connexion gardé et synchronisé plus tard (test 9 de la phase 1). La langue des recettes suit par défaut celle de l'app.
 - Images : compressées avant stockage (800 px, JPEG 75, 80 à 150 Ko) ; les 2 images existantes recompressées.
 - Sentry branché (région UE, erreurs JavaScript dans Expo Go) ; `README.md` et `.env.example` écrits ; logs `[scan]` retirés.
+- Anciens tests de la phase 1 faits sur appareil (inscription, déconnexion, mode avion, rechargement des onglets) : validés.
 
 ## 5. État actuel et problèmes connus
 
@@ -165,7 +166,6 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 
 ### Dette et finitions
 - Offres gratuites partagées par toute l'app : Groq (scan : ~1 000 tokens de sortie par minute ; génération : 8 000 tokens par minute et 1 000 requêtes par jour) et Cloudflare (~150 images par jour estimées) ; au-delà, le secours prend le relais ou l'image n'est pas générée. À revoir avant la bêta (phase 7).
-- Phase 1 validée avec des tests partiels (scan + génération, doublons, langue) : inscription, déconnexion, alertes d'écriture et rechargement des onglets restent à tester sur appareil (dans la liste de tests de la phase 4, dans les trois langues).
 - Confirmation d'email désactivée dans Supabase pendant le développement (à réactiver en phase 7).
 - Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`) : renommage en phase 7, nom pas encore choisi.
 - Sauvegardes de la base dans `backups/` : jamais commitées (`.gitignore`) ni exportées.
@@ -173,7 +173,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 
 ## 6. Prochaine étape
-Validation de la phase 4 dans l'app, puis phase 5 : le cœur anti-gaspi. Détails dans `PLAN.md`.
+Phase 5 : le cœur anti-gaspi. Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash
