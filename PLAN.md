@@ -239,4 +239,5 @@ Objectif : **moins de 5 s pour 90 % des scans**. Mesuré le 24/09/2026 : Gemini 
 | 25/09/2026 | Migration `20260924190000` (servings, tips, suggestion) appliquée avec `npx supabase db push` | `SUPABASE_DB_PASSWORD` configuré : le CLI accède à la base ; historiques local et distant concordants |
 | 25/09/2026 | Renommage de l'app déplacé en phase 7 | Nom pas encore choisi (pistes : Miette, Glana, Frigoscope) |
 | 25/09/2026 | Le modèle de données passe à la notion de foyer dès la phase 2, pour éviter de refaire les phases 3 à 5 | Le garde-manger partagé touche toutes les tables et règles de sécurité : mieux vaut le poser avant de construire dessus |
+| 25/09/2026 | Phase 1 validée avec des tests partiels : 12, 14 et 17 | Faute de temps. Validés dans l'app : scan + génération, pas de doublon à la sauvegarde, trois changements de langue sans erreur. Non testés sur appareil : inscription / email non confirmé, déconnexion et onglets protégés, alertes d'écriture (mode avion), rechargement des onglets, colonnes servings / tips / suggestion (vérifiées directement en base) |
 | | *(résultat du test Gemini vs Clarifai)* | |
