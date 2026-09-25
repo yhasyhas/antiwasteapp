@@ -1,6 +1,7 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { getAuthenticatedUser } from '../_shared/auth.ts';
 import { consumeQuota, DAILY_LIMITS, refundQuota } from '../_shared/quota.ts';
+import { withCors } from '../_shared/cors.ts';
 
 // Modèles configurables par secret : les fournisseurs retirent régulièrement des modèles
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || '';
@@ -22,12 +23,6 @@ const MIN_CONFIDENCE = 0.5;
 const MAX_INGREDIENTS = 20;
 // Gemini et Groq limitent la requête à 20 Mo ; l'app envoie des photos d'environ 100-300 Ko
 const MAX_IMAGE_BASE64_LENGTH = 15 * 1024 * 1024;
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Client-Info, Apikey',
-};
 
 const LANGUAGE_NAMES: Record<string, string> = {
   fr: 'français',
@@ -114,7 +109,7 @@ const MESSAGES: Record<string, Record<string, string>> = {
 function jsonResponse(body: unknown, status: number): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
   });
 }
 
@@ -341,11 +336,7 @@ function cleanIngredients(raw: unknown): DetectedIngredient[] {
     .slice(0, MAX_INGREDIENTS);
 }
 
-Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers: corsHeaders });
-  }
-
+Deno.serve(withCors(async (req: Request) => {
   let language = 'fr';
   // Utilisateur dont le quota a été compté : rendu si l'analyse échoue
   let quotaUserId: string | null = null;
@@ -444,4 +435,4 @@ Deno.serve(async (req: Request) => {
     if (quotaUserId) await refundQuota(quotaUserId, 'scans');
     return errorResponse('ai_error', language, 500, error instanceof Error ? error.message : String(error));
   }
-});
+}));

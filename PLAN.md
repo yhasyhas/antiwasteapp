@@ -117,7 +117,7 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 - [x] `supabase/config.toml` : `verify_jwt = false` pour chaque fonction (la vérification se fait dans le code)
 - [x] Migration : table `usage_counters` (user_id, date, scans, generations, images) avec RLS — migration `20260925100000`, tests `supabase/tests/usage_counters.sql`
 - [x] Quotas dans les fonctions : 10 générations, 20 scans par jour et par utilisateur, erreur 429 au-delà (valeurs dans des secrets : `QUOTA_DAILY_GENERATIONS`, `QUOTA_DAILY_SCANS`)
-- [ ] Restreindre CORS aux origines utiles
+- [x] Restreindre CORS aux origines utiles (`_shared/cors.ts` ; secret facultatif `ALLOWED_ORIGINS`, par défaut le serveur web d'Expo en local `localhost:8081` ; l'app mobile n'envoie pas d'Origin)
 - [ ] Désactiver les anciennes clés `anon` / `service_role` une fois que tout fonctionne
 
 **Garde-manger partagé (préparation, sans changement visible)** — voir « Ce qui distingue l'app »
@@ -250,4 +250,5 @@ Objectif : **moins de 5 s pour 90 % des scans**. Mesuré le 24/09/2026 : Gemini 
 | 25/09/2026 | Phase 1 validée avec des tests partiels : 12, 14 et 17 | Faute de temps. Validés dans l'app : scan + génération, pas de doublon à la sauvegarde, trois changements de langue sans erreur. Non testés sur appareil : inscription / email non confirmé, déconnexion et onglets protégés, alertes d'écriture (mode avion), rechargement des onglets, colonnes servings / tips / suggestion (vérifiées directement en base) |
 | 25/09/2026 | Foyers : seul le garde-manger est partagé ; favoris, historique des recettes et préférences restent par utilisateur | Le partage porte sur ce qui est physiquement commun (le frigo) ; les goûts et l'historique restent personnels. Foyer personnel créé par trigger sur `auth.users` ; sans `household_id`, un ingrédient va dans le foyer personnel de son auteur, donc aucun changement dans l'app |
 | 25/09/2026 | Quotas comptés par jour UTC, avant l'appel à l'IA (fonction SQL atomique), rendus si l'IA échoue ; un refus lié au régime reste compté | Pas de dépassement en cas d'appels simultanés ; une panne de fournisseur ne doit pas coûter de quota à l'utilisateur. Remise à zéro à 1 h ou 2 h du matin, heure de Paris |
+| 25/09/2026 | CORS : liste d'origines autorisées (`ALLOWED_ORIGINS`), par défaut `http://localhost:8081` et `http://127.0.0.1:8081` | L'app est mobile ; seule la version web en local en a besoin. À compléter avec le domaine de production si une version web est publiée |
 | | *(résultat du test Gemini vs Clarifai)* | |

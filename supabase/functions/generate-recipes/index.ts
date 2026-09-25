@@ -2,6 +2,7 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { ingredientsMatch, sameIngredient } from './matching.ts';
 import { getAuthenticatedUser } from '../_shared/auth.ts';
 import { consumeQuota, DAILY_LIMITS, refundQuota } from '../_shared/quota.ts';
+import { withCors } from '../_shared/cors.ts';
 
 const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') || '';
 const POLLINATIONS_API_KEY = Deno.env.get('POLLINATIONS_API_KEY') || '';
@@ -10,12 +11,6 @@ const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = Deno.env.get('GROQ_MODEL') || 'openai/gpt-oss-120b';
 // Les modèles gpt-oss raisonnent avant de répondre : on limite l'effort pour ne pas tronquer le JSON
 const IS_REASONING_MODEL = GROQ_MODEL.includes('gpt-oss');
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Client-Info, Apikey',
-};
 
 interface GenerateRecipeRequest {
   ingredients: string[];
@@ -107,7 +102,7 @@ function requestErrorResponse(code: RequestError, language: string, limit?: numb
   const message = messages[code].replace('{limit}', String(limit));
   return new Response(
     JSON.stringify({ error: code, message, ...(limit !== undefined && { limit }) }),
-    { status: REQUEST_ERROR_STATUS[code], headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    { status: REQUEST_ERROR_STATUS[code], headers: { 'Content-Type': 'application/json' } }
   );
 }
 
@@ -490,11 +485,7 @@ IMPORTANT:
   return { ok: true, recipe };
 }
 
-Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers: corsHeaders });
-  }
-
+Deno.serve(withCors(async (req: Request) => {
   // Utilisateur dont le quota a été compté : rendu si la génération échoue
   let quotaUserId: string | null = null;
 
@@ -511,21 +502,21 @@ Deno.serve(async (req: Request) => {
     if (!ingredients || ingredients.length === 0) {
       return new Response(
         JSON.stringify({ error: 'Aucun ingrédient fourni' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
     if (!preferences?.mealType) {
       return new Response(
         JSON.stringify({ error: 'Type de repas requis (mealType)' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
     if (!preferences?.language) {
       return new Response(
         JSON.stringify({ error: 'Langue requise (language)' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
@@ -594,23 +585,23 @@ Deno.serve(async (req: Request) => {
       if (reason !== 'dietary_refusal') await refundQuota(user.id, 'generations');
       return new Response(
         JSON.stringify({ error: reason, message: messages[reason] }),
-        { status: FAILURE_STATUS[reason], headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: FAILURE_STATUS[reason], headers: { 'Content-Type': 'application/json' } }
       );
     }
 
     return new Response(
       JSON.stringify({ recipes, totalGenerated: recipes.length, requested: numRecipes }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
   } catch (error) {
     console.error('Error generating recipes:', error);
     if (quotaUserId) await refundQuota(quotaUserId, 'generations');
     return new Response(
       JSON.stringify({ error: 'Erreur lors de la génération', details: error instanceof Error ? error.message : String(error) }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
-});
+}));
 
 function checkForbiddenIngredients(recipe: Recipe, dietary: string[]): boolean {
   const allText = [
