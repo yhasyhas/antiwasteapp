@@ -148,7 +148,21 @@ async function requestGroq(
     if (typeof choice?.message?.content !== 'string' || choice.finish_reason === 'length') {
       return { ok: false, details: `Groq: réponse vide ou tronquée (${choice?.finish_reason})` };
     }
-    return { ok: true, text: choice.message.content, usage: data.usage };
+    // Limites de l'offre Groq (par minute et par jour), utiles pour choisir l'ordre des fournisseurs
+    const header = (name: string) => response.headers.get(name);
+    return {
+      ok: true,
+      text: choice.message.content,
+      usage: {
+        ...data.usage,
+        rate_limits: {
+          requests_per_day: header('x-ratelimit-limit-requests'),
+          remaining_requests: header('x-ratelimit-remaining-requests'),
+          tokens_per_minute: header('x-ratelimit-limit-tokens'),
+          remaining_tokens: header('x-ratelimit-remaining-tokens'),
+        },
+      },
+    };
   } catch (error) {
     return { ok: false, details: `Groq: ${describeError(error)}` };
   }
