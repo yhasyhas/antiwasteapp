@@ -7,13 +7,22 @@ import { alertWriteError } from '@/lib/alertWriteError';
 import { callEdgeFunction } from '@/lib/callEdgeFunction';
 import { ensureRecipeImage } from '@/lib/recipeImage';
 import { supabase } from '@/lib/supabase';
+import { daysUntil, sortByUrgency } from '@/lib/expiry';
+import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import type { Filters, Recipe } from '@/components/recipe/types';
 
-// État et actions de l'écran de génération : garde-manger, filtres, génération, historique, favoris, images
-export function useRecipeGeneration() {
+// standard : toutes les recettes ; leftovers : « Transformer mes restes » (plats cuisinés du garde-manger)
+export type GenerationMode = 'standard' | 'leftovers';
+
+// État et actions de l'écran de génération : garde-manger, filtres, génération, historique, favoris, images.
+// initialPriorityIds : ingrédients à utiliser en priorité (ceux d'une notification, par exemple).
+export function useRecipeGeneration(initialPriorityIds: string[] = []) {
   const { user } = useAuth();
   const { t, language } = useLanguage();
-  const [ingredients, setIngredients] = useState<any[]>([]);
+  const [ingredients, setIngredients] = useState<PantryIngredient[]>([]);
+  const [priorityIds, setPriorityIds] = useState<string[]>(initialPriorityIds);
+  // Mode de la génération en cours (le bouton correspondant affiche l'attente)
+  const [generatingMode, setGeneratingMode] = useState<GenerationMode | null>(null);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -35,6 +44,16 @@ export function useRecipeGeneration() {
     loadUserPreferences();
   }, []);
 
+  // Nouvelle notification touchée alors que l'écran est déjà ouvert
+  const initialKey = initialPriorityIds.join(',');
+  useEffect(() => {
+    if (initialKey) setPriorityIds(initialKey.split(','));
+  }, [initialKey]);
+
+  const togglePriority = (id: string) => {
+    setPriorityIds((current) => current.includes(id) ? current.filter((x) => x !== id) : [...current, id]);
+  };
+
   const loadIngredients = async () => {
     if (!user) return;
 
@@ -44,7 +63,7 @@ export function useRecipeGeneration() {
       .eq('user_id', user.id);
 
     if (data) {
-      setIngredients(data);
+      setIngredients(sortByUrgency(data as PantryIngredient[]));
     }
     setLoading(false);
   };
@@ -70,18 +89,28 @@ export function useRecipeGeneration() {
     }
   };
 
-  const generateRecipes = async () => {
+  const generateRecipes = async (mode: GenerationMode = 'standard') => {
     if (ingredients.length === 0) {
       Alert.alert(t('generate.noIngredientsTitle'), t('generate.noIngredientsText'));
       return;
     }
 
     setGenerating(true);
+    setGeneratingMode(mode);
 
     try {
       const { data } = await callEdgeFunction('generate-recipes', {
-        // Avec leur identifiant : le modèle indique quel ingrédient du garde-manger chaque recette utilise
-        ingredients: ingredients.map((i) => ({ id: i.id, name: i.name, quantity: i.quantity || '' })),
+        // Avec leur identifiant : le modèle indique quel ingrédient du garde-manger chaque recette utilise.
+        // days_left (fuseau du téléphone), kind et priority : les plus urgents passent en premier.
+        ingredients: ingredients.map((i) => ({
+          id: i.id,
+          name: i.name,
+          quantity: i.quantity || '',
+          days_left: i.expires_at ? daysUntil(i.expires_at) : null,
+          kind: i.kind,
+          priority: priorityIds.includes(i.id),
+        })),
+        mode,
         preferences: {
           dietary: filters.dietary,
           difficulty: filters.difficulty,
@@ -106,6 +135,7 @@ export function useRecipeGeneration() {
       Alert.alert(t('common.error'), t('generate.failed'));
     } finally {
       setGenerating(false);
+      setGeneratingMode(null);
     }
   };
 
@@ -227,9 +257,13 @@ export function useRecipeGeneration() {
 
   return {
     ingredients,
+    priorityIds,
+    togglePriority,
+    hasLeftovers: ingredients.some((i) => i.kind === 'dish'),
     recipes,
     loading,
     generating,
+    generatingMode,
     selectedRecipe,
     setSelectedRecipe,
     imageLoading,

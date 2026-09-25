@@ -226,6 +226,8 @@ const fr = {
     dietary: 'Régimes alimentaires',
     difficulty: 'Difficulté',
     apply: 'Appliquer',
+    priorityHint: 'Touche un ingrédient pour l’utiliser en priorité. Les points de couleur signalent ceux qui expirent bientôt.',
+    transformLeftovers: 'Transformer mes restes',
   },
   settings: {
     title: 'Réglages',

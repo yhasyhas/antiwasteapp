@@ -225,6 +225,8 @@ const es: Translations = {
     dietary: 'Preferencias alimentarias',
     difficulty: 'Dificultad',
     apply: 'Aplicar',
+    priorityHint: 'Toca un ingrediente para usarlo primero. Los puntos de color señalan los que caducan pronto.',
+    transformLeftovers: 'Transformar mis sobras',
   },
   settings: {
     title: 'Ajustes',

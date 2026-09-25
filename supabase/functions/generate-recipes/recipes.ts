@@ -3,11 +3,27 @@
 
 // ---------- Garde-manger ----------
 
+export type FoodKind = 'ingredient' | 'dish';
+
 export interface PantryItem {
   id: string;
   name: string;
   quantity: string;
+  // Jours avant la date de péremption, calculés par l'app (fuseau du téléphone) : 0 aujourd'hui,
+  // négatif si dépassée, null sans date
+  daysLeft: number | null;
+  kind: FoodKind;
+  // Choisi par l'utilisateur (ou venu d'une notification) : à utiliser en priorité
+  priority: boolean;
 }
+
+// « Expire bientôt » : aujourd'hui, demain ou après-demain (comme les badges de l'app)
+export const URGENT_DAYS = 2;
+
+export const isUrgent = (item: PantryItem) =>
+  item.priority || (item.daysLeft !== null && item.daysLeft >= 0 && item.daysLeft <= URGENT_DAYS);
+
+export type GenerationMode = 'standard' | 'leftovers';
 
 // Les identifiants du garde-manger (uuid) sont remplacés par des alias courts (p1, p2…) dans le prompt
 // et le schéma : moins de tokens, et aucun risque que le modèle recopie mal un uuid.
@@ -19,7 +35,18 @@ export interface Pantry {
 export const MISSING = 'missing';
 export const MAX_PANTRY_ITEMS = 60;
 
-// Accepte la liste envoyée par l'app : objets { id, name, quantity } (depuis la phase 3) ou simples noms
+// Ordre du garde-manger dans le prompt : ingrédients choisis, puis dates les plus proches (dépassées
+// après : elles ne sont pas mises en avant), puis sans date. Les plus urgents gardent leur place si la
+// liste dépasse MAX_PANTRY_ITEMS.
+function urgencyRank(item: PantryItem): number {
+  if (item.priority) return -1;
+  if (item.daysLeft === null) return 100_000;
+  if (item.daysLeft < 0) return 50_000;
+  return item.daysLeft;
+}
+
+// Accepte la liste envoyée par l'app : objets { id, name, quantity, days_left, kind, priority }
+// (days_left, kind et priority depuis la phase 5) ou simples noms
 export function buildPantry(raw: unknown): Pantry {
   const list = Array.isArray(raw) ? raw : [];
   const items: PantryItem[] = [];
@@ -30,17 +57,43 @@ export function buildPantry(raw: unknown): Pantry {
     const id = typeof entry?.id === 'string' && entry.id !== '' ? entry.id : `ingredient-${index}`;
     if (seenIds.has(id)) return;
     seenIds.add(id);
-    items.push({ id, name: name.trim(), quantity: typeof entry?.quantity === 'string' ? entry.quantity.trim() : '' });
+    const daysLeft = typeof entry?.days_left === 'number' && Number.isFinite(entry.days_left) ? Math.round(entry.days_left) : null;
+    items.push({
+      id,
+      name: name.trim(),
+      quantity: typeof entry?.quantity === 'string' ? entry.quantity.trim() : '',
+      daysLeft,
+      kind: entry?.kind === 'dish' ? 'dish' : 'ingredient',
+      priority: entry?.priority === true,
+    });
   });
-  const kept = items.slice(0, MAX_PANTRY_ITEMS);
+  // sort est stable : à urgence égale, l'ordre envoyé par l'app est gardé
+  const kept = items.sort((a, b) => urgencyRank(a) - urgencyRank(b)).slice(0, MAX_PANTRY_ITEMS);
   return { items: kept, aliasOf: new Map(kept.map((item, i) => [`p${i + 1}`, item])) };
 }
 
+function daysText(days: number): string {
+  if (days === 0) return "expire aujourd'hui";
+  if (days === 1) return 'expire demain';
+  return `expire dans ${days} jours`;
+}
+
+// Une ligne par ingrédient : « - p1 : riz (200 g) [reste de plat] [URGENT : expire demain] »
 export function pantryForPrompt(pantry: Pantry): string {
   return [...pantry.aliasOf.entries()]
-    .map(([alias, item]) => `- ${alias} : ${item.name}${item.quantity ? ` (${item.quantity})` : ''}`)
+    .map(([alias, item]) => {
+      const tags: string[] = [];
+      if (item.kind === 'dish') tags.push('[reste de plat]');
+      if (item.priority) tags.push("[URGENT : choisi par l'utilisateur]");
+      else if (isUrgent(item)) tags.push(`[URGENT : ${daysText(item.daysLeft!)}]`);
+      else if (item.daysLeft !== null && item.daysLeft < 0) tags.push('[date dépassée]');
+      return `- ${alias} : ${item.name}${item.quantity ? ` (${item.quantity})` : ''}${tags.length ? ` ${tags.join(' ')}` : ''}`;
+    })
     .join('\n');
 }
+
+export const urgentItems = (pantry: Pantry) => pantry.items.filter(isUrgent);
+export const leftoverItems = (pantry: Pantry) => pantry.items.filter((item) => item.kind === 'dish');
 
 // ---------- Régimes ----------
 
@@ -281,7 +334,7 @@ export function parseRecipes(
   text: string,
   pantry: Pantry,
   diets: StrictDiet[],
-  context: { mealType: string; cuisine: string; difficulty: string; dietary: string[]; maxRecipes: number },
+  context: { mealType: string; cuisine: string; difficulty: string; dietary: string[]; maxRecipes: number; mode?: GenerationMode },
 ): ParseOutcome {
   let parsed: any;
   try {
@@ -303,6 +356,10 @@ export function parseRecipes(
     // impossible à respecter, le modèle invente une recette avec d'autres ingrédients)
     if (!raw.ingredients.some((ingredient: any) => ingredient.pantry_id !== MISSING)) {
       return invalid.push(`n°${index} "${raw.title}" n'utilise aucun ingrédient du garde-manger`);
+    }
+    // « Transformer mes restes » : chaque recette part d'au moins un reste de plat
+    if (context.mode === 'leftovers' && !raw.ingredients.some((ingredient: any) => pantry.aliasOf.get(ingredient.pantry_id)?.kind === 'dish')) {
+      return invalid.push(`n°${index} "${raw.title}" n'utilise aucun reste`);
     }
     const diet = dietViolations(raw, diets);
     if (diet.length > 0) return dietaryRejections.push(`"${raw.title}" : ${diet.join(', ')}`);

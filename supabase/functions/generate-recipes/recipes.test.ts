@@ -7,12 +7,14 @@ import {
   buildPantry,
   buildRecipeSchema,
   isDietException,
+  leftoverItems,
   MAX_PANTRY_ITEMS,
   MISSING,
   pantryForPrompt,
   parseRecipes,
   recipeCount,
   strictDietsOf,
+  urgentItems,
 } from './recipes.ts';
 
 const PANTRY = buildPantry([
@@ -137,4 +139,57 @@ Deno.test('lecture : valeurs par défaut, suggestion vide retirée, nombre de re
 
 Deno.test('nombre de recettes selon le garde-manger', () => {
   assertEquals([1, 2, 3, 5, 6, 20].map(recipeCount), [1, 1, 2, 2, 3, 3]);
+});
+
+// ---------- Anti-gaspi (phase 5) ----------
+
+const URGENT_PANTRY = buildPantry([
+  { id: 'sans-date', name: 'pâtes', quantity: '500 g' },
+  { id: 'loin', name: 'carottes', days_left: 10 },
+  { id: 'perime', name: 'yaourt', days_left: -2 },
+  { id: 'demain', name: 'tomates', days_left: 1 },
+  { id: 'reste', name: 'riz cuit', days_left: 2, kind: 'dish' },
+  { id: 'choisi', name: 'courgette', days_left: 6, priority: true },
+  { id: 'aujourdhui', name: 'poulet', days_left: 0 },
+]);
+
+Deno.test('garde-manger trié par urgence : choisis, puis dates proches, dates dépassées, sans date', () => {
+  assertEquals(URGENT_PANTRY.items.map((i) => i.id), ['choisi', 'aujourdhui', 'demain', 'reste', 'loin', 'perime', 'sans-date']);
+  assertEquals(urgentItems(URGENT_PANTRY).map((i) => i.id), ['choisi', 'aujourdhui', 'demain', 'reste']);
+  assertEquals(leftoverItems(URGENT_PANTRY).map((i) => i.id), ['reste']);
+});
+
+Deno.test('prompt : ingrédients urgents, restes et dates dépassées signalés', () => {
+  const lines = pantryForPrompt(URGENT_PANTRY).split('\n');
+  assertEquals(lines[0], "- p1 : courgette [URGENT : choisi par l'utilisateur]");
+  assertEquals(lines[1], "- p2 : poulet [URGENT : expire aujourd'hui]");
+  assertEquals(lines[2], '- p3 : tomates [URGENT : expire demain]');
+  assertEquals(lines[3], '- p4 : riz cuit [reste de plat] [URGENT : expire dans 2 jours]');
+  assertEquals(lines[4], '- p5 : carottes');
+  assertEquals(lines[5], '- p6 : yaourt [date dépassée]');
+  assertEquals(lines[6], '- p7 : pâtes (500 g)');
+});
+
+Deno.test('les plus urgents restent dans la liste quand elle dépasse la limite', () => {
+  const many = buildPantry([
+    ...Array.from({ length: MAX_PANTRY_ITEMS }, (_, i) => ({ id: `x${i}`, name: `aliment ${i}` })),
+    { id: 'urgent', name: 'lait', days_left: 0 },
+  ]);
+  assertEquals(many.items[0].id, 'urgent');
+  assertEquals(many.items.length, MAX_PANTRY_ITEMS);
+});
+
+Deno.test('mode « Transformer mes restes » : une recette sans reste est écartée', () => {
+  const context = { ...CONTEXT, mode: 'leftovers' as const };
+  const withLeftover = recipe([ing('riz cuit', 'p4'), ing('œuf', MISSING)], { title: 'Riz sauté' });
+  const withoutLeftover = recipe([ing('tomates', 'p3')], { title: 'Salade' });
+  const result = parseRecipes(JSON.stringify({ recipes: [withLeftover, withoutLeftover], refusal: '' }), URGENT_PANTRY, [], context);
+  assert(result.ok);
+  assertEquals(result.value.recipes.map((r) => r.title), ['Riz sauté']);
+  assertEquals(result.value.invalid.length, 1);
+
+  const none = parseRecipes(JSON.stringify({ recipes: [withoutLeftover], refusal: '' }), URGENT_PANTRY, [], context);
+  assert(!none.ok);
+  // En mode normal, la même recette est acceptée
+  assert(parseRecipes(JSON.stringify({ recipes: [withoutLeftover], refusal: '' }), URGENT_PANTRY, [], CONTEXT).ok);
 });

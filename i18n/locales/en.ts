@@ -225,6 +225,8 @@ const en: Translations = {
     dietary: 'Dietary preferences',
     difficulty: 'Difficulty',
     apply: 'Apply',
+    priorityHint: 'Tap an ingredient to use it first. Colored dots mark the ones expiring soon.',
+    transformLeftovers: 'Transform my leftovers',
   },
   settings: {
     title: 'Settings',

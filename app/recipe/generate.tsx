@@ -7,21 +7,28 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import { Stack } from 'expo-router';
-import { ChefHat, Sparkles } from 'lucide-react-native';
+import { Stack, useLocalSearchParams } from 'expo-router';
+import { ChefHat, Soup, Sparkles } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRecipeGeneration } from '@/hooks/useRecipeGeneration';
 import { FilterSummary } from '@/components/recipe/FilterSummary';
 import { FiltersModal } from '@/components/recipe/FiltersModal';
 import { RecipeCard } from '@/components/recipe/RecipeCard';
 import { RecipeDetailModal } from '@/components/recipe/RecipeDetailModal';
+import { PantryChips } from '@/components/recipe/PantryChips';
 
 export default function GenerateRecipeScreen() {
+  // priority : identifiants séparés par des virgules (notification des aliments qui expirent)
+  const { priority } = useLocalSearchParams<{ priority?: string }>();
   const {
     ingredients,
+    priorityIds,
+    togglePriority,
+    hasLeftovers,
     recipes,
     loading,
     generating,
+    generatingMode,
     selectedRecipe,
     setSelectedRecipe,
     imageLoading,
@@ -31,7 +38,7 @@ export default function GenerateRecipeScreen() {
     openRecipe,
     saveRecipe,
     toggleDietaryFilter,
-  } = useRecipeGeneration();
+  } = useRecipeGeneration(priority ? priority.split(',').filter(Boolean) : []);
   const { t } = useLanguage();
   const [showFilters, setShowFilters] = useState(false);
 
@@ -57,22 +64,7 @@ export default function GenerateRecipeScreen() {
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('generate.yourIngredients')}</Text>
-            <View style={styles.ingredientGrid}>
-              {ingredients.slice(0, 6).map((ingredient) => (
-                <View key={ingredient.id} style={styles.ingredientChip}>
-                  <Text style={styles.ingredientChipText}>
-                    {ingredient.name}
-                  </Text>
-                </View>
-              ))}
-              {ingredients.length > 6 && (
-                <View style={styles.ingredientChip}>
-                  <Text style={styles.ingredientChipText}>
-                    {t('generate.more', { count: ingredients.length - 6 })}
-                  </Text>
-                </View>
-              )}
-            </View>
+            <PantryChips ingredients={ingredients} priorityIds={priorityIds} onToggle={togglePriority} />
           </View>
 
           <FilterSummary filters={filters} onOpen={() => setShowFilters(true)} />
@@ -98,15 +90,31 @@ export default function GenerateRecipeScreen() {
         </ScrollView>
 
         <View style={styles.footer}>
+          {hasLeftovers && (
+            <TouchableOpacity
+              style={[styles.leftoversButton, generating && styles.generateButtonDisabled]}
+              onPress={() => generateRecipes('leftovers')}
+              disabled={generating}
+            >
+              {generatingMode === 'leftovers' ? (
+                <ActivityIndicator color="#b45309" />
+              ) : (
+                <>
+                  <Soup size={20} color="#b45309" />
+                  <Text style={styles.leftoversButtonText}>{t('generate.transformLeftovers')}</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             style={[
               styles.generateButton,
               generating && styles.generateButtonDisabled,
             ]}
-            onPress={generateRecipes}
+            onPress={() => generateRecipes('standard')}
             disabled={generating || ingredients.length === 0}
           >
-            {generating ? (
+            {generatingMode === 'standard' ? (
               <ActivityIndicator color="#fff" />
             ) : (
               <>
@@ -167,22 +175,6 @@ const styles = StyleSheet.create({
     color: '#111827',
     marginBottom: 12,
   },
-  ingredientGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  ingredientChip: {
-    backgroundColor: '#f3f4f6',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  ingredientChipText: {
-    fontSize: 14,
-    color: '#374151',
-    fontWeight: '500',
-  },
   emptyState: {
     alignItems: 'center',
     paddingVertical: 40,
@@ -218,6 +210,21 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 12,
     gap: 8,
+  },
+  leftoversButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: '#fef3c7',
+    marginBottom: 10,
+  },
+  leftoversButtonText: {
+    color: '#b45309',
+    fontSize: 16,
+    fontWeight: '700',
   },
   generateButtonDisabled: {
     opacity: 0.6,
