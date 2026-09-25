@@ -22,7 +22,8 @@
       "expo-secure-store",
       "expo-splash-screen",
       "expo-status-bar",
-      "expo-localization"
+      "expo-localization",
+      "@sentry/react-native"
     ],
     "experiments": {
       "typedRoutes": true

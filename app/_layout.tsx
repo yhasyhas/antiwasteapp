@@ -1,3 +1,6 @@
+// En premier : Sentry doit être initialisé avant le reste de l'app
+import { Sentry, setSentryUser } from '@/lib/sentry';
+import { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
@@ -6,6 +9,9 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 
 function RootNavigator() {
   const { user } = useAuth();
+
+  // Les erreurs remontées portent l'identifiant de l'utilisateur (jamais son e-mail)
+  useEffect(() => setSentryUser(user?.id ?? null), [user?.id]);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
@@ -23,7 +29,7 @@ function RootNavigator() {
   );
 }
 
-export default function RootLayout() {
+function RootLayout() {
   useFrameworkReady();
 
   return (
@@ -35,3 +41,6 @@ export default function RootLayout() {
     </AuthProvider>
   );
 }
+
+// Sentry.wrap capte aussi les erreurs de rendu (sans effet tant que Sentry n'est pas configuré)
+export default Sentry.wrap(RootLayout);

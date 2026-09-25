@@ -214,6 +214,7 @@ const en: Translations = {
     signOut: 'Sign out',
     appVersion: 'Anti-Waste Recipe App v{{version}}',
     tagline: 'Reduce food waste, one recipe at a time.',
+    sentryTest: 'Send a test error to Sentry',
   },
   notFound: {
     title: 'Oops!',

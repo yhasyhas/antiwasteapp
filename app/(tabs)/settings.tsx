@@ -10,7 +10,7 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Globe, ChevronRight, User, LogOut } from 'lucide-react-native';
-import { router } from 'expo-router';
+import { sendSentryTestError, sentryEnabled } from '@/lib/sentry';
 
 const languages = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
@@ -98,6 +98,13 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Développement seulement : vérifie que les erreurs remontent dans Sentry */}
+        {__DEV__ && sentryEnabled && (
+          <TouchableOpacity style={styles.testButton} onPress={sendSentryTestError}>
+            <Text style={styles.testButtonText}>{t('settings.sentryTest')}</Text>
+          </TouchableOpacity>
+        )}
+
         {/* Section Info */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>{t('settings.appVersion', { version: '1.0' })}</Text>
@@ -111,6 +118,20 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
+  testButton: {
+    marginHorizontal: 20,
+    marginTop: 8,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderStyle: 'dashed',
+    alignItems: 'center',
+  },
+  testButtonText: {
+    color: '#6b7280',
+    fontSize: 14,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',

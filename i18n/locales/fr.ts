@@ -215,6 +215,7 @@ const fr = {
     signOut: 'Se déconnecter',
     appVersion: 'Anti-Waste Recipe App v{{version}}',
     tagline: 'Réduis le gaspillage alimentaire, une recette à la fois.',
+    sentryTest: 'Envoyer une erreur de test à Sentry',
   },
   notFound: {
     title: 'Oups !',
