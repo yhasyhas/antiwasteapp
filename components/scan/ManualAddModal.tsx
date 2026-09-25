@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, Modal, ScrollView, Switch } from 'react-native';
 import { router } from 'expo-router';
 import { Check, Plus, X } from 'lucide-react-native';
@@ -6,22 +6,43 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { alertWriteError } from '@/lib/alertWriteError';
-import { expiryFromShelfLife, type FoodKind } from '@/lib/expiry';
+import { expiryForPackagedProduct, expiryFromShelfLife, type FoodKind } from '@/lib/expiry';
 import { maybeAskNotificationPermission } from '@/lib/notifications';
 import { notifyPantryChanged } from '@/lib/pantryEvents';
 import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
 import { ExpiryPicker } from '@/components/expiry/ExpiryPicker';
 import { scanModalStyles } from './scanModalStyles';
+import { BarcodeNotice } from './BarcodeNotice';
 
 interface ManualIngredient {
   name: string;
   quantity: string;
   kind: FoodKind;
   expires_at: string;
+  // Produit scanné par code-barres
+  barcode?: string;
+  category?: string | null;
+}
+
+// Saisie préremplie après un scan de code-barres : produit trouvé dans Open Food Facts, ou code seul
+// (found = false). key change à chaque scan, même pour un code déjà scanné.
+export interface ManualPrefill {
+  key: number;
+  barcode: string;
+  found: boolean;
+  name: string;
+  quantity: string;
+  category: string | null;
+}
+
+interface Props {
+  visible: boolean;
+  onClose: () => void;
+  prefill?: ManualPrefill | null;
 }
 
 // Ajout manuel d'ingrédients. La saisie est conservée quand la fenêtre est fermée sans enregistrer.
-export function ManualAddModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
+export function ManualAddModal({ visible, onClose, prefill }: Props) {
   const { user } = useAuth();
   const { t } = useLanguage();
   const [manualIngredients, setManualIngredients] = useState<ManualIngredient[]>([]);
@@ -31,6 +52,18 @@ export function ManualAddModal({ visible, onClose }: { visible: boolean; onClose
   const [isLeftover, setIsLeftover] = useState(false);
   const [newExpiry, setNewExpiry] = useState(() => expiryFromShelfLife(undefined));
   const [expiryChanged, setExpiryChanged] = useState(false);
+  // Code-barres de l'ingrédient en cours de saisie
+  const [pending, setPending] = useState<{ barcode: string; found: boolean; category: string | null } | null>(null);
+
+  useEffect(() => {
+    if (!prefill) return;
+    setNewIngredientName(prefill.name);
+    setNewIngredientQuantity(prefill.quantity);
+    setIsLeftover(false);
+    setNewExpiry(expiryForPackagedProduct(prefill.category));
+    setExpiryChanged(false);
+    setPending({ barcode: prefill.barcode, found: prefill.found, category: prefill.category });
+  }, [prefill?.key]);
 
   const toggleLeftover = (value: boolean) => {
     setIsLeftover(value);
@@ -52,8 +85,10 @@ export function ManualAddModal({ visible, onClose }: { visible: boolean; onClose
         quantity: newIngredientQuantity.trim(),
         kind: isLeftover ? 'dish' : 'ingredient',
         expires_at: newExpiry,
+        ...(pending && { barcode: pending.barcode, category: pending.category }),
       },
     ]);
+    setPending(null);
     setNewIngredientName('');
     setNewIngredientQuantity('');
     setIsLeftover(false);
@@ -74,7 +109,9 @@ export function ManualAddModal({ visible, onClose }: { visible: boolean; onClose
       quantity: ingredient.quantity,
       kind: ingredient.kind,
       expires_at: ingredient.expires_at,
-      added_via: 'manual',
+      category: ingredient.category ?? null,
+      barcode: ingredient.barcode ?? null,
+      added_via: ingredient.barcode ? 'barcode' : 'manual',
     }));
 
     const { error } = await supabase
@@ -120,6 +157,7 @@ export function ManualAddModal({ visible, onClose }: { visible: boolean; onClose
           </View>
 
           <ScrollView style={styles.modalBody}>
+            {pending && <BarcodeNotice barcode={pending.barcode} found={pending.found} />}
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>{t('manual.nameLabel')}</Text>
               <TextInput

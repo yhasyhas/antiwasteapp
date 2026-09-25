@@ -99,6 +99,16 @@ const en: Translations = {
     addCount_one: 'Add {{count}} ingredient',
     addCount_other: 'Add {{count}} ingredients',
   },
+  barcode: {
+    modePhoto: 'Photo',
+    modeBarcode: 'Barcode',
+    pointCamera: "Place the product's barcode inside the frame",
+    lookingUp: 'Looking up the product…',
+    foundHint: 'Product found in Open Food Facts. Check the name and copy the date printed on the pack.',
+    unknownHint: 'Product unknown to Open Food Facts: give it a name, then add it to the list.',
+    lookupFailedTitle: 'Lookup failed',
+    lookupFailedText: 'Open Food Facts is not responding. Check your connection; you can add the product manually.',
+  },
   manual: {
     title: 'Add ingredients',
     nameLabel: 'Ingredient name',

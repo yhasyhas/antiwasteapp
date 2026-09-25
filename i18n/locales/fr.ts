@@ -100,6 +100,16 @@ const fr = {
     addCount_one: 'Ajouter {{count}} ingrédient',
     addCount_other: 'Ajouter {{count}} ingrédients',
   },
+  barcode: {
+    modePhoto: 'Photo',
+    modeBarcode: 'Code-barres',
+    pointCamera: 'Place le code-barres du produit dans le cadre',
+    lookingUp: 'Recherche du produit…',
+    foundHint: 'Produit trouvé dans Open Food Facts. Vérifie le nom et recopie la date imprimée sur l’emballage.',
+    unknownHint: 'Produit inconnu d’Open Food Facts : donne-lui un nom, puis ajoute-le à la liste.',
+    lookupFailedTitle: 'Recherche impossible',
+    lookupFailedText: 'Open Food Facts ne répond pas. Vérifie ta connexion ; tu peux ajouter le produit à la main.',
+  },
   manual: {
     title: 'Ajouter des ingrédients',
     nameLabel: "Nom de l'ingrédient",

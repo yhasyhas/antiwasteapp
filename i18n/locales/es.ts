@@ -99,6 +99,16 @@ const es: Translations = {
     addCount_one: 'Añadir {{count}} ingrediente',
     addCount_other: 'Añadir {{count}} ingredientes',
   },
+  barcode: {
+    modePhoto: 'Foto',
+    modeBarcode: 'Código de barras',
+    pointCamera: 'Coloca el código de barras del producto dentro del marco',
+    lookingUp: 'Buscando el producto…',
+    foundHint: 'Producto encontrado en Open Food Facts. Revisa el nombre y copia la fecha impresa en el envase.',
+    unknownHint: 'Producto desconocido en Open Food Facts: ponle un nombre y añádelo a la lista.',
+    lookupFailedTitle: 'Búsqueda imposible',
+    lookupFailedText: 'Open Food Facts no responde. Revisa tu conexión; puedes añadir el producto a mano.',
+  },
   manual: {
     title: 'Añadir ingredientes',
     nameLabel: 'Nombre del ingrediente',

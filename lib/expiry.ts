@@ -95,3 +95,14 @@ export const EXPIRY_COLORS: Record<ExpiryStatus, { background: string; text: str
   ok: { background: '#d1fae5', text: '#047857' },
   none: { background: '#f3f4f6', text: '#6b7280' },
 };
+
+// Produit emballé scanné par code-barres (non ouvert) : durée par défaut selon la catégorie, en jours.
+// Simple point de départ : l'utilisateur recopie la date imprimée sur l'emballage.
+const PACKAGED_SHELF_LIFE_DAYS: Record<string, number> = {
+  fruit: 5, vegetable: 5, meat: 3, fish: 2, dairy: 10, egg: 21, grain: 365, legume: 365,
+  bakery: 5, condiment: 180, spice: 365, beverage: 180, snack: 120, frozen: 90, other: 30,
+};
+
+export function expiryForPackagedProduct(category: string | null | undefined): string {
+  return addDays(todayISO(), PACKAGED_SHELF_LIFE_DAYS[category ?? 'other'] ?? PACKAGED_SHELF_LIFE_DAYS.other);
+}
