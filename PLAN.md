@@ -138,8 +138,8 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 - [ ] Nouvelle fonction `generate-recipe-image` : Cloudflare Workers AI (FLUX), appelée **seulement** à l'ouverture ou à la sauvegarde d'une recette
 - [ ] Bucket Supabase Storage `recipe-images` ; enregistrer uniquement l'URL Storage dans `recipes.image_url`
 - [ ] Retirer Pollinations : code, secrets, dépendances (Clarifai : retiré en phase 0.6)
-- [ ] `analyze-image` : champ `storage_tip` (conseil de conservation) pour chaque aliment — voir « Ce qui distingue l'app »
-- [ ] `analyze-image` : champ `kind` (`ingredient` ou `dish`) pour distinguer les restes de plats
+- [x] `analyze-image` : champ `storage_tip` (conseil de conservation) pour chaque aliment — voir « Ce qui distingue l'app »
+- [x] `analyze-image` : champ `kind` (`ingredient` ou `dish`) pour distinguer les restes de plats
 - [ ] `generate-recipes` : paramètre `cuisine` (cuisines du monde) et filtre correspondant sur l'écran de génération
 
 ### Point d'attention — Temps d'analyse des photos

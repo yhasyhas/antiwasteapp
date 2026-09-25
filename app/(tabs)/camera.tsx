@@ -30,6 +30,9 @@ interface ScannedIngredient {
   quantity: string;
   category: string;
   confidence: number;
+  // Reçus depuis la phase 3, affichés en phase 5
+  kind?: 'ingredient' | 'dish';
+  storage_tip?: string;
 }
 
 export default function CameraScreen() {

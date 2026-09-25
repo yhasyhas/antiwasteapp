@@ -38,6 +38,11 @@ const CATEGORIES = [
   'bakery', 'condiment', 'spice', 'beverage', 'snack', 'frozen', 'other',
 ];
 
+// ingredient : aliment brut ou produit acheté ; dish : plat cuisiné ou reste de repas
+const KINDS = ['ingredient', 'dish'];
+type FoodKind = 'ingredient' | 'dish';
+const MAX_STORAGE_TIP_LENGTH = 160;
+
 // Sortie structurée, identique pour Gemini et Groq (additionalProperties: false est exigé par le
 // mode strict de Groq). La réponse est de toute façon revalidée par cleanIngredients.
 const RESPONSE_SCHEMA = {
@@ -52,8 +57,10 @@ const RESPONSE_SCHEMA = {
           quantity: { type: 'string', description: 'Quantité estimée avec son unité (ex. "3", "500 g", "1 l"), ou chaîne vide si impossible à estimer' },
           category: { type: 'string', enum: CATEGORIES },
           confidence: { type: 'number', minimum: 0, maximum: 1 },
+          kind: { type: 'string', enum: KINDS },
+          storage_tip: { type: 'string', description: 'Conseil de conservation court, dans la langue demandée' },
         },
-        required: ['name', 'quantity', 'category', 'confidence'],
+        required: ['name', 'quantity', 'category', 'confidence', 'kind', 'storage_tip'],
         additionalProperties: false,
       },
     },
@@ -79,6 +86,8 @@ interface DetectedIngredient {
   quantity: string;
   category: string;
   confidence: number;
+  kind: FoodKind;
+  storage_tip: string;
 }
 
 const MESSAGES: Record<string, Record<string, string>> = {
@@ -131,6 +140,10 @@ function errorResponse(code: string, language: string, status: number, details?:
 // (ex. un modèle qui range les légumes dans "legume" à cause du mot français « légume »)
 const CATEGORY_GUIDE = `un de ces codes : fruit (fruits frais), vegetable (légumes, y compris tomates, pommes de terre, salades), meat (viande, charcuterie), fish (poisson, fruits de mer), dairy (lait, fromage, yaourt, beurre, crème), egg (œufs), grain (pâtes, riz, céréales, farine), legume (légumineuses : lentilles, pois chiches, haricots secs), bakery (pain, viennoiseries, biscuits), condiment (sauces, huile, vinaigre, confiture), spice (épices, herbes séchées), beverage (boissons, y compris jus de fruits), snack (gâteaux apéritif, chocolat, confiseries), frozen (surgelés), other.`;
 
+// Court pour limiter les tokens de sortie (temps de réponse, limite de Groq)
+const STORAGE_TIP_GUIDE = (languageName: string) =>
+  `conseil de conservation court en ${languageName} (une phrase, 12 mots au plus), adapté à l'aliment tel qu'il est sur la photo : où le ranger et combien de temps (ex. « Au frigo, dans une boîte fermée, 3 jours »).`;
+
 function buildPrompt(language: string, mode: AnalyzeMode): string {
   const languageName = LANGUAGE_NAMES[language] || LANGUAGE_NAMES['en'];
 
@@ -142,6 +155,8 @@ Liste uniquement les produits alimentaires achetés.
 - "quantity" : quantité d'après le ticket, avec son unité (ex. "1 kg", "6", "1 l") ; chaîne vide si elle n'est pas indiquée.
 - "category" : ${CATEGORY_GUIDE}
 - "confidence" : entre 0 et 1, selon la lisibilité de la ligne et ta certitude sur le produit.
+- "kind" : "ingredient".
+- "storage_tip" : ${STORAGE_TIP_GUIDE(languageName)}
 - Un même produit n'apparaît qu'une fois : additionne les quantités.
 - Ignore les produits non alimentaires (hygiène, entretien…), les totaux, remises, moyens de paiement et TVA.
 - Si l'image n'est pas un ticket lisible, renvoie une liste vide.`;
@@ -154,6 +169,8 @@ Liste les aliments et ingrédients de cuisine visibles.
 - "quantity" : quantité estimée avec son unité (ex. "3", "500 g", "1 l", "1 botte") ; chaîne vide si impossible à estimer.
 - "category" : ${CATEGORY_GUIDE}
 - "confidence" : entre 0 et 1, ta certitude que l'aliment est bien présent.
+- "kind" : "dish" pour un plat cuisiné ou un reste de repas (ex. "gratin de pâtes", "reste de poulet rôti", "soupe"), dont "name" est alors le nom du plat ; "ingredient" pour tout le reste.
+- "storage_tip" : ${STORAGE_TIP_GUIDE(languageName)}
 - Un même aliment n'apparaît qu'une fois : additionne les quantités.
 - 20 aliments au plus, les plus visibles d'abord.
 - Ignore ce qui n'est pas comestible (ustensiles, meubles, emballages vides).
@@ -253,8 +270,8 @@ async function requestGroq({ prompt, imageBase64, mimeType }: VisionRequest, sig
         // Mode sans réflexion : réponse plus rapide
         reasoning_effort: 'none',
         // L'offre gratuite de Groq limite ce modèle à 1 000 tokens de sortie par minute : une valeur plus
-        // haute fait refuser la requête. 20 ingrédients tiennent dans ~600 tokens.
-        max_completion_tokens: 800,
+        // haute fait refuser la requête. 20 aliments avec leur conseil de conservation tiennent dans ~900 tokens.
+        max_completion_tokens: 1000,
       }),
       signal: withTimeout(signal, GROQ_TIMEOUT_MS),
     });
@@ -293,7 +310,8 @@ const PROVIDERS: VisionProvider[] = [
   { name: 'groq', model: GROQ_VISION_MODEL, configured: GROQ_API_KEY !== '', call: callGroq },
 ];
 
-// Raison pour laquelle un aliment ne respecte pas RESPONSE_SCHEMA, ou null s'il est utilisable
+// Raison pour laquelle un aliment ne respecte pas RESPONSE_SCHEMA, ou null s'il est utilisable.
+// kind et storage_tip ne sont pas bloquants : valeurs par défaut dans cleanIngredients.
 function ingredientViolation(item: any): string | null {
   if (!item || typeof item !== 'object') return 'pas un objet';
   if (typeof item.name !== 'string' || item.name.trim() === '') return '"name" invalide';
@@ -340,6 +358,8 @@ function cleanIngredients(raw: unknown): DetectedIngredient[] {
       quantity: typeof item.quantity === 'string' ? item.quantity.trim() : '',
       category: CATEGORIES.includes(item.category) ? item.category : 'other',
       confidence: typeof item.confidence === 'number' ? Math.min(1, Math.max(0, item.confidence)) : 0,
+      kind: (KINDS.includes(item.kind) ? item.kind : 'ingredient') as FoodKind,
+      storage_tip: typeof item.storage_tip === 'string' ? item.storage_tip.trim().slice(0, MAX_STORAGE_TIP_LENGTH) : '',
     }))
     .filter((item) => item.confidence >= MIN_CONFIDENCE)
     .sort((a, b) => b.confidence - a.confidence)
