@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { callEdgeFunction } from '@/lib/callEdgeFunction';
+import { ensureRecipeImage } from '@/lib/recipeImage';
 import { supabase } from '@/lib/supabase';
 import { router, Stack } from 'expo-router';
 import {
@@ -52,6 +53,8 @@ interface Recipe {
   cuisine?: string;
   tips: string[];
   suggestion?: string;
+  // Description de la photo (en anglais), utilisée par generate-recipe-image
+  image_prompt?: string;
   image_url?: string;
 }
 
@@ -109,6 +112,8 @@ export default function GenerateRecipeScreen() {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  // Recettes dont l'image est en cours de génération
+  const [imageLoading, setImageLoading] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<Filters>({
     dietary: [],
@@ -216,6 +221,7 @@ export default function GenerateRecipeScreen() {
     servings: recipe.servings,
     tips: recipe.tips || [],
     suggestion: recipe.suggestion ?? null,
+    image_prompt: recipe.image_prompt ?? null,
     image_url: recipe.image_url,
     language: filters.language,
   });
@@ -241,6 +247,22 @@ export default function GenerateRecipeScreen() {
       const index = unused.findIndex((row) => row.title === recipe.title);
       return index === -1 ? recipe : { ...recipe, id: unused.splice(index, 1)[0].id as string };
     });
+  };
+
+  // Image générée seulement à l'ouverture ou à la sauvegarde d'une recette (quota images côté serveur)
+  const requestImage = async (recipeId: string | undefined, imageUrl?: string) => {
+    if (!recipeId || imageUrl) return;
+    setImageLoading((current) => [...current, recipeId]);
+    const url = await ensureRecipeImage(recipeId, filters.language);
+    setImageLoading((current) => current.filter((id) => id !== recipeId));
+    if (!url) return;
+    setRecipes((current) => current.map((r) => (r.id === recipeId ? { ...r, image_url: url } : r)));
+    setSelectedRecipe((current) => (current?.id === recipeId ? { ...current, image_url: url } : current));
+  };
+
+  const openRecipe = (recipe: Recipe) => {
+    setSelectedRecipe(recipe);
+    requestImage(recipe.id, recipe.image_url);
   };
 
   // Sauvegarder = ajouter aux favoris la recette déjà présente dans l'historique
@@ -273,6 +295,7 @@ export default function GenerateRecipeScreen() {
       alertWriteError(t, 'adding recipe to favorites', favoriteError);
       return;
     }
+    requestImage(recipeId, recipe.image_url);
 
     Alert.alert(
       'Recipe Saved!',
@@ -398,7 +421,7 @@ export default function GenerateRecipeScreen() {
                 <TouchableOpacity
                   key={index}
                   style={styles.recipeCard}
-                  onPress={() => setSelectedRecipe(recipe)}
+                  onPress={() => openRecipe(recipe)}
                 >
                   {recipe.image_url && (
                     <View style={styles.recipeImageContainer}>
@@ -671,6 +694,11 @@ export default function GenerateRecipeScreen() {
                 </View>
 
                 <ScrollView showsVerticalScrollIndicator={false}>
+                  {!selectedRecipe.image_url && selectedRecipe.id && imageLoading.includes(selectedRecipe.id) && (
+                    <View style={[styles.imageContainer, styles.imagePlaceholder]}>
+                      <ActivityIndicator color="#10b981" />
+                    </View>
+                  )}
                   {selectedRecipe.image_url && (
                     <View style={styles.imageContainer}>
                       <Image 
@@ -922,6 +950,13 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#f3f4f6',
+  },
+  imagePlaceholder: {
+    height: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f3f4f6',
+    borderRadius: 16,
   },
   recipeImageContainer: {
     height: 150,

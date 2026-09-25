@@ -7,10 +7,12 @@ import {
   ScrollView,
   ActivityIndicator,
   Modal,
+  Image,
 } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { alertWriteError } from '@/lib/alertWriteError';
+import { ensureRecipeImage } from '@/lib/recipeImage';
 import { useFocusEffect } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { Heart, Clock, ChefHat, X } from 'lucide-react-native';
@@ -25,15 +27,29 @@ interface Recipe {
   dietary_tags: string[];
   ingredients_used: any[];
   instructions: any[];
+  image_url?: string | null;
   is_favorite?: boolean;
 }
 
 export default function SavedScreen() {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [imageLoading, setImageLoading] = useState<string | null>(null);
+
+  // Image générée seulement à l'ouverture d'une recette qui n'en a pas encore (quota images côté serveur)
+  const openRecipe = async (recipe: Recipe) => {
+    setSelectedRecipe(recipe);
+    if (recipe.image_url) return;
+    setImageLoading(recipe.id);
+    const url = await ensureRecipeImage(recipe.id, language);
+    setImageLoading((current) => (current === recipe.id ? null : current));
+    if (!url) return;
+    setRecipes((current) => current.map((r) => (r.id === recipe.id ? { ...r, image_url: url } : r)));
+    setSelectedRecipe((current) => (current?.id === recipe.id ? { ...current, image_url: url } : current));
+  };
 
   // Rechargé à chaque retour sur l'onglet (recettes sauvegardées depuis l'écran de génération)
   useFocusEffect(
@@ -140,7 +156,7 @@ export default function SavedScreen() {
               <TouchableOpacity
                 key={recipe.id}
                 style={styles.recipeCard}
-                onPress={() => setSelectedRecipe(recipe)}
+                onPress={() => openRecipe(recipe)}
               >
                 <View style={styles.recipeHeader}>
                   <Text style={styles.recipeTitle}>{recipe.title}</Text>
@@ -184,7 +200,7 @@ export default function SavedScreen() {
                   <TouchableOpacity
                     key={recipe.id}
                     style={styles.recipeCard}
-                    onPress={() => setSelectedRecipe(recipe)}
+                    onPress={() => openRecipe(recipe)}
                   >
                     <View style={styles.recipeHeader}>
                       <Text style={styles.recipeTitle}>{recipe.title}</Text>
@@ -240,6 +256,13 @@ export default function SavedScreen() {
               </View>
 
               <ScrollView showsVerticalScrollIndicator={false}>
+                {selectedRecipe.image_url ? (
+                  <Image source={{ uri: selectedRecipe.image_url }} style={styles.recipeImage} resizeMode="cover" />
+                ) : imageLoading === selectedRecipe.id ? (
+                  <View style={[styles.recipeImage, styles.imagePlaceholder]}>
+                    <ActivityIndicator color="#10b981" />
+                  </View>
+                ) : null}
                 <Text style={styles.modalDescription}>
                   {selectedRecipe.description}
                 </Text>
@@ -355,6 +378,17 @@ export default function SavedScreen() {
 }
 
 const styles = StyleSheet.create({
+  recipeImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 16,
+    marginBottom: 16,
+  },
+  imagePlaceholder: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f3f4f6',
+  },
   container: {
     flex: 1,
     backgroundColor: '#f9fafb',
