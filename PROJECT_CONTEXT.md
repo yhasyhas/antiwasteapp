@@ -121,8 +121,8 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - `generateFallbackRecipe` (code mort) supprimé de `generate-recipes`.
 - Section « Ce qui distingue l'app » ajoutée à `PLAN.md` (garde-manger partagé, conservation, restes, cuisines du monde) ; le modèle de données passe à la notion de foyer en phase 2.
 
-### Phase 2 — sécurité et foyers (branche `phase-2`)
-- Nouvelles clés d'API : clé publishable dans l'app, `SUPABASE_PUBLISHABLE_KEYS` / `SUPABASE_SECRET_KEYS` dans les fonctions ; anciennes clés `anon` / `service_role` désactivées.
+### Phase 2 — sécurité et foyers (branche `phase-2`, validée depuis l'app)
+- Nouvelles clés d'API : clé publishable dans l'app, `SUPABASE_PUBLISHABLE_KEYS` / `SUPABASE_SECRET_KEYS` dans les fonctions ; anciennes clés `anon` / `service_role` désactivées le 25/09/2026.
 - Les deux fonctions vérifient l'utilisateur (`_shared/auth.ts`, `verify_jwt = false`) : 401 sans jeton d'utilisateur, même avec une clé d'API.
 - Quotas : 10 générations et 20 scans par jour (UTC) et par utilisateur, comptés avant l'appel à l'IA et rendus si l'IA échoue ; 429 et « Limite du jour atteinte » dans l'app.
 - Foyers : tables `households` / `household_members`, `household_id` sur `ingredients`, RLS par appartenance au foyer, foyer personnel à l'inscription ; données existantes migrées (sauvegarde dans `backups/`). Aucun changement visible.
@@ -144,6 +144,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Phase 1 validée avec des tests partiels (scan + génération, doublons, langue) : inscription, déconnexion, alertes d'écriture et rechargement des onglets restent à tester sur appareil.
 - Confirmation d'email désactivée dans Supabase pendant le développement (à réactiver en phase 7).
 - Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`) : renommage en phase 7, nom pas encore choisi.
+- Sauvegardes de la base dans `backups/` : jamais commitées (`.gitignore`) ni exportées.
 - Pas de README ; tests : `matching.test.ts` (Deno) et `supabase/tests/*.sql`.
 
 ## 6. Prochaine étape
