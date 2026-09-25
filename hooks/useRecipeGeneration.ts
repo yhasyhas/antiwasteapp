@@ -8,6 +8,7 @@ import { callEdgeFunction } from '@/lib/callEdgeFunction';
 import { ensureRecipeImage } from '@/lib/recipeImage';
 import { supabase } from '@/lib/supabase';
 import { daysUntil, sortByUrgency } from '@/lib/expiry';
+import { onPantryChanged } from '@/lib/pantryEvents';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import type { Filters, Recipe } from '@/components/recipe/types';
 
@@ -42,6 +43,8 @@ export function useRecipeGeneration(initialPriorityIds: string[] = []) {
   useEffect(() => {
     loadIngredients();
     loadUserPreferences();
+    // « J'ai cuisiné ça » depuis cet écran : les ingrédients retirés disparaissent de la liste
+    return onPantryChanged(loadIngredients);
   }, []);
 
   // Nouvelle notification touchée alors que l'écran est déjà ouvert

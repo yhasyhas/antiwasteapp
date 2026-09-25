@@ -4,6 +4,7 @@ import { Heart, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { difficultyLabel } from '@/lib/labels';
 import type { SavedRecipe } from '@/hooks/useSavedRecipes';
+import { CookedButton } from '@/components/recipe/CookedButton';
 
 interface Props {
   recipe: SavedRecipe;
@@ -139,6 +140,7 @@ export function SavedRecipeDetailModal({ recipe, imageLoading, onClose, onToggle
                 : t('recipe.saveToFavorites')}
             </Text>
           </TouchableOpacity>
+          <CookedButton ingredientsUsed={recipe.ingredients_used} />
         </View>
       </View>
     </Modal>

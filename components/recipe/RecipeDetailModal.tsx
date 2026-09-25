@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator
 import { Heart, Lightbulb, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { modalStyles, suggestionStyles } from './modalStyles';
+import { CookedButton } from './CookedButton';
 import type { Recipe } from './types';
 
 interface Props {
@@ -156,6 +157,7 @@ export function RecipeDetailModal({ recipe, imageLoading, onClose, onSave }: Pro
               {t('recipe.saveToFavorites')}
             </Text>
           </TouchableOpacity>
+          <CookedButton ingredientsUsed={recipe.ingredients_used} />
         </View>
       </View>
     </Modal>
