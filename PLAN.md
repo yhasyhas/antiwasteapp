@@ -131,25 +131,27 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 
 ## Phase 3 — Nouvelle stack IA
 
-- [ ] Créer `supabase/functions/_shared/ai.ts` : une interface unique (`analyzeImage`, `generateRecipes`) avec fournisseur principal + secours, configurés par secrets
-- [ ] Réécrire `generate-recipes` avec sortie structurée (schéma JSON) ; générer les 3 recettes en un appel ou en parallèle (supprimer la pause de 500 ms)
-- [ ] Remplacer la vérification des ingrédients interdits par mots-clés (`checkForbiddenIngredients`, faux positifs comme « lait de coco » en vegan) : dans la sortie structurée, le modèle indique pour chaque ingrédient s'il respecte chaque régime sélectionné, et le serveur garde une liste d'exceptions (lait de coco, lait d'amande, beurre de cacahuète…)
-- [ ] Le modèle renvoie, pour chaque ingrédient de la recette, l'identifiant de l'ingrédient du garde-manger correspondant (ou "manquant"), ce qui remplace la comparaison de texte (`matching.ts`)
-- [ ] Nouvelle fonction `generate-recipe-image` : Cloudflare Workers AI (FLUX), appelée **seulement** à l'ouverture ou à la sauvegarde d'une recette
-- [ ] Bucket Supabase Storage `recipe-images` ; enregistrer uniquement l'URL Storage dans `recipes.image_url`
-- [ ] Retirer Pollinations : code, secrets, dépendances (Clarifai : retiré en phase 0.6)
-- [ ] `analyze-image` : champ `storage_tip` (conseil de conservation) pour chaque aliment — voir « Ce qui distingue l'app »
-- [ ] `analyze-image` : champ `kind` (`ingredient` ou `dish`) pour distinguer les restes de plats
-- [ ] `generate-recipes` : paramètre `cuisine` (cuisines du monde) et filtre correspondant sur l'écran de génération
+- [x] Créer `supabase/functions/_shared/ai.ts` : une interface unique (`analyzeImage`, `generateRecipes`) avec fournisseur principal + secours, configurés par secrets
+- [x] Réécrire `generate-recipes` avec sortie structurée (schéma JSON) ; générer les 3 recettes en un appel ou en parallèle (supprimer la pause de 500 ms) — un seul appel ; Groq `gpt-oss-120b` puis Gemini (secret `RECIPE_PROVIDERS`)
+- [x] Remplacer la vérification des ingrédients interdits par mots-clés (`checkForbiddenIngredients`, faux positifs comme « lait de coco » en vegan) : dans la sortie structurée, le modèle indique pour chaque ingrédient s'il respecte chaque régime sélectionné, et le serveur garde une liste d'exceptions (lait de coco, lait d'amande, beurre de cacahuète…)
+- [x] Le modèle renvoie, pour chaque ingrédient de la recette, l'identifiant de l'ingrédient du garde-manger correspondant (ou "manquant"), ce qui remplace la comparaison de texte (`matching.ts`)
+- [x] Nouvelle fonction `generate-recipe-image` : Cloudflare Workers AI (FLUX), appelée **seulement** à l'ouverture ou à la sauvegarde d'une recette — quota `QUOTA_DAILY_IMAGES` (10/jour), secrets `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_IMAGE_MODEL`
+- [x] Bucket Supabase Storage `recipe-images` ; enregistrer uniquement l'URL Storage dans `recipes.image_url` — migration `20260925160000`, tests `supabase/tests/recipe_images.sql`
+- [x] Retirer Pollinations : code, secrets, dépendances (Clarifai : retiré en phase 0.6) — plus aucune trace dans le code, les secrets, la base ni la documentation (hors journal)
+- [x] `analyze-image` : champ `storage_tip` (conseil de conservation) pour chaque aliment — voir « Ce qui distingue l'app »
+- [x] `analyze-image` : champ `kind` (`ingredient` ou `dish`) pour distinguer les restes de plats
+- [x] `generate-recipes` : paramètre `cuisine` (cuisines du monde) et filtre correspondant sur l'écran de génération (africaine, maghrébine, asiatique, latino, méditerranéenne, française, peu importe)
 
 ### Point d'attention — Temps d'analyse des photos
 
 Objectif : **moins de 5 s pour 90 % des scans**. Mesuré le 24/09/2026 : Gemini 15,7 s pour un seul ingrédient, Groq 1 à 6 s.
 
-- [ ] Régler la réflexion (thinking) de Gemini au minimum pour la vision — `thinking_level: 'minimal'` est déjà envoyé depuis la phase 0.6 : vérifier qu'il est bien pris en compte par le modèle
-- [ ] Lancer Groq en parallèle si Gemini n'a pas répondu après 5 s, et garder la première réponse valide
-- [ ] Tester des photos de 640 px au lieu de 800 px (temps, qualité de la reconnaissance)
-- [ ] Afficher la photo prise pendant l'analyse
+Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avant 6,3 s de médiane, 9,7 s de p90 ; après, avec Groq lancé à 2,5 s, 4,2 s de médiane, 5,4 s de p90 (7 scans sur 8 sous 5 s). Détail au journal. **Reste à surveiller** : les limites de l'offre gratuite de Groq (voir phase 7).
+
+- [x] Régler la réflexion (thinking) de Gemini au minimum pour la vision — vérifié : `total_thought_tokens` = 0 avec `thinking_level: 'minimal'`
+- [x] Lancer Groq en parallèle si Gemini n'a pas répondu après 5 s, et garder la première réponse valide (délai réglable : secret `SCAN_HEDGE_DELAY_MS`)
+- [x] Tester des photos de 640 px au lieu de 800 px (temps, qualité de la reconnaissance) — 800 px conservé, voir le journal
+- [x] Afficher la photo prise pendant l'analyse
 
 **Terminé quand** : un scan en français renvoie des noms en français, aucune clé n'apparaît dans les réponses envoyées à l'app, et couper le fournisseur principal fait basculer automatiquement sur le secours.
 
@@ -252,4 +254,19 @@ Objectif : **moins de 5 s pour 90 % des scans**. Mesuré le 24/09/2026 : Gemini 
 | 25/09/2026 | Quotas comptés par jour UTC, avant l'appel à l'IA (fonction SQL atomique), rendus si l'IA échoue ; un refus lié au régime reste compté | Pas de dépassement en cas d'appels simultanés ; une panne de fournisseur ne doit pas coûter de quota à l'utilisateur. Remise à zéro à 1 h ou 2 h du matin, heure de Paris |
 | 25/09/2026 | CORS : liste d'origines autorisées (`ALLOWED_ORIGINS`), par défaut `http://localhost:8081` et `http://127.0.0.1:8081` | L'app est mobile ; seule la version web en local en a besoin. À compléter avec le domaine de production si une version web est publiée |
 | 25/09/2026 | Anciennes clés `anon` / `service_role` désactivées le 25/09/2026 à 13:28 UTC (15:28 heure de Paris), depuis le dashboard, avec l'accord explicite de l'utilisateur | L'app testée avec la clé publishable, puis vérification après désactivation : anciennes clés refusées (401), fonctions, quotas et tests SQL OK. Réactivables dans le dashboard (Project Settings → API Keys) |
+| 25/09/2026 | Fonctions : jeton vérifié sur place (signature ES256, clé publique du projet) au lieu d'un appel au serveur d'authentification ; repli sur l'appel si aucune clé ne correspond | Environ 0,3 à 0,5 s gagnées par appel. Un jeton reste accepté jusqu'à son expiration (1 h au plus) après une déconnexion : acceptable pour des appels à l'IA limités par quota. Testé : signature modifiée et `sub` falsifié refusés (401) |
+| 25/09/2026 | Temps de scan mesuré avant la phase 3 (12 scans, 800 px) : médiane 6,3 s, p90 9,7 s, max 22,4 s, 3 sur 12 sous 5 s | Référence. Environ 1 s passait avant l'appel à l'IA (vérification de l'utilisateur, quota), et un échec de Gemini coûtait 20 s d'attente avant Groq |
+| 25/09/2026 | Réflexion de Gemini vérifiée : `total_thought_tokens` = 0 avec `thinking_level: 'minimal'` | Le temps de Gemini (2,5 à 6,7 s, même pour une banane seule à 87 tokens de sortie) ne vient pas de la réflexion mais du délai de réponse du service gratuit |
+| 25/09/2026 | Photos en 800 px conservées (640 px testé) | 640 px : pas plus rapide (8 scans : médiane 6,8 s contre 4,3 s en 800 px, écart dû à la variabilité de Gemini) et reconnaissance un peu moins bonne (carotte manquée 2 fois sur 2 dans le bac à légumes) |
+| 25/09/2026 | Scan : Groq lancé en parallèle après 5 s (12 scans : médiane 6,4 s, p90 7,2 s, max 9,2 s), puis après **2,5 s** via le secret `SCAN_HEDGE_DELAY_MS=2500` (8 scans : médiane 4,2 s, p90 5,4 s, max 5,4 s, 7 sur 8 sous 5 s) | 5 s borne les cas lents mais laisse la médiane au-dessus de 5 s, car Gemini dépasse souvent 5 s. À 2,5 s, l'objectif est presque atteint. Contrepartie : Groq est appelé sur la plupart des scans, et son offre gratuite (limite par minute pour toute l'app : environ 1 000 tokens de sortie, soit 2 à 3 scans) renvoie 429 dès que plusieurs scans se suivent ; le scan attend alors Gemini. Valable pour la bêta, pas au-delà sans offre payante |
+| 25/09/2026 | Vérification de l'utilisateur et du quota avant l'IA : de ~1 s à ~0,3 s | Jeton vérifié sur place (voir plus haut) ; le quota reste un appel à la base |
+| 25/09/2026 | `storage_tip` et `kind` ajoutés au scan | Environ deux fois plus de tokens de sortie (fridge : ~600 au lieu de ~300), donc un peu plus lent ; conseils courts (12 mots) pour limiter l'effet. Plats reconnus : « plat cuisiné » en `dish` |
+| 25/09/2026 | Vérification locale du jeton : une session fermée (déconnexion) reste acceptée par les fonctions jusqu'à l'expiration du jeton, 1 h maximum par défaut | Acceptable pour l'app : les fonctions n'exposent aucune donnée, seulement des appels à l'IA déjà limités par les quotas. Délai de 2,5 s pour `SCAN_HEDGE_DELAY_MS` validé après les tests du bloc 1 |
+| 25/09/2026 | Génération des recettes : **Groq `openai/gpt-oss-120b` en principal, Gemini `gemini-3.1-flash-lite` en secours** (secret `RECIPE_PROVIDERS=groq,gemini`), sans lancement en parallèle | Mesures sur 6 scénarios (1 à 3 recettes, régimes, anglais, cuisines) : Groq médiane 5,0 s, max 7,7 s ; Gemini médiane 10,5 s, max 13,7 s, recettes plus pauvres. Tous deux fiables (6/6, aucun identifiant inconnu). Limites gratuites de Groq pour ce modèle : 1 000 requêtes/jour et 8 000 tokens/minute, soit 1 à 2 générations de 3 recettes par minute pour toute l'app ; au-delà, Gemini prend le relais (plus lent). Bascule testée : Groq coupé → Gemini en 14,5 s |
+| 25/09/2026 | Recettes générées en un seul appel (N recettes dans une même réponse) plutôt qu'en parallèle | Moins de tokens au total (prompt envoyé une fois), donc moins de risque d'atteindre la limite par minute de Groq ; les recettes se différencient mieux quand le modèle les écrit ensemble. Pause de 500 ms supprimée |
+| 25/09/2026 | Ingrédients du garde-manger envoyés avec leur identifiant, remplacés par des alias courts (p1, p2…) dans une liste fermée (`enum`) du schéma ; `matching.ts` supprimé | Le modèle ne peut renvoyer qu'un alias existant ou « missing » ; le serveur retrouve l'uuid. Moins de tokens qu'avec les uuid. Une recette qui n'utilise aucun ingrédient du garde-manger est écartée |
+| 25/09/2026 | Régimes : le modèle indique pour chaque ingrédient les régimes stricts qu'il ne respecte pas (`diet_violations`) ; exceptions côté serveur (laits et beurres végétaux, sarrasin, farine de riz…) ; vérification par mots-clés supprimée | `low-carb` reste une préférence (jamais de rejet). Testé : vegan avec lait de coco et beurre (lait de coco utilisé, beurre évité), sans gluten avec sarrasin et farine de blé, vegan impossible (poulet, œufs) → refus clair (422) |
+| 25/09/2026 | Bucket `recipe-images` public en lecture, écriture réservée à la fonction (clé secrète) | L'URL enregistrée dans `recipes.image_url` s'affiche sans URL signée (qui expirerait). Noms de fichiers aléatoires, bucket impossible à lister. Testé via l'API Storage : un utilisateur ne peut ni déposer, ni supprimer, ni lister ; lecture publique OK |
+| 25/09/2026 | Images : Cloudflare `@cf/black-forest-labs/flux-1-schnell`, 4 étapes, une seule image par recette | Testé de bout en bout : 3,8 à 5,5 s par image, image existante renvoyée en 0,7 s sans quota. Images de 1024×1024 px et 600 à 770 Ko (le modèle ne propose pas d'autre taille) : **à surveiller** pour les données mobiles. Coût estimé d'après la grille Cloudflare : environ 60 neurones par image, soit ~150 images par jour dans l'offre gratuite (10 000 neurones) pour tout le compte ; à vérifier dans le dashboard Cloudflare (Workers AI → utilisation) |
+| 25/09/2026 | Phase 3 validée dans l'app : scan (photo affichée, noms en français), génération avec cuisine, refus clair pour un régime impossible, image à l'ouverture (et dans Favoris) | Tests de fin de phase passés tels que décrits |
 | | *(résultat du test Gemini vs Clarifai)* | |

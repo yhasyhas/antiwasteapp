@@ -9,6 +9,7 @@ import {
   TextInput,
   Modal,
   ScrollView,
+  Image,
 } from 'react-native';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as ImageManipulator from 'expo-image-manipulator';
@@ -30,6 +31,9 @@ interface ScannedIngredient {
   quantity: string;
   category: string;
   confidence: number;
+  // Reçus depuis la phase 3, affichés en phase 5
+  kind?: 'ingredient' | 'dish';
+  storage_tip?: string;
 }
 
 export default function CameraScreen() {
@@ -278,6 +282,10 @@ export default function CameraScreen() {
           <View style={styles.scanFrame} />
         </View>
 
+        {analyzing && capturedImage && (
+          // La photo prise reste affichée pendant l'analyse, sous le message d'attente
+          <Image source={{ uri: capturedImage }} style={styles.capturedImage} resizeMode="cover" />
+        )}
         {analyzing && (
           <View style={styles.analyzingOverlay}>
             <ActivityIndicator size="large" color="#fff" />
@@ -583,13 +591,21 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     backgroundColor: 'transparent',
   },
+  capturedImage: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   analyzingOverlay: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    // Assez transparent pour voir la photo, assez sombre pour lire le message
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -598,11 +614,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginTop: 16,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowRadius: 6,
   },
   analyzingHint: {
-    color: '#d1d5db',
+    color: '#e5e7eb',
     fontSize: 14,
     marginTop: 6,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowRadius: 6,
   },
   controls: {
     backgroundColor: '#fff',

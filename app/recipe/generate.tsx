@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { callEdgeFunction } from '@/lib/callEdgeFunction';
+import { ensureRecipeImage } from '@/lib/recipeImage';
 import { supabase } from '@/lib/supabase';
 import { router, Stack } from 'expo-router';
 import {
@@ -37,7 +38,8 @@ interface Recipe {
   id?: string;
   title: string;
   description: string;
-  ingredients_used: Array<{name: string; quantity: string; unit: string}>;
+  // pantry_id : identifiant de l'ingrédient du garde-manger utilisé, null s'il manque (depuis la phase 3)
+  ingredients_used: Array<{name: string; quantity: string; unit: string; pantry_id?: string | null}>;
   ingredients_from_list: string[];
   missing_ingredients?: string[];
   instructions: string[];
@@ -48,8 +50,11 @@ interface Recipe {
   difficulty: string;
   meal_type: string;
   dietary_tags: string[];
+  cuisine?: string;
   tips: string[];
   suggestion?: string;
+  // Description de la photo (en anglais), utilisée par generate-recipe-image
+  image_prompt?: string;
   image_url?: string;
 }
 
@@ -58,6 +63,7 @@ interface Filters {
   difficulty: 'easy' | 'medium' | 'expert';
   maxCookTime: number;
   mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+  cuisine: Cuisine;
   language: string;
 }
 
@@ -86,6 +92,18 @@ const dietaryOptions = [
 
 const difficultyOptions = ['easy', 'medium', 'expert'];
 
+// Cuisines du monde (paramètre cuisine de generate-recipes) ; libellés dans LanguageContext
+type Cuisine = 'any' | 'african' | 'maghreb' | 'asian' | 'latin' | 'mediterranean' | 'french';
+const cuisineOptions: Array<{ value: Cuisine; labelKey: string }> = [
+  { value: 'any', labelKey: 'cuisineAny' },
+  { value: 'african', labelKey: 'cuisineAfrican' },
+  { value: 'maghreb', labelKey: 'cuisineMaghreb' },
+  { value: 'asian', labelKey: 'cuisineAsian' },
+  { value: 'latin', labelKey: 'cuisineLatin' },
+  { value: 'mediterranean', labelKey: 'cuisineMediterranean' },
+  { value: 'french', labelKey: 'cuisineFrench' },
+];
+
 export default function GenerateRecipeScreen() {
   const { user } = useAuth();
   const { t } = useLanguage();
@@ -94,12 +112,15 @@ export default function GenerateRecipeScreen() {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  // Recettes dont l'image est en cours de génération
+  const [imageLoading, setImageLoading] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<Filters>({
     dietary: [],
     difficulty: 'easy',
     maxCookTime: 60,
     mealType: 'lunch',
+    cuisine: 'any',
     language: 'fr',
   });
 
@@ -132,13 +153,14 @@ export default function GenerateRecipeScreen() {
       .single();
 
     if (data) {
-      setFilters({
+      setFilters((current) => ({
+        ...current,
         dietary: data.dietary_preferences || [],
         difficulty: data.default_difficulty || 'easy',
         maxCookTime: data.max_cook_time || 60,
         mealType: data.default_meal_type || 'lunch',
         language: data.default_language || 'fr',
-      });
+      }));
     }
   };
 
@@ -152,15 +174,16 @@ export default function GenerateRecipeScreen() {
 
     try {
       const { data } = await callEdgeFunction('generate-recipes', {
-        ingredients: ingredients.map((i) => i.name),
+        // Avec leur identifiant : le modèle indique quel ingrédient du garde-manger chaque recette utilise
+        ingredients: ingredients.map((i) => ({ id: i.id, name: i.name, quantity: i.quantity || '' })),
         preferences: {
           dietary: filters.dietary,
           difficulty: filters.difficulty,
           maxCookTime: filters.maxCookTime,
           mealType: filters.mealType,
+          cuisine: filters.cuisine,
           language: filters.language,
         },
-        generateImage: true,
       });
 
       if (data?.recipes) {
@@ -198,6 +221,7 @@ export default function GenerateRecipeScreen() {
     servings: recipe.servings,
     tips: recipe.tips || [],
     suggestion: recipe.suggestion ?? null,
+    image_prompt: recipe.image_prompt ?? null,
     image_url: recipe.image_url,
     language: filters.language,
   });
@@ -223,6 +247,22 @@ export default function GenerateRecipeScreen() {
       const index = unused.findIndex((row) => row.title === recipe.title);
       return index === -1 ? recipe : { ...recipe, id: unused.splice(index, 1)[0].id as string };
     });
+  };
+
+  // Image générée seulement à l'ouverture ou à la sauvegarde d'une recette (quota images côté serveur)
+  const requestImage = async (recipeId: string | undefined, imageUrl?: string) => {
+    if (!recipeId || imageUrl) return;
+    setImageLoading((current) => [...current, recipeId]);
+    const url = await ensureRecipeImage(recipeId, filters.language);
+    setImageLoading((current) => current.filter((id) => id !== recipeId));
+    if (!url) return;
+    setRecipes((current) => current.map((r) => (r.id === recipeId ? { ...r, image_url: url } : r)));
+    setSelectedRecipe((current) => (current?.id === recipeId ? { ...current, image_url: url } : current));
+  };
+
+  const openRecipe = (recipe: Recipe) => {
+    setSelectedRecipe(recipe);
+    requestImage(recipe.id, recipe.image_url);
   };
 
   // Sauvegarder = ajouter aux favoris la recette déjà présente dans l'historique
@@ -255,6 +295,7 @@ export default function GenerateRecipeScreen() {
       alertWriteError(t, 'adding recipe to favorites', favoriteError);
       return;
     }
+    requestImage(recipeId, recipe.image_url);
 
     Alert.alert(
       'Recipe Saved!',
@@ -353,6 +394,13 @@ export default function GenerateRecipeScreen() {
                 <Globe size={14} color="#fff" />
                 <Text style={styles.activeFilterText}>{filters.language.toUpperCase()}</Text>
               </View>
+              {filters.cuisine !== 'any' && (
+                <View style={styles.activeFilterChip}>
+                  <Text style={styles.activeFilterText}>
+                    {t(cuisineOptions.find((c) => c.value === filters.cuisine)?.labelKey || 'cuisineAny')}
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
 
@@ -373,7 +421,7 @@ export default function GenerateRecipeScreen() {
                 <TouchableOpacity
                   key={index}
                   style={styles.recipeCard}
-                  onPress={() => setSelectedRecipe(recipe)}
+                  onPress={() => openRecipe(recipe)}
                 >
                   {recipe.image_url && (
                     <View style={styles.recipeImageContainer}>
@@ -499,6 +547,35 @@ export default function GenerateRecipeScreen() {
                   </View>
                 </View>
 
+                {/* Cuisines du monde */}
+                <View style={styles.filterGroup}>
+                  <Text style={styles.filterGroupTitle}>{t('cuisine')}</Text>
+                  <View style={styles.optionGrid}>
+                    {cuisineOptions.map((option) => (
+                      <TouchableOpacity
+                        key={option.value}
+                        style={[
+                          styles.optionChip,
+                          filters.cuisine === option.value && styles.optionChipSelected,
+                        ]}
+                        onPress={() => setFilters({ ...filters, cuisine: option.value })}
+                      >
+                        {filters.cuisine === option.value && (
+                          <Check size={16} color="#fff" />
+                        )}
+                        <Text
+                          style={[
+                            styles.optionChipText,
+                            filters.cuisine === option.value && styles.optionChipTextSelected,
+                          ]}
+                        >
+                          {t(option.labelKey)}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+
                 {/* Langue - NOUVEAU */}
                 <View style={styles.filterGroup}>
                   <Text style={styles.filterGroupTitle}>Langue / Language</Text>
@@ -617,6 +694,11 @@ export default function GenerateRecipeScreen() {
                 </View>
 
                 <ScrollView showsVerticalScrollIndicator={false}>
+                  {!selectedRecipe.image_url && selectedRecipe.id && imageLoading.includes(selectedRecipe.id) && (
+                    <View style={[styles.imageContainer, styles.imagePlaceholder]}>
+                      <ActivityIndicator color="#10b981" />
+                    </View>
+                  )}
                   {selectedRecipe.image_url && (
                     <View style={styles.imageContainer}>
                       <Image 
@@ -868,6 +950,13 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#f3f4f6',
+  },
+  imagePlaceholder: {
+    height: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f3f4f6',
+    borderRadius: 16,
   },
   recipeImageContainer: {
     height: 150,
