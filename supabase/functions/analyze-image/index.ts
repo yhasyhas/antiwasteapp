@@ -2,15 +2,14 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { getAuthenticatedUser } from '../_shared/auth.ts';
 import { consumeQuota, DAILY_LIMITS, refundQuota } from '../_shared/quota.ts';
 import { withCors } from '../_shared/cors.ts';
+import { type AiProvider, type AttemptLog, geminiProvider, groqProvider, type ParseResult, runWithFallback } from '../_shared/ai.ts';
 
 // Modèles configurables par secret : les fournisseurs retirent régulièrement des modèles
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || '';
 const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-3.1-flash-lite';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/interactions';
 
 const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') || '';
 const GROQ_VISION_MODEL = Deno.env.get('GROQ_VISION_MODEL') || 'qwen/qwen3.8-27b';
-const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 // Gemini est essayé une seule fois : ses modèles saturent tous en même temps, réessayer ne fait
 // que consommer le quota. N'importe quel échec (erreur HTTP, délai dépassé, JSON invalide, réponse
@@ -177,138 +176,16 @@ Liste les aliments et ingrédients de cuisine visibles.
 - S'il n'y a aucun aliment, renvoie une liste vide.`;
 }
 
-interface VisionRequest {
-  prompt: string;
-  imageBase64: string;
-  mimeType: string;
-}
-
-// text : le JSON brut renvoyé par le modèle (lu et validé ensuite, identique pour tous les fournisseurs)
-// usage : consommation de tokens renvoyée par le fournisseur (mode debug uniquement)
-type ProviderResult =
-  | { ok: true; text: string; usage?: unknown }
-  | { ok: false; status?: number; details: string };
-
-interface VisionProvider {
-  name: string;
-  model: string;
-  configured: boolean;
-  call: (request: VisionRequest, signal: AbortSignal) => Promise<ProviderResult>;
-}
-
-function describeError(error: unknown): string {
-  return error instanceof Error ? `${error.name}: ${error.message}` : String(error);
-}
-
-// Délai propre au fournisseur, et annulation quand l'autre fournisseur a déjà répondu
-function withTimeout(signal: AbortSignal, timeoutMs: number): AbortSignal {
-  return AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]);
-}
-
-async function callGemini({ prompt, imageBase64, mimeType }: VisionRequest, signal: AbortSignal): Promise<ProviderResult> {
-  try {
-    const response = await fetch(GEMINI_API_URL, {
-      method: 'POST',
-      headers: { 'x-goog-api-key': GEMINI_API_KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: GEMINI_MODEL,
-        // Ne pas conserver les photos des utilisateurs chez Google
-        store: false,
-        input: [
-          { type: 'text', text: prompt },
-          { type: 'image', data: imageBase64, mime_type: mimeType },
-        ],
-        response_format: { type: 'text', mime_type: 'application/json', schema: RESPONSE_SCHEMA },
-        // Reconnaître des aliments ne demande pas de réflexion : réponse plus rapide
-        generation_config: { temperature: 0.2, thinking_level: 'minimal' },
-      }),
-      signal: withTimeout(signal, GEMINI_TIMEOUT_MS),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      return { ok: false, status: response.status, details: `Gemini ${response.status}: ${errorText.slice(0, 300)}` };
-    }
-
-    // Interactions API : le texte est dans steps[type=model_output].content[type=text]
-    const interaction = await response.json();
-    if (interaction.status !== 'completed') {
-      return { ok: false, details: `Gemini status ${interaction.status}` };
-    }
-    const text = (interaction.steps || [])
-      .filter((step: any) => step.type === 'model_output')
-      .flatMap((step: any) => step.content || [])
-      .filter((item: any) => item.type === 'text' && typeof item.text === 'string')
-      .map((item: any) => item.text)
-      .join('');
-    return { ok: true, text, usage: interaction.usage };
-  } catch (error) {
-    // Délai dépassé, annulation ou erreur réseau
-    return { ok: false, details: `Gemini: ${describeError(error)}` };
-  }
-}
-
-async function requestGroq({ prompt, imageBase64, mimeType }: VisionRequest, signal: AbortSignal): Promise<ProviderResult> {
-  try {
-    const response = await fetch(GROQ_API_URL, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${GROQ_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: GROQ_VISION_MODEL,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'text', text: prompt },
-            { type: 'image_url', image_url: { url: `data:${mimeType};base64,${imageBase64}` } },
-          ],
-        }],
-        response_format: {
-          type: 'json_schema',
-          json_schema: { name: 'detected_ingredients', strict: true, schema: RESPONSE_SCHEMA },
-        },
-        temperature: 0,
-        // Mode sans réflexion : réponse plus rapide
-        reasoning_effort: 'none',
-        // L'offre gratuite de Groq limite ce modèle à 1 000 tokens de sortie par minute : une valeur plus
-        // haute fait refuser la requête. 20 aliments avec leur conseil de conservation tiennent dans ~900 tokens.
-        max_completion_tokens: 1000,
-      }),
-      signal: withTimeout(signal, GROQ_TIMEOUT_MS),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      return { ok: false, status: response.status, details: `Groq ${response.status}: ${errorText.slice(0, 300)}` };
-    }
-
-    const data = await response.json();
-    const text = data.choices?.[0]?.message?.content;
-    if (typeof text !== 'string') {
-      return { ok: false, details: `Groq: réponse sans contenu (${data.choices?.[0]?.finish_reason})` };
-    }
-    return { ok: true, text, usage: data.usage };
-  } catch (error) {
-    return { ok: false, details: `Groq: ${describeError(error)}` };
-  }
-}
-
-// Groq refuse parfois sa propre sortie en mode JSON Schema strict (400 json_validate_failed, JSON coupé
-// du type "{ conto"). C'est aléatoire, rapide (< 1 s) et presque gratuit : on réessaie une fois.
-async function callGroq(request: VisionRequest, signal: AbortSignal): Promise<ProviderResult> {
-  const first = await requestGroq(request, signal);
-  if (first.ok || first.status !== 400 || !first.details.includes('json_validate_failed') || signal.aborted) return first;
-
-  console.warn(`[analyze-image] groq (${GROQ_VISION_MODEL}) json_validate_failed, nouvel essai : ${first.details.slice(0, 200)}`);
-  const second = await requestGroq(request, signal);
-  console.log(`[analyze-image] groq (${GROQ_VISION_MODEL}) nouvel essai après json_validate_failed : ${second.ok ? 'réussi' : 'échec'}`);
-  return second.ok ? second : { ...second, details: `${second.details} (après un nouvel essai sur json_validate_failed)` };
-}
-
-// Fournisseur principal, puis secours
-const PROVIDERS: VisionProvider[] = [
-  { name: 'gemini', model: GEMINI_MODEL, configured: GEMINI_API_KEY !== '', call: callGemini },
-  { name: 'groq', model: GROQ_VISION_MODEL, configured: GROQ_API_KEY !== '', call: callGroq },
+// Fournisseur principal, puis secours (ordre fixe pour le scan : Gemini lit mieux les photos chargées)
+const PROVIDERS: AiProvider[] = [
+  geminiProvider({ apiKey: GEMINI_API_KEY, model: GEMINI_MODEL, timeoutMs: GEMINI_TIMEOUT_MS, thinkingLevel: 'minimal' }),
+  // Mode sans réflexion : réponse plus rapide
+  groqProvider({ apiKey: GROQ_API_KEY, model: GROQ_VISION_MODEL, timeoutMs: GROQ_TIMEOUT_MS, reasoningEffort: 'none' }),
 ];
+
+// L'offre gratuite de Groq limite ce modèle à 1 000 tokens de sortie par minute : une valeur plus haute
+// fait refuser la requête. 20 aliments avec leur conseil de conservation tiennent dans ~900 tokens.
+const MAX_OUTPUT_TOKENS = 1000;
 
 // Raison pour laquelle un aliment ne respecte pas RESPONSE_SCHEMA, ou null s'il est utilisable.
 // kind et storage_tip ne sont pas bloquants : valeurs par défaut dans cleanIngredients.
@@ -372,102 +249,20 @@ function cleanIngredients(raw: unknown): DetectedIngredient[] {
     .slice(0, MAX_INGREDIENTS);
 }
 
-// Résultat d'un fournisseur, une fois sa réponse lue et validée
-type AttemptResult =
-  | { ok: true; provider: VisionProvider; ingredients: DetectedIngredient[] }
-  | { ok: false; provider: VisionProvider; failure: string; code: 'ai_error' | 'invalid_response' };
-
-interface AttemptLog {
-  provider: string;
-  started_at_ms: number;
-  ms: number;
-  ok: boolean;
-  details?: string;
-  usage?: unknown;
+// Lit et valide la réponse d'un fournisseur : liste d'aliments nettoyée, ou raison de l'échec
+function parseIngredients(text: string): ParseResult<{ ingredients: DetectedIngredient[]; invalid: string[] }> {
+  let validation: ValidationResult;
+  try {
+    validation = validateResponse(JSON.parse(text));
+  } catch {
+    return { ok: false, failure: `JSON invalide (${text.slice(0, 120)})`, code: 'invalid_response' };
+  }
+  if (!validation.ok) {
+    return { ok: false, failure: `réponse non conforme au schéma, ${validation.reason}`, code: 'invalid_response' };
+  }
+  return { ok: true, value: { ingredients: cleanIngredients(validation.valid), invalid: validation.invalid } };
 }
 
-async function attempt(provider: VisionProvider, request: VisionRequest, signal: AbortSignal, log: AttemptLog[], t0: number): Promise<AttemptResult> {
-  const started = Date.now();
-  const result = await provider.call(request, signal);
-  const elapsed = Date.now() - started;
-  const label = `[analyze-image] ${provider.name} (${provider.model})`;
-  const entry: AttemptLog = { provider: provider.name, started_at_ms: started - t0, ms: elapsed, ok: false, ...(result.ok && { usage: result.usage }) };
-  log.push(entry);
-
-  let failed: AttemptResult | null = null;
-  let validation: ValidationResult | null = null;
-  if (!result.ok) {
-    failed = { ok: false, provider, failure: result.details, code: 'ai_error' };
-    if (result.status === 401 || result.status === 403) {
-      // Pas une panne passagère : la clé est à corriger. On bascule quand même pour ne pas bloquer l'utilisateur.
-      console.error(`${label} CLÉ ${provider.name.toUpperCase()} INVALIDE (HTTP ${result.status}) : vérifier le secret de sa clé API`);
-    }
-  } else if (result.text.trim() === '') {
-    failed = { ok: false, provider, failure: `${provider.name} : réponse vide`, code: 'invalid_response' };
-  } else {
-    try {
-      validation = validateResponse(JSON.parse(result.text));
-      if (!validation.ok) {
-        failed = { ok: false, provider, failure: `${provider.name} : réponse non conforme au schéma, ${validation.reason}`, code: 'invalid_response' };
-      }
-    } catch {
-      failed = { ok: false, provider, failure: `${provider.name} : JSON invalide (${result.text.slice(0, 120)})`, code: 'invalid_response' };
-    }
-  }
-
-  if (failed || !validation?.ok) {
-    const failure = failed && !failed.ok ? failed : { ok: false as const, provider, failure: 'échec inconnu', code: 'ai_error' as const };
-    entry.details = failure.failure.slice(0, 300);
-    // Une annulation n'est pas une panne : l'autre fournisseur a déjà répondu
-    if (!signal.aborted) console.error(`${label} échec en ${elapsed} ms : ${failure.failure}`);
-    return failure;
-  }
-
-  if (validation.invalid.length > 0) {
-    console.warn(`${label} ${validation.invalid.length} aliment(s) mal formé(s) écarté(s) : ${validation.invalid.slice(0, 5).join(' ; ')}`);
-  }
-  entry.ok = true;
-  return { ok: true, provider, ingredients: cleanIngredients(validation.valid) };
-}
-
-// Lance le fournisseur principal ; si sa réponse n'est pas arrivée après HEDGE_DELAY_MS (ou s'il échoue
-// avant), lance le secours en parallèle. La première réponse valide l'emporte et l'autre appel est annulé.
-// Renvoie le dernier échec si aucun fournisseur ne répond correctement.
-function analyzeWithHedging(providers: VisionProvider[], request: VisionRequest, log: AttemptLog[], t0: number): Promise<AttemptResult> {
-  const controller = new AbortController();
-  return new Promise((resolve) => {
-    let next = 0;
-    let pending = 0;
-    let settled = false;
-    let lastFailure: AttemptResult | null = null;
-    let hedgeTimer: ReturnType<typeof setTimeout> | undefined;
-
-    const finish = (result: AttemptResult) => {
-      settled = true;
-      clearTimeout(hedgeTimer);
-      controller.abort();
-      resolve(result);
-    };
-
-    const startNext = () => {
-      clearTimeout(hedgeTimer);
-      if (settled || next >= providers.length) return;
-      const provider = providers[next++];
-      pending++;
-      attempt(provider, request, controller.signal, log, t0).then((result) => {
-        pending--;
-        if (settled) return;
-        if (result.ok) return finish(result);
-        lastFailure = result;
-        if (next < providers.length) startNext();
-        else if (pending === 0) finish(lastFailure);
-      });
-      if (next < providers.length) hedgeTimer = setTimeout(startNext, HEDGE_DELAY_MS);
-    };
-
-    startNext();
-  });
-}
 
 Deno.serve(withCors(async (req: Request) => {
   const t0 = Date.now();
@@ -505,14 +300,16 @@ Deno.serve(withCors(async (req: Request) => {
     }
     quotaUserId = user.id;
 
-    const visionRequest: VisionRequest = {
-      prompt: buildPrompt(language, mode),
-      imageBase64: image_base64,
-      mimeType: mime_type || 'image/jpeg',
-    };
     const beforeAi = Date.now() - t0;
     const log: AttemptLog[] = [];
-    const result = await analyzeWithHedging(providers, visionRequest, log, t0);
+    const result = await runWithFallback(providers, {
+      prompt: buildPrompt(language, mode),
+      image: { base64: image_base64, mimeType: mime_type || 'image/jpeg' },
+      schema: RESPONSE_SCHEMA,
+      schemaName: 'detected_ingredients',
+      temperature: 0,
+      maxOutputTokens: MAX_OUTPUT_TOKENS,
+    }, parseIngredients, { label: 'analyze-image', log, t0, hedgeDelayMs: HEDGE_DELAY_MS });
     // Détail des appels (durées, tokens), sur demande, pour mesurer les temps d'analyse
     const debugInfo = debug === true ? { debug: { before_ai_ms: beforeAi, total_ms: Date.now() - t0, attempts: log } } : {};
 
@@ -521,14 +318,18 @@ Deno.serve(withCors(async (req: Request) => {
       return jsonResponse({ ...errorBody(result.code, language, result.failure), ...debugInfo }, 502);
     }
 
+    const { ingredients, invalid } = result.value;
+    if (invalid.length > 0) {
+      console.warn(`[analyze-image] ${result.provider.name} : ${invalid.length} aliment(s) mal formé(s) écarté(s) : ${invalid.slice(0, 5).join(' ; ')}`);
+    }
     const elapsed = Date.now() - t0;
-    console.log(`[analyze-image] ${result.provider.name} retenu, ${result.ingredients.length} aliment(s) en ${elapsed} ms (${log.map((a) => `${a.provider} ${a.ok ? 'ok' : 'échec'} ${a.ms} ms`).join(', ')}), mode ${mode}, langue ${language}`);
+    console.log(`[analyze-image] ${result.provider.name} retenu, ${ingredients.length} aliment(s) en ${elapsed} ms (${log.map((a) => `${a.provider} ${a.ok ? 'ok' : 'échec'} ${a.ms} ms`).join(', ')}), mode ${mode}, langue ${language}`);
     // fallback_reason : pourquoi le fournisseur principal a échoué (utile dans les logs [scan] de l'app)
     const primaryFailure = log.find((a) => a.provider === providers[0].name && !a.ok);
     const fallbackReason = result.provider === providers[0] ? null
       : primaryFailure?.details ?? `${providers[0].name} : pas de réponse après ${HEDGE_DELAY_MS} ms`;
     return jsonResponse({
-      ingredients: result.ingredients,
+      ingredients,
       provider: result.provider.name,
       ...(fallbackReason && { fallback_reason: fallbackReason }),
       ...debugInfo,
