@@ -1,5 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { getAuthenticatedUser } from '../_shared/auth.ts';
+import { consumeQuota, DAILY_LIMITS, refundQuota } from '../_shared/quota.ts';
 
 // Modèles configurables par secret : les fournisseurs retirent régulièrement des modèles
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || '';
@@ -88,6 +89,7 @@ const MESSAGES: Record<string, Record<string, string>> = {
     not_configured: 'Le service d\'analyse n\'est pas configuré.',
     ai_error: 'Le service d\'analyse d\'image est momentanément indisponible. Réessayez dans quelques instants.',
     invalid_response: 'La réponse de l\'IA était illisible. Réessayez.',
+    quota_exceeded: 'Vous avez atteint la limite de {limit} analyses de photos par jour. Réessayez demain, ou ajoutez vos ingrédients à la main.',
   },
   en: {
     unauthorized: 'You must be signed in to analyze a photo.',
@@ -96,6 +98,7 @@ const MESSAGES: Record<string, Record<string, string>> = {
     not_configured: 'The analysis service is not configured.',
     ai_error: 'The image analysis service is temporarily unavailable. Please try again in a moment.',
     invalid_response: 'The AI response could not be read. Please try again.',
+    quota_exceeded: 'You have reached the limit of {limit} photo scans per day. Try again tomorrow, or add your ingredients manually.',
   },
   es: {
     unauthorized: 'Debes iniciar sesión para analizar una foto.',
@@ -104,6 +107,7 @@ const MESSAGES: Record<string, Record<string, string>> = {
     not_configured: 'El servicio de análisis no está configurado.',
     ai_error: 'El servicio de análisis de imágenes no está disponible en este momento. Inténtalo de nuevo en unos instantes.',
     invalid_response: 'No se pudo leer la respuesta de la IA. Inténtalo de nuevo.',
+    quota_exceeded: 'Has alcanzado el límite de {limit} análisis de fotos por día. Vuelve a intentarlo mañana o añade tus ingredientes a mano.',
   },
 };
 
@@ -343,6 +347,8 @@ Deno.serve(async (req: Request) => {
   }
 
   let language = 'fr';
+  // Utilisateur dont le quota a été compté : rendu si l'analyse échoue
+  let quotaUserId: string | null = null;
 
   try {
     const { image_base64, mime_type, language: requestedLanguage, mode: requestedMode }: AnalyzeImageRequest = await req.json();
@@ -366,6 +372,13 @@ Deno.serve(async (req: Request) => {
     if (providers.length === 0) {
       return errorResponse('not_configured', language, 500, 'GEMINI_API_KEY and GROQ_API_KEY missing');
     }
+
+    if (!await consumeQuota(user.id, 'scans')) {
+      console.warn(`[analyze-image] quota atteint (${DAILY_LIMITS.scans} scans/jour) pour ${user.id}`);
+      const message = (MESSAGES[language] || MESSAGES['en']).quota_exceeded.replace('{limit}', String(DAILY_LIMITS.scans));
+      return jsonResponse({ error: 'quota_exceeded', message, limit: DAILY_LIMITS.scans }, 429);
+    }
+    quotaUserId = user.id;
 
     const visionRequest: VisionRequest = {
       prompt: buildPrompt(language, mode),
@@ -424,9 +437,11 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ ingredients, provider: provider.name, ...(lastFailure && { fallback_reason: lastFailure }) }, 200);
     }
 
+    await refundQuota(user.id, 'scans');
     return errorResponse(lastFailureCode, language, 502, lastFailure);
   } catch (error) {
     console.error('Error analyzing image:', error);
+    if (quotaUserId) await refundQuota(quotaUserId, 'scans');
     return errorResponse('ai_error', language, 500, error instanceof Error ? error.message : String(error));
   }
 });

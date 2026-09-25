@@ -168,7 +168,7 @@ export default function GenerateRecipeScreen() {
         // quand l'utilisateur la sauvegarde (sinon elle serait insérée une seconde fois)
         setRecipes(await saveRecipesToHistory(data.recipes));
       } else if (data?.error) {
-        Alert.alert('Error', data.message || 'Failed to generate recipes');
+        Alert.alert(data.error === 'quota_exceeded' ? t('dailyLimitTitle') : 'Error', data.message || 'Failed to generate recipes');
       } else {
         Alert.alert('Error', 'Failed to generate recipes');
       }

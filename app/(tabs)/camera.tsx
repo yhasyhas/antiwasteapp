@@ -151,7 +151,8 @@ export default function CameraScreen() {
       // Une erreur du serveur n'est pas un « aucun ingrédient détecté » : on affiche le vrai message
       if (!response.ok || !data || data.error) {
         const message = [data?.message || data?.error, data?.details].filter(Boolean).join('\n') || `HTTP ${response.status}`;
-        Alert.alert('Analysis failed', message, [
+        // 429 : limite du jour atteinte, le message du serveur l'explique et l'ajout manuel reste possible
+        Alert.alert(response.status === 429 ? t('dailyLimitTitle') : 'Analysis failed', message, [
           { text: 'Add Manually', onPress: () => setShowManualAdd(true) },
           { text: 'OK', style: 'cancel' },
         ]);
