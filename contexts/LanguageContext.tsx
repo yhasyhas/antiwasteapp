@@ -1,318 +1,123 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
+import i18n, { isSupportedLanguage, type Language } from '@/i18n';
 import { useAuth } from './AuthContext';
 import { supabase } from '@/lib/supabase';
-import { alertWriteError } from '@/lib/alertWriteError';
 
-type Language = 'fr' | 'en' | 'es';
+export type { Language };
+
+// Langue choisie, gardée sur le téléphone
+const LANGUAGE_KEY = 'app_language';
+// Présent tant que la langue choisie n'a pas pu être enregistrée dans Supabase (hors connexion)
+const PENDING_SYNC_KEY = 'app_language_pending_sync';
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => Promise<void>;
-  t: (key: string) => string;
+  t: TFunction;
   loading: boolean;
 }
-
-const translations: Record<Language, Record<string, string>> = {
-  fr: {
-    welcome: 'Bienvenue',
-    welcomeBack: 'Bon retour !',
-    readyToCook: 'Prêt à cuisiner ?',
-    youHave: 'Vous avez',
-    ingredient: 'ingrédient',
-    ingredients: 'ingrédients',
-    ready: 'prêt',
-    scanFood: 'Scanner',
-    takePhoto: 'Prenez une photo',
-    myPantry: 'Mon garde-manger',
-    savedRecipes: 'Recettes sauvegardées',
-    recentRecipes: 'Recettes récentes',
-    seeAll: 'Voir tout',
-    settings: 'Paramètres',
-    language: 'Langue',
-    selectLanguage: 'Sélectionner la langue',
-    french: 'Français',
-    english: 'English',
-    spanish: 'Español',
-    difficulty: 'Difficulté',
-    mealType: 'Type de repas',
-    dietaryPreferences: 'Préférences alimentaires',
-    breakfast: 'Petit-déjeuner',
-    lunch: 'Déjeuner',
-    dinner: 'Dîner',
-    snack: 'Goûter',
-    easy: 'Facile',
-    medium: 'Moyen',
-    expert: 'Expert',
-    generate: 'Générer',
-    generateRecipes: 'Générer des recettes',
-    cancel: 'Annuler',
-    save: 'Sauvegarder',
-    delete: 'Supprimer',
-    add: 'Ajouter',
-    addIngredients: 'Ajouter des ingrédients',
-    signOut: 'Se déconnecter',
-    minutes: 'minutes',
-    servings: 'personnes',
-    prepTime: 'Préparation',
-    cookTime: 'Cuisson',
-    totalTime: 'Total',
-    instructions: 'Instructions',
-    tips: 'Astuces',
-    noIngredients: 'Aucun ingrédient',
-    addIngredientsFirst: 'Ajoutez des ingrédients d\'abord',
-    cameraPermission: 'Permission caméra requise',
-    grantPermission: 'Accorder la permission',
-    analyzeError: 'Erreur d\'analyse',
-    tryAgain: 'Réessayer',
-    confirmIngredients: 'Confirmer les ingrédients',
-    addManually: 'Ajouter manuellement',
-    saveIngredients: 'Sauvegarder les ingrédients',
-    analyzingPhoto: 'Analyse de ta photo…',
-    analyzingHint: 'Cela peut prendre quelques secondes',
-    checkYourEmail: 'Vérifie ta boîte mail',
-    checkYourEmailText: 'Nous avons envoyé un lien de confirmation à {email}. Ouvre-le pour activer ton compte, puis connecte-toi.',
-    backToLogin: 'Retour à la connexion',
-    writeErrorTitle: 'Enregistrement impossible',
-    writeErrorText: "La modification n'a pas été enregistrée. Vérifie ta connexion et réessaie.",
-    emailNotConfirmed: "Ton adresse email n'est pas encore confirmée. Ouvre le lien reçu par email lors de l'inscription, puis réessaie.",
-    dailyLimitTitle: 'Limite du jour atteinte',
-    cuisine: 'Cuisine',
-    cuisineAny: 'Peu importe',
-    cuisineAfrican: 'Africaine',
-    cuisineMaghreb: 'Maghrébine',
-    cuisineAsian: 'Asiatique',
-    cuisineLatin: 'Latino',
-    cuisineMediterranean: 'Méditerranéenne',
-    cuisineFrench: 'Française',
-  },
-  en: {
-    welcome: 'Welcome',
-    welcomeBack: 'Welcome back!',
-    readyToCook: 'Ready to Cook?',
-    youHave: 'You have',
-    ingredient: 'ingredient',
-    ingredients: 'ingredients',
-    ready: 'ready',
-    scanFood: 'Scan Food',
-    takePhoto: 'Take a photo',
-    myPantry: 'My pantry',
-    savedRecipes: 'Saved recipes',
-    recentRecipes: 'Recent Recipes',
-    seeAll: 'See All',
-    settings: 'Settings',
-    language: 'Language',
-    selectLanguage: 'Select language',
-    french: 'Français',
-    english: 'English',
-    spanish: 'Español',
-    difficulty: 'Difficulty',
-    mealType: 'Meal type',
-    dietaryPreferences: 'Dietary preferences',
-    breakfast: 'Breakfast',
-    lunch: 'Lunch',
-    dinner: 'Dinner',
-    snack: 'Snack',
-    easy: 'Easy',
-    medium: 'Medium',
-    expert: 'Expert',
-    generate: 'Generate',
-    generateRecipes: 'Generate Recipes',
-    cancel: 'Cancel',
-    save: 'Save',
-    delete: 'Delete',
-    add: 'Add',
-    addIngredients: 'Add Ingredients',
-    signOut: 'Sign Out',
-    minutes: 'minutes',
-    servings: 'servings',
-    prepTime: 'Prep time',
-    cookTime: 'Cook time',
-    totalTime: 'Total time',
-    instructions: 'Instructions',
-    tips: 'Tips',
-    noIngredients: 'No ingredients',
-    addIngredientsFirst: 'Add ingredients first',
-    cameraPermission: 'Camera permission required',
-    grantPermission: 'Grant permission',
-    analyzeError: 'Analysis error',
-    tryAgain: 'Try again',
-    confirmIngredients: 'Confirm Ingredients',
-    addManually: 'Add Manually',
-    saveIngredients: 'Save Ingredients',
-    analyzingPhoto: 'Analyzing your photo…',
-    analyzingHint: 'This can take a few seconds',
-    checkYourEmail: 'Check your inbox',
-    checkYourEmailText: 'We sent a confirmation link to {email}. Open it to activate your account, then sign in.',
-    backToLogin: 'Back to sign in',
-    writeErrorTitle: 'Could not save',
-    writeErrorText: 'Your change was not saved. Check your connection and try again.',
-    emailNotConfirmed: 'Your email address is not confirmed yet. Open the link we emailed you when you signed up, then try again.',
-    dailyLimitTitle: 'Daily limit reached',
-    cuisine: 'Cuisine',
-    cuisineAny: 'Any',
-    cuisineAfrican: 'African',
-    cuisineMaghreb: 'North African',
-    cuisineAsian: 'Asian',
-    cuisineLatin: 'Latin American',
-    cuisineMediterranean: 'Mediterranean',
-    cuisineFrench: 'French',
-  },
-  es: {
-    welcome: 'Bienvenido',
-    welcomeBack: '¡Bienvenido de nuevo!',
-    readyToCook: '¿Listo para cocinar?',
-    youHave: 'Tienes',
-    ingredient: 'ingrediente',
-    ingredients: 'ingredientes',
-    ready: 'listo',
-    scanFood: 'Escanear',
-    takePhoto: 'Toma una foto',
-    myPantry: 'Mi despensa',
-    savedRecipes: 'Recetas guardadas',
-    recentRecipes: 'Recetas recientes',
-    seeAll: 'Ver todo',
-    settings: 'Ajustes',
-    language: 'Idioma',
-    selectLanguage: 'Seleccionar idioma',
-    french: 'Français',
-    english: 'English',
-    spanish: 'Español',
-    difficulty: 'Dificultad',
-    mealType: 'Tipo de comida',
-    dietaryPreferences: 'Preferencias dietéticas',
-    breakfast: 'Desayuno',
-    lunch: 'Almuerzo',
-    dinner: 'Cena',
-    snack: 'Merienda',
-    easy: 'Fácil',
-    medium: 'Medio',
-    expert: 'Experto',
-    generate: 'Generar',
-    generateRecipes: 'Generar recetas',
-    cancel: 'Cancelar',
-    save: 'Guardar',
-    delete: 'Eliminar',
-    add: 'Añadir',
-    addIngredients: 'Añadir ingredientes',
-    signOut: 'Cerrar sesión',
-    minutes: 'minutos',
-    servings: 'porciones',
-    prepTime: 'Tiempo de prep',
-    cookTime: 'Tiempo de cocción',
-    totalTime: 'Tiempo total',
-    instructions: 'Instrucciones',
-    tips: 'Consejos',
-    noIngredients: 'Sin ingredientes',
-    addIngredientsFirst: 'Añade ingredientes primero',
-    cameraPermission: 'Permiso de cámara requerido',
-    grantPermission: 'Conceder permiso',
-    analyzeError: 'Error de análisis',
-    tryAgain: 'Intentar de nuevo',
-    confirmIngredients: 'Confirmar ingredientes',
-    addManually: 'Añadir manualmente',
-    saveIngredients: 'Guardar ingredientes',
-    analyzingPhoto: 'Analizando tu foto…',
-    analyzingHint: 'Puede tardar unos segundos',
-    checkYourEmail: 'Revisa tu correo',
-    checkYourEmailText: 'Enviamos un enlace de confirmación a {email}. Ábrelo para activar tu cuenta y luego inicia sesión.',
-    backToLogin: 'Volver al inicio de sesión',
-    writeErrorTitle: 'No se pudo guardar',
-    writeErrorText: 'El cambio no se guardó. Revisa tu conexión e inténtalo de nuevo.',
-    emailNotConfirmed: 'Tu correo aún no está confirmado. Abre el enlace que te enviamos al registrarte y vuelve a intentarlo.',
-    dailyLimitTitle: 'Límite diario alcanzado',
-    cuisine: 'Cocina',
-    cuisineAny: 'Da igual',
-    cuisineAfrican: 'Africana',
-    cuisineMaghreb: 'Magrebí',
-    cuisineAsian: 'Asiática',
-    cuisineLatin: 'Latina',
-    cuisineMediterranean: 'Mediterránea',
-    cuisineFrench: 'Francesa',
-  },
-};
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>('fr');
+  const { t } = useTranslation();
+  const [language, setLanguageState] = useState<Language>(i18n.language as Language);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const userIdRef = useRef<string | null>(null);
+  userIdRef.current = user?.id ?? null;
 
+  const applyLanguage = async (lang: Language) => {
+    setLanguageState(lang);
+    await i18n.changeLanguage(lang);
+  };
+
+  // Langue gardée sur le téléphone ; au premier lancement, i18n a déjà pris celle du téléphone
   useEffect(() => {
-    loadLanguage();
+    (async () => {
+      try {
+        const stored = await AsyncStorage.getItem(LANGUAGE_KEY);
+        if (isSupportedLanguage(stored)) await applyLanguage(stored);
+      } catch (error) {
+        console.error('Error loading language:', error);
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
-  useEffect(() => {
-    if (user) {
-      syncWithSupabase();
-    }
-  }, [user]);
-
-  const loadLanguage = async () => {
+  // Enregistre la langue dans Supabase. Renvoie false hors connexion (réessayé plus tard).
+  const pushToSupabase = async (lang: Language): Promise<boolean> => {
+    const userId = userIdRef.current;
+    if (!userId) return false;
     try {
-      const storedLang = await AsyncStorage.getItem('app_language');
-      if (storedLang) {
-        setLanguageState(storedLang as Language);
-        setLoading(false);
-        return;
-      }
-
-      const deviceLang = navigator.language?.substring(0, 2) || 'fr';
-      const detectedLang = ['fr', 'en', 'es'].includes(deviceLang) ? deviceLang : 'fr';
-      
-      setLanguageState(detectedLang as Language);
-      await AsyncStorage.setItem('app_language', detectedLang);
+      const { error } = await supabase
+        .from('user_preferences')
+        .upsert({
+          user_id: userId,
+          default_language: lang,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id' }); // une seule ligne par utilisateur (contrainte unique sur user_id)
+      if (error) throw error;
+      await AsyncStorage.removeItem(PENDING_SYNC_KEY);
+      return true;
     } catch (error) {
-      console.error('Error loading language:', error);
-      setLanguageState('fr');
-    } finally {
-      setLoading(false);
+      console.warn('[langue] synchronisation avec Supabase reportée :', error);
+      return false;
     }
   };
 
+  // À la connexion et au retour dans l'app : envoie un choix resté en attente, sinon reprend celui du compte
   const syncWithSupabase = async () => {
-    if (!user) return;
-    
+    const userId = userIdRef.current;
+    if (!userId) return;
     try {
+      if (await AsyncStorage.getItem(PENDING_SYNC_KEY)) {
+        const stored = await AsyncStorage.getItem(LANGUAGE_KEY);
+        if (isSupportedLanguage(stored)) await pushToSupabase(stored);
+        return;
+      }
       const { data } = await supabase
         .from('user_preferences')
         .select('default_language')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .maybeSingle(); // pas encore de préférences pour un nouveau compte : ce n'est pas une erreur
 
-      if (data?.default_language && data.default_language !== language) {
-        setLanguageState(data.default_language as Language);
-        await AsyncStorage.setItem('app_language', data.default_language);
+      if (isSupportedLanguage(data?.default_language) && data.default_language !== i18n.language) {
+        await applyLanguage(data.default_language);
+        await AsyncStorage.setItem(LANGUAGE_KEY, data.default_language);
       }
     } catch (error) {
-      console.error('Error syncing with Supabase:', error);
+      console.warn('[langue] lecture de la langue du compte impossible :', error);
     }
   };
 
+  useEffect(() => {
+    if (user) syncWithSupabase();
+  }, [user]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') syncWithSupabase();
+    });
+    return () => subscription.remove();
+  }, []);
+
+  // Le changement s'applique tout de suite et reste sur le téléphone ; hors connexion, il est envoyé
+  // à Supabase plus tard, sans message d'erreur
   const setLanguage = async (newLang: Language) => {
+    await applyLanguage(newLang);
     try {
-      setLanguageState(newLang);
-      await AsyncStorage.setItem('app_language', newLang);
-
-      if (user) {
-        // upsert ne lève pas d'exception : l'erreur est renvoyée et doit être vérifiée
-        const { error } = await supabase
-          .from('user_preferences')
-          .upsert({
-            user_id: user.id,
-            default_language: newLang,
-            updated_at: new Date().toISOString(),
-          }, { onConflict: 'user_id' }); // une seule ligne par utilisateur (contrainte unique sur user_id)
-        if (error) alertWriteError(t, 'saving language', error);
-      }
+      await AsyncStorage.setItem(LANGUAGE_KEY, newLang);
+      await AsyncStorage.setItem(PENDING_SYNC_KEY, '1');
     } catch (error) {
-      alertWriteError(t, 'saving language', error);
+      console.error('Error saving language:', error);
     }
-  };
-
-  const t = (key: string): string => {
-    return translations[language][key] || translations['en'][key] || key;
+    await pushToSupabase(newLang);
   };
 
   return (

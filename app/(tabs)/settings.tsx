@@ -10,7 +10,7 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Globe, ChevronRight, User, LogOut } from 'lucide-react-native';
-import { router } from 'expo-router';
+import { sendSentryTestError, sentryEnabled } from '@/lib/sentry';
 
 const languages = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
@@ -37,7 +37,7 @@ export default function SettingsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t('settings')}</Text>
+        <Text style={styles.headerTitle}>{t('settings.title')}</Text>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -45,7 +45,7 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Globe size={20} color="#10b981" />
-            <Text style={styles.sectionTitle}>{t('language')}</Text>
+            <Text style={styles.sectionTitle}>{t('settings.language')}</Text>
           </View>
 
           {languages.map((lang) => (
@@ -84,25 +84,32 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <User size={20} color="#10b981" />
-            <Text style={styles.sectionTitle}>Compte</Text>
+            <Text style={styles.sectionTitle}>{t('settings.account')}</Text>
           </View>
 
           <View style={styles.infoCard}>
-            <Text style={styles.infoLabel}>Email</Text>
-            <Text style={styles.infoValue}>{user?.email || 'Non connecté'}</Text>
+            <Text style={styles.infoLabel}>{t('settings.email')}</Text>
+            <Text style={styles.infoValue}>{user?.email || t('settings.notSignedIn')}</Text>
           </View>
 
           <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
             <LogOut size={20} color="#ef4444" />
-            <Text style={styles.logoutText}>Se déconnecter</Text>
+            <Text style={styles.logoutText}>{t('settings.signOut')}</Text>
           </TouchableOpacity>
         </View>
 
+        {/* Développement seulement : vérifie que les erreurs remontent dans Sentry */}
+        {__DEV__ && sentryEnabled && (
+          <TouchableOpacity style={styles.testButton} onPress={sendSentryTestError}>
+            <Text style={styles.testButtonText}>{t('settings.sentryTest')}</Text>
+          </TouchableOpacity>
+        )}
+
         {/* Section Info */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Anti-Waste Recipe App v1.0</Text>
+          <Text style={styles.footerText}>{t('settings.appVersion', { version: '1.0' })}</Text>
           <Text style={styles.footerSubtext}>
-            Réduisez le gaspillage alimentaire, une recette à la fois.
+            {t('settings.tagline')}
           </Text>
         </View>
       </ScrollView>
@@ -111,6 +118,20 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
+  testButton: {
+    marginHorizontal: 20,
+    marginTop: 8,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderStyle: 'dashed',
+    alignItems: 'center',
+  },
+  testButtonText: {
+    color: '#6b7280',
+    fontSize: 14,
+  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',

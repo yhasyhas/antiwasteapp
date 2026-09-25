@@ -16,6 +16,7 @@ Dernière mise à jour : 23/09/2026
 - **`npm run typecheck` doit passer avant chaque commit** (à partir de la fin de la phase 0).
 - **Aucune clé secrète dans le code ni dans les réponses envoyées à l'app.** Les secrets vont dans `supabase secrets set`.
 - **Noms de modèles IA toujours dans des secrets** (`GROQ_MODEL`, `GEMINI_MODEL`…), jamais en dur : les fournisseurs retirent des modèles régulièrement.
+- **Rapports et messages en français.**
 - En fin de phase : mettre à jour `PROJECT_CONTEXT.md` et régénérer l'export (`npm run export`).
 - En fin de phase, après la fusion dans `master` : pousser sur GitHub (`git push`). Le dépôt distant est github.com/yhasyhas/antiwasteapp.
 
@@ -157,13 +158,14 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 
 ## Phase 4 — Nettoyage du code et traductions
 
-- [ ] Découper `app/recipe/generate.tsx` : `components/recipe/Filters.tsx`, `RecipeCard.tsx`, `RecipeDetail.tsx`, `hooks/useRecipeGeneration.ts`
-- [ ] Remplacer l'i18n maison par i18next + react-i18next + expo-localization (langue du téléphone par défaut)
-- [ ] Traduire **tous** les écrans : auth, caméra, ingrédients, favoris, génération, titres des onglets
-- [ ] Brancher Sentry (`@sentry/react-native`)
-- [ ] Écrire le `README.md` : installation, secrets nécessaires, déploiement des fonctions et des migrations
+- [x] Découper `app/recipe/generate.tsx` : `components/recipe/Filters.tsx`, `RecipeCard.tsx`, `RecipeDetail.tsx`, `hooks/useRecipeGeneration.ts` — ainsi que caméra, favoris, accueil et garde-manger (`components/`, `hooks/`) ; plus aucun fichier au-delà de 400 lignes
+- [x] Remplacer l'i18n maison par i18next + react-i18next + expo-localization (langue du téléphone par défaut) — clés typées (`i18n/locales/fr.ts` fait référence), langue gardée sur le téléphone et synchronisée avec Supabase dès que possible
+- [x] Traduire **tous** les écrans : auth, caméra, ingrédients, favoris, génération, titres des onglets — ainsi que les alertes, les erreurs de Supabase Auth et les messages des fonctions (fr : tutoiement)
+- [x] Poids des images : compression avant stockage (800 px, JPEG qualité 75, 80 à 150 Ko) et recompression des images existantes (`scripts/recompress-recipe-images.ts`)
+- [x] Brancher Sentry (`@sentry/react-native`) : erreurs JavaScript dans Expo Go, identifiant de l'utilisateur seulement ; inactif sans `EXPO_PUBLIC_SENTRY_DSN`
+- [x] Écrire le `README.md` : installation, secrets nécessaires, déploiement des fonctions et des migrations, tests, règles de travail ; `.env.example`
 
-**Terminé quand** : aucun texte affiché n'est écrit en dur, aucun fichier ne dépasse ~400 lignes, et une erreur volontaire remonte dans Sentry.
+**Terminé quand** : aucun texte affiché n'est écrit en dur, aucun fichier ne dépasse ~400 lignes, et une erreur volontaire remonte dans Sentry. *(Validée le 25/09/2026 dans l'app, en fr / en / es.)*
 
 ## Phase 5 — Le cœur anti-gaspi
 
@@ -269,4 +271,10 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 | 25/09/2026 | Bucket `recipe-images` public en lecture, écriture réservée à la fonction (clé secrète) | L'URL enregistrée dans `recipes.image_url` s'affiche sans URL signée (qui expirerait). Noms de fichiers aléatoires, bucket impossible à lister. Testé via l'API Storage : un utilisateur ne peut ni déposer, ni supprimer, ni lister ; lecture publique OK |
 | 25/09/2026 | Images : Cloudflare `@cf/black-forest-labs/flux-1-schnell`, 4 étapes, une seule image par recette | Testé de bout en bout : 3,8 à 5,5 s par image, image existante renvoyée en 0,7 s sans quota. Images de 1024×1024 px et 600 à 770 Ko (le modèle ne propose pas d'autre taille) : **à surveiller** pour les données mobiles. Coût estimé d'après la grille Cloudflare : environ 60 neurones par image, soit ~150 images par jour dans l'offre gratuite (10 000 neurones) pour tout le compte ; à vérifier dans le dashboard Cloudflare (Workers AI → utilisation) |
 | 25/09/2026 | Phase 3 validée dans l'app : scan (photo affichée, noms en français), génération avec cuisine, refus clair pour un régime impossible, image à l'ouverture (et dans Favoris) | Tests de fin de phase passés tels que décrits |
+| 25/09/2026 | Traductions : i18next + react-i18next + expo-localization, clés typées (une clé absente d'une langue ou mal écrite est une erreur de typecheck), 183 clés en fr / en / es | Langue du téléphone au premier lancement (français si elle n'est pas prise en charge). Polyfill `intl-pluralrules` pour les pluriels sur Hermes. Libellés des valeurs enregistrées (difficulté, régimes, types de repas) traduits à l'affichage, codes inchangés en base |
+| 25/09/2026 | Changement de langue hors connexion : appliqué et gardé sur le téléphone, envoyé à Supabase plus tard (connexion, retour dans l'app), sans alerte | Corrige le test 9 de la phase 1 : l'alerte « Enregistrement impossible » laissait croire que le changement avait échoué. Un choix en attente l'emporte sur la langue enregistrée dans le compte |
+| 25/09/2026 | Tutoiement dans toute l'app en français, y compris les messages des fonctions | Les textes déjà validés (« Vérifie ta boîte mail ») tutoyaient ; les fonctions vouvoyaient |
+| 25/09/2026 | Images des recettes : 800 px de large, JPEG qualité 75 (ImageScript dans la fonction) | Essais sur deux images FLUX : 1024 px q75 = 135 à 190 Ko ; 800 px q75 = 96 à 131 Ko sans perte visible sur un téléphone ; 720 px et 640 px plus légers mais moins nets sur les grands écrans. En production : 81 et 111 Ko, temps de génération inchangé (5 à 6 s). Les 2 images existantes recompressées (677 et 697 Ko → 120 et 116 Ko), originaux dans `backups/recipe-images/`, URL inchangées |
+| 25/09/2026 | Sentry, offre gratuite (Developer), données hébergées dans l'UE (`ingest.de.sentry.io`) ; `@sentry/react-native` ~7.11, DSN dans `.env` (`EXPO_PUBLIC_SENTRY_DSN`) | Dans Expo Go, seules les erreurs JavaScript remontent (pas les plantages natifs ni la mise en file hors connexion) : un build EAS sera nécessaire pour le reste. `sendDefaultPii: false`, seul l'uuid de l'utilisateur est joint (ni e-mail ni IP). Événement de test envoyé à l'API de Sentry : accepté (200). Bouton d'erreur volontaire dans Réglages, visible seulement en développement |
+| 25/09/2026 | Phase 4 validée dans l'app : Sentry (erreur de test reçue), langue du téléphone au premier lancement, parcours complet dans les trois langues ; anciens tests de la phase 1 faits sur appareil (inscription, déconnexion, mode avion, rechargement des onglets) | La validation partielle de la phase 1 est levée. Règle ajoutée : rapports et messages en français |
 | | *(résultat du test Gemini vs Clarifai)* | |

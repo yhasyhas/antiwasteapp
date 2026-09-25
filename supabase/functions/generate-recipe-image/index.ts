@@ -3,6 +3,7 @@ import { getAuthenticatedUser } from '../_shared/auth.ts';
 import { consumeQuota, DAILY_LIMITS, refundQuota } from '../_shared/quota.ts';
 import { withCors } from '../_shared/cors.ts';
 import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_SECRET_KEY, SUPABASE_URL } from '../_shared/keys.ts';
+import { compressRecipeImage } from '../_shared/image.ts';
 
 // Image d'une recette : générée par Cloudflare Workers AI (FLUX), stockée dans le bucket recipe-images,
 // URL enregistrée dans recipes.image_url. Appelée par l'app seulement à l'ouverture ou à la sauvegarde
@@ -23,13 +24,13 @@ type ErrorCode = 'unauthorized' | 'bad_request' | 'not_found' | 'not_configured'
 
 const MESSAGES: Record<string, Record<ErrorCode, string>> = {
   fr: {
-    unauthorized: 'Vous devez être connecté pour générer une image.',
+    unauthorized: 'Tu dois être connecté pour générer une image.',
     bad_request: 'Recette manquante.',
     not_found: 'Recette introuvable.',
     not_configured: 'La génération d\'images n\'est pas configurée.',
-    quota_exceeded: 'Vous avez atteint la limite de {limit} images de recettes par jour. Réessayez demain.',
-    ai_error: 'Le service d\'images est momentanément indisponible. Réessayez plus tard.',
-    storage_error: 'L\'image n\'a pas pu être enregistrée. Réessayez plus tard.',
+    quota_exceeded: 'Tu as atteint la limite de {limit} images de recettes par jour. Réessaie demain.',
+    ai_error: 'Le service d\'images est momentanément indisponible. Réessaie plus tard.',
+    storage_error: 'L\'image n\'a pas pu être enregistrée. Réessaie plus tard.',
   },
   en: {
     unauthorized: 'You must be signed in to generate an image.',
@@ -130,8 +131,8 @@ async function uploadImage(path: string, bytes: Uint8Array): Promise<string> {
   const response = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`, {
     method: 'POST',
     headers: { apikey: SUPABASE_SECRET_KEY, 'Content-Type': 'image/jpeg', 'x-upsert': 'false' },
-    // Uint8Array.from crée son propre tampon : il contient exactement l'image
-    body: bytes.buffer as ArrayBuffer,
+    // Copie : le tableau peut n'être qu'une vue sur un tampon plus grand
+    body: bytes.slice().buffer as ArrayBuffer,
   });
   if (!response.ok) throw new Error(`Storage ${response.status}: ${(await response.text()).slice(0, 200)}`);
   return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${path}`;
@@ -177,6 +178,14 @@ Deno.serve(withCors(async (req: Request) => {
       return errorResponse('ai_error', language, error instanceof Error ? error.message : String(error));
     }
 
+    // Compression (≈ 100 à 150 Ko) ; en cas d'échec, l'image d'origine est gardée plutôt que perdue
+    const originalSize = bytes.length;
+    try {
+      bytes = await compressRecipeImage(bytes);
+    } catch (error) {
+      console.error('[generate-recipe-image] compression impossible, image d’origine conservée :', error);
+    }
+
     // Nom imprévisible : le bucket est public en lecture mais ne peut pas être listé
     const path = `${user.id}/${recipe.id}-${crypto.randomUUID()}.jpg`;
     let imageUrl: string;
@@ -194,7 +203,7 @@ Deno.serve(withCors(async (req: Request) => {
       return errorResponse('storage_error', language, error instanceof Error ? error.message : String(error));
     }
 
-    console.log(`[generate-recipe-image] image de ${recipe.id} en ${Date.now() - t0} ms (${Math.round(bytes.length / 1024)} Ko)`);
+    console.log(`[generate-recipe-image] image de ${recipe.id} en ${Date.now() - t0} ms (${Math.round(originalSize / 1024)} Ko → ${Math.round(bytes.length / 1024)} Ko)`);
     return jsonResponse({ image_url: imageUrl, generated: true }, 200);
   } catch (error) {
     console.error('[generate-recipe-image] erreur :', error);

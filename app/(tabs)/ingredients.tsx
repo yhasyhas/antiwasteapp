@@ -15,20 +15,13 @@ import { alertWriteError } from '@/lib/alertWriteError';
 import { supabase } from '@/lib/supabase';
 import { Search, Trash2, Plus, Package } from 'lucide-react-native';
 import { router, useFocusEffect } from 'expo-router';
-
-interface Ingredient {
-  id: string;
-  name: string;
-  quantity: string;
-  added_via: string;
-  created_at: string;
-}
+import { IngredientCard, type PantryIngredient } from '@/components/pantry/IngredientCard';
 
 export default function IngredientsScreen() {
   const { user } = useAuth();
   const { t } = useLanguage();
-  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-  const [filteredIngredients, setFilteredIngredients] = useState<Ingredient[]>(
+  const [ingredients, setIngredients] = useState<PantryIngredient[]>([]);
+  const [filteredIngredients, setFilteredIngredients] = useState<PantryIngredient[]>(
     []
   );
   const [loading, setLoading] = useState(true);
@@ -73,12 +66,12 @@ export default function IngredientsScreen() {
 
   const deleteIngredient = async (id: string) => {
     Alert.alert(
-      'Delete Ingredient',
-      'Are you sure you want to remove this ingredient?',
+      t('pantry.deleteTitle'),
+      t('pantry.deleteText'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Delete',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             setDeleting(id);
@@ -101,12 +94,12 @@ export default function IngredientsScreen() {
 
   const clearAllIngredients = () => {
     Alert.alert(
-      'Clear All Ingredients',
-      'Are you sure you want to remove all ingredients from your pantry?',
+      t('pantry.clearTitle'),
+      t('pantry.clearText'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Clear All',
+          text: t('pantry.clearTitle'),
           style: 'destructive',
           onPress: async () => {
             if (!user) return;
@@ -142,9 +135,9 @@ export default function IngredientsScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.headerTitle}>My Pantry</Text>
+          <Text style={styles.headerTitle}>{t('pantry.title')}</Text>
           <Text style={styles.headerSubtitle}>
-            {ingredients.length} ingredient{ingredients.length !== 1 ? 's' : ''}
+            {t('ingredientCount', { count: ingredients.length })}
           </Text>
         </View>
         {ingredients.length > 0 && (
@@ -161,7 +154,7 @@ export default function IngredientsScreen() {
         <Search size={20} color="#9ca3af" style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search ingredients..."
+          placeholder={t('pantry.searchPlaceholder')}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -172,16 +165,16 @@ export default function IngredientsScreen() {
           <View style={styles.emptyIconContainer}>
             <Package size={64} color="#d1d5db" strokeWidth={1.5} />
           </View>
-          <Text style={styles.emptyTitle}>No Ingredients Yet</Text>
+          <Text style={styles.emptyTitle}>{t('pantry.emptyTitle')}</Text>
           <Text style={styles.emptyText}>
-            Start adding ingredients to generate delicious recipes
+            {t('pantry.emptyText')}
           </Text>
           <TouchableOpacity
             style={styles.addButton}
             onPress={() => router.push('/(tabs)/camera')}
           >
             <Plus size={20} color="#fff" />
-            <Text style={styles.addButtonText}>Add Ingredients</Text>
+            <Text style={styles.addButtonText}>{t('pantry.addIngredients')}</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -192,54 +185,16 @@ export default function IngredientsScreen() {
           >
             {filteredIngredients.length === 0 ? (
               <View style={styles.noResults}>
-                <Text style={styles.noResultsText}>No ingredients found</Text>
+                <Text style={styles.noResultsText}>{t('pantry.noResults')}</Text>
               </View>
             ) : (
               filteredIngredients.map((ingredient) => (
-                <View key={ingredient.id} style={styles.ingredientCard}>
-                  <View style={styles.ingredientInfo}>
-                    <Text style={styles.ingredientName}>{ingredient.name}</Text>
-                    {ingredient.quantity ? (
-                      <Text style={styles.ingredientQuantity}>
-                        {ingredient.quantity}
-                      </Text>
-                    ) : null}
-                    <View style={styles.ingredientMeta}>
-                      <View
-                        style={[
-                          styles.badge,
-                          ingredient.added_via === 'camera'
-                            ? styles.badgeCamera
-                            : styles.badgeManual,
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.badgeText,
-                            ingredient.added_via === 'camera'
-                              ? styles.badgeTextCamera
-                              : styles.badgeTextManual,
-                          ]}
-                        >
-                          {ingredient.added_via === 'camera'
-                            ? 'Scanned'
-                            : 'Manual'}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                  <TouchableOpacity
-                    onPress={() => deleteIngredient(ingredient.id)}
-                    disabled={deleting === ingredient.id}
-                    style={styles.deleteButton}
-                  >
-                    {deleting === ingredient.id ? (
-                      <ActivityIndicator size="small" color="#ef4444" />
-                    ) : (
-                      <Trash2 size={20} color="#ef4444" />
-                    )}
-                  </TouchableOpacity>
-                </View>
+                <IngredientCard
+                  key={ingredient.id}
+                  ingredient={ingredient}
+                  deleting={deleting === ingredient.id}
+                  onDelete={() => deleteIngredient(ingredient.id)}
+                />
               ))
             )}
           </ScrollView>
@@ -250,7 +205,7 @@ export default function IngredientsScreen() {
               onPress={() => router.push('/(tabs)/camera')}
             >
               <Plus size={20} color="#10b981" />
-              <Text style={styles.addMoreButtonText}>Add More Ingredients</Text>
+              <Text style={styles.addMoreButtonText}>{t('pantry.addMore')}</Text>
             </TouchableOpacity>
           </View>
         </>
@@ -368,63 +323,6 @@ const styles = StyleSheet.create({
   noResultsText: {
     fontSize: 16,
     color: '#6b7280',
-  },
-  ingredientCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  ingredientInfo: {
-    flex: 1,
-  },
-  ingredientName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 4,
-  },
-  ingredientQuantity: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginBottom: 8,
-  },
-  ingredientMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  badge: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 6,
-  },
-  badgeCamera: {
-    backgroundColor: '#ede9fe',
-  },
-  badgeManual: {
-    backgroundColor: '#dbeafe',
-  },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  badgeTextCamera: {
-    color: '#7c3aed',
-  },
-  badgeTextManual: {
-    color: '#2563eb',
-  },
-  deleteButton: {
-    padding: 8,
-    marginLeft: 12,
   },
   footer: {
     padding: 20,

@@ -1,7 +1,9 @@
 import { Tabs } from 'expo-router';
 import { Home, Camera, List, Heart, Settings } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 
 export default function TabsLayout() {
+  const { t } = useTranslation();
   return (
     <Tabs
       screenOptions={{
@@ -25,35 +27,35 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: t('tabs.home'),
           tabBarIcon: ({ size, color }) => <Home size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="camera"
         options={{
-          title: 'Scan',
+          title: t('tabs.scan'),
           tabBarIcon: ({ size, color }) => <Camera size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="ingredients"
         options={{
-          title: 'Ingredients',
+          title: t('tabs.pantry'),
           tabBarIcon: ({ size, color }) => <List size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="saved"
         options={{
-          title: 'Saved',
+          title: t('tabs.saved'),
           tabBarIcon: ({ size, color }) => <Heart size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
+          title: t('tabs.settings'),
           tabBarIcon: ({ size, color }) => <Settings size={size} color={color} />,
         }}
       />
