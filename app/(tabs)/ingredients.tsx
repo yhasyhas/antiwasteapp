@@ -15,20 +15,13 @@ import { alertWriteError } from '@/lib/alertWriteError';
 import { supabase } from '@/lib/supabase';
 import { Search, Trash2, Plus, Package } from 'lucide-react-native';
 import { router, useFocusEffect } from 'expo-router';
-
-interface Ingredient {
-  id: string;
-  name: string;
-  quantity: string;
-  added_via: string;
-  created_at: string;
-}
+import { IngredientCard, type PantryIngredient } from '@/components/pantry/IngredientCard';
 
 export default function IngredientsScreen() {
   const { user } = useAuth();
   const { t } = useLanguage();
-  const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-  const [filteredIngredients, setFilteredIngredients] = useState<Ingredient[]>(
+  const [ingredients, setIngredients] = useState<PantryIngredient[]>([]);
+  const [filteredIngredients, setFilteredIngredients] = useState<PantryIngredient[]>(
     []
   );
   const [loading, setLoading] = useState(true);
@@ -196,50 +189,12 @@ export default function IngredientsScreen() {
               </View>
             ) : (
               filteredIngredients.map((ingredient) => (
-                <View key={ingredient.id} style={styles.ingredientCard}>
-                  <View style={styles.ingredientInfo}>
-                    <Text style={styles.ingredientName}>{ingredient.name}</Text>
-                    {ingredient.quantity ? (
-                      <Text style={styles.ingredientQuantity}>
-                        {ingredient.quantity}
-                      </Text>
-                    ) : null}
-                    <View style={styles.ingredientMeta}>
-                      <View
-                        style={[
-                          styles.badge,
-                          ingredient.added_via === 'camera'
-                            ? styles.badgeCamera
-                            : styles.badgeManual,
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.badgeText,
-                            ingredient.added_via === 'camera'
-                              ? styles.badgeTextCamera
-                              : styles.badgeTextManual,
-                          ]}
-                        >
-                          {ingredient.added_via === 'camera'
-                            ? 'Scanned'
-                            : 'Manual'}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                  <TouchableOpacity
-                    onPress={() => deleteIngredient(ingredient.id)}
-                    disabled={deleting === ingredient.id}
-                    style={styles.deleteButton}
-                  >
-                    {deleting === ingredient.id ? (
-                      <ActivityIndicator size="small" color="#ef4444" />
-                    ) : (
-                      <Trash2 size={20} color="#ef4444" />
-                    )}
-                  </TouchableOpacity>
-                </View>
+                <IngredientCard
+                  key={ingredient.id}
+                  ingredient={ingredient}
+                  deleting={deleting === ingredient.id}
+                  onDelete={() => deleteIngredient(ingredient.id)}
+                />
               ))
             )}
           </ScrollView>
@@ -368,63 +323,6 @@ const styles = StyleSheet.create({
   noResultsText: {
     fontSize: 16,
     color: '#6b7280',
-  },
-  ingredientCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  ingredientInfo: {
-    flex: 1,
-  },
-  ingredientName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 4,
-  },
-  ingredientQuantity: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginBottom: 8,
-  },
-  ingredientMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  badge: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 6,
-  },
-  badgeCamera: {
-    backgroundColor: '#ede9fe',
-  },
-  badgeManual: {
-    backgroundColor: '#dbeafe',
-  },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  badgeTextCamera: {
-    color: '#7c3aed',
-  },
-  badgeTextManual: {
-    color: '#2563eb',
-  },
-  deleteButton: {
-    padding: 8,
-    marginLeft: 12,
   },
   footer: {
     padding: 20,

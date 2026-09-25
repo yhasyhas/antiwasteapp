@@ -157,7 +157,7 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 
 ## Phase 4 — Nettoyage du code et traductions
 
-- [ ] Découper `app/recipe/generate.tsx` : `components/recipe/Filters.tsx`, `RecipeCard.tsx`, `RecipeDetail.tsx`, `hooks/useRecipeGeneration.ts`
+- [x] Découper `app/recipe/generate.tsx` : `components/recipe/Filters.tsx`, `RecipeCard.tsx`, `RecipeDetail.tsx`, `hooks/useRecipeGeneration.ts` — ainsi que caméra, favoris, accueil et garde-manger (`components/`, `hooks/`) ; plus aucun fichier au-delà de 400 lignes
 - [ ] Remplacer l'i18n maison par i18next + react-i18next + expo-localization (langue du téléphone par défaut)
 - [ ] Traduire **tous** les écrans : auth, caméra, ingrédients, favoris, génération, titres des onglets
 - [ ] Brancher Sentry (`@sentry/react-native`)
