@@ -204,6 +204,9 @@ export default function GenerateRecipeScreen() {
     difficulty: recipe.difficulty,
     meal_type: recipe.meal_type,
     dietary_tags: recipe.dietary_tags,
+    servings: recipe.servings,
+    tips: recipe.tips || [],
+    suggestion: recipe.suggestion ?? null,
     image_url: recipe.image_url,
     language: filters.language,
   });
