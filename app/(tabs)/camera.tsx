@@ -16,6 +16,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
+import { alertWriteError } from '@/lib/alertWriteError';
 import { Camera, FlipHorizontal, X, Check, Plus } from 'lucide-react-native';
 import { router } from 'expo-router';
 
@@ -191,8 +192,9 @@ export default function CameraScreen() {
     }
   };
 
+  // Renvoie true si les ingrédients ont bien été enregistrés
   const saveIngredients = async (ingredients: Array<{ name: string; quantity: string }>) => {
-    if (!user) return;
+    if (!user) return false;
 
     const ingredientsToInsert = ingredients.map(({ name, quantity }) => ({
       user_id: user.id,
@@ -206,8 +208,10 @@ export default function CameraScreen() {
       .insert(ingredientsToInsert);
 
     if (error) {
-      console.error('Error saving ingredients:', error);
+      alertWriteError(t, 'saving scanned ingredients', error);
+      return false;
     }
+    return true;
   };
 
   const addManualIngredient = () => {
@@ -242,7 +246,9 @@ export default function CameraScreen() {
       .from('ingredients')
       .insert(ingredientsToInsert);
 
-    if (!error) {
+    if (error) {
+      alertWriteError(t, 'saving manual ingredients', error);
+    } else {
       setManualIngredients([]);
       setShowManualAdd(false);
       Alert.alert(
@@ -451,7 +457,8 @@ export default function CameraScreen() {
               onPress={async () => {
                 const confirmed = detectedIngredients.filter(i => i.confirmed);
                 if (confirmed.length > 0) {
-                  await saveIngredients(confirmed);
+                  // En cas d'échec, le modal reste ouvert pour pouvoir réessayer
+                  if (!(await saveIngredients(confirmed))) return;
                   setShowConfirmation(false);
                   setDetectedIngredients([]);
                   Alert.alert(

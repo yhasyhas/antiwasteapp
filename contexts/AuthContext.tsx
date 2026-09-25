@@ -16,7 +16,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string) => Promise<{ error: any; needsEmailConfirmation: boolean }>;
   signOut: () => Promise<void>;
 }
 
@@ -103,11 +103,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
-    return { error };
+    // Confirmation d'email active : le compte est créé mais sans session tant que le lien n'est pas ouvert
+    return { error, needsEmailConfirmation: !error && !data.session };
   };
 
   const signOut = async () => {

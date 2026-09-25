@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { ChefHat, Sparkles, Clock, TrendingUp } from 'lucide-react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 
 interface Recipe {
   id: string;
@@ -33,10 +33,13 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
-  useEffect(() => {
-    loadIngredients();
-    loadRecipes();
-  }, []);
+  // Rechargé à chaque retour sur l'onglet : ingrédients scannés, recettes générées entre-temps
+  useFocusEffect(
+    useCallback(() => {
+      loadIngredients();
+      loadRecipes();
+    }, [user])
+  );
 
   const loadIngredients = async () => {
     if (!user) return;

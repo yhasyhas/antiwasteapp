@@ -1,6 +1,6 @@
 # Contexte du projet : app mobile anti-gaspi de recettes IA
 
-> Analyse rédigée le 2026-09-23, mise à jour à la fin de la phase 0.6. La feuille de route est dans `PLAN.md`.
+> Analyse rédigée le 2026-09-23, mise à jour à la fin de la phase 1. La feuille de route est dans `PLAN.md`.
 
 ## 1. Le produit
 
@@ -31,23 +31,24 @@ Origine : le code a été généré par **bolt.new** (template `bolt-expo`), pui
 
 ```
 app/
-  _layout.tsx            Stack racine + AuthProvider + LanguageProvider
+  _layout.tsx            Stack racine + AuthProvider + LanguageProvider ; onglets et génération protégés (`Stack.Protected`)
   index.tsx              Redirection : connecté → (tabs), sinon → auth/login
   auth/login.tsx, signup.tsx
   (tabs)/
     _layout.tsx          5 onglets : Home, Scan, Ingredients, Saved, Settings
-    index.tsx            Accueil : compteur d'ingrédients, recettes récentes, CTA "Générer"
+    index.tsx            Accueil : compteur d'ingrédients, recettes récentes, CTA "Générer" (rechargé à chaque retour, `useFocusEffect`)
     camera.tsx           Photo → analyze-image (jeton utilisateur + langue) → modal de confirmation (noms, quantités) → insert ingredients
     ingredients.tsx      Liste / suppression / tout effacer
     saved.tsx            Historique des recettes + favoris
     settings.tsx         Choix de langue, déconnexion
-  recipe/generate.tsx    Filtres + appel generate-recipes + affichage + sauvegarde
+  recipe/generate.tsx    Filtres + appel generate-recipes + historique (id récupérés) + affichage + favori
 contexts/
   AuthContext.tsx        Session Supabase, crée la ligne `profiles` au premier login
   LanguageContext.tsx    i18n maison (fr/en/es), AsyncStorage + sync user_preferences
 lib/supabase.ts          Client Supabase (SecureStore sur mobile, localStorage sur web)
+lib/alertWriteError.ts   Alerte traduite quand une écriture en base échoue
 supabase/
-  migrations/            Schéma SQL (2 migrations)
+  migrations/            Schéma SQL (3 migrations)
   functions/
     _shared/auth.ts      Vérifie l'utilisateur connecté à partir du jeton (401 sinon)
     analyze-image/       Photo ou ticket de caisse → ingrédients (nom dans la langue, quantité, catégorie, confiance) ; Gemini puis Groq
@@ -58,7 +59,7 @@ supabase/
 ### Base de données (toutes les tables en RLS, « chaque utilisateur ne voit que ses données »)
 - `profiles` (id = auth.users.id, email)
 - `ingredients` (name, quantity, added_via, image_url)
-- `recipes` (title, description, ingredients_used, instructions, prep/cook/total_time, difficulty, dietary_tags, meal_type, language, ingredients_from_list, missing_ingredients, image_url)
+- `recipes` (title, description, ingredients_used, instructions, prep/cook/total_time, difficulty, dietary_tags, meal_type, language, ingredients_from_list, missing_ingredients, image_url, servings, tips, suggestion)
 - `favorites` (user_id, recipe_id, unique)
 - `user_preferences` (dietary_preferences, excluded_ingredients, default_difficulty, max_cook_time, default_meal_type, default_language)
 
@@ -101,13 +102,17 @@ supabase/
 - App : quantités estimées affichées et enregistrées ; message « Analyse de ta photo… » pendant l'analyse ; logs temporaires `[scan]`.
 - Clarifai retiré (code et secret).
 
-## 5. État actuel et problèmes connus
+### Phase 1 — bugs et données (branche `phase-1`, validée avec des tests partiels)
+- Inscription : écran « Vérifie ta boîte mail » quand la confirmation d'email est active ; connexion avec un email non confirmé : message clair.
+- Onglets et génération protégés par `Stack.Protected` : sans session (y compris après déconnexion), retour à la connexion.
+- Plus d'écriture en base qui échoue en silence : `lib/alertWriteError` (alerte traduite) ; l'état de l'écran ne change que si l'écriture réussit, le modal de scan reste ouvert en cas d'échec.
+- Accueil, garde-manger et favoris rechargés à chaque retour sur l'onglet (`useFocusEffect`).
+- Recettes : plus de doublon (id récupérés à l'insert dans l'historique, la sauvegarde n'ajoute que le favori) ; colonnes `servings`, `tips`, `suggestion` (migration `20260924190000`) enregistrées.
+- Langue : `onConflict: 'user_id'` sur l'upsert ; `maybeSingle()` pour un compte sans préférences.
+- `generateFallbackRecipe` (code mort) supprimé de `generate-recipes`.
+- Section « Ce qui distingue l'app » ajoutée à `PLAN.md` (garde-manger partagé, conservation, restes, cuisines du monde) ; le modèle de données passe à la notion de foyer en phase 2.
 
-### Bugs (prévus en phase 1)
-1. **Recettes en double** : `saveRecipesToHistory` insère déjà les recettes générées, puis `saveRecipe` les insère une seconde fois avant d'ajouter le favori.
-2. **Upsert de la langue** sans `onConflict: 'user_id'` : le deuxième changement de langue échoue.
-3. `servings`, `tips` et `suggestion` n'ont pas de colonne en base : perdus à la sauvegarde.
-4. Écritures en base dont l'erreur n'est pas vérifiée ; données non rechargées au retour sur un onglet ; onglets accessibles sans session ; inscription et email non confirmé mal gérés.
+## 5. État actuel et problèmes connus
 
 ### Sécurité (phase 2)
 - `generate-recipes` ne vérifie pas l'utilisateur (appel avec la clé anon) : n'importe qui ayant la clé anon peut consommer le quota Groq. `analyze-image` est protégée depuis la phase 0.6. Les deux fonctions acceptent toutes les origines (CORS `*`).
@@ -116,14 +121,16 @@ supabase/
 ### Dette et finitions
 - Vérification des régimes par mots-clés : faux positifs (« lait de coco » refusé en vegan). Remplacement prévu en phase 3.
 - i18n partielle : caméra, ingrédients, favoris, génération, auth et titres des onglets ont des textes écrits en dur.
-- `generateFallbackRecipe` est du code mort ; recettes générées l'une après l'autre avec une pause de 500 ms.
+- Recettes générées l'une après l'autre avec une pause de 500 ms.
 - Scan lent quand Gemini répond (15,7 s mesurés pour un seul ingrédient) et limites serrées de Groq en secours (~3 scans/min, modèle en preview) : repris en phase 3 et avant la bêta (phase 7).
 - Logs temporaires `[scan]` dans `camera.tsx`.
-- Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`).
+- Phase 1 validée avec des tests partiels (scan + génération, doublons, langue) : inscription, déconnexion, alertes d'écriture et rechargement des onglets restent à tester sur appareil.
+- Confirmation d'email désactivée dans Supabase pendant le développement (à réactiver en phase 7).
+- Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`) : renommage en phase 7, nom pas encore choisi.
 - Pas de README ; seuls tests : `matching.test.ts`.
 
 ## 6. Prochaine étape
-Phase 1 : bugs et données (recettes en double, langue, colonnes manquantes, inscription, onglets protégés…). Détails dans `PLAN.md`.
+Phase 2 : sécurité, et passage du modèle de données à la notion de foyer (`households`, `household_members`, `household_id`, RLS). Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash
