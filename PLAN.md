@@ -31,6 +31,17 @@ Dernière mise à jour : 23/09/2026
 | Traductions | i18n maison | i18next + expo-localization |
 | Erreurs | aucun suivi | Sentry (offre gratuite) |
 
+## Ce qui distingue l'app
+
+Quatre fonctionnalités qui la différencient d'un simple générateur de recettes, réparties dans les phases :
+
+| Fonctionnalité | Préparation (données, IA) | Mise en avant dans l'app |
+|---|---|---|
+| **Garde-manger partagé** : un foyer partage le même garde-manger | Phase 2 : tables `households` et `household_members`, colonne `household_id` sur `ingredients` et les autres tables concernées, règles de sécurité basées sur l'appartenance au foyer, foyer personnel créé automatiquement à l'inscription et migration des données existantes, **sans changement visible** | Phase 6 : inviter un membre, rejoindre un foyer, voir qui a ajouté quoi |
+| **Conserver avant de cuisiner** : un conseil de conservation pour chaque aliment | Phase 3 : champ `storage_tip` dans la réponse d'`analyze-image` | Phase 5 : l'enregistrer et l'afficher sur chaque ingrédient |
+| **Restes de plats** : scanner un plat cuisiné, pas seulement des ingrédients | Phase 3 : champ `kind` (`ingredient` ou `dish`) dans la réponse d'`analyze-image` | Phase 5 : date de péremption courte automatique pour les plats, et mode de génération « Transformer mes restes » |
+| **Cuisines du monde** : choisir une cuisine (italienne, sénégalaise, japonaise…) | Phase 3 : paramètre `cuisine` dans `generate-recipes` et filtre sur l'écran de génération | Phase 6 : préférence enregistrée |
+
 ---
 
 ## Phase 0 — Remettre l'app en marche
@@ -79,16 +90,16 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 
 ## Phase 1 — Bugs et données
 
-- [ ] Recettes en double : récupérer les `id` renvoyés par l'insert dans `saveRecipesToHistory`, et faire uniquement l'insert dans `favorites` dans `saveRecipe`
-- [ ] `setLanguage` : ajouter `onConflict: 'user_id'` à l'upsert de `user_preferences`
-- [ ] Migration : colonnes `servings` (integer), `tips` (jsonb) et `suggestion` (text) sur `recipes`, et les enregistrer à la sauvegarde
-- [ ] Supprimer le code mort (`generateFallbackRecipe`)
-- [ ] Renommer l'app : `name`, `slug`, `scheme` dans `app.json`, `name` dans `package.json`
-- [ ] Inscription sans session (confirmation d'email active) : ne pas rediriger vers les onglets, afficher « Vérifie ta boîte mail »
-- [ ] Connexion avec un email non confirmé : afficher un message clair au lieu de l'erreur brute
-- [ ] Aucune écriture en base qui échoue en silence : vérifier `error` après chaque insert / update / delete et prévenir l'utilisateur
-- [ ] Onglets protégés : sans session, rediriger vers la connexion
-- [ ] Recharger les données au retour sur l'écran avec `useFocusEffect` : garde-manger, accueil, favoris
+- [x] Recettes en double : récupérer les `id` renvoyés par l'insert dans `saveRecipesToHistory`, et faire uniquement l'insert dans `favorites` dans `saveRecipe`
+- [x] `setLanguage` : ajouter `onConflict: 'user_id'` à l'upsert de `user_preferences`
+- [x] Migration : colonnes `servings` (integer), `tips` (jsonb) et `suggestion` (text) sur `recipes`, et les enregistrer à la sauvegarde — migration `20260924190000` appliquée avec `db push`
+- [x] Supprimer le code mort (`generateFallbackRecipe`)
+- ~~Renommer l'app~~ → déplacé en phase 7 (nom pas encore choisi)
+- [x] Inscription sans session (confirmation d'email active) : ne pas rediriger vers les onglets, afficher « Vérifie ta boîte mail »
+- [x] Connexion avec un email non confirmé : afficher un message clair au lieu de l'erreur brute
+- [x] Aucune écriture en base qui échoue en silence : vérifier `error` après chaque insert / update / delete et prévenir l'utilisateur
+- [x] Onglets protégés : sans session, rediriger vers la connexion
+- [x] Recharger les données au retour sur l'écran avec `useFocusEffect` : garde-manger, accueil, favoris
 
 **Terminé quand** : sauvegarder une recette ne crée qu'une seule ligne dans `recipes`, et on peut changer de langue trois fois de suite sans erreur.
 
@@ -103,6 +114,13 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 - [ ] Restreindre CORS aux origines utiles
 - [ ] Désactiver les anciennes clés `anon` / `service_role` une fois que tout fonctionne
 
+**Garde-manger partagé (préparation, sans changement visible)** — voir « Ce qui distingue l'app »
+- [ ] Migration : tables `households` et `household_members` (rôle, date d'arrivée), avec RLS
+- [ ] Migration : colonne `household_id` sur `ingredients` et les autres tables concernées (à décider : `recipes`, `favorites`…)
+- [ ] Règles de sécurité (RLS) basées sur l'appartenance au foyer, à la place de `auth.uid() = user_id`
+- [ ] Foyer personnel créé automatiquement à l'inscription ; migration des données existantes vers le foyer personnel de chaque utilisateur
+- [ ] Vérifier qu'aucun écran ne change pour l'utilisateur
+
 **Terminé quand** : un appel sans utilisateur connecté renvoie 401, la 11e génération de la journée renvoie 429, et l'app fonctionne avec les anciennes clés désactivées.
 
 ## Phase 3 — Nouvelle stack IA
@@ -114,6 +132,9 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 - [ ] Nouvelle fonction `generate-recipe-image` : Cloudflare Workers AI (FLUX), appelée **seulement** à l'ouverture ou à la sauvegarde d'une recette
 - [ ] Bucket Supabase Storage `recipe-images` ; enregistrer uniquement l'URL Storage dans `recipes.image_url`
 - [ ] Retirer Pollinations : code, secrets, dépendances (Clarifai : retiré en phase 0.6)
+- [ ] `analyze-image` : champ `storage_tip` (conseil de conservation) pour chaque aliment — voir « Ce qui distingue l'app »
+- [ ] `analyze-image` : champ `kind` (`ingredient` ou `dish`) pour distinguer les restes de plats
+- [ ] `generate-recipes` : paramètre `cuisine` (cuisines du monde) et filtre correspondant sur l'écran de génération
 
 ### Point d'attention — Temps d'analyse des photos
 
@@ -145,6 +166,9 @@ Objectif : **moins de 5 s pour 90 % des scans**. Mesuré le 24/09/2026 : Gemini 
 - [ ] Notifications locales avec `expo-notifications` : rappel la veille de la péremption
 - [ ] Bouton « J'ai cuisiné ça » : retire du garde-manger les ingrédients utilisés (avec confirmation)
 - [ ] Scan de code-barres (`expo-camera`) + recherche du produit sur Open Food Facts
+- [ ] Conserver avant de cuisiner : enregistrer `storage_tip` et l'afficher sur chaque ingrédient
+- [ ] Restes de plats : date de péremption courte automatique pour les éléments `kind = dish`
+- [ ] Restes de plats : mode de génération « Transformer mes restes »
 
 **Terminé quand** : un aliment ajouté avec une date proche déclenche une notification, et la recette proposée l'utilise en premier.
 
@@ -154,6 +178,8 @@ Objectif : **moins de 5 s pour 90 % des scans**. Mesuré le 24/09/2026 : Gemini 
 - [ ] Compteur de gaspillage évité (kg, et éventuellement argent économisé) sur l'accueil
 - [ ] Écran de préférences : régimes, ingrédients exclus, temps max ; utilisé par la génération
 - [ ] Connexion anonyme Supabase pour tester sans compte, avec conversion en compte plus tard
+- [ ] Garde-manger partagé : inviter un membre, rejoindre un foyer, voir qui a ajouté quoi
+- [ ] Cuisines du monde : préférence de cuisine enregistrée et utilisée par défaut
 
 **Terminé quand** : un nouvel utilisateur peut scanner et générer une recette sans créer de compte, puis garder ses données en créant son compte.
 
@@ -162,6 +188,7 @@ Objectif : **moins de 5 s pour 90 % des scans**. Mesuré le 24/09/2026 : Gemini 
 - [ ] Créer un build de développement EAS
 - [ ] Réactiver la confirmation d'email dans Supabase (Authentication → Sign In / Providers → Email)
 - [ ] Revoir les limites de Groq (~3 scans/min en secours, modèle en preview) et de Gemini avant la bêta : offre payante ou autre modèle
+- [ ] Renommer l'app : `name`, `slug`, `scheme` dans `app.json`, `name` dans `package.json` — nom à choisir (pistes : Miette, Glana, Frigoscope)
 - [ ] Icône, écran de démarrage, nom définitif
 - [ ] Passer Gemini en offre payante (les données de l'offre gratuite servent à améliorer les produits Google)
 - [ ] Rédiger la politique de confidentialité (photos, données du garde-manger)
@@ -206,4 +233,10 @@ Objectif : **moins de 5 s pour 90 % des scans**. Mesuré le 24/09/2026 : Gemini 
 | 24/09/2026 | Tout échec de Gemini (HTTP, délai, JSON invalide, réponse vide ou hors schéma) bascule sur Groq ; 401/403 logués « clé invalide » mais basculent aussi ; Groq à température 0 | L'utilisateur ne doit jamais être bloqué par un problème d'un seul fournisseur ; la raison reste visible dans `fallback_reason` et les logs |
 | 24/09/2026 | Ingrédients mal formés écartés un par un ; la réponse n'est un échec que si aucun ingrédient proposé n'est valide | Un seul ingrédient invalide ne doit pas faire perdre tout le scan |
 | 24/09/2026 | **Phase 0.6 validée depuis l'app**, avec deux constats : Gemini 15,7 s pour un seul ingrédient ; après un 503 de Gemini, Groq a échoué en 472 ms avec `json_validate_failed` (`failed_generation` : « { conto ») | Nouvel essai unique de Groq sur `json_validate_failed` (rapide, presque gratuit) ; temps d'analyse repris en phase 3 (point d'attention) |
+| 24/09/2026 | Phase 1 : `Stack.Protected` (expo-router) pour protéger les onglets et l'écran de génération | Mécanisme prévu par expo-router ; règle aussi la déconnexion, qui laissait l'utilisateur sur les onglets |
+| 24/09/2026 | Phase 1 : écritures en base vérifiées via `lib/alertWriteError` (alerte traduite) | Deux faux succès trouvés (ingrédients scannés, favoris). La création du profil reste seulement tracée : sans profil, la première écriture suivante déclenche l'alerte |
+| 24/09/2026 | Phase 1 : recettes enregistrées dans l'historique avant leur affichage, id associé par titre | Supprime le doublon à la sauvegarde ; l'ordre des lignes renvoyées par l'insert n'est pas garanti |
+| 25/09/2026 | Migration `20260924190000` (servings, tips, suggestion) appliquée avec `npx supabase db push` | `SUPABASE_DB_PASSWORD` configuré : le CLI accède à la base ; historiques local et distant concordants |
+| 25/09/2026 | Renommage de l'app déplacé en phase 7 | Nom pas encore choisi (pistes : Miette, Glana, Frigoscope) |
+| 25/09/2026 | Le modèle de données passe à la notion de foyer dès la phase 2, pour éviter de refaire les phases 3 à 5 | Le garde-manger partagé touche toutes les tables et règles de sécurité : mieux vaut le poser avant de construire dessus |
 | | *(résultat du test Gemini vs Clarifai)* | |
