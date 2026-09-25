@@ -5,13 +5,17 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
-import { LanguageProvider } from '@/contexts/LanguageContext';
+import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext';
+import { useExpiryReminders } from '@/hooks/useExpiryReminders';
 
 function RootNavigator() {
   const { user } = useAuth();
+  const { language } = useLanguage();
 
   // Les erreurs remontées portent l'identifiant de l'utilisateur (jamais son e-mail)
   useEffect(() => setSentryUser(user?.id ?? null), [user?.id]);
+  // Rappels de péremption (notifications locales) et ouverture de la génération depuis un rappel
+  useExpiryReminders(user?.id ?? null, language);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>

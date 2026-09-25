@@ -7,6 +7,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { expiryFromShelfLife, type FoodKind } from '@/lib/expiry';
+import { maybeAskNotificationPermission } from '@/lib/notifications';
+import { notifyPantryChanged } from '@/lib/pantryEvents';
 import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
 import { ExpiryPicker } from '@/components/expiry/ExpiryPicker';
 import { scanModalStyles } from './scanModalStyles';
@@ -84,6 +86,9 @@ export function ManualAddModal({ visible, onClose }: { visible: boolean; onClose
     } else {
       setManualIngredients([]);
       onClose();
+      notifyPantryChanged();
+      // Premier ajout d'une date : proposition des rappels avant le message de confirmation
+      await maybeAskNotificationPermission();
       Alert.alert(
         t('manual.successTitle'),
         t('scan.addedToPantry', { count: ingredientsToInsert.length }),

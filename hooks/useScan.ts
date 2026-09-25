@@ -8,6 +8,8 @@ import { supabase } from '@/lib/supabase';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { callEdgeFunction, SessionExpiredError } from '@/lib/callEdgeFunction';
 import { expiryFromShelfLife, type FoodKind } from '@/lib/expiry';
+import { maybeAskNotificationPermission } from '@/lib/notifications';
+import { notifyPantryChanged } from '@/lib/pantryEvents';
 
 // Ingrédient renvoyé par l'Edge Function analyze-image
 interface ScannedIngredient {
@@ -163,6 +165,9 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
       if (!(await saveIngredients(confirmed))) return;
       setShowConfirmation(false);
       setDetectedIngredients([]);
+      notifyPantryChanged();
+      // Premier ajout d'une date : proposition des rappels avant le message de confirmation
+      await maybeAskNotificationPermission();
       Alert.alert(
         t('scan.ingredientsAdded'),
         t('scan.addedToPantry', { count: confirmed.length }),

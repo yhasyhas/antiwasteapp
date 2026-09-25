@@ -18,6 +18,8 @@ import { router, useFocusEffect } from 'expo-router';
 import { IngredientCard, type PantryIngredient } from '@/components/pantry/IngredientCard';
 import { ExpiryEditModal } from '@/components/pantry/ExpiryEditModal';
 import { sortByUrgency } from '@/lib/expiry';
+import { maybeAskNotificationPermission } from '@/lib/notifications';
+import { notifyPantryChanged } from '@/lib/pantryEvents';
 
 export default function IngredientsScreen() {
   const { user } = useAuth();
@@ -90,6 +92,7 @@ export default function IngredientsScreen() {
               alertWriteError(t, 'deleting ingredient', error);
             } else {
               setIngredients(ingredients.filter((ing) => ing.id !== id));
+              notifyPantryChanged();
             }
             setDeleting(null);
           },
@@ -114,6 +117,8 @@ export default function IngredientsScreen() {
     const id = editingExpiry.id;
     setIngredients(sortByUrgency(ingredients.map((ing) => ing.id === id ? { ...ing, expires_at: expiresAt } : ing)));
     setEditingExpiry(null);
+    notifyPantryChanged();
+    if (expiresAt) await maybeAskNotificationPermission();
   };
 
   const clearAllIngredients = () => {
@@ -139,6 +144,7 @@ export default function IngredientsScreen() {
             } else {
               setIngredients([]);
               setFilteredIngredients([]);
+              notifyPantryChanged();
             }
             setLoading(false);
           },
