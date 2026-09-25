@@ -149,7 +149,7 @@ Objectif : **moins de 5 s pour 90 % des scans**. Mesuré le 24/09/2026 : Gemini 
 - [x] Régler la réflexion (thinking) de Gemini au minimum pour la vision — vérifié : `total_thought_tokens` = 0 avec `thinking_level: 'minimal'`
 - [x] Lancer Groq en parallèle si Gemini n'a pas répondu après 5 s, et garder la première réponse valide (délai réglable : secret `SCAN_HEDGE_DELAY_MS`)
 - [x] Tester des photos de 640 px au lieu de 800 px (temps, qualité de la reconnaissance) — 800 px conservé, voir le journal
-- [ ] Afficher la photo prise pendant l'analyse
+- [x] Afficher la photo prise pendant l'analyse
 
 **Terminé quand** : un scan en français renvoie des noms en français, aucune clé n'apparaît dans les réponses envoyées à l'app, et couper le fournisseur principal fait basculer automatiquement sur le secours.
 
