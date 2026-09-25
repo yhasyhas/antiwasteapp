@@ -8,9 +8,6 @@ import { supabase } from '@/lib/supabase';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { callEdgeFunction, SessionExpiredError } from '@/lib/callEdgeFunction';
 
-// TEMPORAIRE (phases 0.5-0.6) : logs pour diagnostiquer le scan. À retirer une fois le scan validé.
-const log = (...args: unknown[]) => console.log('[scan]', ...args);
-
 // Ingrédient renvoyé par l'Edge Function analyze-image
 interface ScannedIngredient {
   name: string;
@@ -57,10 +54,6 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
       }
 
       const base64 = manipulatedImage.base64;
-      log(
-        `base64 : ${Math.round(base64.length / 1024)} Ko (${base64.length} caractères),`,
-        base64.startsWith('data:') ? `PRÉFIXE PRÉSENT : ${base64.slice(0, 30)}` : `sans préfixe, commence par ${base64.slice(0, 12)}`
-      );
 
       // 2. Appeler l'Edge Function avec le jeton de l'utilisateur (la fonction refuse les appels anonymes)
       let result;
@@ -77,13 +70,6 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
         return;
       }
       const { response, data } = result;
-      log(`réponse HTTP ${response.status} (langue ${language}, fournisseur ${data?.provider ?? '-'})`, {
-        error: data?.error,
-        message: data?.message,
-        details: data?.details,
-        fallback_reason: data?.fallback_reason,
-        ingredients: data?.ingredients,
-      });
 
       // Une erreur du serveur n'est pas un « aucun ingrédient détecté » : on affiche le vrai message
       if (!response.ok || !data || data.error) {
@@ -114,7 +100,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
         );
       }
     } catch (error) {
-      log('exception', error);
+      console.error('[scan] analyse impossible :', error);
       Alert.alert(t('common.error'), t('scan.analyzeError', { message: error instanceof Error ? error.message : String(error) }));
     } finally {
       setAnalyzing(false);
