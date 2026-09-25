@@ -14,9 +14,12 @@ const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 // Gemini est essayé une seule fois : ses modèles saturent tous en même temps, réessayer ne fait
 // que consommer le quota. N'importe quel échec (erreur HTTP, délai dépassé, JSON invalide, réponse
-// vide ou non conforme au schéma) fait passer directement à Groq.
+// vide ou non conforme au schéma) fait lancer Groq aussitôt.
 const GEMINI_TIMEOUT_MS = 20_000;
 const GROQ_TIMEOUT_MS = 30_000;
+// Si Gemini n'a pas répondu après ce délai, Groq est lancé en parallèle : la première réponse valide
+// l'emporte. Réglable par secret (objectif : moins de 5 s pour 90 % des scans).
+const HEDGE_DELAY_MS = Number(Deno.env.get('SCAN_HEDGE_DELAY_MS') || 5000);
 
 // En dessous de ce niveau de confiance, l'ingrédient n'est pas proposé à l'utilisateur
 const MIN_CONFIDENCE = 0.5;
@@ -67,6 +70,8 @@ interface AnalyzeImageRequest {
   mime_type?: string;
   language?: string;
   mode?: AnalyzeMode;
+  // true : ajoute à la réponse le détail des appels aux fournisseurs (durées, tokens)
+  debug?: boolean;
 }
 
 interface DetectedIngredient {
@@ -113,9 +118,13 @@ function jsonResponse(body: unknown, status: number): Response {
   });
 }
 
-function errorResponse(code: string, language: string, status: number, details?: string): Response {
+function errorBody(code: string, language: string, details?: string) {
   const messages = MESSAGES[language] || MESSAGES['en'];
-  return jsonResponse({ error: code, message: messages[code] || code, ...(details && { details }) }, status);
+  return { error: code, message: messages[code] || code, ...(details && { details }) };
+}
+
+function errorResponse(code: string, language: string, status: number, details?: string): Response {
+  return jsonResponse(errorBody(code, language, details), status);
 }
 
 // Les codes de catégorie sont en anglais : on précise leur sens pour éviter les confusions
@@ -146,6 +155,7 @@ Liste les aliments et ingrédients de cuisine visibles.
 - "category" : ${CATEGORY_GUIDE}
 - "confidence" : entre 0 et 1, ta certitude que l'aliment est bien présent.
 - Un même aliment n'apparaît qu'une fois : additionne les quantités.
+- 20 aliments au plus, les plus visibles d'abord.
 - Ignore ce qui n'est pas comestible (ustensiles, meubles, emballages vides).
 - S'il n'y a aucun aliment, renvoie une liste vide.`;
 }
@@ -157,22 +167,28 @@ interface VisionRequest {
 }
 
 // text : le JSON brut renvoyé par le modèle (lu et validé ensuite, identique pour tous les fournisseurs)
+// usage : consommation de tokens renvoyée par le fournisseur (mode debug uniquement)
 type ProviderResult =
-  | { ok: true; text: string }
+  | { ok: true; text: string; usage?: unknown }
   | { ok: false; status?: number; details: string };
 
 interface VisionProvider {
   name: string;
   model: string;
   configured: boolean;
-  call: (request: VisionRequest) => Promise<ProviderResult>;
+  call: (request: VisionRequest, signal: AbortSignal) => Promise<ProviderResult>;
 }
 
 function describeError(error: unknown): string {
   return error instanceof Error ? `${error.name}: ${error.message}` : String(error);
 }
 
-async function callGemini({ prompt, imageBase64, mimeType }: VisionRequest): Promise<ProviderResult> {
+// Délai propre au fournisseur, et annulation quand l'autre fournisseur a déjà répondu
+function withTimeout(signal: AbortSignal, timeoutMs: number): AbortSignal {
+  return AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]);
+}
+
+async function callGemini({ prompt, imageBase64, mimeType }: VisionRequest, signal: AbortSignal): Promise<ProviderResult> {
   try {
     const response = await fetch(GEMINI_API_URL, {
       method: 'POST',
@@ -189,7 +205,7 @@ async function callGemini({ prompt, imageBase64, mimeType }: VisionRequest): Pro
         // Reconnaître des aliments ne demande pas de réflexion : réponse plus rapide
         generation_config: { temperature: 0.2, thinking_level: 'minimal' },
       }),
-      signal: AbortSignal.timeout(GEMINI_TIMEOUT_MS),
+      signal: withTimeout(signal, GEMINI_TIMEOUT_MS),
     });
 
     if (!response.ok) {
@@ -208,14 +224,14 @@ async function callGemini({ prompt, imageBase64, mimeType }: VisionRequest): Pro
       .filter((item: any) => item.type === 'text' && typeof item.text === 'string')
       .map((item: any) => item.text)
       .join('');
-    return { ok: true, text };
+    return { ok: true, text, usage: interaction.usage };
   } catch (error) {
-    // Délai dépassé ou erreur réseau
+    // Délai dépassé, annulation ou erreur réseau
     return { ok: false, details: `Gemini: ${describeError(error)}` };
   }
 }
 
-async function requestGroq({ prompt, imageBase64, mimeType }: VisionRequest): Promise<ProviderResult> {
+async function requestGroq({ prompt, imageBase64, mimeType }: VisionRequest, signal: AbortSignal): Promise<ProviderResult> {
   try {
     const response = await fetch(GROQ_API_URL, {
       method: 'POST',
@@ -240,7 +256,7 @@ async function requestGroq({ prompt, imageBase64, mimeType }: VisionRequest): Pr
         // haute fait refuser la requête. 20 ingrédients tiennent dans ~600 tokens.
         max_completion_tokens: 800,
       }),
-      signal: AbortSignal.timeout(GROQ_TIMEOUT_MS),
+      signal: withTimeout(signal, GROQ_TIMEOUT_MS),
     });
 
     if (!response.ok) {
@@ -253,7 +269,7 @@ async function requestGroq({ prompt, imageBase64, mimeType }: VisionRequest): Pr
     if (typeof text !== 'string') {
       return { ok: false, details: `Groq: réponse sans contenu (${data.choices?.[0]?.finish_reason})` };
     }
-    return { ok: true, text };
+    return { ok: true, text, usage: data.usage };
   } catch (error) {
     return { ok: false, details: `Groq: ${describeError(error)}` };
   }
@@ -261,23 +277,23 @@ async function requestGroq({ prompt, imageBase64, mimeType }: VisionRequest): Pr
 
 // Groq refuse parfois sa propre sortie en mode JSON Schema strict (400 json_validate_failed, JSON coupé
 // du type "{ conto"). C'est aléatoire, rapide (< 1 s) et presque gratuit : on réessaie une fois.
-async function callGroq(request: VisionRequest): Promise<ProviderResult> {
-  const first = await requestGroq(request);
-  if (first.ok || first.status !== 400 || !first.details.includes('json_validate_failed')) return first;
+async function callGroq(request: VisionRequest, signal: AbortSignal): Promise<ProviderResult> {
+  const first = await requestGroq(request, signal);
+  if (first.ok || first.status !== 400 || !first.details.includes('json_validate_failed') || signal.aborted) return first;
 
   console.warn(`[analyze-image] groq (${GROQ_VISION_MODEL}) json_validate_failed, nouvel essai : ${first.details.slice(0, 200)}`);
-  const second = await requestGroq(request);
+  const second = await requestGroq(request, signal);
   console.log(`[analyze-image] groq (${GROQ_VISION_MODEL}) nouvel essai après json_validate_failed : ${second.ok ? 'réussi' : 'échec'}`);
   return second.ok ? second : { ...second, details: `${second.details} (après un nouvel essai sur json_validate_failed)` };
 }
 
-// Ordre des tentatives : Gemini, puis Groq
+// Fournisseur principal, puis secours
 const PROVIDERS: VisionProvider[] = [
   { name: 'gemini', model: GEMINI_MODEL, configured: GEMINI_API_KEY !== '', call: callGemini },
   { name: 'groq', model: GROQ_VISION_MODEL, configured: GROQ_API_KEY !== '', call: callGroq },
 ];
 
-// Raison pour laquelle un ingrédient ne respecte pas RESPONSE_SCHEMA, ou null s'il est valide
+// Raison pour laquelle un aliment ne respecte pas RESPONSE_SCHEMA, ou null s'il est utilisable
 function ingredientViolation(item: any): string | null {
   if (!item || typeof item !== 'object') return 'pas un objet';
   if (typeof item.name !== 'string' || item.name.trim() === '') return '"name" invalide';
@@ -291,8 +307,8 @@ type ValidationResult =
   | { ok: true; valid: unknown[]; invalid: string[] }
   | { ok: false; reason: string };
 
-// Écarte les ingrédients mal formés et garde les autres. La réponse n'est un échec que si elle n'a pas
-// de liste d'ingrédients, ou si elle en proposait et qu'aucun n'est valide. Une liste vide dès le
+// Écarte les aliments mal formés et garde les autres. La réponse n'est un échec que si elle n'a pas
+// de liste d'aliments, ou si elle en proposait et qu'aucun n'est valide. Une liste vide dès le
 // départ reste valide (aucun aliment sur la photo).
 function validateResponse(parsed: any): ValidationResult {
   if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.ingredients)) {
@@ -308,7 +324,7 @@ function validateResponse(parsed: any): ValidationResult {
   });
 
   if (valid.length === 0 && invalid.length > 0) {
-    return { ok: false, reason: `aucun ingrédient valide sur ${invalid.length} (${invalid.slice(0, 3).join(' ; ')})` };
+    return { ok: false, reason: `aucun aliment valide sur ${invalid.length} (${invalid.slice(0, 3).join(' ; ')})` };
   }
   return { ok: true, valid, invalid };
 }
@@ -336,13 +352,111 @@ function cleanIngredients(raw: unknown): DetectedIngredient[] {
     .slice(0, MAX_INGREDIENTS);
 }
 
+// Résultat d'un fournisseur, une fois sa réponse lue et validée
+type AttemptResult =
+  | { ok: true; provider: VisionProvider; ingredients: DetectedIngredient[] }
+  | { ok: false; provider: VisionProvider; failure: string; code: 'ai_error' | 'invalid_response' };
+
+interface AttemptLog {
+  provider: string;
+  started_at_ms: number;
+  ms: number;
+  ok: boolean;
+  details?: string;
+  usage?: unknown;
+}
+
+async function attempt(provider: VisionProvider, request: VisionRequest, signal: AbortSignal, log: AttemptLog[], t0: number): Promise<AttemptResult> {
+  const started = Date.now();
+  const result = await provider.call(request, signal);
+  const elapsed = Date.now() - started;
+  const label = `[analyze-image] ${provider.name} (${provider.model})`;
+  const entry: AttemptLog = { provider: provider.name, started_at_ms: started - t0, ms: elapsed, ok: false, ...(result.ok && { usage: result.usage }) };
+  log.push(entry);
+
+  let failed: AttemptResult | null = null;
+  let validation: ValidationResult | null = null;
+  if (!result.ok) {
+    failed = { ok: false, provider, failure: result.details, code: 'ai_error' };
+    if (result.status === 401 || result.status === 403) {
+      // Pas une panne passagère : la clé est à corriger. On bascule quand même pour ne pas bloquer l'utilisateur.
+      console.error(`${label} CLÉ ${provider.name.toUpperCase()} INVALIDE (HTTP ${result.status}) : vérifier le secret de sa clé API`);
+    }
+  } else if (result.text.trim() === '') {
+    failed = { ok: false, provider, failure: `${provider.name} : réponse vide`, code: 'invalid_response' };
+  } else {
+    try {
+      validation = validateResponse(JSON.parse(result.text));
+      if (!validation.ok) {
+        failed = { ok: false, provider, failure: `${provider.name} : réponse non conforme au schéma, ${validation.reason}`, code: 'invalid_response' };
+      }
+    } catch {
+      failed = { ok: false, provider, failure: `${provider.name} : JSON invalide (${result.text.slice(0, 120)})`, code: 'invalid_response' };
+    }
+  }
+
+  if (failed || !validation?.ok) {
+    const failure = failed && !failed.ok ? failed : { ok: false as const, provider, failure: 'échec inconnu', code: 'ai_error' as const };
+    entry.details = failure.failure.slice(0, 300);
+    // Une annulation n'est pas une panne : l'autre fournisseur a déjà répondu
+    if (!signal.aborted) console.error(`${label} échec en ${elapsed} ms : ${failure.failure}`);
+    return failure;
+  }
+
+  if (validation.invalid.length > 0) {
+    console.warn(`${label} ${validation.invalid.length} aliment(s) mal formé(s) écarté(s) : ${validation.invalid.slice(0, 5).join(' ; ')}`);
+  }
+  entry.ok = true;
+  return { ok: true, provider, ingredients: cleanIngredients(validation.valid) };
+}
+
+// Lance le fournisseur principal ; si sa réponse n'est pas arrivée après HEDGE_DELAY_MS (ou s'il échoue
+// avant), lance le secours en parallèle. La première réponse valide l'emporte et l'autre appel est annulé.
+// Renvoie le dernier échec si aucun fournisseur ne répond correctement.
+function analyzeWithHedging(providers: VisionProvider[], request: VisionRequest, log: AttemptLog[], t0: number): Promise<AttemptResult> {
+  const controller = new AbortController();
+  return new Promise((resolve) => {
+    let next = 0;
+    let pending = 0;
+    let settled = false;
+    let lastFailure: AttemptResult | null = null;
+    let hedgeTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const finish = (result: AttemptResult) => {
+      settled = true;
+      clearTimeout(hedgeTimer);
+      controller.abort();
+      resolve(result);
+    };
+
+    const startNext = () => {
+      clearTimeout(hedgeTimer);
+      if (settled || next >= providers.length) return;
+      const provider = providers[next++];
+      pending++;
+      attempt(provider, request, controller.signal, log, t0).then((result) => {
+        pending--;
+        if (settled) return;
+        if (result.ok) return finish(result);
+        lastFailure = result;
+        if (next < providers.length) startNext();
+        else if (pending === 0) finish(lastFailure);
+      });
+      if (next < providers.length) hedgeTimer = setTimeout(startNext, HEDGE_DELAY_MS);
+    };
+
+    startNext();
+  });
+}
+
 Deno.serve(withCors(async (req: Request) => {
+  const t0 = Date.now();
   let language = 'fr';
   // Utilisateur dont le quota a été compté : rendu si l'analyse échoue
   let quotaUserId: string | null = null;
 
   try {
-    const { image_base64, mime_type, language: requestedLanguage, mode: requestedMode }: AnalyzeImageRequest = await req.json();
+    const { image_base64, mime_type, language: requestedLanguage, mode: requestedMode, debug }: AnalyzeImageRequest = await req.json();
     language = (requestedLanguage || 'fr').substring(0, 2).toLowerCase();
     const mode: AnalyzeMode = requestedMode === 'receipt' ? 'receipt' : 'photo';
 
@@ -376,60 +490,29 @@ Deno.serve(withCors(async (req: Request) => {
       imageBase64: image_base64,
       mimeType: mime_type || 'image/jpeg',
     };
-    let lastFailure = '';
-    let lastFailureCode = 'ai_error';
+    const beforeAi = Date.now() - t0;
+    const log: AttemptLog[] = [];
+    const result = await analyzeWithHedging(providers, visionRequest, log, t0);
+    // Détail des appels (durées, tokens), sur demande, pour mesurer les temps d'analyse
+    const debugInfo = debug === true ? { debug: { before_ai_ms: beforeAi, total_ms: Date.now() - t0, attempts: log } } : {};
 
-    for (const provider of providers) {
-      const started = Date.now();
-      const result = await provider.call(visionRequest);
-      const elapsed = Date.now() - started;
-      const label = `[analyze-image] ${provider.name} (${provider.model})`;
-
-      // Tout échec d'un fournisseur (réseau, HTTP, JSON, aucun ingrédient valide) fait passer au suivant
-      let failure: string | null = null;
-      let validation: ValidationResult | null = null;
-
-      if (!result.ok) {
-        failure = result.details;
-        lastFailureCode = 'ai_error';
-        if (result.status === 401 || result.status === 403) {
-          // Pas une panne passagère : la clé est à corriger. On bascule quand même pour ne pas bloquer l'utilisateur.
-          console.error(`${label} CLÉ ${provider.name.toUpperCase()} INVALIDE (HTTP ${result.status}) : vérifier le secret de sa clé API`);
-        }
-      } else if (result.text.trim() === '') {
-        failure = `${provider.name} : réponse vide`;
-        lastFailureCode = 'invalid_response';
-      } else {
-        try {
-          validation = validateResponse(JSON.parse(result.text));
-          if (!validation.ok) {
-            failure = `${provider.name} : réponse non conforme au schéma, ${validation.reason}`;
-            lastFailureCode = 'invalid_response';
-          }
-        } catch {
-          failure = `${provider.name} : JSON invalide (${result.text.slice(0, 120)})`;
-          lastFailureCode = 'invalid_response';
-        }
-      }
-
-      if (failure || !validation?.ok) {
-        console.error(`${label} échec en ${elapsed} ms : ${failure}`);
-        lastFailure = failure || 'échec inconnu';
-        continue;
-      }
-
-      if (validation.invalid.length > 0) {
-        console.warn(`${label} ${validation.invalid.length} ingrédient(s) mal formé(s) écarté(s) : ${validation.invalid.slice(0, 5).join(' ; ')}`);
-      }
-
-      const ingredients = cleanIngredients(validation.valid);
-      console.log(`${label} OK en ${elapsed} ms, ${ingredients.length} ingrédient(s), mode ${mode}, langue ${language}`);
-      // fallback_reason : pourquoi le fournisseur précédent a échoué (utile dans les logs [scan] de l'app)
-      return jsonResponse({ ingredients, provider: provider.name, ...(lastFailure && { fallback_reason: lastFailure }) }, 200);
+    if (!result.ok) {
+      await refundQuota(user.id, 'scans');
+      return jsonResponse({ ...errorBody(result.code, language, result.failure), ...debugInfo }, 502);
     }
 
-    await refundQuota(user.id, 'scans');
-    return errorResponse(lastFailureCode, language, 502, lastFailure);
+    const elapsed = Date.now() - t0;
+    console.log(`[analyze-image] ${result.provider.name} retenu, ${result.ingredients.length} aliment(s) en ${elapsed} ms (${log.map((a) => `${a.provider} ${a.ok ? 'ok' : 'échec'} ${a.ms} ms`).join(', ')}), mode ${mode}, langue ${language}`);
+    // fallback_reason : pourquoi le fournisseur principal a échoué (utile dans les logs [scan] de l'app)
+    const primaryFailure = log.find((a) => a.provider === providers[0].name && !a.ok);
+    const fallbackReason = result.provider === providers[0] ? null
+      : primaryFailure?.details ?? `${providers[0].name} : pas de réponse après ${HEDGE_DELAY_MS} ms`;
+    return jsonResponse({
+      ingredients: result.ingredients,
+      provider: result.provider.name,
+      ...(fallbackReason && { fallback_reason: fallbackReason }),
+      ...debugInfo,
+    }, 200);
   } catch (error) {
     console.error('Error analyzing image:', error);
     if (quotaUserId) await refundQuota(quotaUserId, 'scans');
