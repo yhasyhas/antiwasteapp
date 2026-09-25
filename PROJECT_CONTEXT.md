@@ -1,6 +1,6 @@
 # Contexte du projet : app mobile anti-gaspi de recettes IA
 
-> Analyse rédigée le 2026-09-23, mise à jour à la fin de la phase 3. La feuille de route est dans `PLAN.md`.
+> Analyse rédigée le 2026-09-23, mise à jour à la fin de la phase 4. La feuille de route est dans `PLAN.md`.
 
 ## 1. Le produit
 
@@ -19,6 +19,8 @@ Langues : français (par défaut), anglais, espagnol.
 | Couche | Techno |
 |---|---|
 | App | Expo SDK 57, React Native 0.86, React 19.2, expo-router 57 (routes par fichiers), TypeScript 6 |
+| Traductions | i18next + react-i18next + expo-localization, clés typées, fr / en / es |
+| Suivi des erreurs | Sentry (`@sentry/react-native`), région UE ; erreurs JavaScript seulement dans Expo Go |
 | UI | StyleSheet natif, icônes `lucide-react-native`, couleur principale `#10b981` (vert) |
 | Backend | Supabase (projet `iqzjonmjlscuckdmiehk`) : Auth, Postgres avec RLS, Edge Functions (Deno) ; nouvelles clés d'API (publishable / secrète) |
 | Vision | Gemini Flash-Lite (`GEMINI_MODEL`, par défaut `gemini-3.1-flash-lite`, Interactions API, `store: false`), Groq `qwen/qwen3.8-27b` (`GROQ_VISION_MODEL`) lancé en parallèle après 2,5 s (`SCAN_HEDGE_DELAY_MS`) ; sortie JSON structurée avec conseil de conservation et type (ingrédient ou plat) (fonction `analyze-image`) |
@@ -42,13 +44,21 @@ app/
     saved.tsx            Historique des recettes + favoris (image générée à l'ouverture)
     settings.tsx         Choix de langue, déconnexion
   recipe/generate.tsx    Filtres (dont cuisine) + generate-recipes (ingrédients avec identifiant) + historique + affichage + favori + image
+components/              Composants des écrans : recipe/ (filtres, cartes, détail, options), scan/ (confirmation, ajout manuel, permission),
+                         saved/, home/, pantry/ ; aucun fichier au-delà de 400 lignes
+hooks/                   useRecipeGeneration, useScan, useSavedRecipes
 contexts/
   AuthContext.tsx        Session Supabase, crée la ligne `profiles` au premier login
-  LanguageContext.tsx    i18n maison (fr/en/es), AsyncStorage + sync user_preferences
+  LanguageContext.tsx    Langue de l'app : langue du téléphone par défaut, gardée dans AsyncStorage, synchronisée avec user_preferences dès que possible (sans alerte hors connexion)
+i18n/                    i18next ; locales/fr.ts fait référence (type Translations), en.ts et es.ts ; i18next.d.ts type les clés
 lib/supabase.ts          Client Supabase (clé publishable ; SecureStore sur mobile, localStorage sur web)
 lib/callEdgeFunction.ts  Appel d'une Edge Function avec le jeton de l'utilisateur
 lib/recipeImage.ts       Demande l'image d'une recette (une seule génération à la fois par recette)
 lib/alertWriteError.ts   Alerte traduite quand une écriture en base échoue
+lib/authErrors.ts        Erreurs de Supabase Auth traduites
+lib/labels.ts            Libellés traduits des valeurs enregistrées (difficulté…)
+lib/sentry.ts            Initialisation de Sentry (inactif sans EXPO_PUBLIC_SENTRY_DSN)
+scripts/                 export-project.mjs, recompress-recipe-images.ts (Deno)
 supabase/
   config.toml            verify_jwt = false pour chaque fonction (vérification dans le code)
   migrations/            Schéma SQL (6 migrations)
@@ -59,6 +69,7 @@ supabase/
     _shared/keys.ts      Nouvelles clés (SUPABASE_PUBLISHABLE_KEYS / SUPABASE_SECRET_KEYS)
     _shared/quota.ts     Quotas par jour et par utilisateur (429 au-delà)
     _shared/cors.ts      CORS limité aux origines autorisées
+    _shared/image.ts     Compression des images (ImageScript : 800 px, JPEG qualité 75)
     analyze-image/       Photo ou ticket de caisse → aliments (nom, quantité, catégorie, confiance, kind, storage_tip)
       ingredients.ts     Schéma et validation de la réponse (+ ingredients.test.ts)
     generate-recipes/    N recettes (1 si ≤2 ingrédients, 2 si ≤5, sinon 3), cuisine, régimes
@@ -78,7 +89,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Storage : bucket `recipe-images`, public en lecture, écriture réservée à la fonction (clé secrète)
 
 ### Configuration requise
-- `.env` (client) : `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (relancer Expo avec `-c` après un changement)
+- `.env` (client) : `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `EXPO_PUBLIC_SENTRY_DSN` (facultatif) (relancer Expo avec `-c` après un changement)
 - Secrets des Edge Functions (`supabase secrets set ...`) : `GROQ_API_KEY`, `GEMINI_API_KEY` ; facultatifs (valeurs par défaut dans le code) : `GROQ_MODEL`, `GEMINI_MODEL`, `GROQ_VISION_MODEL`, `QUOTA_DAILY_GENERATIONS` (10), `QUOTA_DAILY_SCANS` (20), `QUOTA_DAILY_IMAGES` (10), `SCAN_HEDGE_DELAY_MS` (2500 en production), `RECIPE_PROVIDERS` (groq,gemini), `GEMINI_RECIPE_MODEL`, `CLOUDFLARE_IMAGE_MODEL`, `ALLOWED_ORIGINS` ; images : `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`
 
 ## 4. Historique : ce qui a été réalisé
@@ -141,24 +152,28 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Images : Cloudflare Workers AI (FLUX schnell), une par recette, à l'ouverture ou à la sauvegarde, quota de 10 par jour ; bucket `recipe-images`. Pollinations entièrement retiré.
 - Tests : 28 tests Deno (`deno test --no-config supabase/functions/`), tests SQL des images.
 
+### Phase 4 — nettoyage du code et traductions (branche `phase-4`, en attente de validation)
+- Découpage : `generate.tsx` (1 364 → 228 lignes), caméra, favoris, accueil et garde-manger en composants (`components/`) et hooks (`hooks/`), sans changement de comportement ; plus gros fichier : 349 lignes. Bouton « Ajouter à la main » de l'écran de permission de la caméra réparé.
+- Traductions : i18next, clés typées, 184 clés en fr / en / es ; tous les écrans, onglets, alertes et erreurs de Supabase Auth ; tutoiement partout en français, y compris dans les fonctions. Langue du téléphone par défaut ; changement hors connexion gardé et synchronisé plus tard (test 9 de la phase 1). La langue des recettes suit par défaut celle de l'app.
+- Images : compressées avant stockage (800 px, JPEG 75, 80 à 150 Ko) ; les 2 images existantes recompressées.
+- Sentry branché (région UE, erreurs JavaScript dans Expo Go) ; `README.md` et `.env.example` écrits ; logs `[scan]` retirés.
+
 ## 5. État actuel et problèmes connus
 
 ### Sécurité
 - L'app filtre encore ses ingrédients par `user_id` (équivalent tant qu'il n'y a qu'un foyer personnel) : à passer à `household_id` en phase 6, avec `user_id` non modifiable.
 
 ### Dette et finitions
-- i18n partielle : caméra, ingrédients, favoris, génération, auth et titres des onglets ont des textes écrits en dur.
 - Offres gratuites partagées par toute l'app : Groq (scan : ~1 000 tokens de sortie par minute ; génération : 8 000 tokens par minute et 1 000 requêtes par jour) et Cloudflare (~150 images par jour estimées) ; au-delà, le secours prend le relais ou l'image n'est pas générée. À revoir avant la bêta (phase 7).
-- Images de 600 à 770 Ko (1024×1024) : lourdes pour les données mobiles.
-- Logs temporaires `[scan]` dans `camera.tsx`.
-- Phase 1 validée avec des tests partiels (scan + génération, doublons, langue) : inscription, déconnexion, alertes d'écriture et rechargement des onglets restent à tester sur appareil.
+- Phase 1 validée avec des tests partiels (scan + génération, doublons, langue) : inscription, déconnexion, alertes d'écriture et rechargement des onglets restent à tester sur appareil (dans la liste de tests de la phase 4, dans les trois langues).
 - Confirmation d'email désactivée dans Supabase pendant le développement (à réactiver en phase 7).
 - Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`) : renommage en phase 7, nom pas encore choisi.
 - Sauvegardes de la base dans `backups/` : jamais commitées (`.gitignore`) ni exportées.
-- Pas de README ; tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
+- Sentry dans Expo Go : pas de plantages natifs ni de stack traces lisibles en production avant un build EAS.
+- Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 
 ## 6. Prochaine étape
-Phase 4 : nettoyage du code et traductions (textes écrits en dur, logs `[scan]`). Détails dans `PLAN.md`.
+Validation de la phase 4 dans l'app, puis phase 5 : le cœur anti-gaspi. Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash

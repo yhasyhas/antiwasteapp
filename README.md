@@ -16,6 +16,7 @@ qui utilisent en priorité le garde-manger. En français, anglais et espagnol.
 | Reconnaissance des aliments | Gemini Flash-Lite, secours Groq (fonction `analyze-image`) |
 | Recettes | Groq `gpt-oss-120b`, secours Gemini (fonction `generate-recipes`) |
 | Images des recettes | Cloudflare Workers AI, FLUX (fonction `generate-recipe-image`) |
+| Suivi des erreurs | Sentry (`@sentry/react-native`) |
 
 ```
 app/                  Écrans (routes expo-router) : onglets, connexion, génération de recettes
@@ -53,6 +54,7 @@ sont intégrées au moment de la compilation.
 |---|---|
 | `EXPO_PUBLIC_SUPABASE_URL` | URL du projet Supabase |
 | `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Clé publishable (`sb_publishable_…`), dans Supabase → Project Settings → API Keys |
+| `EXPO_PUBLIC_SENTRY_DSN` | Facultatif. DSN du projet Sentry (Settings → Projects → Client Keys) ; sans lui, Sentry est inactif |
 
 La clé publishable n'a aucun droit particulier : la sécurité repose sur la RLS et sur la
 vérification de l'utilisateur dans les fonctions. Les anciennes clés `anon` / `service_role` sont désactivées.
@@ -110,6 +112,16 @@ npx supabase functions deploy generate-recipe-image
 
 `supabase/config.toml` désactive la vérification du jeton par la passerelle (`verify_jwt = false`) :
 chaque fonction vérifie elle-même l'utilisateur (`_shared/auth.ts`) et renvoie 401 sans utilisateur connecté.
+
+## Sentry
+
+Les erreurs de l'app remontent dans Sentry dès que `EXPO_PUBLIC_SENTRY_DSN` est défini (`lib/sentry.ts`).
+Seul l'identifiant (uuid) de l'utilisateur est joint, jamais son e-mail ni son adresse IP. Le DSN n'est pas
+un secret : il permet d'envoyer des erreurs au projet, pas de les lire.
+
+- **Expo Go** : seules les erreurs JavaScript remontent. Les plantages natifs, la mise en file hors connexion
+  et les stack traces lisibles en production demandent un build EAS (avec `SENTRY_AUTH_TOKEN` pour envoyer les source maps).
+- **Vérifier** : en développement, Réglages → « Envoyer une erreur de test à Sentry », puis Sentry → Issues.
 
 ## Tests
 
