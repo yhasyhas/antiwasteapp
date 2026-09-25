@@ -2,7 +2,7 @@
 // Lancement : deno test --no-config supabase/functions/
 
 import { assert, assertEquals } from 'jsr:@std/assert@1';
-import { cleanIngredients, MAX_INGREDIENTS, parseIngredients, RESPONSE_SCHEMA, validateResponse } from './ingredients.ts';
+import { cleanIngredients, cleanShelfLife, DEFAULT_SHELF_LIFE_DAYS, MAX_INGREDIENTS, MAX_SHELF_LIFE_DAYS, parseIngredients, RESPONSE_SCHEMA, validateResponse } from './ingredients.ts';
 
 const item = (overrides: Record<string, unknown> = {}) => ({
   name: 'tomate',
@@ -11,12 +11,13 @@ const item = (overrides: Record<string, unknown> = {}) => ({
   confidence: 0.9,
   kind: 'ingredient',
   storage_tip: 'Au frigo, 5 jours.',
+  shelf_life_days: 5,
   ...overrides,
 });
 
 Deno.test('schéma : tous les champs requis, aucun champ en plus (mode strict de Groq)', () => {
   const items = (RESPONSE_SCHEMA.properties.ingredients as any).items;
-  assertEquals(items.required, ['name', 'quantity', 'category', 'confidence', 'kind', 'storage_tip']);
+  assertEquals(items.required, ['name', 'quantity', 'category', 'confidence', 'kind', 'storage_tip', 'shelf_life_days']);
   assertEquals(items.additionalProperties, false);
   assertEquals(items.properties.kind.enum, ['ingredient', 'dish']);
 });
@@ -69,4 +70,25 @@ Deno.test('nettoyage : confiance trop basse écartée, doublons retirés, tri pa
   assertEquals(cleaned.map((i) => [i.name, i.confidence]), [['Pomme', 0.95], ['kiwi', 0.8]]);
   const many = cleanIngredients(Array.from({ length: 30 }, (_, i) => item({ name: `aliment ${i}` })));
   assertEquals(many.length, MAX_INGREDIENTS);
+});
+
+Deno.test('durée de conservation : estimation du modèle gardée, bornée à 2 ans', () => {
+  assertEquals(cleanShelfLife(12, 'dairy', 'ingredient'), 12);
+  assertEquals(cleanShelfLife(4.6, 'vegetable', 'ingredient'), 5);
+  assertEquals(cleanShelfLife(5000, 'grain', 'ingredient'), MAX_SHELF_LIFE_DAYS);
+});
+
+Deno.test('durée de conservation absente ou invalide : valeur par défaut de la catégorie', () => {
+  assertEquals(cleanShelfLife(undefined, 'fish', 'ingredient'), DEFAULT_SHELF_LIFE_DAYS.fish);
+  assertEquals(cleanShelfLife(0, 'egg', 'ingredient'), DEFAULT_SHELF_LIFE_DAYS.egg);
+  assertEquals(cleanShelfLife('3', 'meat', 'ingredient'), DEFAULT_SHELF_LIFE_DAYS.meat);
+  const [cleaned] = cleanIngredients([item({ shelf_life_days: null, category: 'bakery' })]);
+  assertEquals(cleaned.shelf_life_days, DEFAULT_SHELF_LIFE_DAYS.bakery);
+});
+
+Deno.test('plat cuisiné : toujours 2 à 3 jours', () => {
+  assertEquals(cleanShelfLife(10, 'other', 'dish'), 3);
+  assertEquals(cleanShelfLife(1, 'other', 'dish'), 2);
+  assertEquals(cleanShelfLife(2, 'grain', 'dish'), 2);
+  assertEquals(cleanShelfLife(undefined, 'other', 'dish'), 3);
 });
