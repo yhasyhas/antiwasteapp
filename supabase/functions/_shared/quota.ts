@@ -3,12 +3,14 @@
 
 import { SUPABASE_SECRET_KEY, SUPABASE_URL } from './keys.ts';
 
-export type QuotaKind = 'scans' | 'generations';
+export type QuotaKind = 'scans' | 'generations' | 'images';
 
 // Limites réglables par secret, sans redéployer
 export const DAILY_LIMITS: Record<QuotaKind, number> = {
   scans: Number(Deno.env.get('QUOTA_DAILY_SCANS') || 20),
   generations: Number(Deno.env.get('QUOTA_DAILY_GENERATIONS') || 10),
+  // Images de recettes (Cloudflare Workers AI : environ 10 000 neurones gratuits par jour pour tout le compte)
+  images: Number(Deno.env.get('QUOTA_DAILY_IMAGES') || 10),
 };
 
 async function rpc(name: string, args: Record<string, unknown>): Promise<unknown> {
