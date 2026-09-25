@@ -160,6 +160,7 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 - [x] Découper `app/recipe/generate.tsx` : `components/recipe/Filters.tsx`, `RecipeCard.tsx`, `RecipeDetail.tsx`, `hooks/useRecipeGeneration.ts` — ainsi que caméra, favoris, accueil et garde-manger (`components/`, `hooks/`) ; plus aucun fichier au-delà de 400 lignes
 - [x] Remplacer l'i18n maison par i18next + react-i18next + expo-localization (langue du téléphone par défaut) — clés typées (`i18n/locales/fr.ts` fait référence), langue gardée sur le téléphone et synchronisée avec Supabase dès que possible
 - [x] Traduire **tous** les écrans : auth, caméra, ingrédients, favoris, génération, titres des onglets — ainsi que les alertes, les erreurs de Supabase Auth et les messages des fonctions (fr : tutoiement)
+- [x] Poids des images : compression avant stockage (800 px, JPEG qualité 75, 80 à 150 Ko) et recompression des images existantes (`scripts/recompress-recipe-images.ts`)
 - [ ] Brancher Sentry (`@sentry/react-native`)
 - [ ] Écrire le `README.md` : installation, secrets nécessaires, déploiement des fonctions et des migrations
 
@@ -272,4 +273,5 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 | 25/09/2026 | Traductions : i18next + react-i18next + expo-localization, clés typées (une clé absente d'une langue ou mal écrite est une erreur de typecheck), 183 clés en fr / en / es | Langue du téléphone au premier lancement (français si elle n'est pas prise en charge). Polyfill `intl-pluralrules` pour les pluriels sur Hermes. Libellés des valeurs enregistrées (difficulté, régimes, types de repas) traduits à l'affichage, codes inchangés en base |
 | 25/09/2026 | Changement de langue hors connexion : appliqué et gardé sur le téléphone, envoyé à Supabase plus tard (connexion, retour dans l'app), sans alerte | Corrige le test 9 de la phase 1 : l'alerte « Enregistrement impossible » laissait croire que le changement avait échoué. Un choix en attente l'emporte sur la langue enregistrée dans le compte |
 | 25/09/2026 | Tutoiement dans toute l'app en français, y compris les messages des fonctions | Les textes déjà validés (« Vérifie ta boîte mail ») tutoyaient ; les fonctions vouvoyaient |
+| 25/09/2026 | Images des recettes : 800 px de large, JPEG qualité 75 (ImageScript dans la fonction) | Essais sur deux images FLUX : 1024 px q75 = 135 à 190 Ko ; 800 px q75 = 96 à 131 Ko sans perte visible sur un téléphone ; 720 px et 640 px plus légers mais moins nets sur les grands écrans. En production : 81 et 111 Ko, temps de génération inchangé (5 à 6 s). Les 2 images existantes recompressées (677 et 697 Ko → 120 et 116 Ko), originaux dans `backups/recipe-images/`, URL inchangées |
 | | *(résultat du test Gemini vs Clarifai)* | |
