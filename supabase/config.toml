@@ -1,0 +1,12 @@
+# Configuration du CLI Supabase pour le projet lié (iqzjonmjlscuckdmiehk).
+# Seuls les réglages utilisés sont écrits ; le reste garde les valeurs par défaut du CLI.
+project_id = "antiwasteapp"
+
+# La passerelle ne vérifie pas le jeton : chaque fonction vérifie l'utilisateur elle-même
+# (supabase/functions/_shared/auth.ts), ce qui fonctionne aussi avec les nouvelles clés d'API,
+# qui ne sont pas des JWT.
+[functions.analyze-image]
+verify_jwt = false
+
+[functions.generate-recipes]
+verify_jwt = false

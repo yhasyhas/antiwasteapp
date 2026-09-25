@@ -1,5 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { ingredientsMatch, sameIngredient } from './matching.ts';
+import { getAuthenticatedUser } from '../_shared/auth.ts';
 
 const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') || '';
 const POLLINATIONS_API_KEY = Deno.env.get('POLLINATIONS_API_KEY') || '';
@@ -76,6 +77,27 @@ const FAILURE_MESSAGES: Record<string, Record<FailureReason, string>> = {
     dietary_refusal: 'No es posible crear una receta que respete tus restricciones alimentarias con estos ingredientes. Añade ingredientes o quita una restricción.'
   }
 };
+
+// Erreurs de la requête elle-même (avant toute génération)
+type RequestError = 'unauthorized';
+
+const REQUEST_ERROR_MESSAGES: Record<string, Record<RequestError, string>> = {
+  fr: { unauthorized: 'Vous devez être connecté pour générer des recettes.' },
+  en: { unauthorized: 'You must be signed in to generate recipes.' },
+  es: { unauthorized: 'Debes iniciar sesión para generar recetas.' },
+};
+
+const REQUEST_ERROR_STATUS: Record<RequestError, number> = {
+  unauthorized: 401,
+};
+
+function requestErrorResponse(code: RequestError, language: string): Response {
+  const messages = REQUEST_ERROR_MESSAGES[language] || REQUEST_ERROR_MESSAGES['en'];
+  return new Response(
+    JSON.stringify({ error: code, message: messages[code] }),
+    { status: REQUEST_ERROR_STATUS[code], headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  );
+}
 
 const FAILURE_STATUS: Record<FailureReason, number> = {
   api_error: 502,
@@ -463,6 +485,13 @@ Deno.serve(async (req: Request) => {
 
   try {
     const { ingredients, preferences, generateImage }: GenerateRecipeRequest = await req.json();
+    const language = (preferences?.language || 'fr').substring(0, 2).toLowerCase();
+
+    // Chaque génération consomme le quota Groq : réservé aux utilisateurs connectés
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
+      return requestErrorResponse('unauthorized', language);
+    }
 
     if (!ingredients || ingredients.length === 0) {
       return new Response(
@@ -552,7 +581,7 @@ Deno.serve(async (req: Request) => {
   } catch (error) {
     console.error('Error generating recipes:', error);
     return new Response(
-      JSON.stringify({ error: 'Erreur lors de la génération', details: error.message }),
+      JSON.stringify({ error: 'Erreur lors de la génération', details: error instanceof Error ? error.message : String(error) }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
