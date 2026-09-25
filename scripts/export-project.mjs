@@ -30,7 +30,7 @@ const outFile = path.resolve(
 
 // Dossiers jamais parcourus
 const IGNORED_DIRS = new Set([
-  'node_modules', '.git', '.expo', 'dist', 'web-build', 'export', '.temp', 'ios', 'android',
+  'node_modules', '.git', '.expo', 'dist', 'web-build', 'export', 'backups', '.temp', 'ios', 'android',
 ]);
 // Fichiers jamais inclus (secrets, lockfiles, fichiers générés)
 const IGNORED_FILES = [/^\.env/, /^package-lock\.json$/, /^yarn\.lock$/, /^pnpm-lock\.yaml$/, /\.tsbuildinfo$/];
