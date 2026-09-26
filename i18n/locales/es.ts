@@ -206,6 +206,7 @@ const es: Translations = {
     glutenFree: 'Sin gluten',
     dairyFree: 'Sin lactosa',
     lowCarb: 'Baja en carbohidratos',
+    pescatarian: 'Pescetariana',
   },
   cuisine: {
     title: 'Cocina',

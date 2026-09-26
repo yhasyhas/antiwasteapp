@@ -207,6 +207,7 @@ const fr = {
     glutenFree: 'Sans gluten',
     dairyFree: 'Sans lactose',
     lowCarb: 'Pauvre en glucides',
+    pescatarian: 'Pescétarien',
   },
   cuisine: {
     title: 'Cuisine',
