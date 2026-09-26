@@ -148,6 +148,49 @@ export function isDietException(name: string, diet: StrictDiet): boolean {
 
 // ---------- Schéma de sortie ----------
 
+// ---------- Sélection d'ingrédients ----------
+
+// Avec une sélection, les recettes n'utilisent que les ingrédients choisis, plus ces basiques
+// (disponibles partout, jamais considérés comme « un autre ingrédient du garde-manger »)
+export const BASICS = ['sel', 'poivre', 'huile', 'eau', 'salt', 'pepper', 'oil', 'water', 'sal', 'pimienta', 'aceite', 'agua'];
+export const MAX_OTHER_PANTRY = 100;
+
+// Nom comparable : minuscules, sans accents, mots au singulier (« tomates » → « tomate »)
+function matchKey(name: string): string {
+  return normalizeName(name)
+    .split(' ')
+    .map((word) => (word.length > 3 && /[sx]$/.test(word) ? word.slice(0, -1) : word))
+    .join(' ');
+}
+
+export function isBasic(name: string): boolean {
+  const padded = ` ${matchKey(name)} `;
+  return BASICS.some((basic) => padded.includes(` ${basic} `));
+}
+
+// Reste du garde-manger (ingrédients non sélectionnés), noms nettoyés
+export function buildOtherPantry(raw: unknown): string[] {
+  const list = Array.isArray(raw) ? raw : [];
+  return list
+    .filter((name): name is string => typeof name === 'string' && name.trim() !== '')
+    .map((name) => name.trim().slice(0, 80))
+    .slice(0, MAX_OTHER_PANTRY);
+}
+
+// Ingrédient de la recette qui est en fait un ingrédient non sélectionné du garde-manger (le modèle l'a
+// marqué « missing »), ou null. « tomates cerises » correspond à « tomates » ; les basiques sont permis.
+export function otherPantryUsed(raw: any, otherPantry: string[]): string | null {
+  if (otherPantry.length === 0) return null;
+  const others = otherPantry.map(matchKey).filter((key) => key !== '');
+  for (const ingredient of raw.ingredients || []) {
+    if (ingredient?.pantry_id !== MISSING || typeof ingredient.name !== 'string' || isBasic(ingredient.name)) continue;
+    const padded = ` ${matchKey(ingredient.name)} `;
+    const match = others.find((other) => padded.includes(` ${other} `));
+    if (match) return ingredient.name;
+  }
+  return null;
+}
+
 export const DIFFICULTIES = ['easy', 'medium', 'expert'];
 
 // Schéma construit à chaque requête : les alias du garde-manger et les régimes sélectionnés y sont
@@ -334,7 +377,12 @@ export function parseRecipes(
   text: string,
   pantry: Pantry,
   diets: StrictDiet[],
-  context: { mealType: string; cuisine: string; difficulty: string; dietary: string[]; maxRecipes: number; mode?: GenerationMode },
+  context: {
+    mealType: string; cuisine: string; difficulty: string; dietary: string[]; maxRecipes: number;
+    mode?: GenerationMode;
+    // Sélection : ingrédients du garde-manger non choisis, interdits dans les recettes
+    otherPantry?: string[];
+  },
 ): ParseOutcome {
   let parsed: any;
   try {
@@ -360,6 +408,10 @@ export function parseRecipes(
     // « Transformer mes restes » : chaque recette part d'au moins un reste de plat
     if (context.mode === 'leftovers' && !raw.ingredients.some((ingredient: any) => pantry.aliasOf.get(ingredient.pantry_id)?.kind === 'dish')) {
       return invalid.push(`n°${index} "${raw.title}" n'utilise aucun reste`);
+    }
+    const outsideSelection = otherPantryUsed(raw, context.otherPantry ?? []);
+    if (outsideSelection) {
+      return invalid.push(`n°${index} "${raw.title}" utilise « ${outsideSelection} », hors de la sélection`);
     }
     const diet = dietViolations(raw, diets);
     if (diet.length > 0) return dietaryRejections.push(`"${raw.title}" : ${diet.join(', ')}`);

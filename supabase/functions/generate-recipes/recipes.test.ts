@@ -6,7 +6,9 @@ import { assert, assertEquals } from 'jsr:@std/assert@1';
 import {
   buildPantry,
   buildRecipeSchema,
+  isBasic,
   isDietException,
+  otherPantryUsed,
   leftoverItems,
   MAX_PANTRY_ITEMS,
   MISSING,
@@ -192,4 +194,31 @@ Deno.test('mode « Transformer mes restes » : une recette sans reste est écart
   assert(!none.ok);
   // En mode normal, la même recette est acceptée
   assert(parseRecipes(JSON.stringify({ recipes: [withoutLeftover], refusal: '' }), URGENT_PANTRY, [], CONTEXT).ok);
+});
+
+// ---------- Sélection (retours de test de la phase 5) ----------
+
+Deno.test('sélection : les basiques sont toujours permis', () => {
+  for (const name of ['sel', 'poivre noir', "huile d'olive", 'eau', 'Salt', 'aceite de oliva']) assert(isBasic(name), name);
+  for (const name of ['gâteau', "selle d'agneau", 'tomate']) assert(!isBasic(name), name);
+});
+
+Deno.test('sélection : un ingrédient non sélectionné du garde-manger est repéré, même au pluriel ou précisé', () => {
+  const other = ['tomates', 'crème fraîche', 'lait de coco'];
+  const raw = (names: string[]) => ({ ingredients: names.map((name) => ({ name, pantry_id: MISSING })) });
+  assertEquals(otherPantryUsed(raw(['tomate cerise', 'sel']), other), 'tomate cerise');
+  assertEquals(otherPantryUsed(raw(['Crème fraîche épaisse']), other), 'Crème fraîche épaisse');
+  assertEquals(otherPantryUsed(raw(['lait', 'poivre', 'oignon']), other), null);
+  // Un ingrédient de la sélection (identifiant) n'est jamais refusé
+  assertEquals(otherPantryUsed({ ingredients: [{ name: 'tomates', pantry_id: 'p1' }] }, other), null);
+});
+
+Deno.test('sélection : la recette qui utilise un ingrédient réservé est écartée', () => {
+  const context = { ...CONTEXT, otherPantry: ['lait de coco'] };
+  const ok = recipe([ing('banane', 'p1'), ing('sel', MISSING)], { title: 'Banane poêlée' });
+  const outside = recipe([ing('banane', 'p1'), ing('lait de coco', MISSING)], { title: 'Smoothie coco' });
+  const result = parseRecipes(JSON.stringify({ recipes: [ok, outside], refusal: '' }), PANTRY, [], context);
+  assert(result.ok);
+  assertEquals(result.value.recipes.map((r) => r.title), ['Banane poêlée']);
+  assert(result.value.invalid[0].includes('hors de la sélection'));
 });

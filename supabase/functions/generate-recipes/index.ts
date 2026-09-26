@@ -5,6 +5,7 @@ import { withCors } from '../_shared/cors.ts';
 import { type AiProvider, type AttemptLog, geminiProvider, groqProvider, orderProviders, runWithFallback } from '../_shared/ai.ts';
 import {
   buildPantry,
+  buildOtherPantry,
   buildRecipeSchema,
   type GenerationMode,
   leftoverItems,
@@ -41,6 +42,10 @@ interface GenerateRecipeRequest {
   ingredients: unknown[];
   // leftovers : « Transformer mes restes », chaque recette part d'un plat cuisiné du garde-manger
   mode?: GenerationMode;
+  // Sélection de l'utilisateur : ingredients ne contient que les ingrédients choisis, other_pantry le
+  // reste du garde-manger (noms), que les recettes ne doivent pas utiliser
+  selection?: boolean;
+  other_pantry?: unknown[];
   preferences: {
     dietary?: string[];
     difficulty?: 'easy' | 'medium' | 'expert';
@@ -170,6 +175,8 @@ function buildPrompts(options: {
   hasUrgent: boolean;
   hasLeftovers: boolean;
   mode: GenerationMode;
+  selection: boolean;
+  otherPantry: string[];
 }): { system: string; prompt: string } {
   const languageName = LANGUAGE_NAMES[options.language] || LANGUAGE_NAMES['en'];
   const dietaryRules = options.dietary.map((diet) => DIETARY_RULES[diet.toLowerCase()]).filter(Boolean);
@@ -198,7 +205,12 @@ INGRÉDIENTS :
 - "name" : le nom de l'ingrédient seul, sans préparation ni précision (« ail » et non « ail, émincé ») ; la préparation va dans les étapes.
 - Chaque recette utilise au moins un ingrédient du garde-manger.
 - "quantity" : le nombre seul (ex. "500", "2", "1/2") ; "unit" : l'unité abrégée (g, kg, ml, cl, l, c. à soupe, c. à café, pièce, tranche, gousse, pincée).${options.hasStrictDiet ? `
-- "diet_violations" : pour chaque ingrédient, les régimes sélectionnés qu'il ne respecte pas (liste vide s'il les respecte tous). Sois exact : le lait de coco est vegan, le beurre ne l'est pas.` : ''}${options.mode === 'leftovers' ? `
+- "diet_violations" : pour chaque ingrédient, les régimes sélectionnés qu'il ne respecte pas (liste vide s'il les respecte tous). Sois exact : le lait de coco est vegan, le beurre ne l'est pas.` : ''}${options.selection ? `
+
+SÉLECTION DE L'UTILISATEUR (règle stricte) :
+- Il veut cuisiner avec les seuls ingrédients listés dans le garde-manger, plus les basiques : sel, poivre, huile, eau (avec "pantry_id" = "missing").
+- Tout autre ingrédient est à acheter : au plus 2 par recette, et seulement s'il est indispensable.${options.otherPantry.length > 0 ? `
+- Ces ingrédients sont chez lui mais réservés : n'en utilise AUCUN, ni sous un autre nom : ${options.otherPantry.join(', ')}.` : ''}` : ''}${options.mode === 'leftovers' ? `
 
 MODE « TRANSFORMER MES RESTES » (règle stricte) :
 - Chaque recette part d'au moins un ingrédient marqué [reste de plat] et le transforme en un nouveau plat (ex. riz → riz sauté ou galettes, gratin de pâtes → croquettes, poulet rôti → wraps ou salade composée), au lieu de simplement le réchauffer.
@@ -235,8 +247,10 @@ Deno.serve(withCors(async (req: Request) => {
   let language = 'fr';
 
   try {
-    const { ingredients, preferences, mode: requestedMode, debug, providers: requestedOrder }: GenerateRecipeRequest = await req.json();
+    const { ingredients, preferences, mode: requestedMode, selection: requestedSelection, other_pantry, debug, providers: requestedOrder }: GenerateRecipeRequest = await req.json();
     const mode: GenerationMode = requestedMode === 'leftovers' ? 'leftovers' : 'standard';
+    const selection = requestedSelection === true;
+    const otherPantry = selection ? buildOtherPantry(other_pantry) : [];
     language = (preferences?.language || 'fr').substring(0, 2).toLowerCase();
 
     // Chaque génération consomme les quotas des fournisseurs : réservé aux utilisateurs connectés
@@ -272,7 +286,7 @@ Deno.serve(withCors(async (req: Request) => {
     const cuisine: Cuisine = (CUISINES as readonly string[]).includes(preferences.cuisine || '') ? preferences.cuisine as Cuisine : 'any';
     const difficulty = preferences.difficulty || 'easy';
     const count = recipeCount(pantry.items.length);
-    const context = { mealType: preferences.mealType, cuisine, difficulty, dietary, maxRecipes: count, mode };
+    const context = { mealType: preferences.mealType, cuisine, difficulty, dietary, maxRecipes: count, mode, otherPantry };
 
     const { system, prompt } = buildPrompts({
       pantryText: pantryForPrompt(pantry),
@@ -287,6 +301,8 @@ Deno.serve(withCors(async (req: Request) => {
       hasUrgent: urgentItems(pantry).length > 0,
       hasLeftovers: leftoverItems(pantry).length > 0,
       mode,
+      selection,
+      otherPantry,
     });
 
     const providers = debug === true && requestedOrder
