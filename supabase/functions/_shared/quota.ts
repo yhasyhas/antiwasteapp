@@ -9,7 +9,8 @@ export type QuotaKind = 'scans' | 'generations' | 'images';
 export const DAILY_LIMITS: Record<QuotaKind, number> = {
   scans: Number(Deno.env.get('QUOTA_DAILY_SCANS') || 20),
   generations: Number(Deno.env.get('QUOTA_DAILY_GENERATIONS') || 10),
-  // Images de recettes (Cloudflare Workers AI : environ 10 000 neurones gratuits par jour pour tout le compte)
+  // Images de recettes (Cloudflare Workers AI : 10 000 neurones gratuits par jour pour tout le compte,
+  // ≈ 173 neurones par image, soit ≈ 57 images par jour ; à revoir en phase 8)
   images: Number(Deno.env.get('QUOTA_DAILY_IMAGES') || 30),
 };
 

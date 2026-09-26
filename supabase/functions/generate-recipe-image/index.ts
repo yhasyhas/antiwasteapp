@@ -9,8 +9,9 @@ import { compressRecipeImage } from '../_shared/image.ts';
 // URL enregistrée dans recipes.image_url (historique). Appelée par l'app en arrière-plan dès l'affichage
 // des recettes générées (et à l'ouverture d'une recette qui n'en a pas), une seule fois par recette : si
 // l'image existe déjà, elle est renvoyée sans rien générer ni compter.
-// Coût (grille Cloudflare) : FLUX schnell sort toujours du 1024×1024 (aucune taille réglable), soit
-// 4 tuiles × 4,8 + 4 étapes × 9,6 ≈ 58 neurones par image.
+// Coût : FLUX schnell sort toujours du 1024×1024 (aucune taille réglable). Relevé dans le dashboard
+// Cloudflare le 26/09/2026 : ≈ 170 à 200 neurones par image (l'étape est facturée par tuile de 512 px :
+// 4 tuiles × 4 étapes × 9,6 + 4 × 4,8 ≈ 173), soit ≈ 57 images par jour dans l'offre gratuite du compte.
 
 const CLOUDFLARE_ACCOUNT_ID = Deno.env.get('CLOUDFLARE_ACCOUNT_ID') || '';
 const CLOUDFLARE_API_TOKEN = Deno.env.get('CLOUDFLARE_API_TOKEN') || '';

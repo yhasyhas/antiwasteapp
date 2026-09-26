@@ -183,7 +183,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - L'app filtre encore ses ingrédients par `user_id` (équivalent tant qu'il n'y a qu'un foyer personnel) : à passer à `household_id` en phase 6, avec `user_id` non modifiable.
 
 ### Dette et finitions
-- Offres gratuites partagées par toute l'app : Groq (scan : ~1 000 tokens de sortie par minute ; génération : 8 000 tokens par minute et 1 000 requêtes par jour) et Cloudflare (~150 images par jour estimées) ; au-delà, le secours prend le relais ou l'image n'est pas générée. À revoir avant la bêta (phase 8).
+- Offres gratuites partagées par toute l'app : Groq (scan : ~1 000 tokens de sortie par minute ; génération : 8 000 tokens par minute et 1 000 requêtes par jour) et Cloudflare (≈ 57 images par jour mesurées, 173 neurones par image) ; au-delà, le secours prend le relais ou l'image n'est pas générée. À revoir avant la bêta (phase 8).
 - Confirmation d'email désactivée dans Supabase pendant le développement (à réactiver en phase 8).
 - Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`) : renommage en phase 8, nom pas encore choisi.
 - Sauvegardes de la base dans `backups/` : jamais commitées (`.gitignore`) ni exportées.
