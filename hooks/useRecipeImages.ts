@@ -1,30 +1,30 @@
-import { useEffect, useRef, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { ensureRecipeImage, onRecipeImage } from '@/lib/recipeImage';
+import {
+  isPendingImage,
+  isRecipeImageLoading,
+  recipeImageUrl,
+  recipeImagesVersion,
+  requestRecipeImage,
+  subscribeRecipeImages,
+} from '@/lib/recipeImage';
 
-// Images des recettes d'un écran : demande en arrière-plan, recettes en cours (emplacement avec
-// indicateur), et onImage appelé à chaque image arrivée, y compris celles demandées par un autre écran
-export function useRecipeImages(onImage: (recipeId: string, imageUrl: string) => void) {
+type WithImage = { id?: string; image_url?: string | null };
+
+// Images des recettes, lues dans l'état partagé de l'app (lib/recipeImage.ts) : l'écran se met à jour
+// dès qu'une image arrive, même demandée ailleurs.
+export function useRecipeImages() {
   const { language } = useLanguage();
-  const [loadingIds, setLoadingIds] = useState<string[]>([]);
-  const onImageRef = useRef(onImage);
-  onImageRef.current = onImage;
+  useSyncExternalStore(subscribeRecipeImages, recipeImagesVersion);
 
-  useEffect(() => onRecipeImage((id, url) => onImageRef.current(id, url)), []);
-
-  const request = (recipeId: string | undefined, imageUrl?: string | null) => {
-    if (!recipeId || imageUrl) return;
-    setLoadingIds((current) => (current.includes(recipeId) ? current : [...current, recipeId]));
-    ensureRecipeImage(recipeId, language).finally(() => {
-      setLoadingIds((current) => current.filter((id) => id !== recipeId));
-    });
+  // La recette avec son image, si elle est connue (base ou génération de cette session)
+  const withImage = <T extends WithImage>(recipe: T): T => {
+    const url = recipeImageUrl(recipe.id) ?? (isPendingImage(recipe.image_url) ? undefined : recipe.image_url ?? undefined);
+    return url === recipe.image_url ? recipe : { ...recipe, image_url: url };
   };
 
-  const requestAll = (recipes: Array<{ id?: string; image_url?: string | null }>) => {
-    recipes.forEach((recipe) => request(recipe.id, recipe.image_url));
-  };
+  const request = (recipe: WithImage) => requestRecipeImage(recipe.id, language, recipe.image_url);
+  const requestAll = (recipes: WithImage[]) => recipes.forEach(request);
 
-  const isLoading = (recipeId: string | undefined) => !!recipeId && loadingIds.includes(recipeId);
-
-  return { request, requestAll, isLoading };
+  return { withImage, request, requestAll, isLoading: isRecipeImageLoading };
 }

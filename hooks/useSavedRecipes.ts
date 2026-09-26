@@ -18,14 +18,11 @@ export function useSavedRecipes() {
   const [recipes, setRecipes] = useState<SavedRecipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRecipe, setSelectedRecipe] = useState<SavedRecipe | null>(null);
-  const images = useRecipeImages((recipeId, imageUrl) => {
-    setRecipes((current) => current.map((r) => (r.id === recipeId ? { ...r, image_url: imageUrl } : r)));
-    setSelectedRecipe((current) => (current?.id === recipeId ? { ...current, image_url: imageUrl } : current));
-  });
+  const images = useRecipeImages();
 
   const openRecipe = (recipe: SavedRecipe) => {
     setSelectedRecipe(recipe);
-    images.request(recipe.id, recipe.image_url);
+    images.request(recipe);
   };
 
   // Rechargé à chaque retour sur l'onglet (recettes sauvegardées depuis l'écran de génération)
@@ -72,5 +69,14 @@ export function useSavedRecipes() {
     setSelectedRecipe((current) => (current?.id === recipeId ? { ...current, is_favorite: !current.is_favorite } : current));
   };
 
-  return { recipes, loading, selectedRecipe, setSelectedRecipe, isImageLoading: images.isLoading, openRecipe, toggleFavorite };
+  return {
+    // Avec leur image, dès qu'elle est connue (demandée ici ou sur un autre écran)
+    recipes: recipes.map(images.withImage),
+    loading,
+    selectedRecipe: selectedRecipe && images.withImage(selectedRecipe),
+    setSelectedRecipe,
+    isImageLoading: images.isLoading,
+    openRecipe,
+    toggleFavorite,
+  };
 }

@@ -27,10 +27,8 @@ export default function HomeScreen() {
   const [recipes, setRecipes] = useState<RecentRecipe[]>([]);
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [selectedRecipe, setSelectedRecipe] = useState<RecentRecipe | null>(null);
-  const images = useRecipeImages((recipeId, imageUrl) => {
-    setRecipes((current) => current.map((r) => (r.id === recipeId ? { ...r, image_url: imageUrl } : r)));
-    setSelectedRecipe((current) => (current?.id === recipeId ? { ...current, image_url: imageUrl } : current));
-  });
+  // Images lues dans l'état partagé : une image générée sur un autre écran apparaît ici aussi
+  const images = useRecipeImages();
 
   // Rechargé à chaque retour sur l'onglet : ingrédients scannés, recettes générées entre-temps
   useFocusEffect(
@@ -72,7 +70,7 @@ export default function HomeScreen() {
 
   const openRecipe = (recipe: RecentRecipe) => {
     setSelectedRecipe(recipe);
-    images.request(recipe.id, recipe.image_url);
+    images.request(recipe);
   };
 
   const toggleFavorite = async (recipe: RecentRecipe) => {
@@ -171,7 +169,7 @@ export default function HomeScreen() {
             </View>
 
             {recipes.map((recipe) => (
-              <RecentRecipeCard key={recipe.id} recipe={recipe} imageLoading={images.isLoading(recipe.id)} onPress={() => openRecipe(recipe)} />
+              <RecentRecipeCard key={recipe.id} recipe={images.withImage(recipe)} imageLoading={images.isLoading(recipe.id)} onPress={() => openRecipe(recipe)} />
             ))}
           </View>
         )}
@@ -179,7 +177,7 @@ export default function HomeScreen() {
 
       {selectedRecipe && (
         <RecipeSheet
-          recipe={selectedRecipe}
+          recipe={images.withImage(selectedRecipe)}
           imageLoading={images.isLoading(selectedRecipe.id)}
           isFavorite={favoriteIds.has(selectedRecipe.id)}
           onToggleFavorite={() => toggleFavorite(selectedRecipe)}

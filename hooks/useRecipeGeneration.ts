@@ -32,10 +32,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
   const [generating, setGenerating] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   // Images générées en arrière-plan dès l'affichage des recettes : cartes et fiche se remplissent à leur arrivée
-  const images = useRecipeImages((recipeId, imageUrl) => {
-    setRecipes((current) => current.map((r) => (r.id === recipeId ? { ...r, image_url: imageUrl } : r)));
-    setSelectedRecipe((current) => (current?.id === recipeId ? { ...current, image_url: imageUrl } : current));
-  });
+  const images = useRecipeImages();
   const [filters, setFilters] = useState<Filters>({
     dietary: [],
     difficulty: 'easy',
@@ -209,7 +206,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
   const openRecipe = (recipe: Recipe) => {
     setSelectedRecipe(recipe);
     // Image pas encore obtenue (échec de l'historique, quota) : nouvel essai
-    images.request(recipe.id, recipe.image_url);
+    images.request(recipe);
   };
 
   // Favori : la recette est déjà dans l'historique ; on l'ajoute aux favoris, ou on l'en retire
@@ -248,7 +245,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
       else next.delete(id);
       return next;
     });
-    images.request(id, recipe.image_url);
+    images.request({ id, image_url: recipe.image_url });
     if (!favorite) return;
 
     Alert.alert(
@@ -279,11 +276,12 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
     toggleSelected,
     clearSelection: () => setSelectedIds([]),
     hasLeftovers: cookingWith.some((i) => i.kind === 'dish'),
-    recipes,
+    // Avec leur image, dès qu'elle est connue (demandée ici ou sur un autre écran)
+    recipes: recipes.map(images.withImage),
     loading,
     generating,
     generatingMode,
-    selectedRecipe,
+    selectedRecipe: selectedRecipe && images.withImage(selectedRecipe),
     setSelectedRecipe,
     isImageLoading: images.isLoading,
     isFavorite: (recipe: Recipe) => !!recipe.id && favoriteIds.has(recipe.id),

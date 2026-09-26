@@ -35,6 +35,10 @@ export interface Filters {
   language: string;
 }
 
+// Réservation pendant la génération de l'image (voir generate-recipe-image) : pas encore une image
+const imageOf = (value: unknown) =>
+  typeof value === 'string' && value !== '' && !value.startsWith('pending:') ? value : undefined;
+
 const strings = (value: unknown): string[] =>
   Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
 const count = (value: unknown, fallback = 0) => (typeof value === 'number' && Number.isFinite(value) ? value : fallback);
@@ -70,6 +74,6 @@ export function recipeFromRow(row: any): Recipe & { id: string } {
     tips: strings(row?.tips),
     suggestion: typeof row?.suggestion === 'string' && row.suggestion !== '' ? row.suggestion : undefined,
     image_prompt: row?.image_prompt ?? undefined,
-    image_url: row?.image_url ?? undefined,
+    image_url: imageOf(row?.image_url),
   };
 }
