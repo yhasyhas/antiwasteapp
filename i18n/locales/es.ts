@@ -235,7 +235,10 @@ const es: Translations = {
     dietary: 'Preferencias alimentarias',
     difficulty: 'Dificultad',
     apply: 'Aplicar',
-    priorityHint: 'Toca un ingrediente para usarlo primero. Los puntos de color señalan los que caducan pronto.',
+    priorityHint: 'Se usa toda tu despensa, empezando por lo que caduca pronto (puntos de color). Toca ingredientes para cocinar solo con ellos.',
+    selectionActive_one: 'Recetas solo con este ingrediente (más sal, pimienta, aceite, agua).',
+    selectionActive_other: 'Recetas solo con estos {{count}} ingredientes (más sal, pimienta, aceite, agua).',
+    clearSelection: 'Usar todo',
     transformLeftovers: 'Transformar mis sobras',
   },
   notifications: {

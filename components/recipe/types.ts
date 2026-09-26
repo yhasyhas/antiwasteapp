@@ -34,3 +34,42 @@ export interface Filters {
   cuisine: Cuisine;
   language: string;
 }
+
+const strings = (value: unknown): string[] =>
+  Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+const count = (value: unknown, fallback = 0) => (typeof value === 'number' && Number.isFinite(value) ? value : fallback);
+
+// Ligne de la table recipes → Recipe, y compris les anciennes recettes (ingrédients et étapes en texte,
+// colonnes ajoutées plus tard absentes)
+export function recipeFromRow(row: any): Recipe & { id: string } {
+  const ingredients = (Array.isArray(row?.ingredients_used) ? row.ingredients_used : []).map((item: any) =>
+    typeof item === 'string'
+      ? { name: item, quantity: '', unit: '', pantry_id: null }
+      : { name: String(item?.name ?? ''), quantity: String(item?.quantity ?? ''), unit: String(item?.unit ?? ''), pantry_id: item?.pantry_id ?? null },
+  ).filter((item: { name: string }) => item.name !== '');
+  const prep = count(row?.prep_time);
+  const cook = count(row?.cook_time);
+
+  return {
+    id: row.id,
+    title: String(row?.title ?? ''),
+    description: String(row?.description ?? ''),
+    ingredients_used: ingredients,
+    ingredients_from_list: strings(row?.ingredients_from_list),
+    missing_ingredients: strings(row?.missing_ingredients),
+    instructions: (Array.isArray(row?.instructions) ? row.instructions : [])
+      .map((step: any) => (typeof step === 'string' ? step : String(step?.text ?? '')))
+      .filter((step: string) => step !== ''),
+    prep_time: prep,
+    cook_time: cook,
+    total_time: count(row?.total_time, prep + cook),
+    servings: count(row?.servings),
+    difficulty: String(row?.difficulty ?? ''),
+    meal_type: String(row?.meal_type ?? ''),
+    dietary_tags: strings(row?.dietary_tags),
+    tips: strings(row?.tips),
+    suggestion: typeof row?.suggestion === 'string' && row.suggestion !== '' ? row.suggestion : undefined,
+    image_prompt: row?.image_prompt ?? undefined,
+    image_url: row?.image_url ?? undefined,
+  };
+}

@@ -13,29 +13,39 @@ export interface ChipIngredient {
 
 interface Props {
   ingredients: ChipIngredient[];
-  priorityIds: string[];
+  selectedIds: string[];
   onToggle: (id: string) => void;
+  onClear: () => void;
 }
 
 const COLLAPSED_COUNT = 8;
 
 // Ingrédients du garde-manger (triés par urgence) : pastille de couleur selon la date, icône pour les
-// restes ; toucher un ingrédient le fait utiliser en priorité par la génération
-export function PantryChips({ ingredients, priorityIds, onToggle }: Props) {
+// restes. Toucher des ingrédients les sélectionne : la génération ne cuisine alors qu'avec eux.
+export function PantryChips({ ingredients, selectedIds, onToggle, onClear }: Props) {
   const { t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
   // Les ingrédients choisis restent visibles même repliés
   const visible = expanded
     ? ingredients
-    : ingredients.filter((ing, i) => i < COLLAPSED_COUNT || priorityIds.includes(ing.id));
+    : ingredients.filter((ing, i) => i < COLLAPSED_COUNT || selectedIds.includes(ing.id));
   const hidden = ingredients.length - visible.length;
 
   return (
     <View>
-      <Text style={styles.hint}>{t('generate.priorityHint')}</Text>
+      <View style={styles.hintRow}>
+        <Text style={styles.hint}>
+          {selectedIds.length > 0 ? t('generate.selectionActive', { count: selectedIds.length }) : t('generate.priorityHint')}
+        </Text>
+        {selectedIds.length > 0 && (
+          <TouchableOpacity onPress={onClear} hitSlop={8}>
+            <Text style={styles.clear}>{t('generate.clearSelection')}</Text>
+          </TouchableOpacity>
+        )}
+      </View>
       <View style={styles.grid}>
         {visible.map((ingredient) => {
-          const selected = priorityIds.includes(ingredient.id);
+          const selected = selectedIds.includes(ingredient.id);
           const status = expiryStatus(ingredient.expires_at);
           return (
             <TouchableOpacity
@@ -65,10 +75,21 @@ export function PantryChips({ ingredients, priorityIds, onToggle }: Props) {
 }
 
 const styles = StyleSheet.create({
+  hintRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    marginBottom: 10,
+  },
   hint: {
+    flex: 1,
     fontSize: 13,
     color: '#6b7280',
-    marginBottom: 10,
+  },
+  clear: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#10b981',
   },
   grid: {
     flexDirection: 'row',

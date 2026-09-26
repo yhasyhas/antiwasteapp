@@ -236,7 +236,10 @@ const fr = {
     dietary: 'Régimes alimentaires',
     difficulty: 'Difficulté',
     apply: 'Appliquer',
-    priorityHint: 'Touche un ingrédient pour l’utiliser en priorité. Les points de couleur signalent ceux qui expirent bientôt.',
+    priorityHint: 'Tout ton garde-manger est utilisé, en priorité ce qui expire bientôt (points de couleur). Touche des ingrédients pour ne cuisiner qu’avec eux.',
+    selectionActive_one: 'Recettes avec cet ingrédient seulement (plus sel, poivre, huile, eau).',
+    selectionActive_other: 'Recettes avec ces {{count}} ingrédients seulement (plus sel, poivre, huile, eau).',
+    clearSelection: 'Tout utiliser',
     transformLeftovers: 'Transformer mes restes',
   },
   notifications: {

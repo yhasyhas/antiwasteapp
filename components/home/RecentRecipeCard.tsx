@@ -1,22 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Clock } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { Clock, ImageOff } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { difficultyLabel } from '@/lib/labels';
+import type { Recipe } from '@/components/recipe/types';
 
-export interface RecentRecipe {
-  id: string;
-  title: string;
-  description: string;
-  prep_time: number;
-  cook_time: number;
-  difficulty: string;
-  dietary_tags: string[];
-  ingredients_used: any[];
+interface Props {
+  recipe: Recipe;
+  imageLoading: boolean;
+  onPress: () => void;
 }
 
-// Carte d'une recette récente (accueil)
-export function RecentRecipeCard({ recipe, onPress }: { recipe: RecentRecipe; onPress: () => void }) {
+// Carte d'une recette récente (accueil), avec son image
+export function RecentRecipeCard({ recipe, imageLoading, onPress }: Props) {
   const { t } = useLanguage();
 
   return (
@@ -24,6 +20,16 @@ export function RecentRecipeCard({ recipe, onPress }: { recipe: RecentRecipe; on
       style={styles.recipeCard}
       onPress={onPress}
     >
+      <View style={styles.thumbnail}>
+        {recipe.image_url ? (
+          <Image source={{ uri: recipe.image_url }} style={styles.thumbnailImage} resizeMode="cover" />
+        ) : imageLoading ? (
+          <ActivityIndicator color="#10b981" />
+        ) : (
+          <ImageOff size={22} color="#d1d5db" />
+        )}
+      </View>
+      <View style={styles.body}>
       <View style={styles.recipeHeader}>
         <Text style={styles.recipeTitle}>{recipe.title}</Text>
         <View style={styles.difficultyBadge}>
@@ -39,7 +45,7 @@ export function RecentRecipeCard({ recipe, onPress }: { recipe: RecentRecipe; on
         <View style={styles.recipeTime}>
           <Clock size={16} color="#6b7280" />
           <Text style={styles.recipeTimeText}>
-            {t('common.minutes', { count: recipe.prep_time + recipe.cook_time })}
+            {t('common.minutes', { count: recipe.total_time })}
           </Text>
         </View>
         {recipe.dietary_tags.length > 0 && (
@@ -52,16 +58,35 @@ export function RecentRecipeCard({ recipe, onPress }: { recipe: RecentRecipe; on
           </View>
         )}
       </View>
+      </View>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   recipeCard: {
+    flexDirection: 'row',
     backgroundColor: '#fff',
-    padding: 16,
+    padding: 12,
     borderRadius: 12,
     marginBottom: 12,
+    gap: 12,
+  },
+  thumbnail: {
+    width: 84,
+    height: 84,
+    borderRadius: 10,
+    overflow: 'hidden',
+    backgroundColor: '#f3f4f6',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  thumbnailImage: {
+    width: '100%',
+    height: '100%',
+  },
+  body: {
+    flex: 1,
   },
   recipeHeader: {
     flexDirection: 'row',

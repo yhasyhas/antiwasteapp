@@ -10,10 +10,10 @@ import { Heart } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSavedRecipes } from '@/hooks/useSavedRecipes';
 import { SavedRecipeCard } from '@/components/saved/SavedRecipeCard';
-import { SavedRecipeDetailModal } from '@/components/saved/SavedRecipeDetailModal';
+import { RecipeSheet } from '@/components/recipe/RecipeSheet';
 
 export default function SavedScreen() {
-  const { recipes, loading, selectedRecipe, setSelectedRecipe, imageLoading, openRecipe, toggleFavorite } = useSavedRecipes();
+  const { recipes, loading, selectedRecipe, setSelectedRecipe, isImageLoading, openRecipe, toggleFavorite } = useSavedRecipes();
   const { t } = useLanguage();
 
   const favoriteRecipes = recipes.filter((r) => r.is_favorite);
@@ -83,17 +83,12 @@ export default function SavedScreen() {
       )}
 
       {selectedRecipe && (
-        <SavedRecipeDetailModal
+        <RecipeSheet
           recipe={selectedRecipe}
-          imageLoading={imageLoading === selectedRecipe.id}
+          imageLoading={isImageLoading(selectedRecipe.id)}
+          isFavorite={selectedRecipe.is_favorite}
+          onToggleFavorite={() => toggleFavorite(selectedRecipe.id)}
           onClose={() => setSelectedRecipe(null)}
-          onToggleFavorite={() => {
-            toggleFavorite(selectedRecipe.id);
-            setSelectedRecipe({
-              ...selectedRecipe,
-              is_favorite: !selectedRecipe.is_favorite,
-            });
-          }}
         />
       )}
     </View>

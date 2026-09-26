@@ -5,8 +5,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { callEdgeFunction } from '@/lib/callEdgeFunction';
-import { ensureRecipeImage } from '@/lib/recipeImage';
+import { loadFavoriteIds, setFavorite } from '@/lib/favorites';
 import { supabase } from '@/lib/supabase';
+import { useRecipeImages } from '@/hooks/useRecipeImages';
 import { daysUntil, sortByUrgency } from '@/lib/expiry';
 import { onPantryChanged } from '@/lib/pantryEvents';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
@@ -16,20 +17,25 @@ import type { Filters, Recipe } from '@/components/recipe/types';
 export type GenerationMode = 'standard' | 'leftovers';
 
 // État et actions de l'écran de génération : garde-manger, filtres, génération, historique, favoris, images.
-// initialPriorityIds : ingrédients à utiliser en priorité (ceux d'une notification, par exemple).
-export function useRecipeGeneration(initialPriorityIds: string[] = []) {
+// Sélection : si l'utilisateur choisit des ingrédients (ou en reçoit d'une notification), seuls ceux-là sont
+// envoyés au modèle ; sans sélection, tout le garde-manger, avec la priorité aux dates les plus proches.
+export function useRecipeGeneration(initialSelectedIds: string[] = []) {
   const { user } = useAuth();
   const { t, language } = useLanguage();
   const [ingredients, setIngredients] = useState<PantryIngredient[]>([]);
-  const [priorityIds, setPriorityIds] = useState<string[]>(initialPriorityIds);
+  const [selectedIds, setSelectedIds] = useState<string[]>(initialSelectedIds);
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   // Mode de la génération en cours (le bouton correspondant affiche l'attente)
   const [generatingMode, setGeneratingMode] = useState<GenerationMode | null>(null);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
-  // Recettes dont l'image est en cours de génération
-  const [imageLoading, setImageLoading] = useState<string[]>([]);
+  // Images générées en arrière-plan dès l'affichage des recettes : cartes et fiche se remplissent à leur arrivée
+  const images = useRecipeImages((recipeId, imageUrl) => {
+    setRecipes((current) => current.map((r) => (r.id === recipeId ? { ...r, image_url: imageUrl } : r)));
+    setSelectedRecipe((current) => (current?.id === recipeId ? { ...current, image_url: imageUrl } : current));
+  });
   const [filters, setFilters] = useState<Filters>({
     dietary: [],
     difficulty: 'easy',
@@ -43,19 +49,24 @@ export function useRecipeGeneration(initialPriorityIds: string[] = []) {
   useEffect(() => {
     loadIngredients();
     loadUserPreferences();
+    if (user) loadFavoriteIds(user.id).then(setFavoriteIds);
     // « J'ai cuisiné ça » depuis cet écran : les ingrédients retirés disparaissent de la liste
     return onPantryChanged(loadIngredients);
   }, []);
 
   // Nouvelle notification touchée alors que l'écran est déjà ouvert
-  const initialKey = initialPriorityIds.join(',');
+  const initialKey = initialSelectedIds.join(',');
   useEffect(() => {
-    if (initialKey) setPriorityIds(initialKey.split(','));
+    if (initialKey) setSelectedIds(initialKey.split(','));
   }, [initialKey]);
 
-  const togglePriority = (id: string) => {
-    setPriorityIds((current) => current.includes(id) ? current.filter((x) => x !== id) : [...current, id]);
+  const toggleSelected = (id: string) => {
+    setSelectedIds((current) => current.includes(id) ? current.filter((x) => x !== id) : [...current, id]);
   };
+
+  // Ingrédients envoyés au modèle : la sélection, ou tout le garde-manger
+  const selected = ingredients.filter((i) => selectedIds.includes(i.id));
+  const cookingWith = selected.length > 0 ? selected : ingredients;
 
   const loadIngredients = async () => {
     if (!user) return;
@@ -104,15 +115,19 @@ export function useRecipeGeneration(initialPriorityIds: string[] = []) {
     try {
       const { data } = await callEdgeFunction('generate-recipes', {
         // Avec leur identifiant : le modèle indique quel ingrédient du garde-manger chaque recette utilise.
-        // days_left (fuseau du téléphone), kind et priority : les plus urgents passent en premier.
-        ingredients: ingredients.map((i) => ({
+        // days_left (fuseau du téléphone) et kind : les plus urgents passent en premier.
+        ingredients: cookingWith.map((i) => ({
           id: i.id,
           name: i.name,
           quantity: i.quantity || '',
           days_left: i.expires_at ? daysUntil(i.expires_at) : null,
           kind: i.kind,
-          priority: priorityIds.includes(i.id),
         })),
+        // Avec une sélection : le reste du garde-manger, que les recettes ne doivent pas utiliser
+        ...(selected.length > 0 && {
+          selection: true,
+          other_pantry: ingredients.filter((i) => !selectedIds.includes(i.id)).map((i) => i.name),
+        }),
         mode,
         preferences: {
           dietary: filters.dietary,
@@ -127,7 +142,10 @@ export function useRecipeGeneration(initialPriorityIds: string[] = []) {
       if (data?.recipes) {
         // Enregistrées dans l'historique avant l'affichage, pour que chaque recette ait déjà son id
         // quand l'utilisateur la sauvegarde (sinon elle serait insérée une seconde fois)
-        setRecipes(await saveRecipesToHistory(data.recipes));
+        const saved = await saveRecipesToHistory(data.recipes);
+        setRecipes(saved);
+        // Images de toutes les recettes, en arrière-plan : elles apparaissent sur les cartes à leur arrivée
+        images.requestAll(saved);
       } else if (data?.error) {
         Alert.alert(data.error === 'quota_exceeded' ? t('errors.dailyLimitTitle') : t('common.error'), data.message || t('generate.failed'));
       } else {
@@ -188,24 +206,14 @@ export function useRecipeGeneration(initialPriorityIds: string[] = []) {
     });
   };
 
-  // Image générée seulement à l'ouverture ou à la sauvegarde d'une recette (quota images côté serveur)
-  const requestImage = async (recipeId: string | undefined, imageUrl?: string) => {
-    if (!recipeId || imageUrl) return;
-    setImageLoading((current) => [...current, recipeId]);
-    const url = await ensureRecipeImage(recipeId, filters.language);
-    setImageLoading((current) => current.filter((id) => id !== recipeId));
-    if (!url) return;
-    setRecipes((current) => current.map((r) => (r.id === recipeId ? { ...r, image_url: url } : r)));
-    setSelectedRecipe((current) => (current?.id === recipeId ? { ...current, image_url: url } : current));
-  };
-
   const openRecipe = (recipe: Recipe) => {
     setSelectedRecipe(recipe);
-    requestImage(recipe.id, recipe.image_url);
+    // Image pas encore obtenue (échec de l'historique, quota) : nouvel essai
+    images.request(recipe.id, recipe.image_url);
   };
 
-  // Sauvegarder = ajouter aux favoris la recette déjà présente dans l'historique
-  const saveRecipe = async (recipe: Recipe) => {
+  // Favori : la recette est déjà dans l'historique ; on l'ajoute aux favoris, ou on l'en retire
+  const toggleFavorite = async (recipe: Recipe) => {
     if (!user) return;
 
     let recipeId = recipe.id;
@@ -221,20 +229,27 @@ export function useRecipeGeneration(initialPriorityIds: string[] = []) {
         alertWriteError(t, 'saving recipe', error);
         return;
       }
-      recipeId = data.id as string;
-      setRecipes((current) => current.map((r) => (r === recipe ? { ...r, id: recipeId } : r)));
+      const newId = data.id as string;
+      recipeId = newId;
+      setRecipes((current) => current.map((r) => (r === recipe ? { ...r, id: newId } : r)));
+      setSelectedRecipe((current) => (current === recipe ? { ...current, id: newId } : current));
     }
 
-    const { error: favoriteError } = await supabase.from('favorites').insert({
-      user_id: user.id,
-      recipe_id: recipeId,
-    });
-    // 23505 : déjà en favori (contrainte unique user_id + recipe_id), la sauvegarde est donc acquise
-    if (favoriteError && favoriteError.code !== '23505') {
-      alertWriteError(t, 'adding recipe to favorites', favoriteError);
+    const id = recipeId;
+    const favorite = !favoriteIds.has(id);
+    const error = await setFavorite(user.id, id, favorite);
+    if (error) {
+      alertWriteError(t, 'toggling favorite', error);
       return;
     }
-    requestImage(recipeId, recipe.image_url);
+    setFavoriteIds((current) => {
+      const next = new Set(current);
+      if (favorite) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+    images.request(id, recipe.image_url);
+    if (!favorite) return;
 
     Alert.alert(
       t('generate.savedTitle'),
@@ -260,21 +275,23 @@ export function useRecipeGeneration(initialPriorityIds: string[] = []) {
 
   return {
     ingredients,
-    priorityIds,
-    togglePriority,
-    hasLeftovers: ingredients.some((i) => i.kind === 'dish'),
+    selectedIds,
+    toggleSelected,
+    clearSelection: () => setSelectedIds([]),
+    hasLeftovers: cookingWith.some((i) => i.kind === 'dish'),
     recipes,
     loading,
     generating,
     generatingMode,
     selectedRecipe,
     setSelectedRecipe,
-    imageLoading,
+    isImageLoading: images.isLoading,
+    isFavorite: (recipe: Recipe) => !!recipe.id && favoriteIds.has(recipe.id),
     filters,
     setFilters,
     generateRecipes,
     openRecipe,
-    saveRecipe,
+    toggleFavorite,
     toggleDietaryFilter,
   };
 }

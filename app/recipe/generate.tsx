@@ -14,16 +14,17 @@ import { useRecipeGeneration } from '@/hooks/useRecipeGeneration';
 import { FilterSummary } from '@/components/recipe/FilterSummary';
 import { FiltersModal } from '@/components/recipe/FiltersModal';
 import { RecipeCard } from '@/components/recipe/RecipeCard';
-import { RecipeDetailModal } from '@/components/recipe/RecipeDetailModal';
+import { RecipeSheet } from '@/components/recipe/RecipeSheet';
 import { PantryChips } from '@/components/recipe/PantryChips';
 
 export default function GenerateRecipeScreen() {
-  // priority : identifiants séparés par des virgules (notification des aliments qui expirent)
+  // priority : identifiants séparés par des virgules (notification des aliments qui expirent), présélectionnés
   const { priority } = useLocalSearchParams<{ priority?: string }>();
   const {
     ingredients,
-    priorityIds,
-    togglePriority,
+    selectedIds,
+    toggleSelected,
+    clearSelection,
     hasLeftovers,
     recipes,
     loading,
@@ -31,12 +32,13 @@ export default function GenerateRecipeScreen() {
     generatingMode,
     selectedRecipe,
     setSelectedRecipe,
-    imageLoading,
+    isImageLoading,
+    isFavorite,
     filters,
     setFilters,
     generateRecipes,
     openRecipe,
-    saveRecipe,
+    toggleFavorite,
     toggleDietaryFilter,
   } = useRecipeGeneration(priority ? priority.split(',').filter(Boolean) : []);
   const { t } = useLanguage();
@@ -64,7 +66,7 @@ export default function GenerateRecipeScreen() {
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('generate.yourIngredients')}</Text>
-            <PantryChips ingredients={ingredients} priorityIds={priorityIds} onToggle={togglePriority} />
+            <PantryChips ingredients={ingredients} selectedIds={selectedIds} onToggle={toggleSelected} onClear={clearSelection} />
           </View>
 
           <FilterSummary filters={filters} onOpen={() => setShowFilters(true)} />
@@ -83,7 +85,7 @@ export default function GenerateRecipeScreen() {
             <View style={styles.recipesSection}>
               <Text style={styles.sectionTitle}>{t('generate.generatedRecipes')}</Text>
               {recipes.map((recipe, index) => (
-                <RecipeCard key={index} recipe={recipe} onPress={() => openRecipe(recipe)} />
+                <RecipeCard key={index} recipe={recipe} imageLoading={isImageLoading(recipe.id)} onPress={() => openRecipe(recipe)} />
               ))}
             </View>
           )}
@@ -136,14 +138,12 @@ export default function GenerateRecipeScreen() {
         />
 
         {selectedRecipe && (
-          <RecipeDetailModal
+          <RecipeSheet
             recipe={selectedRecipe}
-            imageLoading={!!selectedRecipe.id && imageLoading.includes(selectedRecipe.id)}
+            imageLoading={isImageLoading(selectedRecipe.id)}
+            isFavorite={isFavorite(selectedRecipe)}
+            onToggleFavorite={() => toggleFavorite(selectedRecipe)}
             onClose={() => setSelectedRecipe(null)}
-            onSave={(recipe) => {
-              saveRecipe(recipe);
-              setSelectedRecipe(null);
-            }}
           />
         )}
       </View>

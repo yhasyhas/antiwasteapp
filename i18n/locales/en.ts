@@ -235,7 +235,10 @@ const en: Translations = {
     dietary: 'Dietary preferences',
     difficulty: 'Difficulty',
     apply: 'Apply',
-    priorityHint: 'Tap an ingredient to use it first. Colored dots mark the ones expiring soon.',
+    priorityHint: 'Your whole pantry is used, starting with what expires soon (colored dots). Tap ingredients to cook with them only.',
+    selectionActive_one: 'Recipes with this ingredient only (plus salt, pepper, oil, water).',
+    selectionActive_other: 'Recipes with these {{count}} ingredients only (plus salt, pepper, oil, water).',
+    clearSelection: 'Use everything',
     transformLeftovers: 'Transform my leftovers',
   },
   notifications: {
