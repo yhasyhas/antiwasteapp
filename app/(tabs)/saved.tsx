@@ -9,7 +9,7 @@ import {
 import { Heart } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSavedRecipes } from '@/hooks/useSavedRecipes';
-import { SavedRecipeCard } from '@/components/saved/SavedRecipeCard';
+import { RecipeListCard } from '@/components/recipe/RecipeListCard';
 import { RecipeSheet } from '@/components/recipe/RecipeSheet';
 
 export default function SavedScreen() {
@@ -53,12 +53,12 @@ export default function SavedScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('saved.yourFavorites')}</Text>
             {favoriteRecipes.map((recipe) => (
-              <SavedRecipeCard
+              <RecipeListCard
                 key={recipe.id}
                 recipe={recipe}
-                inFavorites
+                imageLoading={isImageLoading(recipe.id)}
                 onPress={() => openRecipe(recipe)}
-                onToggleFavorite={() => toggleFavorite(recipe.id)}
+                favorite={{ active: true, onToggle: () => toggleFavorite(recipe.id) }}
               />
             ))}
           </View>
@@ -69,12 +69,12 @@ export default function SavedScreen() {
               {recipes
                 .filter((r) => !r.is_favorite)
                 .map((recipe) => (
-                  <SavedRecipeCard
+                  <RecipeListCard
                     key={recipe.id}
                     recipe={recipe}
-                    inFavorites={false}
+                    imageLoading={isImageLoading(recipe.id)}
                     onPress={() => openRecipe(recipe)}
-                    onToggleFavorite={() => toggleFavorite(recipe.id)}
+                    favorite={{ active: false, onToggle: () => toggleFavorite(recipe.id) }}
                   />
                 ))}
             </View>

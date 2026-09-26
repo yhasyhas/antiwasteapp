@@ -16,7 +16,7 @@ import { recipeFromRow, type Recipe } from '@/components/recipe/types';
 import { RecipeSheet } from '@/components/recipe/RecipeSheet';
 import { ChefHat, Sparkles, TrendingUp } from 'lucide-react-native';
 import { router, useFocusEffect } from 'expo-router';
-import { RecentRecipeCard } from '@/components/home/RecentRecipeCard';
+import { RecipeListCard } from '@/components/recipe/RecipeListCard';
 
 type RecentRecipe = Recipe & { id: string };
 
@@ -169,7 +169,7 @@ export default function HomeScreen() {
             </View>
 
             {recipes.map((recipe) => (
-              <RecentRecipeCard key={recipe.id} recipe={images.withImage(recipe)} imageLoading={images.isLoading(recipe.id)} onPress={() => openRecipe(recipe)} />
+              <RecipeListCard key={recipe.id} recipe={images.withImage(recipe)} imageLoading={images.isLoading(recipe.id)} onPress={() => openRecipe(recipe)} />
             ))}
           </View>
         )}

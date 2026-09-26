@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Modal, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Modal } from 'react-native';
+import { Image } from 'expo-image';
 import { Heart, ImageOff, Lightbulb, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { difficultyLabel } from '@/lib/labels';
@@ -39,7 +40,7 @@ export function RecipeSheet({ recipe, imageLoading, imageNotice, isFavorite, onT
             {/* Emplacement réservé : la fiche s'affiche tout de suite, l'image s'y place à son arrivée */}
             <View style={styles.imageSlot}>
               {recipe.image_url ? (
-                <Image source={{ uri: recipe.image_url }} style={styles.image} resizeMode="cover" />
+                <Image source={{ uri: recipe.image_url }} style={styles.image} contentFit="cover" cachePolicy="memory-disk" transition={150} />
               ) : imageLoading ? (
                 <ActivityIndicator color="#10b981" />
               ) : (
