@@ -72,9 +72,10 @@ export function reminderContent(today: ReminderItem[], tomorrow: ReminderItem[],
   };
 }
 
-// Canal Android « Aliments qui expirent ». Dans Expo Go, setNotificationChannelAsync plante
-// (NullPointerException dans NotificationsChannelsProvider) : on garde le canal par défaut d'Expo Go.
-// Le canal dédié sera créé dans un build de développement (phase 6).
+// Canal Android « Aliments qui expirent », créé normalement dans le build de développement et les builds
+// suivants, au démarrage : il sert aux notifications locales comme aux notifications push du serveur.
+// Seule exception, Expo Go : setNotificationChannelAsync y plante (NullPointerException dans
+// NotificationsChannelsProvider), on y garde le canal par défaut.
 const useOwnChannel = Platform.OS === 'android' && !isRunningInExpoGo();
 
 async function ensureChannel() {
@@ -83,6 +84,11 @@ async function ensureChannel() {
     name: i18n.t('notifications.channelName'),
     importance: Notifications.AndroidImportance.DEFAULT,
   });
+}
+
+// Au démarrage et au changement de langue (nom du canal traduit)
+export function setupNotificationChannel(): void {
+  ensureChannel().catch((error) => console.warn('[rappels] canal impossible à créer :', error));
 }
 
 // Canal à indiquer dans le déclencheur : aucun (canal par défaut) si le nôtre n'est pas créé

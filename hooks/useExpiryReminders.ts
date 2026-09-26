@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
 import * as Notifications from '@/lib/notificationsApi';
 import { router } from 'expo-router';
-import { notificationsSupported, rescheduleExpiryReminders } from '@/lib/notifications';
+import { notificationsSupported, rescheduleExpiryReminders, setupNotificationChannel } from '@/lib/notifications';
 import { onPantryChanged } from '@/lib/pantryEvents';
 
 // Web : pas de notifications locales
@@ -14,6 +14,11 @@ const useLastResponse = notificationsSupported ? Notifications.useLastNotificati
 export function useExpiryReminders(userId: string | null, language: string) {
   const userIdRef = useRef(userId);
   userIdRef.current = userId;
+
+  useEffect(() => {
+    if (!notificationsSupported) return;
+    setupNotificationChannel();
+  }, [language]);
 
   useEffect(() => {
     if (!notificationsSupported) return;

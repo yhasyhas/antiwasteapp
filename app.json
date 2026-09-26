@@ -24,10 +24,19 @@
       "expo-status-bar",
       "expo-localization",
       "@sentry/react-native",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "expo-notifications",
+        {
+          "defaultChannel": "expiry"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "android": {
+      "package": "com.yhasyhas.antiwasteapp"
     }
   }
 }
