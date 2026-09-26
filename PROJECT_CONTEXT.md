@@ -1,16 +1,17 @@
 # Contexte du projet : app mobile anti-gaspi de recettes IA
 
-> Analyse rédigée le 2026-09-23, mise à jour à la fin de la phase 4. La feuille de route est dans `PLAN.md`.
+> Analyse rédigée le 2026-09-23, mise à jour à la fin de la phase 5 (validée). La feuille de route est dans `PLAN.md`.
 
 ## 1. Le produit
 
 Une app mobile (Expo / React Native, aussi exportable en web) qui aide à **cuisiner avec ce qu'on a déjà** :
 
 1. L'utilisateur crée un compte (email + mot de passe).
-2. Il remplit son **garde-manger** : photo des aliments (reconnaissance d'image) ou ajout manuel.
+2. Il remplit son **garde-manger** : photo des aliments (reconnaissance d'image), code-barres (Open Food Facts) ou ajout manuel, avec une **date de péremption** proposée ; les restes de plats sont identifiés.
 3. Il choisit des **filtres** (type de repas, difficulté, temps max, régime alimentaire, langue).
 4. Une **IA génère 1 à 3 recettes** à partir de ses ingrédients (avec un choix de cuisine du monde) ; une image est générée à l'ouverture de la recette.
-5. Il peut **sauvegarder / mettre en favori** ses recettes.
+5. Il peut **sauvegarder / mettre en favori** ses recettes, et dire « **J'ai cuisiné ça** » pour retirer du garde-manger ce qu'il a utilisé.
+6. Chaque matin à 9 h, une **notification** regroupe les aliments qui expirent aujourd'hui ou demain ; elle ouvre la génération avec ces aliments en priorité. Mode « **Transformer mes restes** ».
 
 Langues : français (par défaut), anglais, espagnol.
 
@@ -20,6 +21,8 @@ Langues : français (par défaut), anglais, espagnol.
 |---|---|
 | App | Expo SDK 57, React Native 0.86, React 19.2, expo-router 57 (routes par fichiers), TypeScript 6 |
 | Traductions | i18next + react-i18next + expo-localization, clés typées, fr / en / es |
+| Notifications | `expo-notifications`, notifications locales (fonctionnent dans Expo Go) |
+| Codes-barres | `expo-camera` + Open Food Facts (appel direct, User-Agent de l'app) |
 | Suivi des erreurs | Sentry (`@sentry/react-native`), région UE ; erreurs JavaScript seulement dans Expo Go |
 | UI | StyleSheet natif, icônes `lucide-react-native`, couleur principale `#10b981` (vert) |
 | Backend | Supabase (projet `iqzjonmjlscuckdmiehk`) : Auth, Postgres avec RLS, Edge Functions (Deno) ; nouvelles clés d'API (publishable / secrète) |
@@ -46,7 +49,8 @@ app/
   recipe/generate.tsx    Filtres (dont cuisine) + generate-recipes (ingrédients avec identifiant) + historique + affichage + favori + image
 components/              Composants des écrans : recipe/ (filtres, cartes, détail, options), scan/ (confirmation, ajout manuel, permission),
                          saved/, home/, pantry/ ; aucun fichier au-delà de 400 lignes
-hooks/                   useRecipeGeneration, useScan, useSavedRecipes
+components/expiry/       Badge de date (couleur selon l'urgence) et choix de date (boutons rapides, calendrier)
+hooks/                   useRecipeGeneration, useScan, useBarcodeScan, useSavedRecipes, useExpiryReminders (rappels)
 contexts/
   AuthContext.tsx        Session Supabase, crée la ligne `profiles` au premier login
   LanguageContext.tsx    Langue de l'app : langue du téléphone par défaut, gardée dans AsyncStorage, synchronisée avec user_preferences dès que possible (sans alerte hors connexion)
@@ -58,10 +62,14 @@ lib/alertWriteError.ts   Alerte traduite quand une écriture en base échoue
 lib/authErrors.ts        Erreurs de Supabase Auth traduites
 lib/labels.ts            Libellés traduits des valeurs enregistrées (difficulté…)
 lib/sentry.ts            Initialisation de Sentry (inactif sans EXPO_PUBLIC_SENTRY_DSN)
+lib/expiry.ts            Dates de péremption (fuseau du téléphone), urgence, tri, durées par défaut
+lib/notifications.ts     Rappels de péremption (programmation, autorisation, test)
+lib/openFoodFacts.ts     Recherche d'un produit par code-barres
+lib/pantryEvents.ts      Signal « garde-manger modifié » (recalcul des rappels, liste de la génération)
 scripts/                 export-project.mjs, recompress-recipe-images.ts (Deno)
 supabase/
   config.toml            verify_jwt = false pour chaque fonction (vérification dans le code)
-  migrations/            Schéma SQL (6 migrations)
+  migrations/            Schéma SQL (7 migrations)
   tests/                 Tests SQL des règles de sécurité (foyers, quotas, images), en transaction annulée
   functions/
     _shared/ai.ts        Interface unique Gemini / Groq : sortie structurée, secours, lancement en parallèle (+ ai.test.ts)
@@ -70,9 +78,9 @@ supabase/
     _shared/quota.ts     Quotas par jour et par utilisateur (429 au-delà)
     _shared/cors.ts      CORS limité aux origines autorisées
     _shared/image.ts     Compression des images (ImageScript : 800 px, JPEG qualité 75)
-    analyze-image/       Photo ou ticket de caisse → aliments (nom, quantité, catégorie, confiance, kind, storage_tip)
+    analyze-image/       Photo ou ticket de caisse → aliments (nom, quantité, catégorie, confiance, kind, storage_tip, shelf_life_days)
       ingredients.ts     Schéma et validation de la réponse (+ ingredients.test.ts)
-    generate-recipes/    N recettes (1 si ≤2 ingrédients, 2 si ≤5, sinon 3), cuisine, régimes
+    generate-recipes/    N recettes (1 si ≤2 ingrédients, 2 si ≤5, sinon 3), cuisine, régimes, urgence, mode « restes »
       recipes.ts         Schéma, alias du garde-manger, lecture de la réponse, exceptions des régimes (+ recipes.test.ts)
     generate-recipe-image/ Image FLUX d'une recette → bucket recipe-images → recipes.image_url
 ```
@@ -81,7 +89,7 @@ supabase/
 Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes, favoris et préférences restent par utilisateur.
 - `profiles` (id = auth.users.id, email)
 - `households` (name, created_by, is_personal) et `household_members` (role owner/member, joined_at) : foyer personnel créé à l'inscription
-- `ingredients` (household_id, user_id = qui l'a ajouté, name, quantity, added_via, image_url)
+- `ingredients` (household_id, user_id = qui l'a ajouté, name, quantity, added_via camera/manual/barcode, image_url, expires_at, category, kind ingredient/dish, storage_tip, barcode)
 - `recipes` (title, description, ingredients_used, instructions, prep/cook/total_time, difficulty, dietary_tags, meal_type, language, ingredients_from_list, missing_ingredients, image_url, image_prompt, servings, tips, suggestion)
 - `favorites` (user_id, recipe_id, unique)
 - `user_preferences` (dietary_preferences, excluded_ingredients, default_difficulty, max_cook_time, default_meal_type, default_language)
@@ -90,7 +98,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 
 ### Configuration requise
 - `.env` (client) : `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `EXPO_PUBLIC_SENTRY_DSN` (facultatif) (relancer Expo avec `-c` après un changement)
-- Secrets des Edge Functions (`supabase secrets set ...`) : `GROQ_API_KEY`, `GEMINI_API_KEY` ; facultatifs (valeurs par défaut dans le code) : `GROQ_MODEL`, `GEMINI_MODEL`, `GROQ_VISION_MODEL`, `QUOTA_DAILY_GENERATIONS` (10), `QUOTA_DAILY_SCANS` (20), `QUOTA_DAILY_IMAGES` (10), `SCAN_HEDGE_DELAY_MS` (2500 en production), `RECIPE_PROVIDERS` (groq,gemini), `GEMINI_RECIPE_MODEL`, `CLOUDFLARE_IMAGE_MODEL`, `ALLOWED_ORIGINS` ; images : `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`
+- Secrets des Edge Functions (`supabase secrets set ...`) : `GROQ_API_KEY`, `GEMINI_API_KEY` ; facultatifs (valeurs par défaut dans le code) : `GROQ_MODEL`, `GEMINI_MODEL`, `GROQ_VISION_MODEL`, `QUOTA_DAILY_GENERATIONS` (10), `QUOTA_DAILY_SCANS` (20), `QUOTA_DAILY_IMAGES` (30), `SCAN_HEDGE_DELAY_MS` (2500 en production), `RECIPE_PROVIDERS` (groq,gemini), `GEMINI_RECIPE_MODEL`, `CLOUDFLARE_IMAGE_MODEL`, `ALLOWED_ORIGINS` ; images : `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`
 
 ## 4. Historique : ce qui a été réalisé
 
@@ -159,21 +167,33 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Sentry branché (région UE, erreurs JavaScript dans Expo Go) ; `README.md` et `.env.example` écrits ; logs `[scan]` retirés.
 - Anciens tests de la phase 1 faits sur appareil (inscription, déconnexion, mode avion, rechargement des onglets) : validés.
 
+### Phase 5 — le cœur anti-gaspi (branche `phase-5`, validée depuis l'app)
+- Migration : `expires_at`, `category`, `kind`, `storage_tip`, `barcode` sur `ingredients` (tests SQL `ingredients_expiry.sql`).
+- Scan : durée de conservation estimée par l'IA (`shelf_life_days`, 2 à 3 jours pour un plat) ; dates proposées au scan, à l'ajout manuel et au code-barres, modifiables (+3 j, +1 sem., +1 mois, calendrier), y compris depuis le garde-manger.
+- Garde-manger trié par urgence, badges expiré / bientôt / OK, conseil de conservation, badge « Reste ».
+- Génération : ingrédients urgents et choisis en priorité, mode « Transformer mes restes ».
+- Rappels : notification locale à 9 h, autorisation au premier ajout d'une date, ouverture de la génération avec les aliments présélectionnés ; bouton de test en développement.
+- « J'ai cuisiné ça » et scan de code-barres (Open Food Facts).
+- Retours de test : sélection d'ingrédients stricte (seuls ceux choisis, plus sel, poivre, huile, eau ; recette hors sélection écartée par le serveur), images en arrière-plan sur les cartes, fiche recette unique (`components/recipe/RecipeSheet.tsx`) pour la génération, les récentes et les favoris, quota images à 30 par jour, canal de notifications ignoré dans Expo Go ; état des images partagé par tous les écrans et réservation côté serveur (une seule génération par recette, même pour des appels simultanés).
+- Tests : 38 tests Deno.
+
 ## 5. État actuel et problèmes connus
 
 ### Sécurité
 - L'app filtre encore ses ingrédients par `user_id` (équivalent tant qu'il n'y a qu'un foyer personnel) : à passer à `household_id` en phase 6, avec `user_id` non modifiable.
 
 ### Dette et finitions
-- Offres gratuites partagées par toute l'app : Groq (scan : ~1 000 tokens de sortie par minute ; génération : 8 000 tokens par minute et 1 000 requêtes par jour) et Cloudflare (~150 images par jour estimées) ; au-delà, le secours prend le relais ou l'image n'est pas générée. À revoir avant la bêta (phase 7).
-- Confirmation d'email désactivée dans Supabase pendant le développement (à réactiver en phase 7).
-- Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`) : renommage en phase 7, nom pas encore choisi.
+- Offres gratuites partagées par toute l'app : Groq (scan : ~1 000 tokens de sortie par minute ; génération : 8 000 tokens par minute et 1 000 requêtes par jour) et Cloudflare (~150 images par jour estimées) ; au-delà, le secours prend le relais ou l'image n'est pas générée. À revoir avant la bêta (phase 8).
+- Confirmation d'email désactivée dans Supabase pendant le développement (à réactiver en phase 8).
+- Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`) : renommage en phase 8, nom pas encore choisi.
 - Sauvegardes de la base dans `backups/` : jamais commitées (`.gitignore`) ni exportées.
-- Sentry dans Expo Go : pas de plantages natifs ni de stack traces lisibles en production avant un build EAS.
+- Rappels calculés sur le téléphone : un changement fait depuis un autre téléphone du foyer n'est pris en compte qu'à la prochaine ouverture de l'app.
+- « J'ai cuisiné ça » retire les ingrédients entiers (pas de quantité restante).
+- Expo Go : pas de plantages natifs dans Sentry ni de canal de notifications dédié (canal par défaut) avant le build de développement EAS (début de la phase 6).
 - Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 
 ## 6. Prochaine étape
-Phase 5 : le cœur anti-gaspi. Détails dans `PLAN.md`.
+Phase 6 : build de développement EAS, puis donner envie de revenir. Phase 7 : design et ergonomie ; phase 8 : lancement. Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash

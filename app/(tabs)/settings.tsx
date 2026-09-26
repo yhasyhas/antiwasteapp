@@ -6,11 +6,13 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Globe, ChevronRight, User, LogOut } from 'lucide-react-native';
 import { sendSentryTestError, sentryEnabled } from '@/lib/sentry';
+import { notificationsSupported, sendTestReminder } from '@/lib/notifications';
 
 const languages = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
@@ -32,6 +34,13 @@ export default function SettingsScreen() {
 
   const handleLanguageChange = async (newLang: 'fr' | 'en' | 'es') => {
     await setLanguage(newLang);
+  };
+
+  const testNotification = async () => {
+    if (!user) return;
+    const result = await sendTestReminder(user.id);
+    if (result === 'denied') Alert.alert(t('notifications.deniedTitle'), t('notifications.deniedText'));
+    else Alert.alert(t('notifications.testButton'), t('notifications.testSent'));
   };
 
   return (
@@ -102,6 +111,12 @@ export default function SettingsScreen() {
         {__DEV__ && sentryEnabled && (
           <TouchableOpacity style={styles.testButton} onPress={sendSentryTestError}>
             <Text style={styles.testButtonText}>{t('settings.sentryTest')}</Text>
+          </TouchableOpacity>
+        )}
+        {/* Développement seulement : le rappel de péremption, sans attendre 9 h */}
+        {__DEV__ && notificationsSupported && user && (
+          <TouchableOpacity style={styles.testButton} onPress={testNotification}>
+            <Text style={styles.testButtonText}>{t('notifications.testButton')}</Text>
           </TouchableOpacity>
         )}
 

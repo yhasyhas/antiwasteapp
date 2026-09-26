@@ -11,7 +11,9 @@ import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { FlipHorizontal, Plus } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useScan } from '@/hooks/useScan';
-import { ManualAddModal } from '@/components/scan/ManualAddModal';
+import { FOOD_BARCODE_TYPES, useBarcodeScan } from '@/hooks/useBarcodeScan';
+import { ManualAddModal, type ManualPrefill } from '@/components/scan/ManualAddModal';
+import { ScanModeToggle, type ScanMode } from '@/components/scan/ScanModeToggle';
 import { ConfirmIngredientsModal } from '@/components/scan/ConfirmIngredientsModal';
 import { PermissionRequest } from '@/components/scan/PermissionRequest';
 
@@ -20,7 +22,14 @@ export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<CameraType>('back');
   const [showManualAdd, setShowManualAdd] = useState(false);
+  const [mode, setMode] = useState<ScanMode>('photo');
+  // Ajout manuel prérempli après un scan de code-barres
+  const [prefill, setPrefill] = useState<ManualPrefill | null>(null);
   const cameraRef = useRef<any>(null);
+  const { lookingUp, onBarcodeScanned, resume } = useBarcodeScan((result) => {
+    setPrefill(result);
+    setShowManualAdd(true);
+  });
   const {
     capturedImage,
     analyzing,
@@ -29,11 +38,20 @@ export default function CameraScreen() {
     setShowConfirmation,
     analyzeImage,
     toggleDetected,
+    setDetectedExpiry,
     confirmDetected,
   } = useScan({ onManualAdd: () => setShowManualAdd(true) });
 
   const manualAddModal = (
-    <ManualAddModal visible={showManualAdd} onClose={() => setShowManualAdd(false)} />
+    <ManualAddModal
+      visible={showManualAdd}
+      prefill={prefill}
+      onClose={() => {
+        setShowManualAdd(false);
+        // Scan du code-barres suivant
+        resume();
+      }}
+    />
   );
 
   if (!permission) {
@@ -82,11 +100,23 @@ export default function CameraScreen() {
       </View>
 
       <View style={styles.cameraContainer}>
-        <CameraView style={styles.camera} facing={facing} ref={cameraRef} />
+        <CameraView
+          style={styles.camera}
+          facing={facing}
+          ref={cameraRef}
+          barcodeScannerSettings={{ barcodeTypes: [...FOOD_BARCODE_TYPES] }}
+          onBarcodeScanned={mode === 'barcode' && !showManualAdd && !lookingUp ? onBarcodeScanned : undefined}
+        />
         {/* CameraView n'accepte pas d'enfants : le cadre est superposé en position absolue */}
         <View style={styles.cameraOverlay} pointerEvents="none">
-          <View style={styles.scanFrame} />
+          <View style={[styles.scanFrame, mode === 'barcode' && styles.barcodeFrame]} />
         </View>
+        {lookingUp && (
+          <View style={styles.analyzingOverlay}>
+            <ActivityIndicator size="large" color="#fff" />
+            <Text style={styles.analyzingText}>{t('barcode.lookingUp')}</Text>
+          </View>
+        )}
 
         {analyzing && capturedImage && (
           // La photo prise reste affichée pendant l'analyse, sous le message d'attente
@@ -102,8 +132,9 @@ export default function CameraScreen() {
       </View>
 
       <View style={styles.controls}>
+        <ScanModeToggle mode={mode} onChange={setMode} />
         <Text style={styles.instructionText}>
-          {t('scan.pointCamera')}
+          {mode === 'barcode' ? t('barcode.pointCamera') : t('scan.pointCamera')}
         </Text>
 
         <View style={styles.buttonRow}>
@@ -114,13 +145,18 @@ export default function CameraScreen() {
             <FlipHorizontal size={24} color="#6b7280" />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.captureButton}
-            onPress={takePicture}
-            disabled={analyzing}
-          >
-            <View style={styles.captureButtonInner} />
-          </TouchableOpacity>
+          {mode === 'photo' ? (
+            <TouchableOpacity
+              style={styles.captureButton}
+              onPress={takePicture}
+              disabled={analyzing}
+            >
+              <View style={styles.captureButtonInner} />
+            </TouchableOpacity>
+          ) : (
+            // Le code est lu dès qu'il est dans le cadre
+            <View style={styles.captureButtonPlaceholder} />
+          )}
 
           <View style={styles.placeholder} />
         </View>
@@ -132,6 +168,7 @@ export default function CameraScreen() {
         visible={showConfirmation}
         ingredients={detectedIngredients}
         onToggle={toggleDetected}
+        onExpiryChange={setDetectedExpiry}
         onConfirm={confirmDetected}
         onClose={() => setShowConfirmation(false)}
       />
@@ -196,6 +233,11 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     backgroundColor: 'transparent',
   },
+  barcodeFrame: {
+    width: 300,
+    height: 160,
+    borderRadius: 16,
+  },
   capturedImage: {
     position: 'absolute',
     top: 0,
@@ -231,8 +273,8 @@ const styles = StyleSheet.create({
   },
   controls: {
     backgroundColor: '#fff',
-    paddingTop: 24,
-    paddingBottom: 40,
+    paddingTop: 16,
+    paddingBottom: 32,
     paddingHorizontal: 20,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
@@ -241,7 +283,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
     color: '#6b7280',
-    marginBottom: 24,
+    marginBottom: 20,
   },
   buttonRow: {
     flexDirection: 'row',
@@ -273,5 +315,9 @@ const styles = StyleSheet.create({
   },
   placeholder: {
     width: 56,
+  },
+  captureButtonPlaceholder: {
+    width: 72,
+    height: 72,
   },
 });

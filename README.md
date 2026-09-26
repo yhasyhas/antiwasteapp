@@ -16,6 +16,8 @@ qui utilisent en priorité le garde-manger. En français, anglais et espagnol.
 | Reconnaissance des aliments | Gemini Flash-Lite, secours Groq (fonction `analyze-image`) |
 | Recettes | Groq `gpt-oss-120b`, secours Gemini (fonction `generate-recipes`) |
 | Images des recettes | Cloudflare Workers AI, FLUX (fonction `generate-recipe-image`) |
+| Codes-barres | Open Food Facts, appelé depuis l'app (`lib/openFoodFacts.ts`) |
+| Rappels de péremption | Notifications locales `expo-notifications` (`lib/notifications.ts`) |
 | Suivi des erreurs | Sentry (`@sentry/react-native`) |
 
 ```
@@ -84,7 +86,7 @@ Le CLI lit `SUPABASE_ACCESS_TOKEN` (jeton personnel, `sbp_…`) et `SUPABASE_DB_
 | `SCAN_HEDGE_DELAY_MS` | non | Délai avant de lancer Groq en parallèle de Gemini (défaut 5000 ; 2500 en production) |
 | `QUOTA_DAILY_SCANS` | non | Scans par jour et par utilisateur (défaut 20) |
 | `QUOTA_DAILY_GENERATIONS` | non | Générations par jour et par utilisateur (défaut 10) |
-| `QUOTA_DAILY_IMAGES` | non | Images par jour et par utilisateur (défaut 10) |
+| `QUOTA_DAILY_IMAGES` | non | Images par jour et par utilisateur (défaut 30 : 3 par génération) |
 | `ALLOWED_ORIGINS` | non | Origines web autorisées, séparées par des virgules (défaut : Expo web en local) |
 
 Fournis automatiquement par Supabase : `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEYS`, `SUPABASE_SECRET_KEYS`, `SUPABASE_JWKS`.
@@ -123,13 +125,19 @@ un secret : il permet d'envoyer des erreurs au projet, pas de les lire.
   et les stack traces lisibles en production demandent un build EAS (avec `SENTRY_AUTH_TOKEN` pour envoyer les source maps).
 - **Vérifier** : en développement, Réglages → « Envoyer une erreur de test à Sentry », puis Sentry → Issues.
 
+## Notifications
+
+Rappels locaux, sans serveur : une notification par jour à 9 h, seulement si des aliments expirent ce
+jour-là ou le lendemain. L'autorisation est demandée au premier ajout d'une date. Ils fonctionnent dans Expo Go.
+En développement, Réglages → « Tester la notification » l'envoie au bout de 5 secondes.
+
 ## Tests
 
 ```bash
 npm run typecheck                                  # app (TypeScript)
 deno test --no-config supabase/functions/          # fonctions : secours, validation, identifiants, régimes
 PGPASSWORD="$SUPABASE_DB_PASSWORD" psql "$(cat supabase/.temp/pooler-url)" -v ON_ERROR_STOP=1 \
-  -f supabase/tests/household_rls.sql              # idem usage_counters.sql et recipe_images.sql
+  -f supabase/tests/household_rls.sql              # idem usage_counters.sql, recipe_images.sql, ingredients_expiry.sql
 ```
 
 Les tests SQL tournent sur la base distante dans une transaction annulée à la fin : aucune donnée n'est conservée.

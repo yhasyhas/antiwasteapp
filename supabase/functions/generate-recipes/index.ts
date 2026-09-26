@@ -5,11 +5,15 @@ import { withCors } from '../_shared/cors.ts';
 import { type AiProvider, type AttemptLog, geminiProvider, groqProvider, orderProviders, runWithFallback } from '../_shared/ai.ts';
 import {
   buildPantry,
+  buildOtherPantry,
   buildRecipeSchema,
+  type GenerationMode,
+  leftoverItems,
   pantryForPrompt,
   parseRecipes,
   recipeCount,
   strictDietsOf,
+  urgentItems,
 } from './recipes.ts';
 
 // Modèles configurables par secret : les fournisseurs retirent régulièrement des modèles
@@ -34,8 +38,14 @@ const CUISINES = ['any', 'african', 'maghreb', 'asian', 'latin', 'mediterranean'
 type Cuisine = typeof CUISINES[number];
 
 interface GenerateRecipeRequest {
-  // { id, name, quantity } depuis la phase 3 ; simples noms acceptés
+  // { id, name, quantity } depuis la phase 3, + days_left, kind, priority depuis la phase 5 ; simples noms acceptés
   ingredients: unknown[];
+  // leftovers : « Transformer mes restes », chaque recette part d'un plat cuisiné du garde-manger
+  mode?: GenerationMode;
+  // Sélection de l'utilisateur : ingredients ne contient que les ingrédients choisis, other_pantry le
+  // reste du garde-manger (noms), que les recettes ne doivent pas utiliser
+  selection?: boolean;
+  other_pantry?: unknown[];
   preferences: {
     dietary?: string[];
     difficulty?: 'easy' | 'medium' | 'expert';
@@ -77,26 +87,30 @@ const FAILURE_STATUS: Record<FailureReason, number> = {
 };
 
 // Erreurs de la requête elle-même (avant toute génération)
-type RequestError = 'unauthorized' | 'quota_exceeded';
+type RequestError = 'unauthorized' | 'quota_exceeded' | 'no_leftovers';
 
 const REQUEST_ERROR_MESSAGES: Record<string, Record<RequestError, string>> = {
   fr: {
     unauthorized: 'Tu dois être connecté pour générer des recettes.',
     quota_exceeded: 'Tu as atteint la limite de {limit} générations de recettes par jour. Réessaie demain.',
+    no_leftovers: 'Aucun reste dans ton garde-manger. Ajoute un plat cuisiné (scan ou ajout à la main, « C\'est un reste de plat »).',
   },
   en: {
     unauthorized: 'You must be signed in to generate recipes.',
     quota_exceeded: 'You have reached the limit of {limit} recipe generations per day. Try again tomorrow.',
+    no_leftovers: 'No leftovers in your pantry. Add a cooked dish (scan, or add manually with "It\'s a leftover dish").',
   },
   es: {
     unauthorized: 'Debes iniciar sesión para generar recetas.',
     quota_exceeded: 'Has alcanzado el límite de {limit} generaciones de recetas por día. Vuelve a intentarlo mañana.',
+    no_leftovers: 'No hay sobras en tu despensa. Añade un plato cocinado (escaneo o a mano, «Son sobras de un plato»).',
   },
 };
 
 const REQUEST_ERROR_STATUS: Record<RequestError, number> = {
   unauthorized: 401,
   quota_exceeded: 429,
+  no_leftovers: 400,
 };
 
 function jsonResponse(body: unknown, status: number): Response {
@@ -158,6 +172,11 @@ function buildPrompts(options: {
   cuisine: Cuisine;
   dietary: string[];
   hasStrictDiet: boolean;
+  hasUrgent: boolean;
+  hasLeftovers: boolean;
+  mode: GenerationMode;
+  selection: boolean;
+  otherPantry: string[];
 }): { system: string; prompt: string } {
   const languageName = LANGUAGE_NAMES[options.language] || LANGUAGE_NAMES['en'];
   const dietaryRules = options.dietary.map((diet) => DIETARY_RULES[diet.toLowerCase()]).filter(Boolean);
@@ -177,13 +196,25 @@ ${MEAL_PREFERENCES[options.mealType] || ''}
 ${cuisineRule}
 
 INGRÉDIENTS :
-- Utilise en priorité les ingrédients du garde-manger, pour éviter le gaspillage.
+- Utilise en priorité les ingrédients du garde-manger, pour éviter le gaspillage.${options.hasUrgent ? `
+- ANTI-GASPI : les ingrédients marqués [URGENT] passent avant tous les autres. Chaque recette en utilise au moins un, au cœur du plat (pas en simple garniture), et l'ensemble des recettes les utilise tous si c'est possible.` : ''}${options.hasLeftovers ? `
+- Un ingrédient marqué [reste de plat] est un plat déjà cuisiné : on le transforme ou on l'intègre, et il n'est réchauffé qu'une fois, bien à cœur.` : ''}
+- Un ingrédient marqué [date dépassée] n'est jamais mis en avant ; s'il s'agit d'un produit frais (viande, poisson, produit laitier, plat cuisiné), ne l'utilise pas.
 - "pantry_id" : l'identifiant (p1, p2…) de l'ingrédient du garde-manger utilisé, ou "missing" pour tout ingrédient qui n'en vient pas (y compris sel, poivre, huile).
 - Pour un ingrédient du garde-manger, "name" reprend son nom tel qu'il est écrit dans la liste.
 - "name" : le nom de l'ingrédient seul, sans préparation ni précision (« ail » et non « ail, émincé ») ; la préparation va dans les étapes.
 - Chaque recette utilise au moins un ingrédient du garde-manger.
 - "quantity" : le nombre seul (ex. "500", "2", "1/2") ; "unit" : l'unité abrégée (g, kg, ml, cl, l, c. à soupe, c. à café, pièce, tranche, gousse, pincée).${options.hasStrictDiet ? `
-- "diet_violations" : pour chaque ingrédient, les régimes sélectionnés qu'il ne respecte pas (liste vide s'il les respecte tous). Sois exact : le lait de coco est vegan, le beurre ne l'est pas.` : ''}
+- "diet_violations" : pour chaque ingrédient, les régimes sélectionnés qu'il ne respecte pas (liste vide s'il les respecte tous). Sois exact : le lait de coco est vegan, le beurre ne l'est pas.` : ''}${options.selection ? `
+
+SÉLECTION DE L'UTILISATEUR (règle stricte) :
+- Il veut cuisiner avec les seuls ingrédients listés dans le garde-manger, plus les basiques : sel, poivre, huile, eau (avec "pantry_id" = "missing").
+- Tout autre ingrédient est à acheter : au plus 2 par recette, et seulement s'il est indispensable.${options.otherPantry.length > 0 ? `
+- Ces ingrédients sont chez lui mais réservés : n'en utilise AUCUN, ni sous un autre nom : ${options.otherPantry.join(', ')}.` : ''}` : ''}${options.mode === 'leftovers' ? `
+
+MODE « TRANSFORMER MES RESTES » (règle stricte) :
+- Chaque recette part d'au moins un ingrédient marqué [reste de plat] et le transforme en un nouveau plat (ex. riz → riz sauté ou galettes, gratin de pâtes → croquettes, poulet rôti → wraps ou salade composée), au lieu de simplement le réchauffer.
+- Le titre et la description présentent la transformation (ex. « Galettes croustillantes avec ton reste de riz »).` : ''}
 
 ÉTAPES :
 - Précises et actionnables : technique, température, durée et repère visuel (ex. « Faites dorer à feu vif 3 minutes, jusqu'à ce que les bords soient croustillants »).
@@ -216,7 +247,10 @@ Deno.serve(withCors(async (req: Request) => {
   let language = 'fr';
 
   try {
-    const { ingredients, preferences, debug, providers: requestedOrder }: GenerateRecipeRequest = await req.json();
+    const { ingredients, preferences, mode: requestedMode, selection: requestedSelection, other_pantry, debug, providers: requestedOrder }: GenerateRecipeRequest = await req.json();
+    const mode: GenerationMode = requestedMode === 'leftovers' ? 'leftovers' : 'standard';
+    const selection = requestedSelection === true;
+    const otherPantry = selection ? buildOtherPantry(other_pantry) : [];
     language = (preferences?.language || 'fr').substring(0, 2).toLowerCase();
 
     // Chaque génération consomme les quotas des fournisseurs : réservé aux utilisateurs connectés
@@ -231,6 +265,10 @@ Deno.serve(withCors(async (req: Request) => {
     }
     if (!preferences?.mealType) {
       return jsonResponse({ error: 'Type de repas requis (mealType)' }, 400);
+    }
+    // Vérifié avant le quota : sans reste, le mode « Transformer mes restes » n'a rien à transformer
+    if (mode === 'leftovers' && leftoverItems(pantry).length === 0) {
+      return requestErrorResponse('no_leftovers', language);
     }
     if (PROVIDERS.length === 0) {
       return jsonResponse({ error: 'api_error', message: (FAILURE_MESSAGES[language] || FAILURE_MESSAGES['en']).api_error, details: 'GROQ_API_KEY and GEMINI_API_KEY missing' }, 500);
@@ -248,7 +286,7 @@ Deno.serve(withCors(async (req: Request) => {
     const cuisine: Cuisine = (CUISINES as readonly string[]).includes(preferences.cuisine || '') ? preferences.cuisine as Cuisine : 'any';
     const difficulty = preferences.difficulty || 'easy';
     const count = recipeCount(pantry.items.length);
-    const context = { mealType: preferences.mealType, cuisine, difficulty, dietary, maxRecipes: count };
+    const context = { mealType: preferences.mealType, cuisine, difficulty, dietary, maxRecipes: count, mode, otherPantry };
 
     const { system, prompt } = buildPrompts({
       pantryText: pantryForPrompt(pantry),
@@ -260,6 +298,11 @@ Deno.serve(withCors(async (req: Request) => {
       cuisine,
       dietary,
       hasStrictDiet: diets.length > 0,
+      hasUrgent: urgentItems(pantry).length > 0,
+      hasLeftovers: leftoverItems(pantry).length > 0,
+      mode,
+      selection,
+      otherPantry,
     });
 
     const providers = debug === true && requestedOrder

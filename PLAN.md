@@ -30,7 +30,7 @@ Dernière mise à jour : 23/09/2026
 
 | Rôle | Aujourd'hui | Cible |
 |---|---|---|
-| App | Expo SDK 57, expo-router 57, RN 0.86 | SDK 57 dès la phase 0.5 (tests sur Android), build EAS en phase 7 |
+| App | Expo SDK 57, expo-router 57, RN 0.86 | SDK 57 dès la phase 0.5 (tests sur Android), build de développement EAS en phase 6 |
 | Backend | Supabase (clés `anon`, legacy) | Supabase (clés `sb_publishable_` / `sb_secret_`) |
 | Vision | Gemini Flash-Lite (`GEMINI_MODEL`) + secours Groq `qwen/qwen3.8-27b` (`GROQ_VISION_MODEL`), sortie structurée (phase 0.6) ; Clarifai fermé le 17/07/2026 | Idem, avec un temps d'analyse < 5 s pour 90 % des scans (phase 3) |
 | Recettes | Groq `llama-3.3-70b-versatile` (**retiré le 16/08/2026**) | Gemini (principal) + Groq `openai/gpt-oss-120b` (secours) |
@@ -101,7 +101,7 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 - [x] `setLanguage` : ajouter `onConflict: 'user_id'` à l'upsert de `user_preferences`
 - [x] Migration : colonnes `servings` (integer), `tips` (jsonb) et `suggestion` (text) sur `recipes`, et les enregistrer à la sauvegarde — migration `20260924190000` appliquée avec `db push`
 - [x] Supprimer le code mort (`generateFallbackRecipe`)
-- ~~Renommer l'app~~ → déplacé en phase 7 (nom pas encore choisi)
+- ~~Renommer l'app~~ → déplacé en phase 8, lancement (nom pas encore choisi)
 - [x] Inscription sans session (confirmation d'email active) : ne pas rediriger vers les onglets, afficher « Vérifie ta boîte mail »
 - [x] Connexion avec un email non confirmé : afficher un message clair au lieu de l'erreur brute
 - [x] Aucune écriture en base qui échoue en silence : vérifier `error` après chaque insert / update / delete et prévenir l'utilisateur
@@ -169,21 +169,22 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 
 ## Phase 5 — Le cœur anti-gaspi
 
-- [ ] Migration : colonnes `expires_at` (date) et `category` (text) sur `ingredients`
-- [ ] Au scan, l'IA propose une date de péremption selon la catégorie ; l'utilisateur la modifie avec des boutons rapides (+3 j, +1 sem., +1 mois)
-- [ ] Garde-manger trié par urgence, avec badges de couleur (expiré / bientôt / OK)
-- [ ] Le prompt de génération donne la priorité aux ingrédients qui expirent bientôt
-- [ ] Notifications locales avec `expo-notifications` : rappel la veille de la péremption
-- [ ] Bouton « J'ai cuisiné ça » : retire du garde-manger les ingrédients utilisés (avec confirmation)
-- [ ] Scan de code-barres (`expo-camera`) + recherche du produit sur Open Food Facts
-- [ ] Conserver avant de cuisiner : enregistrer `storage_tip` et l'afficher sur chaque ingrédient
-- [ ] Restes de plats : date de péremption courte automatique pour les éléments `kind = dish`
-- [ ] Restes de plats : mode de génération « Transformer mes restes »
+- [x] Migration : colonnes `expires_at` (date), `category`, `kind`, `storage_tip` et `barcode` sur `ingredients`
+- [x] Au scan, l'IA estime la durée de conservation (`shelf_life_days`) ; date proposée au scan et à l'ajout manuel, modifiable avec des boutons rapides (+3 j, +1 sem., +1 mois) ou un calendrier
+- [x] Garde-manger trié par urgence, avec badges de couleur (expiré / bientôt / OK) ; date modifiable en touchant le badge
+- [x] Le prompt de génération donne la priorité aux ingrédients qui expirent bientôt (et à ceux que l'utilisateur choisit)
+- [x] Notifications locales avec `expo-notifications` : une seule par jour à 9 h, qui regroupe les aliments expirant aujourd'hui ou demain ; autorisation demandée au premier ajout d'une date ; la notification ouvre la génération avec ces aliments présélectionnés
+- [x] Bouton « J'ai cuisiné ça » : ingrédients du garde-manger utilisés, tous cochés ; l'utilisateur décoche ce qu'il lui reste, le reste est retiré
+- [x] Scan de code-barres (`expo-camera`) + recherche du produit sur Open Food Facts (User-Agent de l'app) ; produit inconnu : ajout manuel avec le code prérempli
+- [x] Conserver avant de cuisiner : enregistrer `storage_tip` et l'afficher sur chaque ingrédient
+- [x] Restes de plats : date de péremption courte automatique (2 à 3 jours) pour les éléments `kind = dish`, identifiés « Reste »
+- [x] Restes de plats : mode de génération « Transformer mes restes »
 
 **Terminé quand** : un aliment ajouté avec une date proche déclenche une notification, et la recette proposée l'utilise en premier.
 
 ## Phase 6 — Donner envie de revenir
 
+- [ ] Passer à un build de développement EAS (Android) : canal de notifications dédié (impossible dans Expo Go), plantages natifs dans Sentry
 - [ ] Liste de courses construite à partir de `missing_ingredients`
 - [ ] Compteur de gaspillage évité (kg, et éventuellement argent économisé) sur l'accueil
 - [ ] Écran de préférences : régimes, ingrédients exclus, temps max ; utilisé par la génération
@@ -195,9 +196,17 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 
 **Terminé quand** : un nouvel utilisateur peut scanner et générer une recette sans créer de compte, puis garder ses données en créant son compte.
 
-## Phase 7 — Préparer le lancement
+## Phase 7 — Design et ergonomie
 
-- [ ] Créer un build de développement EAS
+- [ ] Identité visuelle : couleurs, typographie, composants (boutons, cartes, badges, fenêtres)
+- [ ] Maquettes des écrans principaux (accueil, scan, garde-manger, génération, fiche recette), **validées avant de coder**
+- [ ] Refonte des écrans d'après les maquettes validées
+- [ ] Boutons, transitions et fluidité (animations, retours visuels, temps de chargement ressentis)
+
+**Terminé quand** : les écrans principaux suivent les maquettes validées et l'app paraît fluide sur un téléphone Android d'entrée de gamme.
+
+## Phase 8 — Préparer le lancement
+
 - [ ] Réactiver la confirmation d'email dans Supabase (Authentication → Sign In / Providers → Email)
 - [ ] Revoir les limites de Groq (~3 scans/min en secours, modèle en preview) et de Gemini avant la bêta : offre payante ou autre modèle
 - [ ] Renommer l'app : `name`, `slug`, `scheme` dans `app.json`, `name` dans `package.json` — nom à choisir (pistes : Miette, Glana, Frigoscope)
@@ -277,4 +286,22 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 | 25/09/2026 | Images des recettes : 800 px de large, JPEG qualité 75 (ImageScript dans la fonction) | Essais sur deux images FLUX : 1024 px q75 = 135 à 190 Ko ; 800 px q75 = 96 à 131 Ko sans perte visible sur un téléphone ; 720 px et 640 px plus légers mais moins nets sur les grands écrans. En production : 81 et 111 Ko, temps de génération inchangé (5 à 6 s). Les 2 images existantes recompressées (677 et 697 Ko → 120 et 116 Ko), originaux dans `backups/recipe-images/`, URL inchangées |
 | 25/09/2026 | Sentry, offre gratuite (Developer), données hébergées dans l'UE (`ingest.de.sentry.io`) ; `@sentry/react-native` ~7.11, DSN dans `.env` (`EXPO_PUBLIC_SENTRY_DSN`) | Dans Expo Go, seules les erreurs JavaScript remontent (pas les plantages natifs ni la mise en file hors connexion) : un build EAS sera nécessaire pour le reste. `sendDefaultPii: false`, seul l'uuid de l'utilisateur est joint (ni e-mail ni IP). Événement de test envoyé à l'API de Sentry : accepté (200). Bouton d'erreur volontaire dans Réglages, visible seulement en développement |
 | 25/09/2026 | Phase 4 validée dans l'app : Sentry (erreur de test reçue), langue du téléphone au premier lancement, parcours complet dans les trois langues ; anciens tests de la phase 1 faits sur appareil (inscription, déconnexion, mode avion, rechargement des onglets) | La validation partielle de la phase 1 est levée. Règle ajoutée : rapports et messages en français |
+| 26/09/2026 | Durée de conservation estimée par l'IA du scan (`shelf_life_days`), bornée côté serveur : 2 à 3 jours pour un plat cuisiné, 1 à 730 jours sinon, valeur par défaut par catégorie si le modèle n'en donne pas. Le conseil de conservation ne contient plus de durée | La date porte la durée ; le conseil plus court compense les tokens ajoutés (limite de 1 000 tokens de sortie par minute de Groq). Testé sur 3 photos : œufs 21 j, fraises 3 j, pain 3 j, restes 2 j |
+| 26/09/2026 | Dates proposées sans IA : ajout manuel 7 jours (3 pour un reste), produit scanné par code-barres selon sa catégorie (laitier 10 j, pâtes 365 j…) avec l'invitation à recopier la date imprimée | Point de départ modifiable ; aucune estimation fiable n'est possible sans l'IA ou la date de l'emballage |
+| 26/09/2026 | « Bientôt » = aujourd'hui, demain ou après-demain (badge orange) ; expiré en rouge ; sans date à la fin de la liste | Même seuil pour les badges, la priorité de la génération et le tri |
+| 26/09/2026 | Génération : l'app envoie les jours restants (calculés dans le fuseau du téléphone), le type et les ingrédients choisis ; le serveur trie par urgence avant d'attribuer les alias et marque [URGENT], [reste de plat], [date dépassée] dans le prompt. Les produits frais à date dépassée ne sont pas utilisés | Testé : courgettes (demain) et crème (aujourd'hui) utilisées dans les 3 recettes sur 10 ingrédients ; lait choisi utilisé dans les 3 recettes |
+| 26/09/2026 | Présélection : les ingrédients de l'écran de génération se touchent pour être utilisés en priorité (ceux d'une notification sont déjà choisis) | Façon de rendre visible la présélection demandée pour les notifications ; **choix d'interface à valider** |
+| 26/09/2026 | « Transformer mes restes » : bouton visible quand le garde-manger contient un plat cuisiné ; recette sans reste écartée côté serveur ; sans reste, refus 400 avant de compter le quota | Testé : chaque recette de 3 essais part d'un reste (riz sauté, croquettes, arancini, gratin…) |
+| 26/09/2026 | Notifications locales (aucun serveur) : rappels des 14 prochains jours programmés à l'avance, recalculés à chaque changement du garde-manger, à l'ouverture de l'app et au changement de langue ; texte sous la forme « Aujourd'hui : crème. Demain : tomates et reste de riz. 3 recettes t'attendent. » | Fonctionne dans Expo Go (seules les notifications distantes en sont retirées). Pas de « tes / ton » devant les noms : l'accord (genre, nombre) n'est pas fiable pour des noms saisis librement. Nombre de recettes : même règle que la génération (1 à 3). Un changement fait depuis un autre téléphone du foyer n'est pris en compte qu'à la prochaine ouverture |
+| 26/09/2026 | Autorisation des notifications : explication puis demande du système au premier ajout d'une date (scan, ajout manuel, date modifiée), une seule fois ; jamais au lancement | Android 12 et avant autorise d'office : pas de question |
+| 26/09/2026 | « J'ai cuisiné ça » : retire entièrement les ingrédients cochés (pas de quantité partielle) ; bouton visible seulement pour les recettes liées au garde-manger par identifiants (depuis la phase 3) | Une gestion des quantités restantes demanderait des quantités structurées ; l'utilisateur décoche ce qu'il garde |
+| 26/09/2026 | Code-barres : Open Food Facts appelé directement depuis l'app (base publique, sans clé), User-Agent « AntiGaspiRecettes/1.0 (adresse du dépôt GitHub) » plutôt qu'une adresse e-mail | Aucune donnée personnelle envoyée ; aucun quota à gérer côté serveur. Catégories Open Food Facts converties en catégories de l'app |
+| 26/09/2026 | expo-notifications importé fonction par fonction (`lib/notificationsApi.ts`), jamais par `import … from 'expo-notifications'` | Le point d'entrée du paquet charge l'enregistrement du jeton des notifications distantes, qui lève une erreur au démarrage dans Expo Go sur Android (SDK 53 et suivants) : l'app ne s'ouvrait plus. Les notifications locales fonctionnent sans ce module ; vérifié dans le bundle Android |
+| 26/09/2026 | Retours de test de la phase 5 — sélection d'ingrédients : si l'utilisateur en choisit (ou en reçoit d'une notification), seuls ceux-là sont envoyés au modèle, plus sel, poivre, huile, eau ; le reste du garde-manger est listé comme réservé et une recette qui l'utilise (même au pluriel ou précisé : « tomates cerises » pour « tomates ») est écartée par le serveur. Sans sélection, tout le garde-manger, priorité aux dates | Remplace la « priorité » des ingrédients touchés. Les ingrédients à acheter restent permis (2 au plus par recette, s'ils sont indispensables). Testé : courgettes + œufs choisis parmi 10 → recettes avec ces deux seuls ingrédients, aucune écartée |
+| 26/09/2026 | Images générées en arrière-plan dès l'affichage des recettes (cartes et fiche se remplissent à leur arrivée) ; quota porté de 10 à 30 images par jour et par utilisateur (3 par génération × 10 générations) | Taille réduite impossible avec FLUX schnell : le modèle refuse width/height (« Additional properties not allowed ») et sort toujours du 1024×1024. FLUX.2 klein 4B serait facturé à la tuile de sortie (≈ 26 neurones en 512×512 contre ≈ 58 pour schnell) mais exige un envoi multipart qui n'a pas abouti en test : à reprendre à la revue des coûts (phase 8). Mesure : 1,3 s de génération, 695 Ko → 122 Ko après compression ; coût d'après la grille Cloudflare 4 tuiles × 4,8 + 4 étapes × 9,6 ≈ 58 neurones par image, soit ≈ 170 images par jour pour tout le compte dans l'offre gratuite (10 000 neurones). Le jeton Cloudflare n'a pas accès aux statistiques d'usage : **consommation réelle à relever dans le dashboard (Workers AI → Utilisation)** |
+| 26/09/2026 | Fiche recette unique (`RecipeSheet`) pour la génération, les recettes récentes et les favoris : image (emplacement réservé, affiché tout de suite), temps, régimes, ingrédients du garde-manger et à acheter, quantités, étapes, conseils, suggestion, favori (ajout ou retrait) et « J'ai cuisiné ça » | Les trois fiches différaient (l'accueil n'affichait qu'un résumé). Les anciennes recettes (ingrédients en texte) sont converties par `recipeFromRow`. L'URL de l'image est enregistrée sur la recette par la fonction ; chaque écran est prévenu de son arrivée |
+| 26/09/2026 | Expo Go : `setNotificationChannelAsync` plante (NullPointerException, NotificationsChannelsProvider) ; le canal dédié n'est créé qu'en dehors d'Expo Go, sinon canal par défaut | Canal « Aliments qui expirent » dans le build de développement (phase 6, désormais en tête de phase) |
+| 26/09/2026 | Nouvelle phase 7 « Design et ergonomie » (identité visuelle, maquettes validées avant de coder, refonte des écrans et de la fluidité) ; le lancement devient la phase 8 ; le build de développement EAS passe au début de la phase 6 | Les mentions « phase 7 » plus haut dans ce journal désignent le lancement, désormais phase 8 |
+| 26/09/2026 | Images des recettes : un seul état partagé par toute l'app (`lib/recipeImage.ts`), lu par toutes les cartes et fiches ; réservation de la recette côté serveur avant la génération (`image_url = pending:<date>`, posée seulement si l'image est vide, reprise après 2 min) | Corrige la carte restée sur l'indicateur après ouverture de la fiche pendant le chargement (chaque écran gardait sa propre copie de l'état). Testé : 3 appels simultanés pour la même recette → 1 génération, 2 réponses « en cours » (202), 1 seule image dans le bucket ; appel suivant : image existante, sans génération ni quota |
+| 26/09/2026 | Phase 5 validée dans l'app, avec les corrections (sélection, images en arrière-plan, fiche unique, sélecteur de date, notifications dans Expo Go). Ingrédients à acheter gardés : 2 au plus par recette avec une sélection | Consommation Cloudflare réelle du jour : chiffres non transmis (à relever dans Workers AI → Utilisation pour la revue des coûts de la phase 8) |
 | | *(résultat du test Gemini vs Clarifai)* | |

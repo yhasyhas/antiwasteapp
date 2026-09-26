@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { Clock, Lightbulb } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { difficultyLabel } from '@/lib/labels';
@@ -8,7 +8,8 @@ import { suggestionStyles } from './modalStyles';
 import type { Recipe } from './types';
 
 // Carte d'une recette générée (liste de l'écran de génération)
-export function RecipeCard({ recipe, onPress }: { recipe: Recipe; onPress: () => void }) {
+// imageLoading : image demandée en arrière-plan, emplacement avec indicateur jusqu'à son arrivée
+export function RecipeCard({ recipe, imageLoading, onPress }: { recipe: Recipe; imageLoading: boolean; onPress: () => void }) {
   const { t } = useLanguage();
 
   return (
@@ -16,13 +17,17 @@ export function RecipeCard({ recipe, onPress }: { recipe: Recipe; onPress: () =>
       style={styles.recipeCard}
       onPress={onPress}
     >
-      {recipe.image_url && (
+      {(recipe.image_url || imageLoading) && (
         <View style={styles.recipeImageContainer}>
-          <Image
-            source={{ uri: recipe.image_url }}
-            style={styles.recipeThumbnail}
-            resizeMode="cover"
-          />
+          {recipe.image_url ? (
+            <Image
+              source={{ uri: recipe.image_url }}
+              style={styles.recipeThumbnail}
+              resizeMode="cover"
+            />
+          ) : (
+            <ActivityIndicator color="#10b981" />
+          )}
         </View>
       )}
       <View style={styles.recipeContent}>
@@ -78,6 +83,8 @@ const styles = StyleSheet.create({
   recipeImageContainer: {
     height: 150,
     backgroundColor: '#e5e7eb',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   recipeThumbnail: {
     width: '100%',

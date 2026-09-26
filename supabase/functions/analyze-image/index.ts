@@ -92,9 +92,12 @@ function errorResponse(code: string, language: string, status: number, details?:
 // (ex. un modèle qui range les légumes dans "legume" à cause du mot français « légume »)
 const CATEGORY_GUIDE = `un de ces codes : fruit (fruits frais), vegetable (légumes, y compris tomates, pommes de terre, salades), meat (viande, charcuterie), fish (poisson, fruits de mer), dairy (lait, fromage, yaourt, beurre, crème), egg (œufs), grain (pâtes, riz, céréales, farine), legume (légumineuses : lentilles, pois chiches, haricots secs), bakery (pain, viennoiseries, biscuits), condiment (sauces, huile, vinaigre, confiture), spice (épices, herbes séchées), beverage (boissons, y compris jus de fruits), snack (gâteaux apéritif, chocolat, confiseries), frozen (surgelés), other.`;
 
-// Court pour limiter les tokens de sortie (temps de réponse, limite de Groq)
+// Court pour limiter les tokens de sortie (temps de réponse, limite de Groq). La durée est dans
+// shelf_life_days, le conseil dit seulement où et comment ranger l'aliment.
 const STORAGE_TIP_GUIDE = (languageName: string) =>
-  `conseil de conservation court en ${languageName} (une phrase, 12 mots au plus), adapté à l'aliment tel qu'il est sur la photo : où le ranger et combien de temps (ex. « Au frigo, dans une boîte fermée, 3 jours »).`;
+  `conseil de conservation court en ${languageName} (10 mots au plus), adapté à l'aliment tel qu'il est sur la photo : où et comment le ranger, sans durée (ex. « Au frigo, dans une boîte fermée »).`;
+
+const SHELF_LIFE_GUIDE = `nombre de jours pendant lesquels l'aliment reste bon à partir d'aujourd'hui, dans de bonnes conditions de conservation, selon l'aliment et son état (ex. salade 4, lait ouvert 3, yaourt 15, pâtes sèches 365). Plat cuisiné ou reste ("kind" = "dish") : 2 ou 3.`;
 
 function buildPrompt(language: string, mode: AnalyzeMode): string {
   const languageName = LANGUAGE_NAMES[language] || LANGUAGE_NAMES['en'];
@@ -109,6 +112,7 @@ Liste uniquement les produits alimentaires achetés.
 - "confidence" : entre 0 et 1, selon la lisibilité de la ligne et ta certitude sur le produit.
 - "kind" : "ingredient".
 - "storage_tip" : ${STORAGE_TIP_GUIDE(languageName)}
+- "shelf_life_days" : ${SHELF_LIFE_GUIDE} Produit neuf, non ouvert.
 - Un même produit n'apparaît qu'une fois : additionne les quantités.
 - Ignore les produits non alimentaires (hygiène, entretien…), les totaux, remises, moyens de paiement et TVA.
 - Si l'image n'est pas un ticket lisible, renvoie une liste vide.`;
@@ -123,6 +127,7 @@ Liste les aliments et ingrédients de cuisine visibles.
 - "confidence" : entre 0 et 1, ta certitude que l'aliment est bien présent.
 - "kind" : "dish" pour un plat cuisiné ou un reste de repas (ex. "gratin de pâtes", "reste de poulet rôti", "soupe"), dont "name" est alors le nom du plat ; "ingredient" pour tout le reste.
 - "storage_tip" : ${STORAGE_TIP_GUIDE(languageName)}
+- "shelf_life_days" : ${SHELF_LIFE_GUIDE}
 - Un même aliment n'apparaît qu'une fois : additionne les quantités.
 - 20 aliments au plus, les plus visibles d'abord.
 - Ignore ce qui n'est pas comestible (ustensiles, meubles, emballages vides).
@@ -137,7 +142,7 @@ const PROVIDERS: AiProvider[] = [
 ];
 
 // L'offre gratuite de Groq limite ce modèle à 1 000 tokens de sortie par minute : une valeur plus haute
-// fait refuser la requête. 20 aliments avec leur conseil de conservation tiennent dans ~900 tokens.
+// fait refuser la requête. 20 aliments avec leur conseil et leur durée de conservation tiennent dans ~900 tokens.
 const MAX_OUTPUT_TOKENS = 1000;
 
 Deno.serve(withCors(async (req: Request) => {

@@ -6,8 +6,11 @@ import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_SECRET_KEY, SUPABASE_URL } from '../
 import { compressRecipeImage } from '../_shared/image.ts';
 
 // Image d'une recette : générée par Cloudflare Workers AI (FLUX), stockée dans le bucket recipe-images,
-// URL enregistrée dans recipes.image_url. Appelée par l'app seulement à l'ouverture ou à la sauvegarde
-// d'une recette, et une seule fois par recette : si l'image existe déjà, elle est renvoyée sans rien générer.
+// URL enregistrée dans recipes.image_url (historique). Appelée par l'app en arrière-plan dès l'affichage
+// des recettes générées (et à l'ouverture d'une recette qui n'en a pas), une seule fois par recette : si
+// l'image existe déjà, elle est renvoyée sans rien générer ni compter.
+// Coût (grille Cloudflare) : FLUX schnell sort toujours du 1024×1024 (aucune taille réglable), soit
+// 4 tuiles × 4,8 + 4 étapes × 9,6 ≈ 58 neurones par image.
 
 const CLOUDFLARE_ACCOUNT_ID = Deno.env.get('CLOUDFLARE_ACCOUNT_ID') || '';
 const CLOUDFLARE_API_TOKEN = Deno.env.get('CLOUDFLARE_API_TOKEN') || '';
@@ -95,6 +98,54 @@ async function loadRecipe(recipeId: string, authorization: string): Promise<Reci
   return rows[0] ?? null;
 }
 
+// ---------- Une seule génération par recette ----------
+// Avant de générer, la fonction réserve la recette : image_url = « pending:<date> », posé seulement si
+// image_url est vide (ou si une réservation a plus de 2 minutes : appel interrompu). Un deuxième appel
+// simultané (autre écran, autre téléphone du foyer) ne peut pas la poser : il ne génère rien et répond
+// « en cours » (202), l'app redemande quelques secondes plus tard. L'app ne traite jamais « pending: »
+// comme une image.
+
+const CLAIM_PREFIX = 'pending:';
+const CLAIM_TTL_MS = 120_000;
+
+function existingImageResponse(recipe: Pick<RecipeRow, 'image_url'>): Response | null {
+  const url = recipe.image_url;
+  if (!url) return null;
+  if (!url.startsWith(CLAIM_PREFIX)) return jsonResponse({ image_url: url, generated: false }, 200);
+  const claimedAt = Date.parse(url.slice(CLAIM_PREFIX.length));
+  // Réservation expirée : on pourra la reprendre
+  if (!Number.isFinite(claimedAt) || Date.now() - claimedAt > CLAIM_TTL_MS) return null;
+  return jsonResponse({ status: 'in_progress' }, 202);
+}
+
+// Change image_url si sa valeur actuelle correspond à « expected » (filtre PostgREST) ; vrai si une ligne
+// a été modifiée
+async function updateImageUrl(recipeId: string, expected: { eq: string } | { or: string }, value: string | null, authorization: string): Promise<boolean> {
+  const params = new URLSearchParams({ id: `eq.${recipeId}` });
+  if ('eq' in expected) params.set('image_url', `eq.${expected.eq}`);
+  else params.set('or', expected.or);
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/recipes?${params}`, {
+    method: 'PATCH',
+    headers: { ...asUser(authorization), Prefer: 'return=representation' },
+    body: JSON.stringify({ image_url: value }),
+  });
+  if (!response.ok) throw new Error(`mise à jour de la recette : HTTP ${response.status}`);
+  const rows = await response.json();
+  return Array.isArray(rows) && rows.length === 1;
+}
+
+// Renvoie la réservation posée, ou null si la recette est déjà réservée ou a déjà son image
+async function claimRecipe(recipeId: string, authorization: string): Promise<string | null> {
+  const claim = `${CLAIM_PREFIX}${new Date().toISOString()}`;
+  const expired = `${CLAIM_PREFIX}${new Date(Date.now() - CLAIM_TTL_MS).toISOString()}`;
+  const free = `(image_url.is.null,and(image_url.like."${CLAIM_PREFIX}*",image_url.lt."${expired}"))`;
+  return await updateImageUrl(recipeId, { or: free }, claim, authorization) ? claim : null;
+}
+
+async function releaseClaim(recipeId: string, claim: string, authorization: string) {
+  await updateImageUrl(recipeId, { eq: claim }, null, authorization);
+}
+
 // FLUX comprend mieux l'anglais : image_prompt est écrit en anglais par generate-recipes
 function buildImagePrompt(recipe: Pick<RecipeRow, 'title' | 'description' | 'image_prompt'>): string {
   if (recipe.image_prompt && recipe.image_prompt.trim() !== '') return recipe.image_prompt.trim().slice(0, 1000);
@@ -142,6 +193,10 @@ Deno.serve(withCors(async (req: Request) => {
   const t0 = Date.now();
   let language = 'fr';
   let quotaUserId: string | null = null;
+  // Réservation posée sur la recette, libérée si la génération échoue
+  let claim: string | null = null;
+  let claimedRecipeId = '';
+  let claimAuthorization = '';
 
   try {
     const body = await req.json().catch(() => ({}));
@@ -156,15 +211,26 @@ Deno.serve(withCors(async (req: Request) => {
     const recipe = await loadRecipe(recipeId, authorization);
     if (!recipe) return errorResponse('not_found', language);
 
-    // Déjà générée : aucune génération, aucun quota
-    if (recipe.image_url) return jsonResponse({ image_url: recipe.image_url, generated: false }, 200);
+    // Déjà générée : aucune génération, aucun quota ; en cours ailleurs : l'app redemandera
+    const existing = existingImageResponse(recipe);
+    if (existing) return existing;
 
     if (!CLOUDFLARE_ACCOUNT_ID || !CLOUDFLARE_API_TOKEN) {
       return errorResponse('not_configured', language, 'CLOUDFLARE_ACCOUNT_ID or CLOUDFLARE_API_TOKEN missing');
     }
 
+    // Réservation de la recette : si un autre appel l'a prise entre-temps, on ne génère rien
+    claim = await claimRecipe(recipe.id, authorization);
+    claimedRecipeId = recipe.id;
+    claimAuthorization = authorization;
+    if (!claim) {
+      const current = await loadRecipe(recipe.id, authorization);
+      return (current && existingImageResponse(current)) || jsonResponse({ status: 'in_progress' }, 202);
+    }
+
     if (!await consumeQuota(user.id, 'images')) {
       console.warn(`[generate-recipe-image] quota atteint (${DAILY_LIMITS.images} images/jour) pour ${user.id}`);
+      await releaseClaim(recipe.id, claim, authorization);
       return errorResponse('quota_exceeded', language);
     }
     quotaUserId = user.id;
@@ -175,6 +241,7 @@ Deno.serve(withCors(async (req: Request) => {
     } catch (error) {
       console.error('[generate-recipe-image] génération :', error);
       await refundQuota(user.id, 'images');
+      await releaseClaim(recipe.id, claim, authorization);
       return errorResponse('ai_error', language, error instanceof Error ? error.message : String(error));
     }
 
@@ -191,15 +258,13 @@ Deno.serve(withCors(async (req: Request) => {
     let imageUrl: string;
     try {
       imageUrl = await uploadImage(path, bytes);
-      const update = await fetch(`${SUPABASE_URL}/rest/v1/recipes?id=eq.${recipe.id}`, {
-        method: 'PATCH',
-        headers: { ...asUser(authorization), Prefer: 'return=minimal' },
-        body: JSON.stringify({ image_url: imageUrl }),
-      });
-      if (!update.ok) throw new Error(`mise à jour de la recette : HTTP ${update.status}`);
+      // Remplace la réservation (et seulement elle) par l'URL de l'image
+      const saved = await updateImageUrl(recipe.id, { eq: claim }, imageUrl, authorization);
+      if (!saved) throw new Error('réservation perdue avant l\'enregistrement');
     } catch (error) {
       console.error('[generate-recipe-image] enregistrement :', error);
       await refundQuota(user.id, 'images');
+      await releaseClaim(recipe.id, claim, authorization);
       return errorResponse('storage_error', language, error instanceof Error ? error.message : String(error));
     }
 
@@ -208,6 +273,7 @@ Deno.serve(withCors(async (req: Request) => {
   } catch (error) {
     console.error('[generate-recipe-image] erreur :', error);
     if (quotaUserId) await refundQuota(quotaUserId, 'images');
+    if (claim && claimedRecipeId) await releaseClaim(claimedRecipeId, claim, claimAuthorization).catch(() => {});
     return errorResponse('ai_error', language, error instanceof Error ? error.message : String(error));
   }
 }));

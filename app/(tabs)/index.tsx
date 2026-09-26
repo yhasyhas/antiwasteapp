@@ -9,18 +9,26 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
+import { alertWriteError } from '@/lib/alertWriteError';
+import { loadFavoriteIds, setFavorite } from '@/lib/favorites';
+import { useRecipeImages } from '@/hooks/useRecipeImages';
+import { recipeFromRow, type Recipe } from '@/components/recipe/types';
+import { RecipeSheet } from '@/components/recipe/RecipeSheet';
 import { ChefHat, Sparkles, TrendingUp } from 'lucide-react-native';
 import { router, useFocusEffect } from 'expo-router';
-import { RecentRecipeCard, type RecentRecipe } from '@/components/home/RecentRecipeCard';
-import { RecipeSummaryModal } from '@/components/home/RecipeSummaryModal';
+import { RecentRecipeCard } from '@/components/home/RecentRecipeCard';
+
+type RecentRecipe = Recipe & { id: string };
 
 export default function HomeScreen() {
   const { user, signOut } = useAuth();
   const { t } = useLanguage();
   const [ingredients, setIngredients] = useState<any[]>([]);
   const [recipes, setRecipes] = useState<RecentRecipe[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [selectedRecipe, setSelectedRecipe] = useState<RecentRecipe | null>(null);
+  // Images lues dans l'état partagé : une image générée sur un autre écran apparaît ici aussi
+  const images = useRecipeImages();
 
   // Rechargé à chaque retour sur l'onglet : ingrédients scannés, recettes générées entre-temps
   useFocusEffect(
@@ -55,8 +63,30 @@ export default function HomeScreen() {
       .limit(5);
 
     if (data) {
-      setRecipes(data);
+      setRecipes(data.map(recipeFromRow));
     }
+    setFavoriteIds(await loadFavoriteIds(user.id));
+  };
+
+  const openRecipe = (recipe: RecentRecipe) => {
+    setSelectedRecipe(recipe);
+    images.request(recipe);
+  };
+
+  const toggleFavorite = async (recipe: RecentRecipe) => {
+    if (!user) return;
+    const favorite = !favoriteIds.has(recipe.id);
+    const error = await setFavorite(user.id, recipe.id, favorite);
+    if (error) {
+      alertWriteError(t, 'toggling favorite', error);
+      return;
+    }
+    setFavoriteIds((current) => {
+      const next = new Set(current);
+      if (favorite) next.add(recipe.id);
+      else next.delete(recipe.id);
+      return next;
+    });
   };
 
   const handleGenerateRecipes = () => {
@@ -139,14 +169,20 @@ export default function HomeScreen() {
             </View>
 
             {recipes.map((recipe) => (
-              <RecentRecipeCard key={recipe.id} recipe={recipe} onPress={() => setSelectedRecipe(recipe)} />
+              <RecentRecipeCard key={recipe.id} recipe={images.withImage(recipe)} imageLoading={images.isLoading(recipe.id)} onPress={() => openRecipe(recipe)} />
             ))}
           </View>
         )}
       </ScrollView>
 
       {selectedRecipe && (
-        <RecipeSummaryModal recipe={selectedRecipe} onClose={() => setSelectedRecipe(null)} />
+        <RecipeSheet
+          recipe={images.withImage(selectedRecipe)}
+          imageLoading={images.isLoading(selectedRecipe.id)}
+          isFavorite={favoriteIds.has(selectedRecipe.id)}
+          onToggleFavorite={() => toggleFavorite(selectedRecipe)}
+          onClose={() => setSelectedRecipe(null)}
+        />
       )}
     </View>
   );

@@ -16,6 +16,10 @@ import { supabase } from '@/lib/supabase';
 import { Search, Trash2, Plus, Package } from 'lucide-react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { IngredientCard, type PantryIngredient } from '@/components/pantry/IngredientCard';
+import { ExpiryEditModal } from '@/components/pantry/ExpiryEditModal';
+import { sortByUrgency } from '@/lib/expiry';
+import { maybeAskNotificationPermission } from '@/lib/notifications';
+import { notifyPantryChanged } from '@/lib/pantryEvents';
 
 export default function IngredientsScreen() {
   const { user } = useAuth();
@@ -27,6 +31,8 @@ export default function IngredientsScreen() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [editingExpiry, setEditingExpiry] = useState<PantryIngredient | null>(null);
+  const [savingExpiry, setSavingExpiry] = useState(false);
 
   // Rechargé à chaque retour sur l'onglet (ingrédients ajoutés depuis la caméra, par exemple)
   useFocusEffect(
@@ -58,8 +64,10 @@ export default function IngredientsScreen() {
       .order('created_at', { ascending: false });
 
     if (data) {
-      setIngredients(data);
-      setFilteredIngredients(data);
+      // Par urgence : expirés et proches d'abord, sans date à la fin
+      const sorted = sortByUrgency(data as PantryIngredient[]);
+      setIngredients(sorted);
+      setFilteredIngredients(sorted);
     }
     setLoading(false);
   };
@@ -84,12 +92,33 @@ export default function IngredientsScreen() {
               alertWriteError(t, 'deleting ingredient', error);
             } else {
               setIngredients(ingredients.filter((ing) => ing.id !== id));
+              notifyPantryChanged();
             }
             setDeleting(null);
           },
         },
       ]
     );
+  };
+
+  const saveExpiry = async (expiresAt: string | null) => {
+    if (!editingExpiry) return;
+    setSavingExpiry(true);
+    const { error } = await supabase
+      .from('ingredients')
+      .update({ expires_at: expiresAt })
+      .eq('id', editingExpiry.id);
+    setSavingExpiry(false);
+
+    if (error) {
+      alertWriteError(t, 'updating expiry date', error);
+      return;
+    }
+    const id = editingExpiry.id;
+    setIngredients(sortByUrgency(ingredients.map((ing) => ing.id === id ? { ...ing, expires_at: expiresAt } : ing)));
+    setEditingExpiry(null);
+    notifyPantryChanged();
+    if (expiresAt) await maybeAskNotificationPermission();
   };
 
   const clearAllIngredients = () => {
@@ -115,6 +144,7 @@ export default function IngredientsScreen() {
             } else {
               setIngredients([]);
               setFilteredIngredients([]);
+              notifyPantryChanged();
             }
             setLoading(false);
           },
@@ -194,6 +224,7 @@ export default function IngredientsScreen() {
                   ingredient={ingredient}
                   deleting={deleting === ingredient.id}
                   onDelete={() => deleteIngredient(ingredient.id)}
+                  onEditExpiry={() => setEditingExpiry(ingredient)}
                 />
               ))
             )}
@@ -210,6 +241,13 @@ export default function IngredientsScreen() {
           </View>
         </>
       )}
+
+      <ExpiryEditModal
+        ingredient={editingExpiry}
+        saving={savingExpiry}
+        onSave={saveExpiry}
+        onClose={() => setEditingExpiry(null)}
+      />
     </View>
   );
 }
