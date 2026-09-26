@@ -6,12 +6,13 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
-  TextInput,
   Alert,
 } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
+import { Input } from '@/components/ui/Input';
+import { KeyboardAvoider } from '@/components/ui/KeyboardAvoider';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { supabase } from '@/lib/supabase';
 import { Search, Trash2, Plus, Package, Users } from 'lucide-react-native';
@@ -182,7 +183,7 @@ export default function IngredientsScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoider style={styles.container}>
       <View style={[styles.header, safe.top(20)]}>
         <View style={styles.headerText}>
           <Text style={styles.headerTitle}>{t('pantry.title')}</Text>
@@ -213,7 +214,7 @@ export default function IngredientsScreen() {
 
       <View style={styles.searchContainer}>
         <Search size={20} color="#9ca3af" style={styles.searchIcon} />
-        <TextInput
+        <Input
           style={styles.searchInput}
           placeholder={t('pantry.searchPlaceholder')}
           value={searchQuery}
@@ -280,7 +281,7 @@ export default function IngredientsScreen() {
         onSave={saveExpiry}
         onClose={() => setEditingExpiry(null)}
       />
-    </View>
+    </KeyboardAvoider>
   );
 }
 

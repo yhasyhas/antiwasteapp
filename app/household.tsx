@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   Alert,
   Share,
   ActivityIndicator,
@@ -15,6 +14,8 @@ import { Stack, useFocusEffect } from 'expo-router';
 import { Crown, LogOut, Share2, UserMinus, UserPlus, Users } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
+import { Input } from '@/components/ui/Input';
+import { KeyboardAvoider, useKeyboardScroll } from '@/components/ui/KeyboardAvoider';
 import { useHousehold } from '@/hooks/useHousehold';
 import {
   createInvite,
@@ -34,6 +35,7 @@ import {
 export default function HouseholdScreen() {
   const { t, language } = useLanguage();
   const safe = useSafeSpacing();
+  const keyboardScroll = useKeyboardScroll();
   const household = useHousehold();
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState<string | null>(null);
@@ -150,8 +152,11 @@ export default function HouseholdScreen() {
   return (
     <>
       <Stack.Screen options={{ headerShown: true, title: t('household.title') }} />
+      <KeyboardAvoider style={styles.container}>
       <ScrollView
-        style={styles.container}
+        ref={keyboardScroll.scrollRef}
+        onScroll={keyboardScroll.onScroll}
+        scrollEventThrottle={keyboardScroll.scrollEventThrottle}
         contentContainerStyle={[styles.content, safe.bottom(40)]}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
         keyboardShouldPersistTaps="handled"
@@ -193,7 +198,7 @@ export default function HouseholdScreen() {
           <Text style={styles.cardTitle}>{t('household.yourName')}</Text>
           <Text style={styles.hint}>{t('household.yourNameHint')}</Text>
           <View style={styles.inputRow}>
-            <TextInput
+            <Input
               style={styles.input}
               value={name}
               onChangeText={setName}
@@ -246,7 +251,7 @@ export default function HouseholdScreen() {
             <Text style={styles.cardTitle}>{t('household.joinTitle')}</Text>
             <Text style={styles.hint}>{t('household.joinHint')}</Text>
             <View style={styles.inputRow}>
-              <TextInput
+              <Input
                 style={[styles.input, styles.codeInput]}
                 value={code}
                 onChangeText={(value) => setCode(value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
@@ -273,6 +278,7 @@ export default function HouseholdScreen() {
           </TouchableOpacity>
         )}
       </ScrollView>
+      </KeyboardAvoider>
     </>
   );
 }

@@ -26,6 +26,8 @@ const en: Translations = {
     settings: 'Settings',
   },
   auth: {
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
     tagline: 'Turn your ingredients into delicious meals',
     email: 'Email',
     emailPlaceholder: 'your@email.com',

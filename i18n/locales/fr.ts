@@ -27,6 +27,8 @@ const fr = {
     settings: 'Réglages',
   },
   auth: {
+    showPassword: 'Afficher le mot de passe',
+    hidePassword: 'Masquer le mot de passe',
     tagline: 'Transforme tes ingrédients en bons petits plats',
     email: 'E-mail',
     emailPlaceholder: 'ton@email.com',
