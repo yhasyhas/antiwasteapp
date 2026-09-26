@@ -191,7 +191,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Phase 6b planifiée : fiches aliments (`food_key`, table partagée `food_facts`, signalements, pré-remplissage d'une centaine d'aliments), voir PLAN.md.
 
 ### Phase 6a — build de développement, foyer partagé, notifications serveur (branche `phase-6a`)
-- Build : `eas.json` (development, preview, production), `expo-dev-client`, package Android `com.yhasyhas.antiwasteapp`, `app.config.js` (google-services.json hors de git), canal de notifications créé au démarrage hors d'Expo Go. **Build en attente du compte Expo et du projet Firebase.**
+- Build : `eas.json` (development, preview, production), `expo-dev-client`, variante de développement (`app.config.js`, `APP_VARIANT`) : paquet `com.yhasyhas.antiwasteapp.dev`, nom « Antigaspi (dev) », paquet définitif en phase 8 ; google-services.json hors de git, canal de notifications créé au démarrage hors d'Expo Go. **Build en attente du compte Expo et du projet Firebase.**
 - Foyer partagé (migration `shared_households`, tests `household_sharing.sql`) : foyer actif (partagé, sinon personnel), invitation par code 48 h, 8 membres, départ, retrait, transfert de propriété, compte supprimé sans perte du foyer, auteur des ingrédients figé, diffusion temps réel sur `household:<id>` ; écran `app/household.tsx`, état partagé `lib/household.ts`, « ajouté par » sur chaque ingrédient.
 - Résumé de 9 h par le serveur (migration `daily_digest`, tests `daily_digest.sql`) : `push_tokens`, `daily_digests`, pg_cron toutes les 15 min → fonction `daily-digest` (Expo Push, reçus, alerte Sentry `push_failure`) ; app : `lib/pushNotifications.ts`, rappels locaux en secours sans jeton.
 - Tests : 48 tests Deno, 7 fichiers de tests SQL.

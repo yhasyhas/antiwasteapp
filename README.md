@@ -176,7 +176,9 @@ fonctions SQL (migration `shared_households`), le garde-manger se met à jour en
 
 ## Build de développement (Android)
 
-`eas.json` : profils `development` (APK avec `expo-dev-client`), `preview` et `production`. Le fichier Firebase
+`eas.json` : profils `development` (APK avec `expo-dev-client`), `preview` et `production`. Chaque profil fixe
+`APP_VARIANT` : le build de développement s'appelle « Antigaspi (dev) », paquet `com.yhasyhas.antiwasteapp.dev`
+(`app.config.js`). Paquet et nom définitifs : phase 8 (d'ici là, preview et production échouent volontairement). Le fichier Firebase
 `google-services.json` (notifications push) n'est pas dans git : en local à la racine, pour EAS en variable
 d'environnement de type fichier `GOOGLE_SERVICES_JSON` (lue par `app.config.js`).
 

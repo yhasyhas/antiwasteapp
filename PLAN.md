@@ -189,7 +189,7 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 
 Regroupe ce qui dépend du build de développement.
 
-- [ ] Passer à un build de développement EAS (Android) : canal de notifications dédié (impossible dans Expo Go), plantages natifs dans Sentry — *configuration prête (`eas.json`, `expo-dev-client`, canal créé au démarrage) ; build en attente du compte Expo et du projet Firebase*
+- [ ] Passer à un build de développement EAS (Android) : canal de notifications dédié (impossible dans Expo Go), plantages natifs dans Sentry — *configuration prête (`eas.json`, `expo-dev-client`, canal créé au démarrage, paquet `com.yhasyhas.antiwasteapp.dev` et nom « Antigaspi (dev) ») ; build en attente du compte Expo et du projet Firebase*
 - [x] Garde-manger partagé : inviter un membre, rejoindre un foyer, voir qui a ajouté quoi
 - [x] Garde-manger partagé : l'app filtre ses ingrédients par `household_id` (aujourd'hui par `user_id`, équivalent tant qu'il n'y a qu'un foyer personnel) ; gérer le départ ou la suppression du compte du propriétaire d'un foyer partagé (aujourd'hui, supprimer un compte supprime son foyer)
 - [x] Garde-manger partagé : empêcher la modification de `user_id` sur un ingrédient existant (l'auteur ne doit pas pouvoir être changé par un autre membre)
@@ -237,6 +237,7 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 - [ ] Revoir les limites de Groq (~3 scans/min en secours, modèle en preview) et de Gemini avant la bêta : offre payante ou autre modèle
 - [ ] Renommer l'app : `name`, `slug`, `scheme` dans `app.json`, `name` dans `package.json` — nom à choisir (pistes : Miette, Glana, Frigoscope)
 - [ ] Icône, écran de démarrage, nom définitif
+- [ ] Choisir le nom de paquet définitif, l'ajouter au projet Firebase, et créer le build de production (variantes `preview` et `production` dans `app.config.js` ; le build de développement garde `com.yhasyhas.antiwasteapp.dev`)
 - [ ] Passer Gemini en offre payante (les données de l'offre gratuite servent à améliorer les produits Google)
 - [ ] Rédiger la politique de confidentialité (photos, données du garde-manger)
 - [ ] Bêta fermée : TestFlight (iOS) et tests internes Google Play, avec quelques proches
@@ -343,4 +344,6 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 | 26/09/2026 | « Ajouté par » : nom choisi dans « Mon foyer » (`profiles.display_name`), sinon le début de l'adresse e-mail, visible des seuls membres du foyer | Aucune adresse complète n'est montrée |
 | 26/09/2026 | Temps réel par diffusion (Realtime broadcast) sur un canal privé `household:<id>`, autorisé par une règle sur `realtime.messages` (membres seulement), un message par instruction et par foyer ; l'app recharge le garde-manger à chaque message | Plutôt que postgres_changes : les suppressions ne sont pas filtrables par foyer et seraient envoyées à tous. Vérifié avec deux comptes : le membre reçoit, un non-membre est refusé |
 | 26/09/2026 | Résumé de 9 h envoyé par le serveur : pg_cron toutes les 15 minutes (fuseaux à la demi-heure compris) → Edge Function `daily-digest` (secret `CRON_SECRET`, copie dans Vault), fenêtre de rattrapage jusqu'à 11 h 59, un résumé par utilisateur et par jour local (clé primaire) ; reçus Expo vérifiés 15 minutes après ; alerte Sentry `alert:push_failure` une fois par jour | Un appareil avec jeton push reçoit le résumé du serveur et annule ses rappels locaux ; sans jeton (Expo Go, web, Firebase absent, autorisation refusée), rappels locaux : jamais les deux sur un même appareil |
+| 26/09/2026 | Choix validés : les ingrédients d'un compte supprimé restent dans le foyer ; le dernier membre qui part récupère le garde-manger | |
+| 26/09/2026 | Pas encore de nom de paquet définitif : le build de développement utilise `com.yhasyhas.antiwasteapp.dev` et le nom « Antigaspi (dev) » (`app.config.js`, variable `APP_VARIANT` fixée par le profil EAS) ; paquet et nom définitifs choisis en phase 8 avec le nom de l'app | Un build preview ou production échoue tant que le paquet définitif n'est pas choisi |
 | | *(résultat du test Gemini vs Clarifai)* | |
