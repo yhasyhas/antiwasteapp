@@ -198,13 +198,14 @@ Regroupe ce qui dépend du build de développement.
 
 **Terminé quand** : l'app tourne dans le build de développement, deux comptes partagent un garde-manger mis à jour en temps réel, et le résumé de 9 h arrive par notification push.
 
-### Phase 6b — Liste de courses, compteur anti-gaspi, préférences, essai sans compte, fiches aliments
+### Phase 6b — Invitation par lien, liste de courses, compteur anti-gaspi, préférences, essai sans compte, fiches aliments
 
-- [ ] Liste de courses construite à partir de `missing_ingredients`
-- [ ] Compteur de gaspillage évité (kg, et éventuellement argent économisé) sur l'accueil
-- [ ] Écran de préférences : régimes, ingrédients exclus, temps max ; utilisé par la génération
+- [ ] Invitation par lien : route `join` de l'app (code prérempli), page web d'invitation sur Cloudflare Pages (trois langues, ouvre l'app ou propose le téléchargement), message de partage avec le lien
+- [ ] Liste de courses partagée par le foyer, en temps réel : ingrédients manquants d'une recette en un geste (`missing_ingredients`), ajout manuel, article acheté envoyé au garde-manger avec une date proposée
+- [ ] Compteur anti-gaspi sur l'accueil, en nombre d'aliments (ce mois-ci, pour le foyer et pour moi) : « sauvé » avec « J'ai cuisiné ça », « gaspillé » quand un aliment est supprimé après sa date
+- [ ] Écran de préférences : régimes, aliments exclus (allergies et goûts), temps maximum, nombre de personnes ; appliquées par défaut à la génération, modifiables dans les filtres
 - [ ] Cuisines du monde : préférence de cuisine enregistrée et utilisée par défaut
-- [ ] Connexion anonyme Supabase pour tester sans compte, avec conversion en compte plus tard
+- [ ] Essai sans compte : connexion anonyme Supabase protégée par Cloudflare Turnstile, quotas réduits, conversion en vrai compte sans perte de données (garde-manger et foyer compris), invité par lien accepté
 
 #### Fiches aliments
 
