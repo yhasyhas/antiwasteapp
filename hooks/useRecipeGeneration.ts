@@ -141,8 +141,10 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
         // Enregistrées dans l'historique avant l'affichage, pour que chaque recette ait déjà son id
         // quand l'utilisateur la sauvegarde (sinon elle serait insérée une seconde fois)
         const saved = await saveRecipesToHistory(data.recipes);
-        // Pas d'image demandée ici : elle n'est générée qu'à l'ouverture de la fiche
         setRecipes(saved);
+        // Nouvelle génération seulement : images demandées en arrière-plan dès l'affichage des résultats,
+        // elles apparaissent sur les cartes à leur arrivée (les autres listes n'en demandent jamais)
+        images.requestAll(saved);
       } else if (data?.error) {
         // Quota personnel, quota des fournisseurs (secours compris) ou panne
         Alert.alert(failureTitle(t, failureReasonOf(data), t('common.error')), data.message || t('generate.failed'));

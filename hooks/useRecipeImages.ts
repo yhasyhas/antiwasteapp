@@ -13,8 +13,9 @@ import {
 type WithImage = { id?: string; image_url?: string | null };
 
 // Images des recettes, lues dans l'état partagé de l'app (lib/recipeImage.ts) : l'écran se met à jour
-// dès qu'une image arrive, même demandée ailleurs. Une image n'est demandée qu'à l'ouverture d'une fiche
-// (request), jamais pour afficher une liste.
+// dès qu'une image arrive, même demandée ailleurs. Une image est demandée à l'ouverture d'une fiche
+// (request) et, pour les seules recettes d'une nouvelle génération, dès l'affichage des résultats
+// (requestAll) ; jamais pour afficher les autres listes (accueil, favoris, toutes les recettes).
 export function useRecipeImages() {
   const { language, t } = useLanguage();
   useSyncExternalStore(subscribeRecipeImages, recipeImagesVersion);
@@ -26,6 +27,8 @@ export function useRecipeImages() {
   };
 
   const request = (recipe: WithImage) => requestRecipeImage(recipe.id, language, recipe.image_url);
+  // Réservé aux recettes d'une nouvelle génération
+  const requestAll = (recipes: WithImage[]) => recipes.forEach(request);
 
   // Message discret à l'emplacement de l'image quand elle n'a pas pu être générée
   const notice = (recipeId: string | undefined): string | null => {
@@ -36,5 +39,5 @@ export function useRecipeImages() {
     return null;
   };
 
-  return { withImage, request, isLoading: isRecipeImageLoading, notice };
+  return { withImage, request, requestAll, isLoading: isRecipeImageLoading, notice };
 }

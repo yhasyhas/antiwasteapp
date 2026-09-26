@@ -8,7 +8,7 @@ import type { Recipe } from './types';
 
 interface Props {
   recipe: Recipe;
-  // Image en cours de génération (fiche ouverte) : indicateur dans la vignette jusqu'à son arrivée
+  // Image en cours de génération : indicateur dans la vignette jusqu'à son arrivée
   imageLoading?: boolean;
   onPress: () => void;
   // Cœur de favori sur la carte (écran Favoris)
@@ -16,8 +16,8 @@ interface Props {
 }
 
 // Carte de recette unique, pour toutes les listes (accueil, favoris, toutes les recettes, génération).
-// Elle affiche l'image si elle existe, sans jamais la demander : l'image n'est générée qu'à l'ouverture
-// de la fiche, et la carte se met à jour à son arrivée (état partagé des images).
+// Elle affiche l'image si elle existe, sans jamais la demander elle-même (voir useRecipeImages) ; la carte
+// se met à jour à son arrivée (état partagé des images).
 export function RecipeListCard({ recipe, imageLoading = false, onPress, favorite }: Props) {
   const { t } = useLanguage();
 
