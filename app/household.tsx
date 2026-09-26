@@ -14,6 +14,7 @@ import {
 import { Stack, useFocusEffect } from 'expo-router';
 import { Crown, LogOut, Share2, UserMinus, UserPlus, Users } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { useHousehold } from '@/hooks/useHousehold';
 import {
   createInvite,
@@ -32,6 +33,7 @@ import {
 // quitter le foyer ; le propriétaire peut retirer un membre
 export default function HouseholdScreen() {
   const { t, language } = useLanguage();
+  const safe = useSafeSpacing();
   const household = useHousehold();
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState<string | null>(null);
@@ -150,7 +152,7 @@ export default function HouseholdScreen() {
       <Stack.Screen options={{ headerShown: true, title: t('household.title') }} />
       <ScrollView
         style={styles.container}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, safe.bottom(40)]}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
         keyboardShouldPersistTaps="handled"
       >

@@ -1,9 +1,13 @@
 import { Tabs } from 'expo-router';
 import { Home, Camera, List, Heart, Settings } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabsLayout() {
   const { t } = useTranslation();
+  // Boutons de navigation d'Android (trois boutons ou barre de gestes) : la barre d'onglets se place
+  // au-dessus, au lieu d'une hauteur fixe qu'ils recouvraient
+  const insets = useSafeAreaInsets();
   return (
     <Tabs
       screenOptions={{
@@ -15,8 +19,8 @@ export default function TabsLayout() {
           borderTopWidth: 1,
           borderTopColor: '#f3f4f6',
           paddingTop: 8,
-          paddingBottom: 8,
-          height: 64,
+          paddingBottom: 8 + insets.bottom,
+          height: 64 + insets.bottom,
         },
         tabBarLabelStyle: {
           fontSize: 11,

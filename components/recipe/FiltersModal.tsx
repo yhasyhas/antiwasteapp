@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { Check, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { difficultyLabel } from '@/lib/labels';
 import { cuisineOptions, dietaryOptions, difficultyOptions, languages, mealTypes } from './options';
 import { modalStyles } from './modalStyles';
@@ -18,6 +19,7 @@ interface Props {
 // Fenêtre des préférences de génération : type de repas, cuisine, langue, régimes, difficulté
 export function FiltersModal({ visible, filters, onChange, onToggleDietary, onClose }: Props) {
   const { t } = useLanguage();
+  const safe = useSafeSpacing();
 
   return (
     <Modal
@@ -27,7 +29,7 @@ export function FiltersModal({ visible, filters, onChange, onToggleDietary, onCl
       onRequestClose={onClose}
     >
       <View style={modalStyles.modalOverlay}>
-        <View style={modalStyles.modalContent}>
+        <View style={[modalStyles.modalContent, safe.bottom(24)]}>
           <View style={modalStyles.modalHeader}>
             <Text style={modalStyles.modalTitle}>{t('generate.filtersTitle')}</Text>
             <TouchableOpacity onPress={onClose}>

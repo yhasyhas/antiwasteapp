@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'rea
 import { Image } from 'expo-image';
 import { ChefHat, Clock, Heart, Lightbulb } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { difficultyLabel } from '@/lib/labels';
+import { dietLabel, difficultyLabel } from '@/lib/labels';
 import type { Recipe } from './types';
 
 interface Props {
@@ -70,7 +70,7 @@ export function RecipeListCard({ recipe, imageLoading = false, onPress, favorite
           ) : null}
           {recipe.dietary_tags.slice(0, 1).map((tag, index) => (
             <View key={index} style={styles.tag}>
-              <Text style={styles.tagText} numberOfLines={1}>{tag}</Text>
+              <Text style={styles.tagText} numberOfLines={1}>{dietLabel(t, tag)}</Text>
             </View>
           ))}
         </View>

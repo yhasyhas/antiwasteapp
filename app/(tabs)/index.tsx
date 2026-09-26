@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { supabase } from '@/lib/supabase';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { loadFavoriteIds, setFavorite } from '@/lib/favorites';
@@ -25,6 +26,7 @@ type RecentRecipe = Recipe & { id: string };
 export default function HomeScreen() {
   const { user, signOut } = useAuth();
   const { t } = useLanguage();
+  const safe = useSafeSpacing();
   const [ingredients, setIngredients] = useState<any[]>([]);
   const [recipes, setRecipes] = useState<RecentRecipe[]>([]);
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
@@ -105,7 +107,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, safe.top(20)]}>
         <View>
           <Text style={styles.greeting}>{t('home.welcomeBack')}</Text>
           <Text style={styles.email}>{user?.email}</Text>
@@ -206,7 +208,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 60,
     paddingBottom: 20,
     backgroundColor: '#fff',
     borderBottomWidth: 1,

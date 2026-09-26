@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 import { X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { ExpiryPicker } from '@/components/expiry/ExpiryPicker';
 import { expiryFromShelfLife } from '@/lib/expiry';
 import { scanModalStyles } from '@/components/scan/scanModalStyles';
@@ -17,6 +18,7 @@ interface Props {
 // Modification de la date de péremption d'un ingrédient du garde-manger
 export function ExpiryEditModal({ ingredient, saving, onSave, onClose }: Props) {
   const { t } = useLanguage();
+  const safe = useSafeSpacing();
   const [value, setValue] = useState(() => expiryFromShelfLife(undefined));
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export function ExpiryEditModal({ ingredient, saving, onSave, onClose }: Props) 
   return (
     <Modal visible={ingredient !== null} animationType="slide" transparent={true} onRequestClose={onClose}>
       <View style={scanModalStyles.modalOverlay}>
-        <View style={scanModalStyles.modalContent}>
+        <View style={[scanModalStyles.modalContent, safe.bottom(24)]}>
           <View style={scanModalStyles.modalHeader}>
             <Text style={styles.title} numberOfLines={2}>{ingredient?.name}</Text>
             <TouchableOpacity onPress={onClose}>

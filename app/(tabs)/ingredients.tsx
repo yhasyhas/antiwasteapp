@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { supabase } from '@/lib/supabase';
 import { Search, Trash2, Plus, Package, Users } from 'lucide-react-native';
@@ -26,6 +27,7 @@ import { useHousehold } from '@/hooks/useHousehold';
 export default function IngredientsScreen() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const safe = useSafeSpacing();
   const [ingredients, setIngredients] = useState<PantryIngredient[]>([]);
   const [filteredIngredients, setFilteredIngredients] = useState<PantryIngredient[]>(
     []
@@ -181,7 +183,7 @@ export default function IngredientsScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, safe.top(20)]}>
         <View style={styles.headerText}>
           <Text style={styles.headerTitle}>{t('pantry.title')}</Text>
           <Text style={styles.headerSubtitle}>
@@ -298,7 +300,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 60,
     paddingBottom: 20,
     backgroundColor: '#fff',
     borderBottomWidth: 1,

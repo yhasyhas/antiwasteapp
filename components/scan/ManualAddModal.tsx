@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { Check, Plus, X } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { supabase } from '@/lib/supabase';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { expiryForPackagedProduct, expiryFromShelfLife, type FoodKind } from '@/lib/expiry';
@@ -45,6 +46,7 @@ interface Props {
 export function ManualAddModal({ visible, onClose, prefill }: Props) {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const safe = useSafeSpacing();
   const [manualIngredients, setManualIngredients] = useState<ManualIngredient[]>([]);
   const [newIngredientName, setNewIngredientName] = useState('');
   const [newIngredientQuantity, setNewIngredientQuantity] = useState('');
@@ -148,7 +150,7 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
       onRequestClose={onClose}
     >
       <View style={scanModalStyles.modalOverlay}>
-        <View style={scanModalStyles.modalContent}>
+        <View style={[scanModalStyles.modalContent, safe.bottom(24)]}>
           <View style={scanModalStyles.modalHeader}>
             <Text style={scanModalStyles.modalTitle}>{t('manual.title')}</Text>
             <TouchableOpacity onPress={onClose}>

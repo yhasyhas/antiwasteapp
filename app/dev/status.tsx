@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } 
 import { Redirect, Stack, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { supabase } from '@/lib/supabase';
 
 interface Counters {
@@ -27,6 +28,7 @@ interface ProviderEvent {
 export default function ServiceStatusScreen() {
   const { user } = useAuth();
   const { t, language } = useLanguage();
+  const safe = useSafeSpacing();
   const [counters, setCounters] = useState<Counters>({ scans: 0, generations: 0, images: 0 });
   const [events, setEvents] = useState<ProviderEvent[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -56,7 +58,7 @@ export default function ServiceStatusScreen() {
       <Stack.Screen options={{ headerShown: true, title: t('devStatus.title') }} />
       <ScrollView
         style={styles.container}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, safe.bottom(24)]}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={load} />}
       >
         <Text style={styles.sectionTitle}>{t('devStatus.today')}</Text>

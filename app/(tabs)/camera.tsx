@@ -10,6 +10,7 @@ import {
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { FlipHorizontal, Plus } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { useScan } from '@/hooks/useScan';
 import { FOOD_BARCODE_TYPES, useBarcodeScan } from '@/hooks/useBarcodeScan';
 import { ManualAddModal, type ManualPrefill } from '@/components/scan/ManualAddModal';
@@ -19,6 +20,7 @@ import { PermissionRequest } from '@/components/scan/PermissionRequest';
 
 export default function CameraScreen() {
   const { t } = useLanguage();
+  const safe = useSafeSpacing();
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<CameraType>('back');
   const [showManualAdd, setShowManualAdd] = useState(false);
@@ -88,7 +90,7 @@ export default function CameraScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, safe.top(20)]}>
         <Text style={styles.headerTitle}>{t('scan.title')}</Text>
         <TouchableOpacity
           style={styles.manualButton}
@@ -186,7 +188,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 60,
     paddingBottom: 16,
     backgroundColor: '#fff',
   },

@@ -13,12 +13,14 @@ import {
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { authErrorMessage } from '@/lib/authErrors';
 import { ChefHat, Mail } from 'lucide-react-native';
 
 export default function SignUpScreen() {
   const { signUp } = useAuth();
   const { t } = useLanguage();
+  const safe = useSafeSpacing();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -91,7 +93,7 @@ export default function SignUpScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: safe.insets.top + 24, paddingBottom: safe.insets.bottom + 24 }]}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>

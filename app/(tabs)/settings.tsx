@@ -9,6 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { useAuth } from '@/contexts/AuthContext';
 import { Globe, ChevronRight, User, LogOut, Users } from 'lucide-react-native';
 import { sendSentryTestError, sentryEnabled } from '@/lib/sentry';
@@ -23,6 +24,7 @@ const languages = [
 
 export default function SettingsScreen() {
   const { language, setLanguage, t, loading } = useLanguage();
+  const safe = useSafeSpacing();
   const { user, signOut } = useAuth();
 
   if (loading) {
@@ -46,7 +48,7 @@ export default function SettingsScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, safe.top(20)]}>
         <Text style={styles.headerTitle}>{t('settings.title')}</Text>
       </View>
 
@@ -173,7 +175,6 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#fff',
     paddingHorizontal: 20,
-    paddingTop: 60,
     paddingBottom: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#f3f4f6',
