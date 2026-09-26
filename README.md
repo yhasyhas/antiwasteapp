@@ -87,6 +87,7 @@ Le CLI lit `SUPABASE_ACCESS_TOKEN` (jeton personnel, `sbp_…`) et `SUPABASE_DB_
 | `QUOTA_DAILY_SCANS` | non | Scans par jour et par utilisateur (défaut 20) |
 | `QUOTA_DAILY_GENERATIONS` | non | Générations par jour et par utilisateur (défaut 10) |
 | `QUOTA_DAILY_IMAGES` | non | Images par jour et par utilisateur (défaut 30 : 3 par génération) |
+| `SENTRY_DSN` | non | DSN Sentry (le même que l'app) : alertes de quota des fournisseurs |
 | `ALLOWED_ORIGINS` | non | Origines web autorisées, séparées par des virgules (défaut : Expo web en local) |
 
 Fournis automatiquement par Supabase : `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEYS`, `SUPABASE_SECRET_KEYS`, `SUPABASE_JWKS`.
@@ -125,6 +126,25 @@ un secret : il permet d'envoyer des erreurs au projet, pas de les lire.
   et les stack traces lisibles en production demandent un build EAS (avec `SENTRY_AUTH_TOKEN` pour envoyer les source maps).
 - **Vérifier** : en développement, Réglages → « Envoyer une erreur de test à Sentry », puis Sentry → Issues.
 
+## Quotas et alertes
+
+Chaque échec lié à un quota porte une raison précise, renvoyée à l'app et écrite dans les journaux des fonctions (`[quota]`) :
+
+| Raison | Cas | Dans l'app |
+|---|---|---|
+| `user_quota` | Limite personnelle du jour atteinte (scans, générations, images) | « Limite du jour atteinte » ; à l'emplacement de l'image : « elles reviennent demain » |
+| `provider_quota` | Quota épuisé chez Gemini (`RESOURCE_EXHAUSTED`), Groq (`rate_limit_exceeded`) ou Cloudflare (allocation gratuite de neurones) | « Service saturé » ; pour le scan et la génération, seulement si tous les fournisseurs, secours compris, ont échoué |
+| `provider_error` | Panne, délai dépassé, réponse illisible | Message d'indisponibilité habituel |
+
+- **Alerte Sentry** : quand le quota d'un fournisseur est épuisé (même si le secours a pris le relais), un avertissement
+  part dans Sentry (tag `alert:provider_quota`, fournisseur, fonction, date), une fois par jour et par fournisseur au
+  plus (table `provider_quota_events`). Secret nécessaire : `SENTRY_DSN` (le même DSN que l'app).
+- **Écran « État des services »** (Réglages, développement seulement) : compteurs du jour et derniers quotas épuisés.
+- **Simulation** (tests, sans consommer de quota) : champ `simulate` du corps de la requête, pris en compte seulement
+  avec l'en-tête `x-simulate-key` égal à la clé secrète : `{ "user_quota": true }` ou
+  `{ "providers": { "gemini": "quota", "groq": "error" } }` (`cloudflare` pour les images). Les essais sont marqués
+  `simulated` en base et envoyés à Sentry dans l'environnement `test`.
+
 ## Notifications
 
 Rappels locaux, sans serveur : une notification par jour à 9 h, seulement si des aliments expirent ce
@@ -137,7 +157,7 @@ En développement, Réglages → « Tester la notification » l'envoie au bout d
 npm run typecheck                                  # app (TypeScript)
 deno test --no-config --allow-env supabase/functions/          # fonctions : secours, validation, identifiants, régimes
 PGPASSWORD="$SUPABASE_DB_PASSWORD" psql "$(cat supabase/.temp/pooler-url)" -v ON_ERROR_STOP=1 \
-  -f supabase/tests/household_rls.sql              # idem usage_counters.sql, recipe_images.sql, ingredients_expiry.sql
+  -f supabase/tests/household_rls.sql              # idem usage_counters.sql, recipe_images.sql, ingredients_expiry.sql, provider_quota_events.sql
 ```
 
 Les tests SQL tournent sur la base distante dans une transaction annulée à la fin : aucune donnée n'est conservée.

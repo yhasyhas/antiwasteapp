@@ -12,7 +12,8 @@ export function logUserQuota(fn: string, kind: string, limit: number, userId: st
   console.warn(`[quota] QUOTA PERSONNEL ATTEINT (user_quota) : ${kind}, ${limit} par jour, fonction ${fn}, utilisateur ${userId}`);
 }
 
-async function sendSentryWarning(provider: string, fn: string, details: string, simulated: boolean) {
+// Exportée pour vérifier l'envoi en local (même format que les alertes des fonctions)
+export async function sendSentryWarning(provider: string, fn: string, details: string, simulated: boolean) {
   if (!SENTRY_DSN) {
     console.warn('[quota] SENTRY_DSN absent : pas d\'alerte Sentry');
     return;

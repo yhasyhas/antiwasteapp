@@ -177,6 +177,11 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Retours de test : sélection d'ingrédients stricte (seuls ceux choisis, plus sel, poivre, huile, eau ; recette hors sélection écartée par le serveur), images en arrière-plan sur les cartes, fiche recette unique (`components/recipe/RecipeSheet.tsx`) pour la génération, les récentes et les favoris, quota images à 30 par jour, canal de notifications ignoré dans Expo Go ; état des images partagé par tous les écrans et réservation côté serveur (une seule génération par recette, même pour des appels simultanés).
 - Tests : 38 tests Deno.
 
+### Quotas visibles (branche `quota-alerts`)
+- Raison précise des échecs (`user_quota`, `provider_quota`, `provider_error`) dans les trois fonctions, journaux `[quota]`, message traduit dans l'app (à l'emplacement de l'image pour les images).
+- Alerte Sentry une fois par jour et par fournisseur quand un quota de fournisseur est épuisé (`provider_quota_events`, secret `SENTRY_DSN`).
+- Écran « État des services » (développement) ; simulation des erreurs réservée à la clé secrète ; 45 tests Deno.
+
 ## 5. État actuel et problèmes connus
 
 ### Sécurité
