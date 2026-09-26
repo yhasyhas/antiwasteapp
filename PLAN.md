@@ -222,8 +222,6 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 
 **Terminé quand** : un nouvel utilisateur peut scanner et générer une recette sans créer de compte, puis garder ses données en créant son compte ; toucher un aliment du garde-manger (scanné, ajouté à la main ou par code-barres) ouvre sa fiche dans la langue de l'app, sans nouvelle génération pour les aliments pré-remplis ; les fiches peuvent être relues et signalées.
 
-**Terminé quand** : un nouvel utilisateur peut scanner et générer une recette sans créer de compte, puis garder ses données en créant son compte.
-
 ## Phase 7 — Design et ergonomie
 
 - [ ] Identité visuelle : couleurs, typographie, composants (boutons, cartes, badges, fenêtres)
