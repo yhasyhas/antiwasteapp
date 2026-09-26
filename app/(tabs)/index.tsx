@@ -179,6 +179,7 @@ export default function HomeScreen() {
         <RecipeSheet
           recipe={images.withImage(selectedRecipe)}
           imageLoading={images.isLoading(selectedRecipe.id)}
+          imageNotice={images.notice(selectedRecipe.id)}
           isFavorite={favoriteIds.has(selectedRecipe.id)}
           onToggleFavorite={() => toggleFavorite(selectedRecipe)}
           onClose={() => setSelectedRecipe(null)}

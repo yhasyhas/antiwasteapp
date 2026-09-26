@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Globe, ChevronRight, User, LogOut } from 'lucide-react-native';
 import { sendSentryTestError, sentryEnabled } from '@/lib/sentry';
 import { notificationsSupported, sendTestReminder } from '@/lib/notifications';
+import { router } from 'expo-router';
 
 const languages = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
@@ -111,6 +112,12 @@ export default function SettingsScreen() {
         {__DEV__ && sentryEnabled && (
           <TouchableOpacity style={styles.testButton} onPress={sendSentryTestError}>
             <Text style={styles.testButtonText}>{t('settings.sentryTest')}</Text>
+          </TouchableOpacity>
+        )}
+        {/* Développement seulement : compteurs du jour et quotas de fournisseurs épuisés */}
+        {__DEV__ && user && (
+          <TouchableOpacity style={styles.testButton} onPress={() => router.push('/dev/status')}>
+            <Text style={styles.testButtonText}>{t('devStatus.open')}</Text>
           </TouchableOpacity>
         )}
         {/* Développement seulement : le rappel de péremption, sans attendre 9 h */}

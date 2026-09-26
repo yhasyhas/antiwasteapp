@@ -27,6 +27,8 @@ function RootNavigator() {
       <Stack.Protected guard={!!user}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="recipe/generate" />
+        {/* Développement seulement (l'écran redirige ailleurs hors développement) */}
+        <Stack.Screen name="dev/status" />
       </Stack.Protected>
       <Stack.Screen name="+not-found" />
     </Stack>

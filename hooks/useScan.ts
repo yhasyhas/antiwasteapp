@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { callEdgeFunction, SessionExpiredError } from '@/lib/callEdgeFunction';
+import { failureReasonOf, failureTitle } from '@/lib/quotaReason';
 import { expiryFromShelfLife, type FoodKind } from '@/lib/expiry';
 import { maybeAskNotificationPermission } from '@/lib/notifications';
 import { notifyPantryChanged } from '@/lib/pantryEvents';
@@ -83,8 +84,9 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
       // Une erreur du serveur n'est pas un « aucun ingrédient détecté » : on affiche le vrai message
       if (!response.ok || !data || data.error) {
         const message = [data?.message || data?.error, data?.details].filter(Boolean).join('\n') || `HTTP ${response.status}`;
-        // 429 : limite du jour atteinte, le message du serveur l'explique et l'ajout manuel reste possible
-        Alert.alert(response.status === 429 ? t('errors.dailyLimitTitle') : t('scan.analysisFailed'), message, [
+        // Quota personnel, quota des fournisseurs (secours compris) ou panne : le message du serveur l'explique,
+        // l'ajout manuel reste possible
+        Alert.alert(failureTitle(t, failureReasonOf(data), t('scan.analysisFailed')), message, [
           { text: t('scan.addManually'), onPress: onManualAdd },
           { text: t('common.ok'), style: 'cancel' },
         ]);

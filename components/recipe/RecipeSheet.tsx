@@ -11,6 +11,8 @@ interface Props {
   recipe: Recipe;
   // Image en cours de génération : l'emplacement affiche un indicateur, puis l'image à son arrivée
   imageLoading: boolean;
+  // Image impossible (quota du jour, panne) : message discret à son emplacement
+  imageNotice?: string | null;
   isFavorite: boolean;
   onToggleFavorite: () => void;
   onClose: () => void;
@@ -18,7 +20,7 @@ interface Props {
 
 // Fiche recette unique (génération, recettes récentes, favoris) : image, temps, ingrédients du
 // garde-manger et à acheter, quantités, étapes, conseils, suggestion, favori et « J'ai cuisiné ça »
-export function RecipeSheet({ recipe, imageLoading, isFavorite, onToggleFavorite, onClose }: Props) {
+export function RecipeSheet({ recipe, imageLoading, imageNotice, isFavorite, onToggleFavorite, onClose }: Props) {
   const { t } = useLanguage();
   const missing = recipe.missing_ingredients ?? [];
 
@@ -41,7 +43,10 @@ export function RecipeSheet({ recipe, imageLoading, isFavorite, onToggleFavorite
               ) : imageLoading ? (
                 <ActivityIndicator color="#10b981" />
               ) : (
-                <ImageOff size={32} color="#d1d5db" />
+                <>
+                  <ImageOff size={32} color="#d1d5db" />
+                  {imageNotice ? <Text style={styles.imageNotice}>{imageNotice}</Text> : null}
+                </>
               )}
             </View>
             {recipe.image_url ? <Text style={styles.imageCaption}>{t('recipe.imageCaption')}</Text> : null}
@@ -181,6 +186,13 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
+  },
+  imageNotice: {
+    fontSize: 13,
+    color: '#9ca3af',
+    textAlign: 'center',
+    marginTop: 8,
+    paddingHorizontal: 24,
   },
   imageCaption: {
     fontSize: 12,

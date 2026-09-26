@@ -3,6 +3,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import {
   isPendingImage,
   isRecipeImageLoading,
+  recipeImageFailure,
   recipeImageUrl,
   recipeImagesVersion,
   requestRecipeImage,
@@ -14,7 +15,7 @@ type WithImage = { id?: string; image_url?: string | null };
 // Images des recettes, lues dans l'état partagé de l'app (lib/recipeImage.ts) : l'écran se met à jour
 // dès qu'une image arrive, même demandée ailleurs.
 export function useRecipeImages() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   useSyncExternalStore(subscribeRecipeImages, recipeImagesVersion);
 
   // La recette avec son image, si elle est connue (base ou génération de cette session)
@@ -26,5 +27,14 @@ export function useRecipeImages() {
   const request = (recipe: WithImage) => requestRecipeImage(recipe.id, language, recipe.image_url);
   const requestAll = (recipes: WithImage[]) => recipes.forEach(request);
 
-  return { withImage, request, requestAll, isLoading: isRecipeImageLoading };
+  // Message discret à l'emplacement de l'image quand elle n'a pas pu être générée
+  const notice = (recipeId: string | undefined): string | null => {
+    const reason = recipeImageFailure(recipeId);
+    if (reason === 'user_quota') return t('recipe.imageUserQuota');
+    if (reason === 'provider_quota') return t('recipe.imageProviderQuota');
+    if (reason === 'provider_error') return t('recipe.imageUnavailable');
+    return null;
+  };
+
+  return { withImage, request, requestAll, isLoading: isRecipeImageLoading, notice };
 }
