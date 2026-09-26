@@ -6,8 +6,11 @@ import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_SECRET_KEY, SUPABASE_URL } from '../
 import { compressRecipeImage } from '../_shared/image.ts';
 
 // Image d'une recette : générée par Cloudflare Workers AI (FLUX), stockée dans le bucket recipe-images,
-// URL enregistrée dans recipes.image_url. Appelée par l'app seulement à l'ouverture ou à la sauvegarde
-// d'une recette, et une seule fois par recette : si l'image existe déjà, elle est renvoyée sans rien générer.
+// URL enregistrée dans recipes.image_url (historique). Appelée par l'app en arrière-plan dès l'affichage
+// des recettes générées (et à l'ouverture d'une recette qui n'en a pas), une seule fois par recette : si
+// l'image existe déjà, elle est renvoyée sans rien générer ni compter.
+// Coût (grille Cloudflare) : FLUX schnell sort toujours du 1024×1024 (aucune taille réglable), soit
+// 4 tuiles × 4,8 + 4 étapes × 9,6 ≈ 58 neurones par image.
 
 const CLOUDFLARE_ACCOUNT_ID = Deno.env.get('CLOUDFLARE_ACCOUNT_ID') || '';
 const CLOUDFLARE_API_TOKEN = Deno.env.get('CLOUDFLARE_API_TOKEN') || '';

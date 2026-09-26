@@ -86,7 +86,7 @@ Le CLI lit `SUPABASE_ACCESS_TOKEN` (jeton personnel, `sbp_…`) et `SUPABASE_DB_
 | `SCAN_HEDGE_DELAY_MS` | non | Délai avant de lancer Groq en parallèle de Gemini (défaut 5000 ; 2500 en production) |
 | `QUOTA_DAILY_SCANS` | non | Scans par jour et par utilisateur (défaut 20) |
 | `QUOTA_DAILY_GENERATIONS` | non | Générations par jour et par utilisateur (défaut 10) |
-| `QUOTA_DAILY_IMAGES` | non | Images par jour et par utilisateur (défaut 10) |
+| `QUOTA_DAILY_IMAGES` | non | Images par jour et par utilisateur (défaut 30 : 3 par génération) |
 | `ALLOWED_ORIGINS` | non | Origines web autorisées, séparées par des virgules (défaut : Expo web en local) |
 
 Fournis automatiquement par Supabase : `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEYS`, `SUPABASE_SECRET_KEYS`, `SUPABASE_JWKS`.
