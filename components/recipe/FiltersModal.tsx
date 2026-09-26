@@ -6,6 +6,7 @@ import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { difficultyLabel } from '@/lib/labels';
 import { cuisineOptions, dietaryOptions, difficultyOptions, languages, mealTypes } from './options';
 import { modalStyles } from './modalStyles';
+import { CookTimeChoice, ServingsStepper } from './PreferenceControls';
 import type { Filters } from './types';
 
 interface Props {
@@ -156,6 +157,26 @@ export function FiltersModal({ visible, filters, onChange, onToggleDietary, onCl
               </View>
             </View>
 
+            {/* Temps maximum */}
+            <View style={styles.filterGroup}>
+              <Text style={styles.filterGroupTitle}>{t('preferences.maxTime')}</Text>
+              <CookTimeChoice value={filters.maxCookTime} onChange={(maxCookTime) => onChange({ ...filters, maxCookTime })} />
+            </View>
+
+            {/* Nombre de personnes */}
+            <View style={styles.filterGroup}>
+              <Text style={styles.filterGroupTitle}>{t('preferences.servings')}</Text>
+              <ServingsStepper value={filters.servings} onChange={(servings) => onChange({ ...filters, servings })} />
+            </View>
+
+            {/* Aliments exclus : rappel (modifiables dans les préférences) */}
+            {filters.excluded.length > 0 && (
+              <View style={styles.filterGroup}>
+                <Text style={styles.filterGroupTitle}>{t('preferences.excluded')}</Text>
+                <Text style={styles.excludedNote}>{t('preferences.excludedNote', { items: filters.excluded.join(', ') })}</Text>
+              </View>
+            )}
+
             {/* Difficulté */}
             <View style={styles.filterGroup}>
               <Text style={styles.filterGroupTitle}>{t('generate.difficulty')}</Text>
@@ -203,6 +224,11 @@ export function FiltersModal({ visible, filters, onChange, onToggleDietary, onCl
 }
 
 const styles = StyleSheet.create({
+  excludedNote: {
+    fontSize: 14,
+    color: '#6b7280',
+    lineHeight: 20,
+  },
   filterGroup: {
     marginBottom: 24,
   },

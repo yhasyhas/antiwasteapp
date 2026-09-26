@@ -11,7 +11,7 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { useAuth } from '@/contexts/AuthContext';
-import { Globe, ChevronRight, User, LogOut, Users } from 'lucide-react-native';
+import { Globe, ChevronRight, User, LogOut, Users, SlidersHorizontal } from 'lucide-react-native';
 import { sendSentryTestError, sentryEnabled } from '@/lib/sentry';
 import { notificationsSupported, sendTestReminder } from '@/lib/notifications';
 import { router } from 'expo-router';
@@ -103,6 +103,12 @@ export default function SettingsScreen() {
             <Text style={styles.infoLabel}>{t('settings.email')}</Text>
             <Text style={styles.infoValue}>{user?.email || t('settings.notSignedIn')}</Text>
           </View>
+
+          <TouchableOpacity style={[styles.householdRow, styles.rowSpacing]} onPress={() => router.push('/preferences')}>
+            <SlidersHorizontal size={20} color="#10b981" />
+            <Text style={styles.householdText}>{t('preferences.title')}</Text>
+            <ChevronRight size={20} color="#9ca3af" />
+          </TouchableOpacity>
 
           <TouchableOpacity style={styles.householdRow} onPress={() => router.push('/household')}>
             <Users size={20} color="#10b981" />
@@ -274,6 +280,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 16,
     borderRadius: 12,
+  },
+  rowSpacing: {
+    marginBottom: 8,
   },
   householdText: {
     flex: 1,

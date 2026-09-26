@@ -32,6 +32,7 @@ function RootNavigator() {
         <Stack.Screen name="recipe/generate" />
         <Stack.Screen name="household" />
         <Stack.Screen name="shopping" />
+        <Stack.Screen name="preferences" />
         {/* Développement seulement (l'écran redirige ailleurs hors développement) */}
         <Stack.Screen name="dev/status" />
       </Stack.Protected>
