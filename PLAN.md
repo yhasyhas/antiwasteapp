@@ -44,10 +44,10 @@ Cinq fonctionnalités qui la différencient d'un simple générateur de recettes
 
 | Fonctionnalité | Préparation (données, IA) | Mise en avant dans l'app |
 |---|---|---|
-| **Garde-manger partagé** : un foyer partage le même garde-manger | Phase 2 : tables `households` et `household_members`, colonne `household_id` sur `ingredients` et les autres tables concernées, règles de sécurité basées sur l'appartenance au foyer, foyer personnel créé automatiquement à l'inscription et migration des données existantes, **sans changement visible** | Phase 6 : inviter un membre, rejoindre un foyer, voir qui a ajouté quoi |
+| **Garde-manger partagé** : un foyer partage le même garde-manger | Phase 2 : tables `households` et `household_members`, colonne `household_id` sur `ingredients` et les autres tables concernées, règles de sécurité basées sur l'appartenance au foyer, foyer personnel créé automatiquement à l'inscription et migration des données existantes, **sans changement visible** | Phase 6a : inviter un membre, rejoindre un foyer, voir qui a ajouté quoi |
 | **Conserver avant de cuisiner** : un conseil de conservation pour chaque aliment | Phase 3 : champ `storage_tip` dans la réponse d'`analyze-image` | Phase 5 : l'enregistrer et l'afficher sur chaque ingrédient |
 | **Restes de plats** : scanner un plat cuisiné, pas seulement des ingrédients | Phase 3 : champ `kind` (`ingredient` ou `dish`) dans la réponse d'`analyze-image` | Phase 5 : date de péremption courte automatique pour les plats, et mode de génération « Transformer mes restes » |
-| **Cuisines du monde** : choisir une cuisine (italienne, sénégalaise, japonaise…) | Phase 3 : paramètre `cuisine` dans `generate-recipes` et filtre sur l'écran de génération | Phase 6 : préférence enregistrée |
+| **Cuisines du monde** : choisir une cuisine (italienne, sénégalaise, japonaise…) | Phase 3 : paramètre `cuisine` dans `generate-recipes` et filtre sur l'écran de génération | Phase 6b : préférence enregistrée |
 | **Fiches aliments** : en touchant un aliment du garde-manger, une fiche courte (description, origine, saison, atouts nutritionnels, astuces anti-gaspi) | Phase 6b : identifiant standard `food_key` renvoyé par le scan (et déterminé à l'ajout manuel et au code-barres), table partagée `food_facts` générée une seule fois par aliment dans les trois langues, pré-remplie avec la centaine d'aliments les plus courants | Phase 6b : fiche ouverte depuis le garde-manger, mention « Informations générales, pas un avis médical », bouton « Signaler une erreur » |
 
 ---
@@ -185,19 +185,28 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 
 ## Phase 6 — Donner envie de revenir
 
-### Phase 6a
+### Phase 6a — Build de développement, foyer partagé, notifications envoyées par le serveur
+
+Regroupe ce qui dépend du build de développement.
 
 - [ ] Passer à un build de développement EAS (Android) : canal de notifications dédié (impossible dans Expo Go), plantages natifs dans Sentry
-- [ ] Liste de courses construite à partir de `missing_ingredients`
-- [ ] Compteur de gaspillage évité (kg, et éventuellement argent économisé) sur l'accueil
-- [ ] Écran de préférences : régimes, ingrédients exclus, temps max ; utilisé par la génération
-- [ ] Connexion anonyme Supabase pour tester sans compte, avec conversion en compte plus tard
 - [ ] Garde-manger partagé : inviter un membre, rejoindre un foyer, voir qui a ajouté quoi
 - [ ] Garde-manger partagé : l'app filtre ses ingrédients par `household_id` (aujourd'hui par `user_id`, équivalent tant qu'il n'y a qu'un foyer personnel) ; gérer le départ ou la suppression du compte du propriétaire d'un foyer partagé (aujourd'hui, supprimer un compte supprime son foyer)
 - [ ] Garde-manger partagé : empêcher la modification de `user_id` sur un ingrédient existant (l'auteur ne doit pas pouvoir être changé par un autre membre)
-- [ ] Cuisines du monde : préférence de cuisine enregistrée et utilisée par défaut
+- [ ] Garde-manger partagé : mise à jour en temps réel entre les membres (Supabase Realtime)
+- [ ] Notifications envoyées par le serveur : résumé quotidien à 9 h (heure locale), calculé à partir du garde-manger du foyer, envoyé par Expo Push (pg_cron et une Edge Function) ; notifications locales en secours sans jeton push, jamais en double ; alerte Sentry en cas d'échec d'envoi
 
-### Phase 6b — Fiches aliments
+**Terminé quand** : l'app tourne dans le build de développement, deux comptes partagent un garde-manger mis à jour en temps réel, et le résumé de 9 h arrive par notification push.
+
+### Phase 6b — Liste de courses, compteur anti-gaspi, préférences, essai sans compte, fiches aliments
+
+- [ ] Liste de courses construite à partir de `missing_ingredients`
+- [ ] Compteur de gaspillage évité (kg, et éventuellement argent économisé) sur l'accueil
+- [ ] Écran de préférences : régimes, ingrédients exclus, temps max ; utilisé par la génération
+- [ ] Cuisines du monde : préférence de cuisine enregistrée et utilisée par défaut
+- [ ] Connexion anonyme Supabase pour tester sans compte, avec conversion en compte plus tard
+
+#### Fiches aliments
 
 En touchant un aliment du garde-manger, on voit sa fiche : description courte, origine, saison, principaux atouts nutritionnels et astuces anti-gaspi. Informations générales uniquement, sans promesse de santé.
 
@@ -211,7 +220,7 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 - [ ] Pré-remplir la centaine d'aliments les plus courants (liste versionnée dans le dépôt, script lancé une fois avec la clé secrète, reprise possible sans régénérer les fiches existantes)
 - [ ] Relecture des fiches : script d'export en Markdown (une fiche par aliment, trois langues, signalements en regard) et marquage `reviewed` des fiches relues ; les fiches signalées remontent en tête
 
-**Terminé quand** : toucher un aliment du garde-manger (scanné, ajouté à la main ou par code-barres) ouvre sa fiche dans la langue de l'app, sans nouvelle génération pour les aliments pré-remplis ; les fiches peuvent être relues et signalées.
+**Terminé quand** : un nouvel utilisateur peut scanner et générer une recette sans créer de compte, puis garder ses données en créant son compte ; toucher un aliment du garde-manger (scanné, ajouté à la main ou par code-barres) ouvre sa fiche dans la langue de l'app, sans nouvelle génération pour les aliments pré-remplis ; les fiches peuvent être relues et signalées.
 
 **Terminé quand** : un nouvel utilisateur peut scanner et générer une recette sans créer de compte, puis garder ses données en créant son compte.
 
@@ -330,4 +339,5 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 | 26/09/2026 | Carte de recette unique (`components/recipe/RecipeListCard.tsx`) pour l'accueil, les favoris, toutes les recettes et les résultats de génération : vignette avec l'image si elle existe, sinon vignette de remplacement ; images affichées avec `expo-image` (cache mémoire et disque) | Afficher une liste ne génère plus aucune image, y compris après une génération (auparavant les 3 images étaient demandées en arrière-plan) : l'image n'est générée qu'à l'ouverture de la fiche et la carte se met à jour à son arrivée. Moins de neurones Cloudflare consommés pour des recettes jamais ouvertes |
 | 26/09/2026 | Images des résultats de génération : génération en arrière-plan rétablie, uniquement pour les recettes d'une nouvelle génération, dès l'affichage des résultats | Accueil, favoris et toutes les recettes gardent la règle : aucune image générée pour afficher la liste, seulement à l'ouverture de la fiche |
 | 26/09/2026 | Nouvelle fonctionnalité « Fiches aliments » ajoutée en phase 6b et à « Ce qui distingue l'app » ; phase 6 découpée en 6a (tâches existantes) et 6b (fiches aliments) | Fiches partagées par tous les utilisateurs et générées une seule fois (trois langues par appel), clé `food_key` commune au scan, à l'ajout manuel et au code-barres ; informations générales uniquement, mention « pas un avis médical », signalements ; quota et alertes comme les autres fonctions |
+| 26/09/2026 | Phase 6 réorganisée : 6a = build de développement, foyer partagé, notifications envoyées par le serveur ; 6b = liste de courses, compteur anti-gaspi, préférences, essai sans compte, fiches aliments | 6a regroupe ce qui dépend du build de développement |
 | | *(résultat du test Gemini vs Clarifai)* | |
