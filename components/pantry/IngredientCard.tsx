@@ -29,10 +29,11 @@ interface Props {
   addedBy?: string;
 }
 
-const ORIGIN_STYLES: Record<string, { background: string; text: string; labelKey: 'pantry.scanned' | 'pantry.manual' | 'pantry.barcode' }> = {
+const ORIGIN_STYLES: Record<string, { background: string; text: string; labelKey: 'pantry.scanned' | 'pantry.manual' | 'pantry.barcode' | 'pantry.shopping' }> = {
   camera: { background: '#ede9fe', text: '#7c3aed', labelKey: 'pantry.scanned' },
   barcode: { background: '#e0e7ff', text: '#4338ca', labelKey: 'pantry.barcode' },
   manual: { background: '#dbeafe', text: '#2563eb', labelKey: 'pantry.manual' },
+  shopping: { background: '#fce7f3', text: '#be185d', labelKey: 'pantry.shopping' },
 };
 
 // Ingrédient du garde-manger : nom, quantité, date de péremption (badge de couleur, modifiable),

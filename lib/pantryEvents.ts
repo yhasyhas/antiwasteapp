@@ -12,3 +12,15 @@ export function onPantryChanged(listener: Listener): () => void {
 export function notifyPantryChanged() {
   listeners.forEach((listener) => listener());
 }
+
+// Liste de courses du foyer modifiée (ici ou par un autre membre, en temps réel)
+const shoppingListeners = new Set<Listener>();
+
+export function onShoppingChanged(listener: Listener): () => void {
+  shoppingListeners.add(listener);
+  return () => shoppingListeners.delete(listener);
+}
+
+export function notifyShoppingChanged() {
+  shoppingListeners.forEach((listener) => listener());
+}

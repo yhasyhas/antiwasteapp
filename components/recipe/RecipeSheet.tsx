@@ -7,6 +7,7 @@ import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { dietLabel, difficultyLabel } from '@/lib/labels';
 import { modalStyles, suggestionStyles } from './modalStyles';
 import { CookedButton } from './CookedButton';
+import { AddMissingButton } from './AddMissingButton';
 import type { Recipe } from './types';
 
 interface Props {
@@ -104,6 +105,7 @@ export function RecipeSheet({ recipe, imageLoading, imageNotice, isFavorite, onT
                     </View>
                   ))}
                 </View>
+                <AddMissingButton names={missing} recipeId={recipe.id} recipeTitle={recipe.title} onOpenList={onClose} />
               </Section>
             )}
 

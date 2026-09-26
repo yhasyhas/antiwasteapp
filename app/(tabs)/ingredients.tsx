@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/Input';
 import { KeyboardAvoider } from '@/components/ui/KeyboardAvoider';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { supabase } from '@/lib/supabase';
-import { Search, Trash2, Plus, Package, Users } from 'lucide-react-native';
+import { Search, Trash2, Plus, Package, Users, ShoppingCart } from 'lucide-react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { IngredientCard, type PantryIngredient } from '@/components/pantry/IngredientCard';
 import { ExpiryEditModal } from '@/components/pantry/ExpiryEditModal';
@@ -194,6 +194,13 @@ export default function IngredientsScreen() {
           </Text>
         </View>
         <View style={styles.headerActions}>
+          <TouchableOpacity
+            style={styles.householdButton}
+            onPress={() => router.push('/shopping')}
+            accessibilityLabel={t('shopping.title')}
+          >
+            <ShoppingCart size={20} color="#10b981" />
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.householdButton}
             onPress={() => router.push('/household')}
