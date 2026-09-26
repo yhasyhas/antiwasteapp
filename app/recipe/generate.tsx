@@ -13,7 +13,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useRecipeGeneration } from '@/hooks/useRecipeGeneration';
 import { FilterSummary } from '@/components/recipe/FilterSummary';
 import { FiltersModal } from '@/components/recipe/FiltersModal';
-import { RecipeCard } from '@/components/recipe/RecipeCard';
+import { RecipeListCard } from '@/components/recipe/RecipeListCard';
 import { RecipeSheet } from '@/components/recipe/RecipeSheet';
 import { PantryChips } from '@/components/recipe/PantryChips';
 
@@ -86,7 +86,7 @@ export default function GenerateRecipeScreen() {
             <View style={styles.recipesSection}>
               <Text style={styles.sectionTitle}>{t('generate.generatedRecipes')}</Text>
               {recipes.map((recipe, index) => (
-                <RecipeCard key={index} recipe={recipe} imageLoading={isImageLoading(recipe.id)} onPress={() => openRecipe(recipe)} />
+                <RecipeListCard key={recipe.id ?? index} recipe={recipe} imageLoading={isImageLoading(recipe.id)} onPress={() => openRecipe(recipe)} />
               ))}
             </View>
           )}
