@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { AuthError, Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { unregisterPush } from '@/lib/pushNotifications';
 
 // Jeton de rafraîchissement absent, expiré ou déjà utilisé : la session enregistrée est inutilisable
 function isInvalidRefreshToken(error: AuthError) {
@@ -112,6 +113,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
+    // Tant que la session existe : l'appareil ne recevra plus les résumés de ce compte
+    await unregisterPush();
     await supabase.auth.signOut();
   };
 
