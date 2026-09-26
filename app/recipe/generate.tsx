@@ -33,6 +33,7 @@ export default function GenerateRecipeScreen() {
     selectedRecipe,
     setSelectedRecipe,
     isImageLoading,
+    imageNotice,
     isFavorite,
     filters,
     setFilters,
@@ -141,6 +142,7 @@ export default function GenerateRecipeScreen() {
           <RecipeSheet
             recipe={selectedRecipe}
             imageLoading={isImageLoading(selectedRecipe.id)}
+            imageNotice={imageNotice(selectedRecipe.id)}
             isFavorite={isFavorite(selectedRecipe)}
             onToggleFavorite={() => toggleFavorite(selectedRecipe)}
             onClose={() => setSelectedRecipe(null)}

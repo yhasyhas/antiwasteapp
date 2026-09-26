@@ -201,9 +201,42 @@ export type ParseResult<T> =
 // ai_error : fournisseur injoignable ou en erreur ; invalid_response : réponse illisible ou non conforme
 export type FailureCode = 'ai_error' | 'invalid_response';
 
+// Raison d'un échec de fournisseur : quota épuisé chez lui, ou panne (erreur, délai, réponse illisible)
+export type ProviderFailureReason = 'provider_quota' | 'provider_error';
+
+// Erreurs de quota propres à chaque fournisseur : Gemini RESOURCE_EXHAUSTED, Groq rate_limit_exceeded
+// (par minute ou par jour), Cloudflare « daily free allocation of 10,000 neurons » (code 3036) ; HTTP 429
+// pour tous. Un 503 « surchargé » de Gemini est une panne, pas un quota.
+const QUOTA_PATTERN = /RESOURCE_EXHAUSTED|rate_limit_exceeded|rate limit|quota|free allocation|neurons|"code":\s*3036/i;
+
+export function classifyProviderFailure(status: number | undefined, details: string): ProviderFailureReason {
+  return status === 429 || QUOTA_PATTERN.test(details) ? 'provider_quota' : 'provider_error';
+}
+
+// Fournisseur dont le quota s'est révélé épuisé pendant l'appel (même si un autre a pris le relais)
+export interface ProviderQuotaHit {
+  provider: string;
+  details: string;
+}
+
 export type FallbackResult<T> =
+  | { ok: true; value: T; provider: AiProvider; quotaHits: ProviderQuotaHit[] }
+  | { ok: false; failure: string; code: FailureCode; provider: AiProvider; reason: ProviderFailureReason; quotaHits: ProviderQuotaHit[] };
+
+// Erreurs simulées pour les tests (jamais d'appel réel au fournisseur) : quota épuisé ou panne
+export type SimulatedFailure = 'quota' | 'error';
+
+function simulatedResult(provider: AiProvider, failure: SimulatedFailure): ProviderResult {
+  const name = provider.name.charAt(0).toUpperCase() + provider.name.slice(1);
+  return failure === 'quota'
+    ? { ok: false, status: 429, details: `${name} 429 (simulé) : quota épuisé (RESOURCE_EXHAUSTED / rate_limit_exceeded)` }
+    : { ok: false, status: 500, details: `${name} 500 (simulé) : panne du fournisseur` };
+}
+
+// Résultat interne d'une tentative, avec la raison de l'échec
+type AttemptResult<T> =
   | { ok: true; value: T; provider: AiProvider }
-  | { ok: false; failure: string; code: FailureCode; provider: AiProvider };
+  | { ok: false; failure: string; code: FailureCode; provider: AiProvider; reason: ProviderFailureReason };
 
 // Journal des tentatives, renvoyé en mode debug (durées, tokens)
 export interface AttemptLog {
@@ -223,26 +256,31 @@ async function attempt<T>(
   log: AttemptLog[],
   t0: number,
   label: string,
-): Promise<FallbackResult<T>> {
+  simulate?: SimulatedFailure,
+): Promise<AttemptResult<T>> {
   const started = Date.now();
-  const result = await provider.call(request, signal);
+  const result = simulate ? simulatedResult(provider, simulate) : await provider.call(request, signal);
   const entry: AttemptLog = { provider: provider.name, started_at_ms: started - t0, ms: Date.now() - started, ok: false, ...(result.ok && { usage: result.usage }) };
   log.push(entry);
 
-  let outcome: FallbackResult<T>;
+  let outcome: AttemptResult<T>;
   if (!result.ok) {
-    outcome = { ok: false, failure: result.details, code: 'ai_error', provider };
+    const reason = classifyProviderFailure(result.status, result.details);
+    outcome = { ok: false, failure: result.details, code: 'ai_error', provider, reason };
+    if (reason === 'provider_quota') {
+      console.error(`[${label}] QUOTA ÉPUISÉ chez ${provider.name} (${provider.model}) : ${result.details.slice(0, 200)}`);
+    }
     if (result.status === 401 || result.status === 403) {
       // Pas une panne passagère : la clé est à corriger. On bascule quand même pour ne pas bloquer l'utilisateur.
       console.error(`[${label}] ${provider.name} (${provider.model}) CLÉ ${provider.name.toUpperCase()} INVALIDE (HTTP ${result.status}) : vérifier le secret de sa clé API`);
     }
   } else if (result.text.trim() === '') {
-    outcome = { ok: false, failure: `${provider.name} : réponse vide`, code: 'invalid_response', provider };
+    outcome = { ok: false, failure: `${provider.name} : réponse vide`, code: 'invalid_response', provider, reason: 'provider_error' };
   } else {
     const parsed = parse(result.text);
     outcome = parsed.ok
       ? { ok: true, value: parsed.value, provider }
-      : { ok: false, failure: `${provider.name} : ${parsed.failure}`, code: parsed.code, provider };
+      : { ok: false, failure: `${provider.name} : ${parsed.failure}`, code: parsed.code, provider, reason: 'provider_error' };
   }
 
   if (!outcome.ok) {
@@ -259,7 +297,14 @@ export function runWithFallback<T>(
   providers: AiProvider[],
   request: AiRequest,
   parse: (text: string) => ParseResult<T>,
-  options: { label: string; log: AttemptLog[]; t0: number; hedgeDelayMs?: number },
+  options: {
+    label: string;
+    log: AttemptLog[];
+    t0: number;
+    hedgeDelayMs?: number;
+    // Tests : échec simulé par fournisseur, sans appel réel
+    simulate?: Record<string, SimulatedFailure>;
+  },
 ): Promise<FallbackResult<T>> {
   const controller = new AbortController();
   return new Promise((resolve) => {
@@ -267,12 +312,22 @@ export function runWithFallback<T>(
     let pending = 0;
     let settled = false;
     let hedgeTimer: ReturnType<typeof setTimeout> | undefined;
+    // Échecs des fournisseurs : la raison finale et les quotas épuisés en découlent
+    const failures: Array<{ provider: string; reason: ProviderFailureReason; details: string }> = [];
 
-    const finish = (result: FallbackResult<T>) => {
+    const finish = (result: AttemptResult<T>) => {
       settled = true;
       clearTimeout(hedgeTimer);
       controller.abort();
-      resolve(result);
+      const quotaHits = failures
+        .filter((failure) => failure.reason === 'provider_quota')
+        .map(({ provider, details }) => ({ provider, details }));
+      if (result.ok) return resolve({ ...result, quotaHits });
+      // Tous les fournisseurs ont échoué : quota seulement si c'est la cause pour chacun d'eux
+      const reason: ProviderFailureReason = failures.length > 0 && failures.every((failure) => failure.reason === 'provider_quota')
+        ? 'provider_quota'
+        : 'provider_error';
+      resolve({ ...result, reason, quotaHits });
     };
 
     const startNext = () => {
@@ -280,9 +335,10 @@ export function runWithFallback<T>(
       if (settled || next >= providers.length) return;
       const provider = providers[next++];
       pending++;
-      attempt(provider, request, parse, controller.signal, options.log, options.t0, options.label).then((result) => {
+      attempt(provider, request, parse, controller.signal, options.log, options.t0, options.label, options.simulate?.[provider.name]).then((result) => {
         pending--;
         if (settled) return;
+        if (!result.ok) failures.push({ provider: provider.name, reason: result.reason, details: result.failure });
         if (result.ok) return finish(result);
         if (next < providers.length) startNext();
         else if (pending === 0) finish(result);

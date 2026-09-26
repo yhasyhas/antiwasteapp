@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { callEdgeFunction } from '@/lib/callEdgeFunction';
 import { loadFavoriteIds, setFavorite } from '@/lib/favorites';
+import { failureReasonOf, failureTitle } from '@/lib/quotaReason';
 import { supabase } from '@/lib/supabase';
 import { useRecipeImages } from '@/hooks/useRecipeImages';
 import { daysUntil, sortByUrgency } from '@/lib/expiry';
@@ -144,7 +145,8 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
         // Images de toutes les recettes, en arrière-plan : elles apparaissent sur les cartes à leur arrivée
         images.requestAll(saved);
       } else if (data?.error) {
-        Alert.alert(data.error === 'quota_exceeded' ? t('errors.dailyLimitTitle') : t('common.error'), data.message || t('generate.failed'));
+        // Quota personnel, quota des fournisseurs (secours compris) ou panne
+        Alert.alert(failureTitle(t, failureReasonOf(data), t('common.error')), data.message || t('generate.failed'));
       } else {
         Alert.alert(t('common.error'), t('generate.failed'));
       }
@@ -284,6 +286,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
     selectedRecipe: selectedRecipe && images.withImage(selectedRecipe),
     setSelectedRecipe,
     isImageLoading: images.isLoading,
+    imageNotice: images.notice,
     isFavorite: (recipe: Recipe) => !!recipe.id && favoriteIds.has(recipe.id),
     filters,
     setFilters,

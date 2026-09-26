@@ -13,7 +13,7 @@ import { SavedRecipeCard } from '@/components/saved/SavedRecipeCard';
 import { RecipeSheet } from '@/components/recipe/RecipeSheet';
 
 export default function SavedScreen() {
-  const { recipes, loading, selectedRecipe, setSelectedRecipe, isImageLoading, openRecipe, toggleFavorite } = useSavedRecipes();
+  const { recipes, loading, selectedRecipe, setSelectedRecipe, isImageLoading, imageNotice, openRecipe, toggleFavorite } = useSavedRecipes();
   const { t } = useLanguage();
 
   const favoriteRecipes = recipes.filter((r) => r.is_favorite);
@@ -86,6 +86,7 @@ export default function SavedScreen() {
         <RecipeSheet
           recipe={selectedRecipe}
           imageLoading={isImageLoading(selectedRecipe.id)}
+          imageNotice={imageNotice(selectedRecipe.id)}
           isFavorite={selectedRecipe.is_favorite}
           onToggleFavorite={() => toggleFavorite(selectedRecipe.id)}
           onClose={() => setSelectedRecipe(null)}

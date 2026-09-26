@@ -1,10 +1,17 @@
 import { callEdgeFunction } from './callEdgeFunction';
+import { failureReasonOf, type FailureReason } from './quotaReason';
 
 // Images des recettes : un seul état partagé par toute l'app. Chaque carte et chaque fiche lit l'image
 // ici, quel que soit l'écran qui l'a demandée ou reçue. Une recette n'est jamais redemandée tant que son
-// image est en cours ou déjà obtenue ; après un échec, elle peut l'être à la prochaine ouverture.
+// image est en cours ou déjà obtenue. Après une panne, elle peut l'être à la prochaine ouverture ; après
+// un quota épuisé (personnel ou Cloudflare), pas avant le lendemain (UTC, comme les quotas).
 
-type ImageState = { status: 'loading' } | { status: 'done'; url: string } | { status: 'failed' };
+type ImageState =
+  | { status: 'loading' }
+  | { status: 'done'; url: string }
+  | { status: 'failed'; reason: FailureReason; day: string };
+
+const utcDay = () => new Date().toISOString().slice(0, 10);
 
 const states = new Map<string, ImageState>();
 const listeners = new Set<() => void>();
@@ -40,22 +47,29 @@ export function isRecipeImageLoading(recipeId: string | undefined): boolean {
   return !!recipeId && states.get(recipeId)?.status === 'loading';
 }
 
-async function fetchImage(recipeId: string, language: string): Promise<string | null> {
+// Raison de l'échec de l'image (affichée discrètement à son emplacement), ou null
+export function recipeImageFailure(recipeId: string | undefined): FailureReason | null {
+  const state = recipeId ? states.get(recipeId) : undefined;
+  return state?.status === 'failed' ? state.reason : null;
+}
+
+async function fetchImage(recipeId: string, language: string): Promise<{ url: string } | { reason: FailureReason }> {
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     try {
       const { response, data } = await callEdgeFunction('generate-recipe-image', { recipe_id: recipeId, language });
-      if (response.ok && typeof data?.image_url === 'string') return data.image_url;
+      if (response.ok && typeof data?.image_url === 'string') return { url: data.image_url };
       if (response.status !== 202) {
-        console.warn('[image] pas d\'image pour la recette', recipeId, response.status, data?.error, data?.details);
-        return null;
+        const reason = failureReasonOf(data) ?? 'provider_error';
+        console.warn(`[image] pas d'image pour la recette ${recipeId} (${reason})`, response.status, data?.error, data?.details);
+        return { reason };
       }
     } catch (error) {
       console.warn('[image] appel impossible', error);
-      return null;
+      return { reason: 'provider_error' };
     }
     await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
   }
-  return null;
+  return { reason: 'provider_error' };
 }
 
 // Demande l'image d'une recette enregistrée (generate-recipe-image), sans attendre. La fonction
@@ -69,11 +83,13 @@ export function requestRecipeImage(recipeId: string | undefined, language: strin
     if (states.get(recipeId)?.status !== 'done') setState(recipeId, { status: 'done', url: knownUrl });
     return;
   }
-  const status = states.get(recipeId)?.status;
-  if (status === 'loading' || status === 'done') return;
+  const state = states.get(recipeId);
+  if (state?.status === 'loading' || state?.status === 'done') return;
+  // Quota épuisé aujourd'hui : inutile de redemander avant demain
+  if (state?.status === 'failed' && state.reason !== 'provider_error' && state.day === utcDay()) return;
 
   setState(recipeId, { status: 'loading' });
-  fetchImage(recipeId, language).then((url) => {
-    setState(recipeId, url ? { status: 'done', url } : { status: 'failed' });
+  fetchImage(recipeId, language).then((result) => {
+    setState(recipeId, 'url' in result ? { status: 'done', url: result.url } : { status: 'failed', reason: result.reason, day: utcDay() });
   });
 }

@@ -1,6 +1,8 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { getAuthenticatedUser } from '../_shared/auth.ts';
 import { consumeQuota, DAILY_LIMITS, refundQuota } from '../_shared/quota.ts';
+import { logUserQuota, reportInBackground, reportProviderQuota } from '../_shared/quotaAlerts.ts';
+import { readSimulation } from '../_shared/simulate.ts';
 import { withCors } from '../_shared/cors.ts';
 import { type AiProvider, type AttemptLog, geminiProvider, groqProvider, orderProviders, runWithFallback } from '../_shared/ai.ts';
 import {
@@ -60,23 +62,27 @@ interface GenerateRecipeRequest {
 }
 
 // Causes d'échec distinguées dans la réponse envoyée à l'app
-type FailureReason = 'api_error' | 'invalid_json' | 'dietary_refusal';
+// provider_quota : quota épuisé chez tous les fournisseurs ; api_error et invalid_json : panne
+type FailureReason = 'api_error' | 'invalid_json' | 'dietary_refusal' | 'provider_quota';
 
 const FAILURE_MESSAGES: Record<string, Record<FailureReason, string>> = {
   fr: {
     api_error: 'Le service de génération de recettes est momentanément indisponible. Réessaie dans quelques instants.',
     invalid_json: 'La réponse de l\'IA était illisible. Réessaie.',
     dietary_refusal: 'Impossible de créer une recette qui respecte tes régimes alimentaires avec ces ingrédients. Ajoute des ingrédients ou retire un régime.',
+    provider_quota: 'Le service de recettes a atteint sa limite pour le moment. Réessaie plus tard.',
   },
   en: {
     api_error: 'The recipe generation service is temporarily unavailable. Please try again in a moment.',
     invalid_json: 'The AI response could not be read. Please try again.',
     dietary_refusal: 'No recipe can respect your dietary restrictions with these ingredients. Add ingredients or remove a restriction.',
+    provider_quota: 'The recipe service has reached its limit for now. Please try again later.',
   },
   es: {
     api_error: 'El servicio de generación de recetas no está disponible en este momento. Inténtalo de nuevo en unos instantes.',
     invalid_json: 'No se pudo leer la respuesta de la IA. Inténtalo de nuevo.',
     dietary_refusal: 'No es posible crear una receta que respete tus restricciones alimentarias con estos ingredientes. Añade ingredientes o quita una restricción.',
+    provider_quota: 'El servicio de recetas ha alcanzado su límite por ahora. Inténtalo más tarde.',
   },
 };
 
@@ -84,6 +90,14 @@ const FAILURE_STATUS: Record<FailureReason, number> = {
   api_error: 502,
   invalid_json: 502,
   dietary_refusal: 422,
+  provider_quota: 503,
+};
+
+// Raison transmise à l'app pour les échecs liés à un quota ou à une panne (pas pour un refus de régime)
+const FAILURE_KIND: Partial<Record<FailureReason, string>> = {
+  api_error: 'provider_error',
+  invalid_json: 'provider_error',
+  provider_quota: 'provider_quota',
 };
 
 // Erreurs de la requête elle-même (avant toute génération)
@@ -120,12 +134,12 @@ function jsonResponse(body: unknown, status: number): Response {
 function requestErrorResponse(code: RequestError, language: string, limit?: number): Response {
   const messages = REQUEST_ERROR_MESSAGES[language] || REQUEST_ERROR_MESSAGES['en'];
   const message = messages[code].replace('{limit}', String(limit));
-  return jsonResponse({ error: code, message, ...(limit !== undefined && { limit }) }, REQUEST_ERROR_STATUS[code]);
+  return jsonResponse({ error: code, ...(code === 'quota_exceeded' && { reason: 'user_quota' }), message, ...(limit !== undefined && { limit }) }, REQUEST_ERROR_STATUS[code]);
 }
 
 function failureResponse(reason: FailureReason, language: string, extra: Record<string, unknown> = {}): Response {
   const messages = FAILURE_MESSAGES[language] || FAILURE_MESSAGES['en'];
-  return jsonResponse({ error: reason, message: messages[reason], ...extra }, FAILURE_STATUS[reason]);
+  return jsonResponse({ error: reason, ...(FAILURE_KIND[reason] && { reason: FAILURE_KIND[reason] }), message: messages[reason], ...extra }, FAILURE_STATUS[reason]);
 }
 
 // ---------- Prompt ----------
@@ -247,7 +261,10 @@ Deno.serve(withCors(async (req: Request) => {
   let language = 'fr';
 
   try {
-    const { ingredients, preferences, mode: requestedMode, selection: requestedSelection, other_pantry, debug, providers: requestedOrder }: GenerateRecipeRequest = await req.json();
+    const body = await req.json();
+    const { ingredients, preferences, mode: requestedMode, selection: requestedSelection, other_pantry, debug, providers: requestedOrder }: GenerateRecipeRequest = body;
+    // Tests : erreurs de quota simulées (clé secrète exigée)
+    const simulation = readSimulation(req, body);
     const mode: GenerationMode = requestedMode === 'leftovers' ? 'leftovers' : 'standard';
     const selection = requestedSelection === true;
     const otherPantry = selection ? buildOtherPantry(other_pantry) : [];
@@ -275,8 +292,8 @@ Deno.serve(withCors(async (req: Request) => {
     }
 
     // Une génération = un appel de l'app, quel que soit le nombre de recettes renvoyées
-    if (!await consumeQuota(user.id, 'generations')) {
-      console.warn(`[generate-recipes] quota atteint (${DAILY_LIMITS.generations} générations/jour) pour ${user.id}`);
+    if (simulation?.user_quota || !await consumeQuota(user.id, 'generations')) {
+      logUserQuota('generate-recipes', 'generations', DAILY_LIMITS.generations, user.id);
       return requestErrorResponse('quota_exceeded', language, DAILY_LIMITS.generations);
     }
     quotaUserId = user.id;
@@ -316,14 +333,19 @@ Deno.serve(withCors(async (req: Request) => {
       schemaName: 'recipes',
       temperature: 0.8,
       maxOutputTokens: MAX_OUTPUT_TOKENS,
-    }, (text) => parseRecipes(text, pantry, diets, context), { label: 'generate-recipes', log, t0 });
+    }, (text) => parseRecipes(text, pantry, diets, context), { label: 'generate-recipes', log, t0, simulate: simulation?.providers });
+    // Quotas de fournisseurs épuisés, même si le secours a répondu : alerte (une fois par jour et par fournisseur)
+    for (const hit of result.quotaHits) {
+      reportInBackground(reportProviderQuota(hit.provider, 'generate-recipes', hit.details, simulation !== null));
+    }
     const debugInfo = debug === true ? { debug: { total_ms: Date.now() - t0, attempts: log } } : {};
 
     if (!result.ok) {
       // Panne ou réponse illisible des deux fournisseurs : la génération n'est pas comptée
       await refundQuota(user.id, 'generations');
-      console.error(`[generate-recipes] échec : ${result.failure}`);
-      return failureResponse(result.code === 'ai_error' ? 'api_error' : 'invalid_json', language, debugInfo);
+      console.error(`[generate-recipes] ÉCHEC (${result.reason}) : ${result.failure}`);
+      const failure: FailureReason = result.reason === 'provider_quota' ? 'provider_quota' : result.code === 'ai_error' ? 'api_error' : 'invalid_json';
+      return failureResponse(failure, language, debugInfo);
     }
 
     const { recipes, dietaryRejections, refusal, invalid } = result.value;
@@ -347,6 +369,6 @@ Deno.serve(withCors(async (req: Request) => {
   } catch (error) {
     console.error('Error generating recipes:', error);
     if (quotaUserId) await refundQuota(quotaUserId, 'generations');
-    return jsonResponse({ error: 'api_error', message: (FAILURE_MESSAGES[language] || FAILURE_MESSAGES['en']).api_error, details: error instanceof Error ? error.message : String(error) }, 500);
+    return jsonResponse({ error: 'api_error', reason: 'provider_error', message: (FAILURE_MESSAGES[language] || FAILURE_MESSAGES['en']).api_error, details: error instanceof Error ? error.message : String(error) }, 500);
   }
 }));

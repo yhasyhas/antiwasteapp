@@ -76,6 +76,7 @@ export function useSavedRecipes() {
     selectedRecipe: selectedRecipe && images.withImage(selectedRecipe),
     setSelectedRecipe,
     isImageLoading: images.isLoading,
+    imageNotice: images.notice,
     openRecipe,
     toggleFavorite,
   };
