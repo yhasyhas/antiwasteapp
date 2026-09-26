@@ -22,6 +22,8 @@ interface ScannedIngredient {
   storage_tip?: string;
   // Durée de conservation estimée par l'IA, en jours
   shelf_life_days?: number;
+  // Identifiant standard de l'aliment (fiche aliment), null pour un plat
+  food_key?: string | null;
 }
 
 export interface DetectedIngredient {
@@ -30,6 +32,7 @@ export interface DetectedIngredient {
   category: string;
   kind: FoodKind;
   storage_tip: string;
+  food_key: string | null;
   // Date proposée à partir de shelf_life_days, modifiable dans la confirmation
   expires_at: string;
   confirmed: boolean;
@@ -102,6 +105,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
             category: ingredient.category,
             kind,
             storage_tip: ingredient.storage_tip ?? '',
+            food_key: ingredient.food_key ?? null,
             expires_at: expiryFromShelfLife(ingredient.shelf_life_days, kind),
             confirmed: true,
           };
@@ -138,13 +142,14 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
   const saveIngredients = async (ingredients: DetectedIngredient[]) => {
     if (!user) return false;
 
-    const ingredientsToInsert = ingredients.map(({ name, quantity, category, kind, storage_tip, expires_at }) => ({
+    const ingredientsToInsert = ingredients.map(({ name, quantity, category, kind, storage_tip, food_key, expires_at }) => ({
       user_id: user.id,
       name,
       quantity,
       category,
       kind,
       storage_tip: storage_tip || null,
+      food_key,
       expires_at,
       added_via: 'camera',
     }));

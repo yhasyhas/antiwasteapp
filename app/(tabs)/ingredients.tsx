@@ -19,6 +19,7 @@ import { Search, Trash2, Plus, Package, Users, ShoppingCart } from 'lucide-react
 import { router, useFocusEffect } from 'expo-router';
 import { IngredientCard, type PantryIngredient } from '@/components/pantry/IngredientCard';
 import { ExpiryEditModal } from '@/components/pantry/ExpiryEditModal';
+import { FoodFactSheet } from '@/components/pantry/FoodFactSheet';
 import { sortByUrgency } from '@/lib/expiry';
 import { maybeAskNotificationPermission } from '@/lib/notifications';
 import { notifyPantryChanged, onPantryChanged } from '@/lib/pantryEvents';
@@ -39,6 +40,8 @@ export default function IngredientsScreen() {
   const [editingExpiry, setEditingExpiry] = useState<PantryIngredient | null>(null);
   const [savingExpiry, setSavingExpiry] = useState(false);
   const household = useHousehold();
+  // Fiche de l'aliment touché
+  const [factIngredient, setFactIngredient] = useState<PantryIngredient | null>(null);
 
   // Garde-manger partagé : rechargé quand un membre le modifie (temps réel) ou qu'on change de foyer
   useEffect(() => onPantryChanged(loadIngredients), [user]);
@@ -265,6 +268,7 @@ export default function IngredientsScreen() {
                   onDelete={() => deleteIngredient(ingredient.id)}
                   onEditExpiry={() => setEditingExpiry(ingredient)}
                   addedBy={addedBy(ingredient.user_id)}
+                  onOpenFact={() => setFactIngredient(ingredient)}
                 />
               ))
             )}
@@ -281,6 +285,8 @@ export default function IngredientsScreen() {
           </View>
         </>
       )}
+
+      <FoodFactSheet ingredient={factIngredient} onClose={() => setFactIngredient(null)} />
 
       <ExpiryEditModal
         ingredient={editingExpiry}

@@ -1,0 +1,22 @@
+[
+  ["apple", "pomme"], ["banana", "banane"], ["orange", "orange"], ["lemon", "citron"], ["lime", "citron vert"],
+  ["pear", "poire"], ["strawberry", "fraise"], ["grape", "raisin"], ["peach", "pêche"], ["apricot", "abricot"],
+  ["cherry", "cerise"], ["pineapple", "ananas"], ["mango", "mangue"], ["kiwi", "kiwi"], ["watermelon", "pastèque"],
+  ["melon", "melon"], ["avocado", "avocat"], ["plantain", "banane plantain"], ["coconut", "noix de coco"], ["date", "datte"],
+  ["tomato", "tomate"], ["cherry_tomato", "tomate cerise"], ["potato", "pomme de terre"], ["sweet_potato", "patate douce"], ["carrot", "carotte"],
+  ["onion", "oignon"], ["red_onion", "oignon rouge"], ["shallot", "échalote"], ["garlic", "ail"], ["leek", "poireau"],
+  ["zucchini", "courgette"], ["eggplant", "aubergine"], ["bell_pepper", "poivron"], ["chili_pepper", "piment"], ["cucumber", "concombre"],
+  ["lettuce", "salade"], ["spinach", "épinard"], ["cabbage", "chou"], ["cauliflower", "chou-fleur"], ["broccoli", "brocoli"],
+  ["green_bean", "haricot vert"], ["pea", "petit pois"], ["corn", "maïs"], ["mushroom", "champignon"], ["pumpkin", "potiron"],
+  ["butternut_squash", "courge butternut"], ["beetroot", "betterave"], ["celery", "céleri"], ["radish", "radis"], ["okra", "gombo"],
+  ["cassava", "manioc"], ["yam", "igname"], ["ginger", "gingembre"], ["parsley", "persil"], ["coriander", "coriandre"],
+  ["basil", "basilic"], ["mint", "menthe"], ["egg", "œuf"], ["milk", "lait"], ["butter", "beurre"],
+  ["cream", "crème"], ["yogurt", "yaourt"], ["cheese", "fromage"], ["grated_cheese", "fromage râpé"], ["mozzarella", "mozzarella"],
+  ["chicken", "poulet"], ["chicken_breast", "blanc de poulet"], ["ground_beef", "viande hachée"], ["beef", "bœuf"], ["pork", "porc"],
+  ["ham", "jambon"], ["bacon", "lardons"], ["sausage", "saucisse"], ["lamb", "agneau"], ["turkey", "dinde"],
+  ["salmon", "saumon"], ["tuna", "thon"], ["white_fish", "poisson blanc"], ["shrimp", "crevette"], ["sardine", "sardine"],
+  ["bread", "pain"], ["sandwich_bread", "pain de mie"], ["rice", "riz"], ["pasta", "pâtes"], ["flour", "farine"],
+  ["couscous", "semoule"], ["oat", "flocons d'avoine"], ["lentil", "lentille"], ["chickpea", "pois chiche"], ["kidney_bean", "haricot rouge"],
+  ["tofu", "tofu"], ["peanut", "arachide"], ["almond", "amande"], ["walnut", "noix"], ["olive_oil", "huile d'olive"],
+  ["sugar", "sucre"], ["honey", "miel"], ["chocolate", "chocolat"], ["tomato_paste", "concentré de tomate"], ["orange_juice", "jus d'orange"]
+]
