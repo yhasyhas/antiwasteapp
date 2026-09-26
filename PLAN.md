@@ -189,7 +189,7 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 
 Regroupe ce qui dépend du build de développement.
 
-- [ ] Passer à un build de développement EAS (Android) : canal de notifications dédié (impossible dans Expo Go), plantages natifs dans Sentry — *configuration prête (`eas.json`, `expo-dev-client`, canal créé au démarrage, paquet `com.yhasyhas.antiwasteapp.dev` et nom « Antigaspi (dev) ») ; build en attente du compte Expo et du projet Firebase*
+- [ ] Passer à un build de développement EAS (Android) : canal de notifications dédié (impossible dans Expo Go), plantages natifs dans Sentry — *configuration prête (`eas.json`, `expo-dev-client`, canal créé au démarrage, paquet `com.yhasyhas.antiwasteapp.dev` et nom « Antigaspi (dev) ») ; premier build créé le 26/09/2026, installation sur téléphone à valider*
 - [x] Garde-manger partagé : inviter un membre, rejoindre un foyer, voir qui a ajouté quoi
 - [x] Garde-manger partagé : l'app filtre ses ingrédients par `household_id` (aujourd'hui par `user_id`, équivalent tant qu'il n'y a qu'un foyer personnel) ; gérer le départ ou la suppression du compte du propriétaire d'un foyer partagé (aujourd'hui, supprimer un compte supprime son foyer)
 - [x] Garde-manger partagé : empêcher la modification de `user_id` sur un ingrédient existant (l'auteur ne doit pas pouvoir être changé par un autre membre)
