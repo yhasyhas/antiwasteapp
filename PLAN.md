@@ -228,6 +228,7 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 - [ ] Maquettes des écrans principaux (accueil, scan, garde-manger, génération, fiche recette), **validées avant de coder**
 - [ ] Refonte des écrans d'après les maquettes validées
 - [ ] Boutons, transitions et fluidité (animations, retours visuels, temps de chargement ressentis)
+- [ ] Icônes des cartes de l'accueil à revoir : « Scanner » (un appareil photo) et « Mon garde-manger » (la courbe montante ne convient pas)
 
 **Terminé quand** : les écrans principaux suivent les maquettes validées et l'app paraît fluide sur un téléphone Android d'entrée de gamme.
 
@@ -347,4 +348,6 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 | 26/09/2026 | Choix validés : les ingrédients d'un compte supprimé restent dans le foyer ; le dernier membre qui part récupère le garde-manger | |
 | 26/09/2026 | Pas encore de nom de paquet définitif : le build de développement utilise `com.yhasyhas.antiwasteapp.dev` et le nom « Antigaspi (dev) » (`app.config.js`, variable `APP_VARIANT` fixée par le profil EAS) ; paquet et nom définitifs choisis en phase 8 avec le nom de l'app | Un build preview ou production échoue tant que le paquet définitif n'est pas choisi |
 | 26/09/2026 | Projet EAS `@yhasyhas/bolt-expo-nativewind` créé (compte personnel yhasyhas) ; `google-services.json` envoyé comme variable EAS de type fichier (`GOOGLE_SERVICES_JSON`, environnement development) ; clé du compte de service Firebase associée au paquet `.dev` pour FCM V1 ; keystore Android généré et gardé par EAS | Le nom du projet EAS reprend le slug du modèle : à renommer en phase 8 avec l'app. La clé Firebase reste hors du dépôt, jamais affichée |
+| 26/09/2026 | Build de développement : l'app s'affiche d'un bord à l'autre (edge-to-edge, obligatoire avec Expo SDK 57), les boutons de navigation d'Android recouvraient la barre d'onglets de hauteur fixe. Barre d'onglets, en-têtes, pied de page de la génération, feuilles qui montent du bas et écrans de connexion tiennent compte des marges du système (`hooks/useSafeSpacing.ts`, `useSafeAreaInsets`), en navigation à trois boutons comme par gestes | Correction en JavaScript seulement : un rechargement suffit, pas de nouveau build |
+| 26/09/2026 | Étiquettes de régime des recettes traduites (`dietLabel`) : les modèles les écrivent librement (« vegetarian », « Gluten-Free », « sans gluten »…), normalisées puis traduites ; les étiquettes qui ne sont pas des régimes restent telles quelles | Ajout de « pescétarien » |
 | | *(résultat du test Gemini vs Clarifai)* | |
