@@ -94,6 +94,9 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - `favorites` (user_id, recipe_id, unique)
 - `user_preferences` (dietary_preferences, excluded_ingredients, default_difficulty, max_cook_time, default_meal_type, default_language)
 - `usage_counters` (user_id, day UTC, scans, generations, images) : écrite seulement par les fonctions
+- `household_invites` (code, household_id, expires_at) : lue et écrite seulement par les fonctions du foyer ; `profiles.display_name` : nom affiché aux membres
+- `push_tokens` (token, user_id, timezone, language) et `daily_digests` (user_id, local_date, status, ticket_ids) : résumé de 9 h
+- `provider_quota_events` : quotas épuisés et échecs d'envoi (`expo_push`), une alerte par jour
 - Storage : bucket `recipe-images`, public en lecture, écriture réservée à la fonction (clé secrète)
 
 ### Configuration requise
@@ -187,23 +190,29 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Image sur la carte si elle existe (`expo-image`, `cachePolicy="memory-disk"`, aussi dans la fiche), sinon vignette de remplacement ; aucune image demandée pour afficher l'accueil, les favoris ou toutes les recettes, seulement à l'ouverture de la fiche ; les recettes d'une nouvelle génération ont leurs images demandées en arrière-plan dès l'affichage des résultats (état partagé `lib/recipeImage.ts`).
 - Phase 6b planifiée : fiches aliments (`food_key`, table partagée `food_facts`, signalements, pré-remplissage d'une centaine d'aliments), voir PLAN.md.
 
+### Phase 6a — build de développement, foyer partagé, notifications serveur (branche `phase-6a`)
+- Build : `eas.json` (development, preview, production), `expo-dev-client`, package Android `com.yhasyhas.antiwasteapp`, `app.config.js` (google-services.json hors de git), canal de notifications créé au démarrage hors d'Expo Go. **Build en attente du compte Expo et du projet Firebase.**
+- Foyer partagé (migration `shared_households`, tests `household_sharing.sql`) : foyer actif (partagé, sinon personnel), invitation par code 48 h, 8 membres, départ, retrait, transfert de propriété, compte supprimé sans perte du foyer, auteur des ingrédients figé, diffusion temps réel sur `household:<id>` ; écran `app/household.tsx`, état partagé `lib/household.ts`, « ajouté par » sur chaque ingrédient.
+- Résumé de 9 h par le serveur (migration `daily_digest`, tests `daily_digest.sql`) : `push_tokens`, `daily_digests`, pg_cron toutes les 15 min → fonction `daily-digest` (Expo Push, reçus, alerte Sentry `push_failure`) ; app : `lib/pushNotifications.ts`, rappels locaux en secours sans jeton.
+- Tests : 48 tests Deno, 7 fichiers de tests SQL.
+
 ## 5. État actuel et problèmes connus
 
 ### Sécurité
-- L'app filtre encore ses ingrédients par `user_id` (équivalent tant qu'il n'y a qu'un foyer personnel) : à passer à `household_id` en phase 6, avec `user_id` non modifiable.
+- Garde-manger filtré par foyer (`household_id`), auteur des ingrédients non modifiable (phase 6a). Les fonctions du foyer, des invitations et du résumé sont en SECURITY DEFINER avec `search_path` vide ; `claim_daily_digests` réservée à la clé secrète.
 
 ### Dette et finitions
 - Offres gratuites partagées par toute l'app : Groq (scan : ~1 000 tokens de sortie par minute ; génération : 8 000 tokens par minute et 1 000 requêtes par jour) et Cloudflare (≈ 57 images par jour mesurées, 173 neurones par image) ; au-delà, le secours prend le relais ou l'image n'est pas générée. À revoir avant la bêta (phase 8).
 - Confirmation d'email désactivée dans Supabase pendant le développement (à réactiver en phase 8).
 - Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`) : renommage en phase 8, nom pas encore choisi.
 - Sauvegardes de la base dans `backups/` : jamais commitées (`.gitignore`) ni exportées.
-- Rappels calculés sur le téléphone : un changement fait depuis un autre téléphone du foyer n'est pris en compte qu'à la prochaine ouverture de l'app.
+- Rappels locaux (secours sans jeton push) calculés sur le téléphone ; avec le temps réel, un changement fait par un autre membre les recalcule dès que l'app est ouverte.
 - « J'ai cuisiné ça » retire les ingrédients entiers (pas de quantité restante).
-- Expo Go : pas de plantages natifs dans Sentry ni de canal de notifications dédié (canal par défaut) avant le build de développement EAS (début de la phase 6).
+- Expo Go : pas de plantages natifs dans Sentry, pas de canal de notifications dédié ni de notifications push (rappels locaux) ; tout cela arrive avec le build de développement EAS (phase 6a, en attente du compte Expo).
 - Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 
 ## 6. Prochaine étape
-Phase 6 : build de développement EAS, puis donner envie de revenir. Phase 7 : design et ergonomie ; phase 8 : lancement. Détails dans `PLAN.md`.
+Phase 6a : créer le build de développement (compte Expo, projet Firebase), puis vérifier foyer partagé et résumé push sur téléphone. Phase 6b : liste de courses, compteur anti-gaspi, préférences, essai sans compte, fiches aliments. Phase 7 : design et ergonomie ; phase 8 : lancement. Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash

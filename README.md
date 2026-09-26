@@ -89,6 +89,8 @@ Le CLI lit `SUPABASE_ACCESS_TOKEN` (jeton personnel, `sbp_…`) et `SUPABASE_DB_
 | `QUOTA_DAILY_IMAGES` | non | Images par jour et par utilisateur (défaut 30 : 3 par génération) |
 | `SENTRY_DSN` | non | DSN Sentry (le même que l'app) : alertes de quota des fournisseurs |
 | `ALLOWED_ORIGINS` | non | Origines web autorisées, séparées par des virgules (défaut : Expo web en local) |
+| `CRON_SECRET` | pour le résumé de 9 h | Secret de la tâche pg_cron qui appelle `daily-digest` (même valeur dans Vault : `daily_digest_cron_secret`) |
+| `EXPO_ACCESS_TOKEN` | non | Jeton Expo, seulement si la sécurité renforcée des notifications push est activée |
 
 Fournis automatiquement par Supabase : `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEYS`, `SUPABASE_SECRET_KEYS`, `SUPABASE_JWKS`.
 
@@ -111,10 +113,12 @@ sauvegarde : `npx supabase db dump --linked --data-only -f backups/<nom>.sql` (d
 npx supabase functions deploy analyze-image
 npx supabase functions deploy generate-recipes
 npx supabase functions deploy generate-recipe-image
+npx supabase functions deploy daily-digest
 ```
 
 `supabase/config.toml` désactive la vérification du jeton par la passerelle (`verify_jwt = false`) :
 chaque fonction vérifie elle-même l'utilisateur (`_shared/auth.ts`) et renvoie 401 sans utilisateur connecté.
+`daily-digest` n'est jamais appelée par l'app : seulement par pg_cron, avec l'en-tête `x-cron-secret`.
 
 ## Sentry
 
@@ -147,9 +151,39 @@ Chaque échec lié à un quota porte une raison précise, renvoyée à l'app et 
 
 ## Notifications
 
-Rappels locaux, sans serveur : une notification par jour à 9 h, seulement si des aliments expirent ce
-jour-là ou le lendemain. L'autorisation est demandée au premier ajout d'une date. Ils fonctionnent dans Expo Go.
-En développement, Réglages → « Tester la notification » l'envoie au bout de 5 secondes.
+Une notification par jour à 9 h (heure locale), seulement si des aliments du foyer expirent ce jour-là ou le
+lendemain. L'autorisation est demandée au premier ajout d'une date.
+
+- **Envoyée par le serveur** (build de développement ou de production) : l'app enregistre le jeton Expo Push de
+  l'appareil avec son fuseau et sa langue (`push_tokens`). pg_cron appelle `daily-digest` toutes les 15 minutes ;
+  la fonction réserve le résumé du jour (`daily_digests`, un seul par utilisateur et par jour local) et l'envoie par
+  Expo Push. Les appareils désinstallés sont retirés ; en cas d'échec d'envoi, alerte Sentry `alert:push_failure`
+  une fois par jour. Essai : en-tête `x-simulate-key` égal à la clé secrète et
+  `{ "simulate": { "user_id": "…", "force": true } }` (`"push": "error"` pour simuler un échec).
+- **Rappels locaux en secours** : sans jeton push (Expo Go, web, Firebase pas configuré, autorisation refusée),
+  l'app programme elle-même les rappels. Un appareil reçoit l'un ou l'autre, jamais les deux.
+- En développement, Réglages → « Tester la notification » envoie un rappel local au bout de 5 secondes.
+- Secret de la tâche : `CRON_SECRET` (secret des fonctions) et la même valeur dans Vault sous le nom
+  `daily_digest_cron_secret` (`select vault.create_secret('<valeur>', 'daily_digest_cron_secret');`), jamais dans git.
+
+## Foyer partagé
+
+Réglages → « Mon foyer » (ou l'icône en haut du garde-manger) : membres, nom affiché, code d'invitation de 6
+caractères valable 48 h (menu de partage du téléphone), rejoindre un foyer (avec ou sans son garde-manger),
+quitter le foyer ; le propriétaire peut retirer un membre. 8 membres au plus. Toutes les règles sont dans des
+fonctions SQL (migration `shared_households`), le garde-manger se met à jour en temps réel (canal privé
+`household:<id>`).
+
+## Build de développement (Android)
+
+`eas.json` : profils `development` (APK avec `expo-dev-client`), `preview` et `production`. Le fichier Firebase
+`google-services.json` (notifications push) n'est pas dans git : en local à la racine, pour EAS en variable
+d'environnement de type fichier `GOOGLE_SERVICES_JSON` (lue par `app.config.js`).
+
+```bash
+eas build --profile development --platform android   # APK à installer sur le téléphone
+npx expo start --dev-client                          # puis ouvrir l'app installée
+```
 
 ## Tests
 
@@ -157,7 +191,7 @@ En développement, Réglages → « Tester la notification » l'envoie au bout d
 npm run typecheck                                  # app (TypeScript)
 deno test --no-config --allow-env supabase/functions/          # fonctions : secours, validation, identifiants, régimes
 PGPASSWORD="$SUPABASE_DB_PASSWORD" psql "$(cat supabase/.temp/pooler-url)" -v ON_ERROR_STOP=1 \
-  -f supabase/tests/household_rls.sql              # idem usage_counters.sql, recipe_images.sql, ingredients_expiry.sql, provider_quota_events.sql
+  -f supabase/tests/household_rls.sql              # idem usage_counters.sql, recipe_images.sql, ingredients_expiry.sql, provider_quota_events.sql, household_sharing.sql, daily_digest.sql
 ```
 
 Les tests SQL tournent sur la base distante dans une transaction annulée à la fin : aucune donnée n'est conservée.
