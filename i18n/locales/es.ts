@@ -26,6 +26,12 @@ const es: Translations = {
     settings: 'Ajustes',
   },
   auth: {
+    captchaTitle: 'Verificación antirrobots',
+    captchaFailed: 'La verificación antirrobots ha fallado. Inténtalo de nuevo.',
+    invitedBanner: 'Te han invitado a un hogar: inicia sesión, crea una cuenta o prueba sin cuenta, y se te propondrá el hogar.',
+    tryWithoutAccount: 'Probar sin cuenta',
+    tryWithoutAccountHint: 'Podrás crear tu cuenta más tarde sin perder nada.',
+    guestName: 'Prueba sin cuenta',
     showPassword: 'Mostrar la contraseña',
     hidePassword: 'Ocultar la contraseña',
     tagline: 'Convierte tus ingredientes en platos deliciosos',
@@ -282,6 +288,10 @@ const es: Translations = {
     nothingLeft: 'Los ingredientes de esta receta ya no están en tu despensa.',
   },
   settings: {
+    guestTitle: 'Prueba sin cuenta',
+    guestText: 'Tus datos solo se guardan en este teléfono. Crea tu cuenta para encontrarlos en todas partes: se conservan la despensa, el hogar y las recetas.',
+    guestSignOutTitle: '¿Salir de la prueba?',
+    guestSignOutText: 'Sin cuenta, no podrás recuperar tu despensa, tu hogar ni tus recetas. Crea primero tu cuenta para conservarlos.',
     title: 'Ajustes',
     language: 'Idioma',
     account: 'Cuenta',
@@ -307,6 +317,7 @@ const es: Translations = {
     refresh: 'Actualizar',
   },
   household: {
+    guest: 'Invitado',
     title: 'Mi hogar',
     open: 'Mi hogar',
     personalIntro: 'Comparte tu despensa con las personas que viven contigo: todos ven, añaden y quitan alimentos, en tiempo real.',
@@ -423,6 +434,13 @@ const es: Translations = {
     servingsValue_one: '{{count}} persona',
     servingsValue_other: '{{count}} personas',
     save: 'Guardar',
+  },
+  upgrade: {
+    title: 'Crear mi cuenta',
+    intro: 'Añade un correo electrónico y una contraseña: se conserva todo lo que hiciste durante la prueba (despensa, hogar, recetas, favoritos).',
+    submit: 'Crear mi cuenta',
+    doneTitle: 'Cuenta creada',
+    doneText: 'Ya puedes iniciar sesión con tu correo en cualquier teléfono.',
   },
   notFound: {
     title: '¡Vaya!',

@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Vérification</title>
+  <!-- Cloudflare Turnstile : vérification anti-robot avant une connexion (dans l'app, affichée dans une
+       WebView). Le jeton obtenu est renvoyé à l'app, qui le transmet à Supabase (captchaToken). -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=start&render=explicit" async defer></script>
+  <style>
+    body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #fff; font-family: system-ui, sans-serif; }
+    #widget { min-height: 70px; }
+  </style>
+</head>
+<body>
+  <div id="widget"></div>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const send = (message) => {
+      if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify(message));
+      else window.parent.postMessage(message, '*');
+    };
+    function start() {
+      turnstile.render('#widget', {
+        sitekey: params.get('sitekey') || '',
+        language: params.get('lang') || 'auto',
+        callback: (token) => send({ type: 'token', token }),
+        'error-callback': (code) => send({ type: 'error', code: String(code) }),
+        'expired-callback': () => send({ type: 'expired' }),
+      });
+    }
+  </script>
+</body>
+</html>

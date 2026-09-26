@@ -27,6 +27,12 @@ const fr = {
     settings: 'Réglages',
   },
   auth: {
+    captchaTitle: 'Vérification anti-robot',
+    captchaFailed: 'La vérification anti-robot a échoué. Réessaie.',
+    invitedBanner: 'Tu as reçu une invitation dans un foyer : connecte-toi, crée un compte ou essaie sans compte, puis le foyer te sera proposé.',
+    tryWithoutAccount: 'Essayer sans compte',
+    tryWithoutAccountHint: 'Tu pourras créer ton compte plus tard, sans rien perdre.',
+    guestName: 'Essai sans compte',
     showPassword: 'Afficher le mot de passe',
     hidePassword: 'Masquer le mot de passe',
     tagline: 'Transforme tes ingrédients en bons petits plats',
@@ -283,6 +289,10 @@ const fr = {
     nothingLeft: 'Les ingrédients de cette recette ne sont plus dans ton garde-manger.',
   },
   settings: {
+    guestTitle: 'Essai sans compte',
+    guestText: 'Tes données sont gardées sur ce téléphone seulement. Crée ton compte pour les retrouver partout : garde-manger, foyer et recettes sont conservés.',
+    guestSignOutTitle: 'Quitter l\'essai ?',
+    guestSignOutText: 'Sans compte, tu ne pourras plus retrouver ton garde-manger, ton foyer ni tes recettes. Crée d\'abord ton compte pour les garder.',
     title: 'Réglages',
     language: 'Langue',
     account: 'Compte',
@@ -308,6 +318,7 @@ const fr = {
     refresh: 'Actualiser',
   },
   household: {
+    guest: 'Invité',
     title: 'Mon foyer',
     open: 'Mon foyer',
     personalIntro: "Partage ton garde-manger avec les personnes qui vivent avec toi : chacun voit, ajoute et retire les aliments, en temps réel.",
@@ -424,6 +435,13 @@ const fr = {
     servingsValue_one: '{{count}} personne',
     servingsValue_other: '{{count}} personnes',
     save: 'Enregistrer',
+  },
+  upgrade: {
+    title: 'Créer mon compte',
+    intro: "Ajoute une adresse e-mail et un mot de passe : tout ce que tu as fait pendant l'essai est gardé (garde-manger, foyer, recettes, favoris).",
+    submit: 'Créer mon compte',
+    doneTitle: 'Compte créé',
+    doneText: 'Tu peux maintenant te connecter avec ton adresse e-mail sur n\'importe quel téléphone.',
   },
   notFound: {
     title: 'Oups !',

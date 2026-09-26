@@ -48,7 +48,7 @@ export default function IngredientsScreen() {
     if (!household?.shared) return undefined;
     const member = household.members.find((m) => m.user_id === authorId);
     if (!member) return t('household.formerMember');
-    return member.is_me ? t('household.me') : member.name;
+    return member.is_me ? t('household.me') : member.name ?? t('household.guest');
   };
 
   // Rechargé à chaque retour sur l'onglet (ingrédients ajoutés depuis la caméra, par exemple)

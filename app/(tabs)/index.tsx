@@ -120,7 +120,7 @@ export default function HomeScreen() {
       <View style={[styles.header, safe.top(20)]}>
         <View>
           <Text style={styles.greeting}>{t('home.welcomeBack')}</Text>
-          <Text style={styles.email}>{user?.email}</Text>
+          <Text style={styles.email}>{user?.email || t('auth.guestName')}</Text>
         </View>
         <TouchableOpacity onPress={signOut} style={styles.logoutButton}>
           <Text style={styles.logoutText}>{t('home.signOut')}</Text>

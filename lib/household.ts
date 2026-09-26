@@ -9,7 +9,8 @@ import { notifyPantryChanged, notifyShoppingChanged } from './pantryEvents';
 
 export interface HouseholdMember {
   user_id: string;
-  name: string;
+  // null : compte sans nom ni adresse (essai sans compte) ; l'app affiche « Invité »
+  name: string | null;
   role: 'owner' | 'member';
   joined_at: string;
   is_me: boolean;

@@ -26,6 +26,12 @@ const en: Translations = {
     settings: 'Settings',
   },
   auth: {
+    captchaTitle: 'Anti-bot check',
+    captchaFailed: 'The anti-bot check failed. Try again.',
+    invitedBanner: "You've been invited to a household: sign in, create an account or try without an account, and the household will be offered to you.",
+    tryWithoutAccount: 'Try without an account',
+    tryWithoutAccountHint: 'You can create your account later without losing anything.',
+    guestName: 'Trying without an account',
     showPassword: 'Show password',
     hidePassword: 'Hide password',
     tagline: 'Turn your ingredients into delicious meals',
@@ -282,6 +288,10 @@ const en: Translations = {
     nothingLeft: "This recipe's ingredients are no longer in your pantry.",
   },
   settings: {
+    guestTitle: 'Trying without an account',
+    guestText: 'Your data is kept on this phone only. Create your account to find it everywhere: pantry, household and recipes are kept.',
+    guestSignOutTitle: 'Leave the trial?',
+    guestSignOutText: "Without an account, you won't be able to get your pantry, household or recipes back. Create your account first to keep them.",
     title: 'Settings',
     language: 'Language',
     account: 'Account',
@@ -307,6 +317,7 @@ const en: Translations = {
     refresh: 'Refresh',
   },
   household: {
+    guest: 'Guest',
     title: 'My household',
     open: 'My household',
     personalIntro: 'Share your pantry with the people you live with: everyone sees, adds and removes food, in real time.',
@@ -423,6 +434,13 @@ const en: Translations = {
     servingsValue_one: '{{count}} person',
     servingsValue_other: '{{count}} people',
     save: 'Save',
+  },
+  upgrade: {
+    title: 'Create my account',
+    intro: 'Add an email address and a password: everything you did during the trial is kept (pantry, household, recipes, favourites).',
+    submit: 'Create my account',
+    doneTitle: 'Account created',
+    doneText: 'You can now sign in with your email address on any phone.',
   },
   notFound: {
     title: 'Oops!',

@@ -13,11 +13,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { Input, PasswordInput } from '@/components/ui/Input';
 import { KeyboardAvoider, useKeyboardScroll } from '@/components/ui/KeyboardAvoider';
+import { CaptchaCancelled, useCaptcha } from '@/components/auth/Captcha';
 import { authErrorMessage } from '@/lib/authErrors';
 import { ChefHat, Mail } from 'lucide-react-native';
 
 export default function SignUpScreen() {
   const { signUp } = useAuth();
+  const { getToken, captcha } = useCaptcha();
   const { t } = useLanguage();
   const safe = useSafeSpacing();
   const keyboardScroll = useKeyboardScroll();
@@ -45,10 +47,17 @@ export default function SignUpScreen() {
       return;
     }
 
-    setLoading(true);
     setError('');
+    let token: string | undefined;
+    try {
+      token = await getToken();
+    } catch (captchaError) {
+      if (!(captchaError instanceof CaptchaCancelled)) setError(t('auth.captchaFailed'));
+      return;
+    }
+    setLoading(true);
 
-    const { error: signUpError, needsEmailConfirmation } = await signUp(email, password);
+    const { error: signUpError, needsEmailConfirmation } = await signUp(email, password, token);
     setLoading(false);
 
     if (signUpError) {
@@ -169,6 +178,7 @@ export default function SignUpScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      {captcha}
     </KeyboardAvoider>
   );
 }

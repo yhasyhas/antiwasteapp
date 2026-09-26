@@ -65,7 +65,7 @@ export default function ShoppingScreen() {
     if (!household?.shared) return null;
     const member = household.members.find((m) => m.user_id === userId);
     if (!member) return t('household.formerMember');
-    return member.is_me ? t('household.me') : member.name;
+    return member.is_me ? t('household.me') : member.name ?? t('household.guest');
   };
 
   const failed = (error: unknown) => {

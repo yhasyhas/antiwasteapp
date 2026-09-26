@@ -150,7 +150,7 @@ export default function HouseholdScreen() {
   };
 
   const remove = (member: HouseholdMember) => {
-    Alert.alert(t('household.removeTitle'), t('household.removeText', { name: member.name }), [
+    Alert.alert(t('household.removeTitle'), t('household.removeText', { name: member.name ?? t('household.guest') }), [
       { text: t('common.cancel'), style: 'cancel' },
       { text: t('household.remove'), style: 'destructive', onPress: () => run(`remove-${member.user_id}`, () => removeMember(member.user_id)) },
     ]);
@@ -194,7 +194,7 @@ export default function HouseholdScreen() {
             <View key={member.user_id} style={styles.memberRow}>
               <View style={styles.memberInfo}>
                 <Text style={styles.memberName}>
-                  {member.name}{member.is_me ? ` (${t('household.me')})` : ''}
+                  {member.name ?? t('household.guest')}{member.is_me ? ` (${t('household.me')})` : ''}
                 </Text>
                 {member.role === 'owner' && (
                   <View style={styles.ownerBadge}>

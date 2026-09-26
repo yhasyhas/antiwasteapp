@@ -25,7 +25,20 @@ const languages = [
 export default function SettingsScreen() {
   const { language, setLanguage, t, loading } = useLanguage();
   const safe = useSafeSpacing();
-  const { user, signOut } = useAuth();
+  const { user, signOut, isAnonymous } = useAuth();
+
+  // Compte d'essai : se déconnecter perd l'accès aux données (aucun moyen de se reconnecter)
+  const confirmSignOut = () => {
+    if (!isAnonymous) {
+      signOut();
+      return;
+    }
+    Alert.alert(t('settings.guestSignOutTitle'), t('settings.guestSignOutText'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('upgrade.title'), onPress: () => router.push('/auth/upgrade') },
+      { text: t('settings.signOut'), style: 'destructive', onPress: () => signOut() },
+    ]);
+  };
 
   if (loading) {
     return (
@@ -99,10 +112,20 @@ export default function SettingsScreen() {
             <Text style={styles.sectionTitle}>{t('settings.account')}</Text>
           </View>
 
-          <View style={styles.infoCard}>
-            <Text style={styles.infoLabel}>{t('settings.email')}</Text>
-            <Text style={styles.infoValue}>{user?.email || t('settings.notSignedIn')}</Text>
-          </View>
+          {isAnonymous ? (
+            <View style={styles.guestCard}>
+              <Text style={styles.guestTitle}>{t('settings.guestTitle')}</Text>
+              <Text style={styles.guestText}>{t('settings.guestText')}</Text>
+              <TouchableOpacity style={styles.guestButton} onPress={() => router.push('/auth/upgrade')}>
+                <Text style={styles.guestButtonText}>{t('upgrade.title')}</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.infoCard}>
+              <Text style={styles.infoLabel}>{t('settings.email')}</Text>
+              <Text style={styles.infoValue}>{user?.email || t('settings.notSignedIn')}</Text>
+            </View>
+          )}
 
           <TouchableOpacity style={[styles.householdRow, styles.rowSpacing]} onPress={() => router.push('/preferences')}>
             <SlidersHorizontal size={20} color="#10b981" />
@@ -116,7 +139,7 @@ export default function SettingsScreen() {
             <ChevronRight size={20} color="#9ca3af" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
+          <TouchableOpacity style={styles.logoutButton} onPress={confirmSignOut}>
             <LogOut size={20} color="#ef4444" />
             <Text style={styles.logoutText}>{t('settings.signOut')}</Text>
           </TouchableOpacity>
@@ -280,6 +303,37 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 16,
     borderRadius: 12,
+  },
+  guestCard: {
+    backgroundColor: '#f0fdf4',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 8,
+    gap: 6,
+    borderWidth: 1,
+    borderColor: '#d1fae5',
+  },
+  guestTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#047857',
+  },
+  guestText: {
+    fontSize: 14,
+    color: '#374151',
+    lineHeight: 20,
+  },
+  guestButton: {
+    marginTop: 6,
+    backgroundColor: '#10b981',
+    borderRadius: 10,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  guestButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 15,
   },
   rowSpacing: {
     marginBottom: 8,
