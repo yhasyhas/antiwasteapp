@@ -1,6 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { getAuthenticatedUser } from '../_shared/auth.ts';
-import { consumeQuota, DAILY_LIMITS, refundQuota } from '../_shared/quota.ts';
+import { consumeQuota, dailyLimit, refundQuota } from '../_shared/quota.ts';
 import { logUserQuota, reportInBackground, reportProviderQuota } from '../_shared/quotaAlerts.ts';
 import { readSimulation } from '../_shared/simulate.ts';
 import { withCors } from '../_shared/cors.ts';
@@ -182,10 +182,11 @@ Deno.serve(withCors(async (req: Request) => {
       return errorResponse('not_configured', language, 500, 'GEMINI_API_KEY and GROQ_API_KEY missing');
     }
 
-    if (simulation?.user_quota || !await consumeQuota(user.id, 'scans')) {
-      logUserQuota('analyze-image', 'scans', DAILY_LIMITS.scans, user.id);
-      const message = (MESSAGES[language] || MESSAGES['en']).quota_exceeded.replace('{limit}', String(DAILY_LIMITS.scans));
-      return jsonResponse({ error: 'quota_exceeded', reason: 'user_quota', message, limit: DAILY_LIMITS.scans }, 429);
+    if (simulation?.user_quota || !await consumeQuota(user, 'scans')) {
+      const limit = dailyLimit(user, 'scans');
+      logUserQuota('analyze-image', 'scans', limit, user.id);
+      const message = (MESSAGES[language] || MESSAGES['en']).quota_exceeded.replace('{limit}', String(limit));
+      return jsonResponse({ error: 'quota_exceeded', reason: 'user_quota', message, limit }, 429);
     }
     quotaUserId = user.id;
 

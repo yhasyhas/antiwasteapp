@@ -1,6 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { getAuthenticatedUser } from '../_shared/auth.ts';
-import { consumeQuota, DAILY_LIMITS, refundQuota } from '../_shared/quota.ts';
+import { consumeQuota, DAILY_LIMITS, dailyLimit, refundQuota } from '../_shared/quota.ts';
 import { withCors } from '../_shared/cors.ts';
 import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_SECRET_KEY, SUPABASE_URL } from '../_shared/keys.ts';
 import { compressRecipeImage } from '../_shared/image.ts';
@@ -86,8 +86,8 @@ const REASONS: Partial<Record<ErrorCode, string>> = {
   storage_error: 'provider_error',
 };
 
-function errorResponse(code: ErrorCode, language: string, details?: string): Response {
-  const message = (MESSAGES[language] || MESSAGES['en'])[code].replace('{limit}', String(DAILY_LIMITS.images));
+function errorResponse(code: ErrorCode, language: string, details?: string, limit = DAILY_LIMITS.images): Response {
+  const message = (MESSAGES[language] || MESSAGES['en'])[code].replace('{limit}', String(limit));
   return jsonResponse({ error: code, ...(REASONS[code] && { reason: REASONS[code] }), message, ...(details && { details }) }, STATUS[code]);
 }
 
@@ -257,10 +257,10 @@ Deno.serve(withCors(async (req: Request) => {
       return (current && existingImageResponse(current)) || jsonResponse({ status: 'in_progress' }, 202);
     }
 
-    if (simulation?.user_quota || !await consumeQuota(user.id, 'images')) {
-      logUserQuota('generate-recipe-image', 'images', DAILY_LIMITS.images, user.id);
+    if (simulation?.user_quota || !await consumeQuota(user, 'images')) {
+      logUserQuota('generate-recipe-image', 'images', dailyLimit(user, 'images'), user.id);
       await releaseClaim(recipe.id, claim, authorization);
-      return errorResponse('quota_exceeded', language);
+      return errorResponse('quota_exceeded', language, undefined, dailyLimit(user, 'images'));
     }
     quotaUserId = user.id;
 

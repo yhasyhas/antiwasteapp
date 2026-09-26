@@ -1,6 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { getAuthenticatedUser } from '../_shared/auth.ts';
-import { consumeQuota, DAILY_LIMITS, refundQuota } from '../_shared/quota.ts';
+import { consumeQuota, dailyLimit, refundQuota } from '../_shared/quota.ts';
 import { logUserQuota, reportInBackground, reportProviderQuota } from '../_shared/quotaAlerts.ts';
 import { readSimulation } from '../_shared/simulate.ts';
 import { withCors } from '../_shared/cors.ts';
@@ -302,9 +302,9 @@ Deno.serve(withCors(async (req: Request) => {
     }
 
     // Une génération = un appel de l'app, quel que soit le nombre de recettes renvoyées
-    if (simulation?.user_quota || !await consumeQuota(user.id, 'generations')) {
-      logUserQuota('generate-recipes', 'generations', DAILY_LIMITS.generations, user.id);
-      return requestErrorResponse('quota_exceeded', language, DAILY_LIMITS.generations);
+    if (simulation?.user_quota || !await consumeQuota(user, 'generations')) {
+      logUserQuota('generate-recipes', 'generations', dailyLimit(user, 'generations'), user.id);
+      return requestErrorResponse('quota_exceeded', language, dailyLimit(user, 'generations'));
     }
     quotaUserId = user.id;
 
