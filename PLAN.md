@@ -189,12 +189,12 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 
 Regroupe ce qui dépend du build de développement.
 
-- [ ] Passer à un build de développement EAS (Android) : canal de notifications dédié (impossible dans Expo Go), plantages natifs dans Sentry — *configuration prête (`eas.json`, `expo-dev-client`, canal créé au démarrage, paquet `com.yhasyhas.antiwasteapp.dev` et nom « Antigaspi (dev) ») ; premier build créé le 26/09/2026, installation sur téléphone à valider*
+- [x] Passer à un build de développement EAS (Android) : canal de notifications dédié (impossible dans Expo Go), plantages natifs dans Sentry — *paquet `com.yhasyhas.antiwasteapp.dev`, nom « Antigaspi (dev) », installé et validé sur deux téléphones*
 - [x] Garde-manger partagé : inviter un membre, rejoindre un foyer, voir qui a ajouté quoi
 - [x] Garde-manger partagé : l'app filtre ses ingrédients par `household_id` (aujourd'hui par `user_id`, équivalent tant qu'il n'y a qu'un foyer personnel) ; gérer le départ ou la suppression du compte du propriétaire d'un foyer partagé (aujourd'hui, supprimer un compte supprime son foyer)
 - [x] Garde-manger partagé : empêcher la modification de `user_id` sur un ingrédient existant (l'auteur ne doit pas pouvoir être changé par un autre membre)
 - [x] Garde-manger partagé : mise à jour en temps réel entre les membres (Supabase Realtime)
-- [ ] Notifications envoyées par le serveur : résumé quotidien à 9 h (heure locale), calculé à partir du garde-manger du foyer, envoyé par Expo Push (pg_cron et une Edge Function) ; notifications locales en secours sans jeton push, jamais en double ; alerte Sentry en cas d'échec d'envoi — *serveur en place et testé (daily-digest, pg_cron) ; arrivée sur le téléphone à vérifier avec le build*
+- [x] Notifications envoyées par le serveur : résumé quotidien à 9 h (heure locale), calculé à partir du garde-manger du foyer, envoyé par Expo Push (pg_cron et une Edge Function) ; notifications locales en secours sans jeton push, jamais en double ; alerte Sentry en cas d'échec d'envoi — *notification reçue sur le téléphone, ouverture de la génération validée*
 
 **Terminé quand** : l'app tourne dans le build de développement, deux comptes partagent un garde-manger mis à jour en temps réel, et le résumé de 9 h arrive par notification push.
 
@@ -354,4 +354,5 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 | 26/09/2026 | Clavier : avec l'affichage bord à bord, la fenêtre ne rétrécit plus à l'ouverture du clavier. Conteneur `KeyboardAvoider` (KeyboardAvoidingView en « padding » sur Android aussi, décalage mesuré à l'écran : juste sous un en-tête comme dans une fenêtre) et remontée du champ actif dans les zones qui défilent (`useKeyboardScroll`) : connexion, inscription, Mon foyer, ajout manuel, garde-manger | JavaScript seulement, sans nouvelle bibliothèque native : un rechargement suffit |
 | 26/09/2026 | Champs de saisie : couleur du texte et du texte indicatif explicites partout (`components/ui/Input.tsx`) ; Android en mode sombre écrivait en blanc sur les champs blancs. Œil pour afficher ou masquer le mot de passe (connexion, inscription). `userInterfaceStyle` passé à `light` (l'app n'a pas de thème sombre) : pris en compte au prochain build | Le thème sombre éventuel relève de la phase 7 |
 | 26/09/2026 | Noms Open Food Facts nettoyés (`cleanProductName`) : symboles de mise en forme, composition et allergènes collés au nom, précisions entre parenthèses retirés ; 40 caractères au plus, coupés au dernier mot | |
+| 26/09/2026 | Phase 6a validée sur deux téléphones (build de développement) : foyer partagé et temps réel, notification push reçue (reçu Firebase confirmé) et ouverture de la génération, barre d'onglets, clavier, mot de passe, caméra, code-barres, étiquettes | Fusion de `phase-6a` dans master |
 | | *(résultat du test Gemini vs Clarifai)* | |
