@@ -1,5 +1,5 @@
 import { Alert, Platform } from 'react-native';
-import * as Notifications from 'expo-notifications';
+import * as Notifications from '@/lib/notificationsApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import i18n from '@/i18n';
 import { supabase } from '@/lib/supabase';

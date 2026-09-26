@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { AppState } from 'react-native';
-import * as Notifications from 'expo-notifications';
+import * as Notifications from '@/lib/notificationsApi';
 import { router } from 'expo-router';
 import { notificationsSupported, rescheduleExpiryReminders } from '@/lib/notifications';
 import { onPantryChanged } from '@/lib/pantryEvents';
