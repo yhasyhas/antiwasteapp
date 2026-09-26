@@ -135,7 +135,7 @@ En développement, Réglages → « Tester la notification » l'envoie au bout d
 
 ```bash
 npm run typecheck                                  # app (TypeScript)
-deno test --no-config supabase/functions/          # fonctions : secours, validation, identifiants, régimes
+deno test --no-config --allow-env supabase/functions/          # fonctions : secours, validation, identifiants, régimes
 PGPASSWORD="$SUPABASE_DB_PASSWORD" psql "$(cat supabase/.temp/pooler-url)" -v ON_ERROR_STOP=1 \
   -f supabase/tests/household_rls.sql              # idem usage_counters.sql, recipe_images.sql, ingredients_expiry.sql
 ```

@@ -4,6 +4,9 @@ import { consumeQuota, DAILY_LIMITS, refundQuota } from '../_shared/quota.ts';
 import { withCors } from '../_shared/cors.ts';
 import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_SECRET_KEY, SUPABASE_URL } from '../_shared/keys.ts';
 import { compressRecipeImage } from '../_shared/image.ts';
+import { classifyProviderFailure } from '../_shared/ai.ts';
+import { logUserQuota, reportInBackground, reportProviderQuota } from '../_shared/quotaAlerts.ts';
+import { readSimulation } from '../_shared/simulate.ts';
 
 // Image d'une recette : générée par Cloudflare Workers AI (FLUX), stockée dans le bucket recipe-images,
 // URL enregistrée dans recipes.image_url (historique). Appelée par l'app en arrière-plan dès l'affichage
@@ -24,7 +27,8 @@ const FLUX_STEPS = 4;
 const BUCKET = 'recipe-images';
 const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
 
-type ErrorCode = 'unauthorized' | 'bad_request' | 'not_found' | 'not_configured' | 'quota_exceeded' | 'ai_error' | 'storage_error';
+// quota_exceeded : quota personnel (user_quota) ; provider_quota : allocation Cloudflare du compte épuisée
+type ErrorCode = 'unauthorized' | 'bad_request' | 'not_found' | 'not_configured' | 'quota_exceeded' | 'provider_quota' | 'ai_error' | 'storage_error';
 
 const MESSAGES: Record<string, Record<ErrorCode, string>> = {
   fr: {
@@ -35,6 +39,7 @@ const MESSAGES: Record<string, Record<ErrorCode, string>> = {
     quota_exceeded: 'Tu as atteint la limite de {limit} images de recettes par jour. Réessaie demain.',
     ai_error: 'Le service d\'images est momentanément indisponible. Réessaie plus tard.',
     storage_error: 'L\'image n\'a pas pu être enregistrée. Réessaie plus tard.',
+    provider_quota: 'Images du jour épuisées, elles reviennent demain.',
   },
   en: {
     unauthorized: 'You must be signed in to generate an image.',
@@ -44,6 +49,7 @@ const MESSAGES: Record<string, Record<ErrorCode, string>> = {
     quota_exceeded: 'You have reached the limit of {limit} recipe images per day. Try again tomorrow.',
     ai_error: 'The image service is temporarily unavailable. Please try again later.',
     storage_error: 'The image could not be saved. Please try again later.',
+    provider_quota: 'Today\'s images have run out; they will be back tomorrow.',
   },
   es: {
     unauthorized: 'Debes iniciar sesión para generar una imagen.',
@@ -53,6 +59,7 @@ const MESSAGES: Record<string, Record<ErrorCode, string>> = {
     quota_exceeded: 'Has alcanzado el límite de {limit} imágenes de recetas por día. Vuelve a intentarlo mañana.',
     ai_error: 'El servicio de imágenes no está disponible en este momento. Inténtalo más tarde.',
     storage_error: 'No se pudo guardar la imagen. Inténtalo más tarde.',
+    provider_quota: 'Se acabaron las imágenes de hoy; vuelven mañana.',
   },
 };
 
@@ -62,6 +69,7 @@ const STATUS: Record<ErrorCode, number> = {
   not_found: 404,
   not_configured: 503,
   quota_exceeded: 429,
+  provider_quota: 503,
   ai_error: 502,
   storage_error: 502,
 };
@@ -70,9 +78,24 @@ function jsonResponse(body: unknown, status: number): Response {
   return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 }
 
+// Raison transmise à l'app pour les échecs liés à un quota ou à une panne du fournisseur
+const REASONS: Partial<Record<ErrorCode, string>> = {
+  quota_exceeded: 'user_quota',
+  provider_quota: 'provider_quota',
+  ai_error: 'provider_error',
+  storage_error: 'provider_error',
+};
+
 function errorResponse(code: ErrorCode, language: string, details?: string): Response {
   const message = (MESSAGES[language] || MESSAGES['en'])[code].replace('{limit}', String(DAILY_LIMITS.images));
-  return jsonResponse({ error: code, message, ...(details && { details }) }, STATUS[code]);
+  return jsonResponse({ error: code, ...(REASONS[code] && { reason: REASONS[code] }), message, ...(details && { details }) }, STATUS[code]);
+}
+
+// Échec de Cloudflare, avec son statut HTTP (pour reconnaître un quota épuisé)
+class CloudflareError extends Error {
+  constructor(readonly status: number | undefined, message: string) {
+    super(message);
+  }
 }
 
 interface RecipeRow {
@@ -153,7 +176,10 @@ function buildImagePrompt(recipe: Pick<RecipeRow, 'title' | 'description' | 'ima
   return `Professional food photography of ${recipe.title}${recipe.description ? `, ${recipe.description}` : ''}. Appetizing, natural light, served on a plate.`.slice(0, 1000);
 }
 
-async function generateImage(prompt: string): Promise<Uint8Array> {
+async function generateImage(prompt: string, simulate?: 'quota' | 'error'): Promise<Uint8Array> {
+  // Tests : échec simulé, sans appel à Cloudflare
+  if (simulate === 'quota') throw new CloudflareError(429, 'Cloudflare 429 (simulé) : you have used up your daily free allocation of 10,000 neurons');
+  if (simulate === 'error') throw new CloudflareError(500, 'Cloudflare 500 (simulé) : panne du fournisseur');
   const response = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run/${CLOUDFLARE_IMAGE_MODEL}`,
     {
@@ -168,7 +194,7 @@ async function generateImage(prompt: string): Promise<Uint8Array> {
     if (response.status === 401 || response.status === 403) {
       console.error('[generate-recipe-image] JETON CLOUDFLARE REFUSÉ : vérifier CLOUDFLARE_API_TOKEN et ses droits Workers AI');
     }
-    throw new Error(`Cloudflare ${response.status}: ${text.slice(0, 300)}`);
+    throw new CloudflareError(response.status, `Cloudflare ${response.status}: ${text.slice(0, 300)}`);
   }
   const data = await response.json();
   const base64 = data?.result?.image;
@@ -201,6 +227,8 @@ Deno.serve(withCors(async (req: Request) => {
 
   try {
     const body = await req.json().catch(() => ({}));
+    // Tests : erreurs de quota simulées (clé secrète exigée)
+    const simulation = readSimulation(req, body);
     language = String(body?.language || 'fr').substring(0, 2).toLowerCase();
     const recipeId = typeof body?.recipe_id === 'string' ? body.recipe_id : '';
 
@@ -229,8 +257,8 @@ Deno.serve(withCors(async (req: Request) => {
       return (current && existingImageResponse(current)) || jsonResponse({ status: 'in_progress' }, 202);
     }
 
-    if (!await consumeQuota(user.id, 'images')) {
-      console.warn(`[generate-recipe-image] quota atteint (${DAILY_LIMITS.images} images/jour) pour ${user.id}`);
+    if (simulation?.user_quota || !await consumeQuota(user.id, 'images')) {
+      logUserQuota('generate-recipe-image', 'images', DAILY_LIMITS.images, user.id);
       await releaseClaim(recipe.id, claim, authorization);
       return errorResponse('quota_exceeded', language);
     }
@@ -238,12 +266,18 @@ Deno.serve(withCors(async (req: Request) => {
 
     let bytes: Uint8Array;
     try {
-      bytes = await generateImage(buildImagePrompt(recipe));
+      bytes = await generateImage(buildImagePrompt(recipe), simulation?.providers.cloudflare);
     } catch (error) {
-      console.error('[generate-recipe-image] génération :', error);
+      const details = error instanceof Error ? error.message : String(error);
+      const reason = classifyProviderFailure(error instanceof CloudflareError ? error.status : undefined, details);
+      console.error(`[generate-recipe-image] ÉCHEC (${reason}) : ${details.slice(0, 300)}`);
       await refundQuota(user.id, 'images');
       await releaseClaim(recipe.id, claim, authorization);
-      return errorResponse('ai_error', language, error instanceof Error ? error.message : String(error));
+      if (reason === 'provider_quota') {
+        reportInBackground(reportProviderQuota('cloudflare', 'generate-recipe-image', details, simulation !== null));
+        return errorResponse('provider_quota', language, details);
+      }
+      return errorResponse('ai_error', language, details);
     }
 
     // Compression (≈ 100 à 150 Ko) ; en cas d'échec, l'image d'origine est gardée plutôt que perdue

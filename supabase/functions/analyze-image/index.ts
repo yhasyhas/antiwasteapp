@@ -1,6 +1,8 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { getAuthenticatedUser } from '../_shared/auth.ts';
 import { consumeQuota, DAILY_LIMITS, refundQuota } from '../_shared/quota.ts';
+import { logUserQuota, reportInBackground, reportProviderQuota } from '../_shared/quotaAlerts.ts';
+import { readSimulation } from '../_shared/simulate.ts';
 import { withCors } from '../_shared/cors.ts';
 import { type AiProvider, type AttemptLog, geminiProvider, groqProvider, runWithFallback } from '../_shared/ai.ts';
 import { parseIngredients, RESPONSE_SCHEMA } from './ingredients.ts';
@@ -51,6 +53,7 @@ const MESSAGES: Record<string, Record<string, string>> = {
     ai_error: 'Le service d\'analyse d\'image est momentanément indisponible. Réessaie dans quelques instants.',
     invalid_response: 'La réponse de l\'IA était illisible. Réessaie.',
     quota_exceeded: 'Tu as atteint la limite de {limit} analyses de photos par jour. Réessaie demain, ou ajoute tes ingrédients à la main.',
+    provider_quota: 'Le service d\'analyse a atteint sa limite pour le moment. Ajoute tes ingrédients à la main, ou réessaie plus tard.',
   },
   en: {
     unauthorized: 'You must be signed in to analyze a photo.',
@@ -60,6 +63,7 @@ const MESSAGES: Record<string, Record<string, string>> = {
     ai_error: 'The image analysis service is temporarily unavailable. Please try again in a moment.',
     invalid_response: 'The AI response could not be read. Please try again.',
     quota_exceeded: 'You have reached the limit of {limit} photo scans per day. Try again tomorrow, or add your ingredients manually.',
+    provider_quota: 'The analysis service has reached its limit for now. Add your ingredients manually, or try again later.',
   },
   es: {
     unauthorized: 'Debes iniciar sesión para analizar una foto.',
@@ -69,6 +73,7 @@ const MESSAGES: Record<string, Record<string, string>> = {
     ai_error: 'El servicio de análisis de imágenes no está disponible en este momento. Inténtalo de nuevo en unos instantes.',
     invalid_response: 'No se pudo leer la respuesta de la IA. Inténtalo de nuevo.',
     quota_exceeded: 'Has alcanzado el límite de {limit} análisis de fotos por día. Vuelve a intentarlo mañana o añade tus ingredientes a mano.',
+    provider_quota: 'El servicio de análisis ha alcanzado su límite por ahora. Añade tus ingredientes a mano o inténtalo más tarde.',
   },
 };
 
@@ -152,7 +157,10 @@ Deno.serve(withCors(async (req: Request) => {
   let quotaUserId: string | null = null;
 
   try {
-    const { image_base64, mime_type, language: requestedLanguage, mode: requestedMode, debug }: AnalyzeImageRequest = await req.json();
+    const body = await req.json();
+    const { image_base64, mime_type, language: requestedLanguage, mode: requestedMode, debug }: AnalyzeImageRequest = body;
+    // Tests : erreurs de quota simulées (clé secrète exigée)
+    const simulation = readSimulation(req, body);
     language = (requestedLanguage || 'fr').substring(0, 2).toLowerCase();
     const mode: AnalyzeMode = requestedMode === 'receipt' ? 'receipt' : 'photo';
 
@@ -174,10 +182,10 @@ Deno.serve(withCors(async (req: Request) => {
       return errorResponse('not_configured', language, 500, 'GEMINI_API_KEY and GROQ_API_KEY missing');
     }
 
-    if (!await consumeQuota(user.id, 'scans')) {
-      console.warn(`[analyze-image] quota atteint (${DAILY_LIMITS.scans} scans/jour) pour ${user.id}`);
+    if (simulation?.user_quota || !await consumeQuota(user.id, 'scans')) {
+      logUserQuota('analyze-image', 'scans', DAILY_LIMITS.scans, user.id);
       const message = (MESSAGES[language] || MESSAGES['en']).quota_exceeded.replace('{limit}', String(DAILY_LIMITS.scans));
-      return jsonResponse({ error: 'quota_exceeded', message, limit: DAILY_LIMITS.scans }, 429);
+      return jsonResponse({ error: 'quota_exceeded', reason: 'user_quota', message, limit: DAILY_LIMITS.scans }, 429);
     }
     quotaUserId = user.id;
 
@@ -190,13 +198,20 @@ Deno.serve(withCors(async (req: Request) => {
       schemaName: 'detected_ingredients',
       temperature: 0,
       maxOutputTokens: MAX_OUTPUT_TOKENS,
-    }, parseIngredients, { label: 'analyze-image', log, t0, hedgeDelayMs: HEDGE_DELAY_MS });
+    }, parseIngredients, { label: 'analyze-image', log, t0, hedgeDelayMs: HEDGE_DELAY_MS, simulate: simulation?.providers });
+    // Quotas de fournisseurs épuisés, même si le secours a répondu : alerte (une fois par jour et par fournisseur)
+    for (const hit of result.quotaHits) {
+      reportInBackground(reportProviderQuota(hit.provider, 'analyze-image', hit.details, simulation !== null));
+    }
     // Détail des appels (durées, tokens), sur demande, pour mesurer les temps d'analyse
     const debugInfo = debug === true ? { debug: { before_ai_ms: beforeAi, total_ms: Date.now() - t0, attempts: log } } : {};
 
     if (!result.ok) {
       await refundQuota(user.id, 'scans');
-      return jsonResponse({ ...errorBody(result.code, language, result.failure), ...debugInfo }, 502);
+      // Tous les fournisseurs ont échoué : quota épuisé chez chacun (provider_quota) ou panne (provider_error)
+      const code = result.reason === 'provider_quota' ? 'provider_quota' : result.code;
+      console.error(`[analyze-image] ÉCHEC (${result.reason}) : ${result.failure.slice(0, 200)}`);
+      return jsonResponse({ ...errorBody(code, language, result.failure), reason: result.reason, ...debugInfo }, result.reason === 'provider_quota' ? 503 : 502);
     }
 
     const { ingredients, invalid } = result.value;
@@ -218,6 +233,6 @@ Deno.serve(withCors(async (req: Request) => {
   } catch (error) {
     console.error('Error analyzing image:', error);
     if (quotaUserId) await refundQuota(quotaUserId, 'scans');
-    return errorResponse('ai_error', language, 500, error instanceof Error ? error.message : String(error));
+    return jsonResponse({ ...errorBody('ai_error', language, error instanceof Error ? error.message : String(error)), reason: 'provider_error' }, 500);
   }
 }));

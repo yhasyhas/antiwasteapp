@@ -2,7 +2,7 @@
 // Lancement : deno test --no-config supabase/functions/
 
 import { assert, assertEquals } from 'jsr:@std/assert@1';
-import { type AiProvider, type AiRequest, type AttemptLog, orderProviders, type ParseResult, type ProviderResult, runWithFallback } from './ai.ts';
+import { type AiProvider, type AiRequest, type AttemptLog, classifyProviderFailure, orderProviders, type ParseResult, type ProviderResult, runWithFallback } from './ai.ts';
 
 const REQUEST: AiRequest = { prompt: 'test', schema: {}, schemaName: 'test', temperature: 0, maxOutputTokens: 100 };
 
@@ -124,4 +124,49 @@ Deno.test('orderProviders : ordre du secret, noms inconnus ignorés, fournisseur
   assertEquals(orderProviders([gemini, groq], 'inconnu, groq').map((p) => p.name), ['groq', 'gemini']);
   assertEquals(orderProviders([gemini, groq], undefined).map((p) => p.name), ['gemini', 'groq']);
   assertEquals(orderProviders([off, groq], 'autre,groq').map((p) => p.name), ['groq']);
+});
+
+// ---------- Quotas des fournisseurs ----------
+
+Deno.test('classification : erreurs de quota de Gemini, Groq et Cloudflare ; le reste est une panne', () => {
+  assertEquals(classifyProviderFailure(429, 'Gemini 429: {\"error\":{\"status\":\"RESOURCE_EXHAUSTED\"}}'), 'provider_quota');
+  assertEquals(classifyProviderFailure(429, 'Groq 429: {\"error\":{\"code\":\"rate_limit_exceeded\"}}'), 'provider_quota');
+  assertEquals(classifyProviderFailure(400, 'Cloudflare 400: {\"errors\":[{\"message\":\"AiError: you have used up your daily free allocation of 10,000 neurons\",\"code\":3036}]}'), 'provider_quota');
+  assertEquals(classifyProviderFailure(undefined, 'Gemini status RESOURCE_EXHAUSTED'), 'provider_quota');
+  assertEquals(classifyProviderFailure(503, 'Gemini 503: {\"status\":\"UNAVAILABLE\",\"message\":\"The model is overloaded\"}'), 'provider_error');
+  assertEquals(classifyProviderFailure(500, 'Groq 500: internal error'), 'provider_error');
+  assertEquals(classifyProviderFailure(undefined, 'Gemini: TimeoutError: Signal timed out.'), 'provider_error');
+});
+
+Deno.test('quota épuisé chez le principal, le secours répond : succès, quota signalé', async () => {
+  const primary = fakeProvider('gemini', 5, httpError(429));
+  const backup = fakeProvider('groq', 5, ok('{"value":"b"}'));
+  const { result } = await run([primary.provider, backup.provider]);
+  assert(result.ok);
+  assertEquals(result.quotaHits.map((hit) => hit.provider), ['gemini']);
+});
+
+Deno.test('tous les fournisseurs à court de quota : raison provider_quota', async () => {
+  const { result } = await run([fakeProvider('gemini', 5, httpError(429)).provider, fakeProvider('groq', 5, httpError(429)).provider]);
+  assert(!result.ok);
+  assertEquals(result.reason, 'provider_quota');
+  assertEquals(result.quotaHits.length, 2);
+});
+
+Deno.test("quota chez l'un, panne chez l'autre : raison provider_error, quota tout de même signalé", async () => {
+  const { result } = await run([fakeProvider('gemini', 5, httpError(429)).provider, fakeProvider('groq', 5, httpError(500)).provider]);
+  assert(!result.ok);
+  assertEquals(result.reason, 'provider_error');
+  assertEquals(result.quotaHits.map((hit) => hit.provider), ['gemini']);
+});
+
+Deno.test('simulation : aucun appel réel au fournisseur simulé', async () => {
+  const primary = fakeProvider('gemini', 5, ok('{"value":"a"}'));
+  const backup = fakeProvider('groq', 5, ok('{"value":"b"}'));
+  const log: AttemptLog[] = [];
+  const result = await runWithFallback([primary.provider, backup.provider], REQUEST, parse, { label: 'test', log, t0: Date.now(), simulate: { gemini: 'quota' } });
+  assert(result.ok);
+  assertEquals(result.value, 'b');
+  assertEquals(primary.state.calls, 0);
+  assertEquals(result.quotaHits.map((hit) => hit.provider), ['gemini']);
 });

@@ -158,7 +158,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - `_shared/ai.ts` : interface unique pour les deux fournisseurs, utilisée par le scan et la génération.
 - Génération : sortie structurée stricte, N recettes en un appel, Groq puis Gemini ; identifiants du garde-manger (alias en liste fermée) à la place de la comparaison de texte ; régimes vérifiés par ingrédient avec exceptions côté serveur ; paramètre et filtre « Cuisine ».
 - Images : Cloudflare Workers AI (FLUX schnell), une par recette, à l'ouverture ou à la sauvegarde, quota de 10 par jour ; bucket `recipe-images`. Pollinations entièrement retiré.
-- Tests : 28 tests Deno (`deno test --no-config supabase/functions/`), tests SQL des images.
+- Tests : 28 tests Deno (`deno test --no-config --allow-env supabase/functions/`), tests SQL des images.
 
 ### Phase 4 — nettoyage du code et traductions (branche `phase-4`, validée depuis l'app en fr / en / es)
 - Découpage : `generate.tsx` (1 364 → 228 lignes), caméra, favoris, accueil et garde-manger en composants (`components/`) et hooks (`hooks/`), sans changement de comportement ; plus gros fichier : 349 lignes. Bouton « Ajouter à la main » de l'écran de permission de la caméra réparé.
@@ -203,7 +203,7 @@ npx supabase db push         # appliquer les migrations sur le projet lié
 npx supabase functions deploy analyze-image
 npx supabase functions deploy generate-recipes
 npx supabase functions deploy generate-recipe-image
-deno test --no-config supabase/functions/   # tests Deno (secours, validation, identifiants, régimes)
+deno test --no-config --allow-env supabase/functions/   # tests Deno (secours, validation, identifiants, régimes)
 PGPASSWORD="$SUPABASE_DB_PASSWORD" psql "$(cat supabase/.temp/pooler-url)" -v ON_ERROR_STOP=1 -f supabase/tests/household_rls.sql   # tests de sécurité (idem usage_counters.sql, recipe_images.sql)
 npm run export               # régénère l'export complet du projet (voir scripts/export-project.mjs)
 ```
