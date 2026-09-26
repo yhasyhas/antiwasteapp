@@ -21,6 +21,7 @@ import { RecipeSheet } from '@/components/recipe/RecipeSheet';
 import { ChefHat, ShoppingCart, Sparkles, TrendingUp } from 'lucide-react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { RecipeListCard } from '@/components/recipe/RecipeListCard';
+import { WasteCounter } from '@/components/home/WasteCounter';
 
 type RecentRecipe = Recipe & { id: string };
 
@@ -187,6 +188,8 @@ export default function HomeScreen() {
             <Text style={styles.actionSubtitle}>{t('shopping.toBuyCount', { count: toBuy })}</Text>
           </TouchableOpacity>
         </View>
+
+        <WasteCounter />
 
         {recipes.length > 0 && (
           <View style={styles.section}>

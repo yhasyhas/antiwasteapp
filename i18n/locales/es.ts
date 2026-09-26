@@ -397,6 +397,17 @@ const es: Translations = {
     alreadyOnList: 'Estos ingredientes ya están en la lista.',
     viewList: 'Ver la lista',
   },
+  counter: {
+    title: 'Este mes',
+    household: 'El hogar',
+    me: 'Yo',
+    mine: 'Mi balance',
+    saved_one: '{{count}} alimento salvado',
+    saved_other: '{{count}} alimentos salvados',
+    wasted_one: '{{count}} desperdiciado',
+    wasted_other: '{{count}} desperdiciados',
+    hint: '«Lo he cocinado» cuenta los alimentos salvados; un alimento borrado después de su fecha cuenta como desperdiciado.',
+  },
   notFound: {
     title: '¡Vaya!',
     text: 'Esta pantalla no existe.',

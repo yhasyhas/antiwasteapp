@@ -398,6 +398,17 @@ const fr = {
     alreadyOnList: 'Ces ingrédients sont déjà sur la liste.',
     viewList: 'Voir la liste',
   },
+  counter: {
+    title: 'Ce mois-ci',
+    household: 'Le foyer',
+    me: 'Moi',
+    mine: 'Mon bilan',
+    saved_one: '{{count}} aliment sauvé',
+    saved_other: '{{count}} aliments sauvés',
+    wasted_one: '{{count}} gaspillé',
+    wasted_other: '{{count}} gaspillés',
+    hint: "« J'ai cuisiné ça » compte les aliments sauvés ; un aliment supprimé après sa date compte comme gaspillé.",
+  },
   notFound: {
     title: 'Oups !',
     text: "Cet écran n'existe pas.",

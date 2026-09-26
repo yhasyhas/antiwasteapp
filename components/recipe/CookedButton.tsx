@@ -63,7 +63,8 @@ export function CookedButton({ ingredientsUsed }: Props) {
       return;
     }
     setRemoving(true);
-    const { error } = await supabase.from('ingredients').delete().in('id', ids);
+    // Retirés et comptés « sauvés » (compteur anti-gaspi)
+    const { error } = await supabase.rpc('cook_ingredients', { p_ids: ids });
     setRemoving(false);
     if (error) {
       alertWriteError(t, 'removing cooked ingredients', error);

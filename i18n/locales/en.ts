@@ -397,6 +397,17 @@ const en: Translations = {
     alreadyOnList: 'These ingredients are already on the list.',
     viewList: 'View the list',
   },
+  counter: {
+    title: 'This month',
+    household: 'Household',
+    me: 'Me',
+    mine: 'My record',
+    saved_one: '{{count}} item saved',
+    saved_other: '{{count}} items saved',
+    wasted_one: '{{count}} wasted',
+    wasted_other: '{{count}} wasted',
+    hint: '"I cooked this" counts saved items; an item deleted after its date counts as wasted.',
+  },
   notFound: {
     title: 'Oops!',
     text: "This screen doesn't exist.",
