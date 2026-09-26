@@ -192,11 +192,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   headerTitle: {
+    flex: 1,
+    marginRight: 12,
     fontSize: 24,
     fontWeight: '700',
     color: '#111827',
   },
   manualButton: {
+    flexShrink: 0,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,

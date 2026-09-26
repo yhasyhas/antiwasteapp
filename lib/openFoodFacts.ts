@@ -5,7 +5,8 @@
 const API_URL = 'https://world.openfoodfacts.org/api/v2/product';
 const USER_AGENT = 'AntiGaspiRecettes/1.0 (https://github.com/yhasyhas/antiwasteapp)';
 const TIMEOUT_MS = 8000;
-const MAX_NAME_LENGTH = 80;
+// Nom court, lisible dans le garde-manger et dans les notifications
+const MAX_NAME_LENGTH = 40;
 
 export interface OffProduct {
   name: string;
@@ -40,10 +41,37 @@ export function categoryFromTags(tags: unknown): string {
   return 'other';
 }
 
+// Nettoie un nom saisi par les contributeurs d'Open Food Facts : symboles de mise en forme (**, _, #),
+// composition ou allergènes collés au nom (« Ingrédients : … », « Contient : … », « peut contenir … »),
+// précisions entre parenthèses ou crochets, séparateurs de fin. Coupé au dernier mot entier.
+export function cleanProductName(raw: string): string {
+  let name = raw
+    .replace(/[*_#~`|<>{}]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  // Composition ou allergènes : tout ce qui suit est retiré
+  name = name.replace(/\s*[-–—:,.;]?\s*\b(ingr[ée]dients?|ingredientes|composition|allerg[èe]nes?|allergens?|al[ée]rgenos|contient|contains|contiene|peut contenir|may contain|puede contener|traces?)\b.*$/iu, '');
+  // Précisions entre parenthèses ou crochets
+  name = name.replace(/\s*[([][^)\]]*[)\]]/g, '').replace(/\s*[([].*$/, '');
+  // Séparateurs et ponctuation en bout de nom
+  name = name.replace(/^[\s\-–—:,.;/]+|[\s\-–—:,.;/]+$/g, '').replace(/\s+/g, ' ');
+  if (name.length > MAX_NAME_LENGTH) {
+    const cut = name.slice(0, MAX_NAME_LENGTH + 1);
+    const lastSpace = cut.lastIndexOf(' ');
+    name = (lastSpace > 12 ? cut.slice(0, lastSpace) : name.slice(0, MAX_NAME_LENGTH)).replace(/[\s\-–—:,.;/]+$/, '');
+  }
+  // Première lettre en majuscule (« LAIT DEMI-ÉCRÉMÉ » reste tel quel)
+  return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
 function productName(product: any, language: string): string {
   const candidates = [product[`product_name_${language}`], product.product_name, product.generic_name];
-  const name = candidates.find((value) => typeof value === 'string' && value.trim() !== '');
-  return name ? name.trim().slice(0, MAX_NAME_LENGTH) : '';
+  for (const value of candidates) {
+    if (typeof value !== 'string') continue;
+    const name = cleanProductName(value);
+    if (name.length >= 2) return name;
+  }
+  return '';
 }
 
 // « 400 g e » → « 400 g » (le « ℮ » des emballages européens)

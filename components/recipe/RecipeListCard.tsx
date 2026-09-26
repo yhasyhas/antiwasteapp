@@ -70,7 +70,7 @@ export function RecipeListCard({ recipe, imageLoading = false, onPress, favorite
           ) : null}
           {recipe.dietary_tags.slice(0, 1).map((tag, index) => (
             <View key={index} style={styles.tag}>
-              <Text style={styles.tagText} numberOfLines={1}>{dietLabel(t, tag)}</Text>
+              <Text style={styles.tagText}>{dietLabel(t, tag)}</Text>
             </View>
           ))}
         </View>
@@ -143,6 +143,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     gap: 8,
     marginTop: 'auto',
@@ -169,7 +170,6 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
   },
   tag: {
-    flexShrink: 1,
     paddingVertical: 3,
     paddingHorizontal: 8,
     borderRadius: 6,
