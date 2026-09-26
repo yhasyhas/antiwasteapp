@@ -6,7 +6,7 @@
 -- Tout se passe dans une transaction annulée à la fin : aucune donnée ne reste en base.
 
 BEGIN;
-\i supabase/migrations/20260927110000_user_preferences.sql
+
 INSERT INTO auth.users (id, email) VALUES ('00000000-0000-4000-a000-000000000a01', 'pref-test@example.com');
 INSERT INTO public.profiles (id, email) VALUES ('00000000-0000-4000-a000-000000000a01', 'pref-test@example.com');
 SET LOCAL ROLE authenticated;
