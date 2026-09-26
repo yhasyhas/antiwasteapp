@@ -9,6 +9,8 @@ import {
   buildPantry,
   buildOtherPantry,
   buildRecipeSchema,
+  cleanExcluded,
+  cleanServings,
   type GenerationMode,
   leftoverItems,
   pantryForPrompt,
@@ -55,6 +57,9 @@ interface GenerateRecipeRequest {
     mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
     cuisine?: string;
     language: string;
+    // Préférences : aliments exclus (allergies, goûts) et nombre de personnes
+    excluded?: string[];
+    servings?: number;
   };
   // true : ajoute le détail des appels (durées, tokens) ; permet aussi d'imposer l'ordre des fournisseurs (mesures)
   debug?: boolean;
@@ -191,6 +196,8 @@ function buildPrompts(options: {
   mode: GenerationMode;
   selection: boolean;
   otherPantry: string[];
+  excluded: string[];
+  servings: number | null;
 }): { system: string; prompt: string } {
   const languageName = LANGUAGE_NAMES[options.language] || LANGUAGE_NAMES['en'];
   const dietaryRules = options.dietary.map((diet) => DIETARY_RULES[diet.toLowerCase()]).filter(Boolean);
@@ -202,7 +209,9 @@ function buildPrompts(options: {
 
 RÉGIMES ALIMENTAIRES (règles strictes) :
 ${dietaryRules.length > 0 ? dietaryRules.map((rule) => `- ${rule}`).join('\n') : '- aucun'}
-
+${options.excluded.length > 0 ? `
+ALIMENTS EXCLUS (allergies ou goûts, règle stricte) : n'utilise jamais ${options.excluded.join(', ')}, ni un produit qui en contient ou en dérive (sauce, pâte, beurre, lait…), même s'il est dans le garde-manger.
+` : ''}
 TYPE DE REPAS (${MEAL_NAMES[options.mealType] || options.mealType}) — préférence, pas une règle :
 ${MEAL_PREFERENCES[options.mealType] || ''}
 - Si les ingrédients s'y prêtent mal, propose quand même la meilleure recette possible et remplis "suggestion" avec une phrase courte indiquant le moment où elle est idéale (ex. « Idéal aussi en petit-déjeuner »). Sinon, "suggestion" est une chaîne vide.
@@ -245,7 +254,8 @@ ${options.pantryText}
 
 Crée exactement ${options.count} recette${options.count > 1 ? 's' : ''}${options.count > 1 ? ' vraiment différentes les unes des autres (plat, technique de cuisson, texture)' : ''}.
 - Difficulté : ${options.difficulty}
-- Temps total maximum : ${options.maxCookTime} minutes
+- Temps total maximum : ${options.maxCookTime} minutes${options.servings ? `
+- Pour ${options.servings} personne${options.servings > 1 ? 's' : ''} : quantités adaptées, "servings" = ${options.servings}` : ''}
 
 ${refusal}`;
 
@@ -303,7 +313,9 @@ Deno.serve(withCors(async (req: Request) => {
     const cuisine: Cuisine = (CUISINES as readonly string[]).includes(preferences.cuisine || '') ? preferences.cuisine as Cuisine : 'any';
     const difficulty = preferences.difficulty || 'easy';
     const count = recipeCount(pantry.items.length);
-    const context = { mealType: preferences.mealType, cuisine, difficulty, dietary, maxRecipes: count, mode, otherPantry };
+    const excluded = cleanExcluded(preferences.excluded);
+    const servings = cleanServings(preferences.servings);
+    const context = { mealType: preferences.mealType, cuisine, difficulty, dietary, maxRecipes: count, mode, otherPantry, excluded, servings };
 
     const { system, prompt } = buildPrompts({
       pantryText: pantryForPrompt(pantry),
@@ -320,6 +332,8 @@ Deno.serve(withCors(async (req: Request) => {
       mode,
       selection,
       otherPantry,
+      excluded,
+      servings,
     });
 
     const providers = debug === true && requestedOrder

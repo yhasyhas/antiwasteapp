@@ -191,6 +191,35 @@ export function otherPantryUsed(raw: any, otherPantry: string[]): string | null 
   return null;
 }
 
+// Aliment exclu par l'utilisateur (allergie ou goût) présent dans la recette, qu'il vienne du garde-manger
+// ou non, ou null. « arachide » exclut « beurre d'arachide » ; mots entiers seulement.
+export function excludedUsed(raw: any, pantry: Pantry, excluded: string[]): string | null {
+  const keys = excluded.map(matchKey).filter((key) => key !== '');
+  if (keys.length === 0) return null;
+  for (const ingredient of raw.ingredients || []) {
+    const pantryItem = ingredient?.pantry_id === MISSING ? undefined : pantry.aliasOf.get(ingredient?.pantry_id);
+    const name = pantryItem ? pantryItem.name : typeof ingredient?.name === 'string' ? ingredient.name : '';
+    const padded = ` ${matchKey(name)} `;
+    if (keys.some((key) => padded.includes(` ${key} `))) return name;
+  }
+  return null;
+}
+
+// Préférences de l'utilisateur envoyées par l'app : liste nettoyée (20 aliments au plus)
+export function cleanExcluded(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((item): item is string => typeof item === 'string')
+    .map((item) => item.trim().slice(0, 40))
+    .filter((item) => item !== '')
+    .slice(0, 20);
+}
+
+// Nombre de personnes : 1 à 12, sinon null (pas de préférence)
+export function cleanServings(value: unknown): number | null {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= 12 ? value : null;
+}
+
 export const DIFFICULTIES = ['easy', 'medium', 'expert'];
 
 // Schéma construit à chaque requête : les alias du garde-manger et les régimes sélectionnés y sont
@@ -328,7 +357,7 @@ export function dietViolations(recipe: any, diets: StrictDiet[]): string[] {
   return violations;
 }
 
-export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; cuisine: string; difficulty: string; dietary: string[] }): Recipe {
+export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; cuisine: string; difficulty: string; dietary: string[]; servings?: number | null }): Recipe {
   const ingredients: RecipeIngredient[] = raw.ingredients.map((ingredient: any) => {
     const pantryItem = ingredient.pantry_id === MISSING ? undefined : pantry.aliasOf.get(ingredient.pantry_id);
     return {
@@ -350,7 +379,7 @@ export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; 
     prep_time: isCount(raw.prep_time) ? Math.round(raw.prep_time) : 15,
     cook_time: isCount(raw.cook_time) ? Math.round(raw.cook_time) : 20,
     total_time: isCount(raw.total_time) ? Math.round(raw.total_time) : 35,
-    servings: isCount(raw.servings) && raw.servings > 0 ? Math.round(raw.servings) : 2,
+    servings: context.servings ?? (isCount(raw.servings) && raw.servings > 0 ? Math.round(raw.servings) : 2),
     meal_type: context.mealType,
     cuisine: context.cuisine,
     dietary_tags: isStringArray(raw.dietary_tags) ? raw.dietary_tags : context.dietary,
@@ -382,6 +411,9 @@ export function parseRecipes(
     mode?: GenerationMode;
     // Sélection : ingrédients du garde-manger non choisis, interdits dans les recettes
     otherPantry?: string[];
+    // Aliments exclus (allergies, goûts) et nombre de personnes (préférences)
+    excluded?: string[];
+    servings?: number | null;
   },
 ): ParseOutcome {
   let parsed: any;
@@ -408,6 +440,10 @@ export function parseRecipes(
     // « Transformer mes restes » : chaque recette part d'au moins un reste de plat
     if (context.mode === 'leftovers' && !raw.ingredients.some((ingredient: any) => pantry.aliasOf.get(ingredient.pantry_id)?.kind === 'dish')) {
       return invalid.push(`n°${index} "${raw.title}" n'utilise aucun reste`);
+    }
+    const excludedIngredient = excludedUsed(raw, pantry, context.excluded ?? []);
+    if (excludedIngredient) {
+      return invalid.push(`n°${index} "${raw.title}" contient « ${excludedIngredient} », exclu par l'utilisateur`);
     }
     const outsideSelection = otherPantryUsed(raw, context.otherPantry ?? []);
     if (outsideSelection) {

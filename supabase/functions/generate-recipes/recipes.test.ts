@@ -6,6 +6,9 @@ import { assert, assertEquals } from 'jsr:@std/assert@1';
 import {
   buildPantry,
   buildRecipeSchema,
+  cleanExcluded,
+  cleanServings,
+  excludedUsed,
   isBasic,
   isDietException,
   otherPantryUsed,
@@ -221,4 +224,24 @@ Deno.test('sélection : la recette qui utilise un ingrédient réservé est éca
   assert(result.ok);
   assertEquals(result.value.recipes.map((r) => r.title), ['Banane poêlée']);
   assert(result.value.invalid[0].includes('hors de la sélection'));
+});
+
+Deno.test('aliments exclus : recette écartée si elle en contient un (garde-manger ou à acheter), mots entiers', () => {
+  const withPeanut = recipe([ing('banane', 'p1'), ing("beurre d'arachide", MISSING)]);
+  assertEquals(excludedUsed(withPeanut, PANTRY, ['Arachide']), "beurre d'arachide");
+  assertEquals(excludedUsed(recipe([ing('ignoré', 'p2')]), PANTRY, ['lait']), 'lait');
+  assertEquals(excludedUsed(recipe([ing('lait de coco', 'p3')]), PANTRY, ['coco']), 'lait de coco');
+  assertEquals(excludedUsed(recipe([ing('banane', 'p1')]), PANTRY, ['ban']), null);
+  const outcome = parseRecipes(JSON.stringify({ recipes: [withPeanut, recipe([ing('banane', 'p1')], { title: 'Banane' })], refusal: '' }), PANTRY, [], { ...CONTEXT, excluded: ['arachide'] });
+  assert(outcome.ok);
+  assertEquals(outcome.value.recipes.map((r) => r.title), ['Banane']);
+});
+
+Deno.test('préférences : aliments exclus nettoyés, nombre de personnes imposé à la recette', () => {
+  assertEquals(cleanExcluded([' arachide ', '', 3, 'x'.repeat(60)]), ['arachide', 'x'.repeat(40)]);
+  assertEquals(cleanExcluded('arachide'), []);
+  assertEquals([cleanServings(4), cleanServings(0), cleanServings(13), cleanServings(2.5), cleanServings('4')], [4, null, null, null, null]);
+  const outcome = parseRecipes(JSON.stringify({ recipes: [recipe([ing('banane', 'p1')])], refusal: '' }), PANTRY, [], { ...CONTEXT, servings: 6 });
+  assert(outcome.ok);
+  assertEquals(outcome.value.recipes[0].servings, 6);
 });
