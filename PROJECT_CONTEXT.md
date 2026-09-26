@@ -184,7 +184,8 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 
 ### Cartes de recettes (branche `recipe-cards`)
 - Carte unique `components/recipe/RecipeListCard.tsx` (accueil, favoris, toutes les recettes, génération), avec cœur de favori en option ; remplace `RecentRecipeCard`, `RecipeCard` et `SavedRecipeCard`.
-- Image sur la carte si elle existe (`expo-image`, `cachePolicy="memory-disk"`, aussi dans la fiche), sinon vignette de remplacement ; aucune image demandée pour afficher une liste, seulement à l'ouverture de la fiche (état partagé `lib/recipeImage.ts`).
+- Image sur la carte si elle existe (`expo-image`, `cachePolicy="memory-disk"`, aussi dans la fiche), sinon vignette de remplacement ; aucune image demandée pour afficher l'accueil, les favoris ou toutes les recettes, seulement à l'ouverture de la fiche ; les recettes d'une nouvelle génération ont leurs images demandées en arrière-plan dès l'affichage des résultats (état partagé `lib/recipeImage.ts`).
+- Phase 6b planifiée : fiches aliments (`food_key`, table partagée `food_facts`, signalements, pré-remplissage d'une centaine d'aliments), voir PLAN.md.
 
 ## 5. État actuel et problèmes connus
 

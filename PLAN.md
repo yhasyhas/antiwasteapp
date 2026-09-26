@@ -40,7 +40,7 @@ Dernière mise à jour : 23/09/2026
 
 ## Ce qui distingue l'app
 
-Quatre fonctionnalités qui la différencient d'un simple générateur de recettes, réparties dans les phases :
+Cinq fonctionnalités qui la différencient d'un simple générateur de recettes, réparties dans les phases :
 
 | Fonctionnalité | Préparation (données, IA) | Mise en avant dans l'app |
 |---|---|---|
@@ -48,6 +48,7 @@ Quatre fonctionnalités qui la différencient d'un simple générateur de recett
 | **Conserver avant de cuisiner** : un conseil de conservation pour chaque aliment | Phase 3 : champ `storage_tip` dans la réponse d'`analyze-image` | Phase 5 : l'enregistrer et l'afficher sur chaque ingrédient |
 | **Restes de plats** : scanner un plat cuisiné, pas seulement des ingrédients | Phase 3 : champ `kind` (`ingredient` ou `dish`) dans la réponse d'`analyze-image` | Phase 5 : date de péremption courte automatique pour les plats, et mode de génération « Transformer mes restes » |
 | **Cuisines du monde** : choisir une cuisine (italienne, sénégalaise, japonaise…) | Phase 3 : paramètre `cuisine` dans `generate-recipes` et filtre sur l'écran de génération | Phase 6 : préférence enregistrée |
+| **Fiches aliments** : en touchant un aliment du garde-manger, une fiche courte (description, origine, saison, atouts nutritionnels, astuces anti-gaspi) | Phase 6b : identifiant standard `food_key` renvoyé par le scan (et déterminé à l'ajout manuel et au code-barres), table partagée `food_facts` générée une seule fois par aliment dans les trois langues, pré-remplie avec la centaine d'aliments les plus courants | Phase 6b : fiche ouverte depuis le garde-manger, mention « Informations générales, pas un avis médical », bouton « Signaler une erreur » |
 
 ---
 
@@ -184,6 +185,8 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 
 ## Phase 6 — Donner envie de revenir
 
+### Phase 6a
+
 - [ ] Passer à un build de développement EAS (Android) : canal de notifications dédié (impossible dans Expo Go), plantages natifs dans Sentry
 - [ ] Liste de courses construite à partir de `missing_ingredients`
 - [ ] Compteur de gaspillage évité (kg, et éventuellement argent économisé) sur l'accueil
@@ -193,6 +196,22 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 - [ ] Garde-manger partagé : l'app filtre ses ingrédients par `household_id` (aujourd'hui par `user_id`, équivalent tant qu'il n'y a qu'un foyer personnel) ; gérer le départ ou la suppression du compte du propriétaire d'un foyer partagé (aujourd'hui, supprimer un compte supprime son foyer)
 - [ ] Garde-manger partagé : empêcher la modification de `user_id` sur un ingrédient existant (l'auteur ne doit pas pouvoir être changé par un autre membre)
 - [ ] Cuisines du monde : préférence de cuisine enregistrée et utilisée par défaut
+
+### Phase 6b — Fiches aliments
+
+En touchant un aliment du garde-manger, on voit sa fiche : description courte, origine, saison, principaux atouts nutritionnels et astuces anti-gaspi. Informations générales uniquement, sans promesse de santé.
+
+- [ ] Identifiant standard de l'aliment `food_key` (anglais, minuscules, singulier : `banana`, `plantain`, `cherry_tomato`) qui regroupe les variantes (« bananes mûres », « banane » → `banana`) : renvoyé par `analyze-image` pour chaque aliment (`null` pour un plat cuisiné), colonne `food_key` sur `ingredients` (migration d'ajout, sans toucher aux données existantes)
+- [ ] `food_key` à l'ajout manuel et au code-barres : correspondance avec les noms connus des fiches (noms dans les trois langues et variantes enregistrées), sinon un appel IA léger qui renvoie l'identifiant ; pour le code-barres, à partir du nom et des catégories Open Food Facts. Anciens ingrédients sans `food_key` : même correspondance à l'ouverture de la fiche
+- [ ] Table partagée `food_facts` (clé `food_key`) : contenu dans les trois langues (fr, en, es) généré **en un seul appel**, noms et variantes par langue, modèle utilisé, date, état de relecture (`reviewed`) ; lecture pour les utilisateurs connectés, écriture réservée aux fonctions (clé secrète) ; tests SQL
+- [ ] Table `food_fact_reports` (signalements) : aliment, langue, message facultatif, auteur ; chaque utilisateur ne crée et ne lit que ses signalements ; tests SQL
+- [ ] Fonction `food-fact` : renvoie la fiche existante sans rien générer ; sinon la génère une seule fois pour tous les utilisateurs (réservation contre les appels simultanés, comme les images), consigne « informations générales, aucune promesse de santé ni conseil médical », validation du JSON renvoyé (champs, longueurs, trois langues) ; secours entre fournisseurs, noms de modèles dans les secrets
+- [ ] Quota : seules les nouvelles fiches générées comptent (quota personnel par jour dans `usage_counters`, lire une fiche existante est gratuit) ; raisons `user_quota` / `provider_quota` / `provider_error` et alerte Sentry en cas de quota de fournisseur épuisé, comme les autres fonctions ; tests Deno
+- [ ] Écran de fiche depuis le garde-manger (toucher un aliment) : sections traduites, mention « Informations générales, pas un avis médical », bouton « Signaler une erreur » ; message clair si la fiche ne peut pas être générée (quota, panne)
+- [ ] Pré-remplir la centaine d'aliments les plus courants (liste versionnée dans le dépôt, script lancé une fois avec la clé secrète, reprise possible sans régénérer les fiches existantes)
+- [ ] Relecture des fiches : script d'export en Markdown (une fiche par aliment, trois langues, signalements en regard) et marquage `reviewed` des fiches relues ; les fiches signalées remontent en tête
+
+**Terminé quand** : toucher un aliment du garde-manger (scanné, ajouté à la main ou par code-barres) ouvre sa fiche dans la langue de l'app, sans nouvelle génération pour les aliments pré-remplis ; les fiches peuvent être relues et signalées.
 
 **Terminé quand** : un nouvel utilisateur peut scanner et générer une recette sans créer de compte, puis garder ses données en créant son compte.
 
@@ -309,4 +328,6 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 | 26/09/2026 | Alerte Sentry (avertissement, tag `alert:provider_quota`) quand le quota d'un fournisseur est épuisé, même si le secours a répondu ; une fois par jour et par fournisseur au plus, grâce à la table `provider_quota_events` (les fonctions ne partagent pas de mémoire) ; un problème Sentry par fournisseur et par jour | L'e-mail de Sentry dépend d'une règle d'alerte : la règle par défaut ne notifie que les problèmes « haute priorité », pas forcément les avertissements (voir README et rapport) |
 | 26/09/2026 | Simulation des erreurs de quota pour les tests : champ `simulate`, pris en compte seulement avec la clé secrète (en-tête `x-simulate-key`) ; aucun appel au fournisseur simulé | Testé sur les fonctions déployées : 9 cas (3 raisons × 3 fonctions) conformes, quotas rendus, réservation d'image libérée ; alertes simulées enregistrées pour Gemini, Groq et Cloudflare |
 | 26/09/2026 | Carte de recette unique (`components/recipe/RecipeListCard.tsx`) pour l'accueil, les favoris, toutes les recettes et les résultats de génération : vignette avec l'image si elle existe, sinon vignette de remplacement ; images affichées avec `expo-image` (cache mémoire et disque) | Afficher une liste ne génère plus aucune image, y compris après une génération (auparavant les 3 images étaient demandées en arrière-plan) : l'image n'est générée qu'à l'ouverture de la fiche et la carte se met à jour à son arrivée. Moins de neurones Cloudflare consommés pour des recettes jamais ouvertes |
+| 26/09/2026 | Images des résultats de génération : génération en arrière-plan rétablie, uniquement pour les recettes d'une nouvelle génération, dès l'affichage des résultats | Accueil, favoris et toutes les recettes gardent la règle : aucune image générée pour afficher la liste, seulement à l'ouverture de la fiche |
+| 26/09/2026 | Nouvelle fonctionnalité « Fiches aliments » ajoutée en phase 6b et à « Ce qui distingue l'app » ; phase 6 découpée en 6a (tâches existantes) et 6b (fiches aliments) | Fiches partagées par tous les utilisateurs et générées une seule fois (trois langues par appel), clé `food_key` commune au scan, à l'ajout manuel et au code-barres ; informations générales uniquement, mention « pas un avis médical », signalements ; quota et alertes comme les autres fonctions |
 | | *(résultat du test Gemini vs Clarifai)* | |
