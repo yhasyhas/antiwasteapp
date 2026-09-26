@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { CalendarDays } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { addDays, addMonths, formatDate, fromISODate, todayISO, toISODate } from '@/lib/expiry';
@@ -22,10 +22,10 @@ export function ExpiryPicker({ value, onChange }: Props) {
     { label: t('expiry.plus1Month'), iso: addMonths(today, 1) },
   ];
 
-  const onCalendarChange = (event: DateTimePickerEvent, date?: Date) => {
-    // Android : la fenêtre se ferme d'elle-même ; iOS : calendrier affiché jusqu'à « OK »
+  // Date choisie. Android : la fenêtre se ferme d'elle-même ; iOS : calendrier affiché jusqu'à « OK »
+  const onCalendarValue = (_event: unknown, date: Date) => {
     if (Platform.OS === 'android') setShowCalendar(false);
-    if (event.type === 'set' && date) onChange(toISODate(date));
+    onChange(toISODate(date));
   };
 
   return (
@@ -55,7 +55,8 @@ export function ExpiryPicker({ value, onChange }: Props) {
             mode="date"
             display={Platform.OS === 'ios' ? 'inline' : 'default'}
             minimumDate={fromISODate(today)}
-            onChange={onCalendarChange}
+            onValueChange={onCalendarValue}
+            onDismiss={() => setShowCalendar(false)}
           />
           {Platform.OS === 'ios' && (
             <TouchableOpacity style={styles.done} onPress={() => setShowCalendar(false)}>
