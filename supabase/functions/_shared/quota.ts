@@ -4,7 +4,7 @@
 import { SUPABASE_SECRET_KEY, SUPABASE_URL } from './keys.ts';
 import type { AuthenticatedUser } from './auth.ts';
 
-export type QuotaKind = 'scans' | 'generations' | 'images';
+export type QuotaKind = 'scans' | 'generations' | 'images' | 'facts';
 
 // Limites réglables par secret, sans redéployer
 export const DAILY_LIMITS: Record<QuotaKind, number> = {
@@ -13,6 +13,8 @@ export const DAILY_LIMITS: Record<QuotaKind, number> = {
   // Images de recettes (Cloudflare Workers AI : 10 000 neurones gratuits par jour pour tout le compte,
   // ≈ 173 neurones par image, soit ≈ 57 images par jour ; à revoir en phase 8)
   images: Number(Deno.env.get('QUOTA_DAILY_IMAGES') || 30),
+  // Fiches aliments générées (lire une fiche existante ne compte pas)
+  facts: Number(Deno.env.get('QUOTA_DAILY_FACTS') || 15),
 };
 
 // Essai sans compte (connexion anonyme) : quotas réduits, pour limiter les abus
@@ -20,6 +22,7 @@ export const ANONYMOUS_LIMITS: Record<QuotaKind, number> = {
   scans: Number(Deno.env.get('QUOTA_ANON_SCANS') || 5),
   generations: Number(Deno.env.get('QUOTA_ANON_GENERATIONS') || 3),
   images: Number(Deno.env.get('QUOTA_ANON_IMAGES') || 9),
+  facts: Number(Deno.env.get('QUOTA_ANON_FACTS') || 5),
 };
 
 type QuotaUser = Pick<AuthenticatedUser, 'id' | 'isAnonymous'>;
