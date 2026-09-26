@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { loadFavoriteIds, setFavorite } from '@/lib/favorites';
+import { activeHouseholdId } from '@/lib/household';
+import { onPantryChanged } from '@/lib/pantryEvents';
 import { useRecipeImages } from '@/hooks/useRecipeImages';
 import { recipeFromRow, type Recipe } from '@/components/recipe/types';
 import { RecipeSheet } from '@/components/recipe/RecipeSheet';
@@ -38,13 +40,18 @@ export default function HomeScreen() {
     }, [user])
   );
 
+  // Garde-manger du foyer actif ; rechargé quand un membre le modifie (temps réel)
+  useEffect(() => onPantryChanged(loadIngredients), [user]);
+
   const loadIngredients = async () => {
     if (!user) return;
+    const householdId = await activeHouseholdId();
+    if (!householdId) return;
 
     const { data, error } = await supabase
       .from('ingredients')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('household_id', householdId)
       .order('created_at', { ascending: false });
 
     if (data) {

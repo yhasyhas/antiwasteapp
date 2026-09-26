@@ -7,6 +7,7 @@ import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext';
 import { useExpiryReminders } from '@/hooks/useExpiryReminders';
+import { useHouseholdSession } from '@/hooks/useHousehold';
 
 function RootNavigator() {
   const { user } = useAuth();
@@ -14,6 +15,8 @@ function RootNavigator() {
 
   // Les erreurs remontées portent l'identifiant de l'utilisateur (jamais son e-mail)
   useEffect(() => setSentryUser(user?.id ?? null), [user?.id]);
+  // Foyer actif (garde-manger partagé) et ses mises à jour en temps réel
+  useHouseholdSession(user?.id ?? null);
   // Rappels de péremption (notifications locales) et ouverture de la génération depuis un rappel
   useExpiryReminders(user?.id ?? null, language);
 
@@ -27,6 +30,7 @@ function RootNavigator() {
       <Stack.Protected guard={!!user}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="recipe/generate" />
+        <Stack.Screen name="household" />
         {/* Développement seulement (l'écran redirige ailleurs hors développement) */}
         <Stack.Screen name="dev/status" />
       </Stack.Protected>

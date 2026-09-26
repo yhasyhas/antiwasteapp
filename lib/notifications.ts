@@ -6,6 +6,7 @@ import i18n from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import { addDays, fromISODate, todayISO } from '@/lib/expiry';
 import { notifyPantryChanged } from '@/lib/pantryEvents';
+import { activeHouseholdId } from '@/lib/household';
 
 // Rappels de péremption : notifications locales (aucun serveur), une seule par jour à 9 h, qui regroupe
 // les aliments qui expirent ce jour-là ou le lendemain. Aucune notification les jours où rien n'expire.
@@ -101,11 +102,14 @@ async function cancelReminders() {
     .map((request) => Notifications.cancelScheduledNotificationAsync(request.identifier)));
 }
 
-async function loadPantry(userId: string): Promise<ReminderItem[] | null> {
+// Garde-manger du foyer actif (partagé ou personnel)
+async function loadPantry(_userId: string): Promise<ReminderItem[] | null> {
+  const householdId = await activeHouseholdId();
+  if (!householdId) return null;
   const { data, error } = await supabase
     .from('ingredients')
     .select('id, name, expires_at')
-    .eq('user_id', userId);
+    .eq('household_id', householdId);
   if (error) {
     console.warn('[rappels] garde-manger illisible :', error.message);
     return null;
