@@ -1,5 +1,6 @@
-// Quotas épuisés : journal clair, enregistrement en base (provider_quota_events) et alerte Sentry une fois
-// par jour et par fournisseur. Rien ici ne doit faire échouer la requête de l'utilisateur.
+// Quotas épuisés et échecs d'envoi des notifications push : journal clair, enregistrement en base
+// (provider_quota_events) et alerte Sentry une fois par jour et par fournisseur. Rien ici ne doit faire
+// échouer la requête de l'utilisateur.
 
 import { SUPABASE_SECRET_KEY, SUPABASE_URL } from './keys.ts';
 
@@ -12,8 +13,12 @@ export function logUserQuota(fn: string, kind: string, limit: number, userId: st
   console.warn(`[quota] QUOTA PERSONNEL ATTEINT (user_quota) : ${kind}, ${limit} par jour, fonction ${fn}, utilisateur ${userId}`);
 }
 
+// Type d'alerte (tag Sentry « alert ») : quota d'un fournisseur d'IA épuisé, ou échec d'envoi des
+// notifications push (Expo Push)
+export type AlertKind = 'provider_quota' | 'push_failure';
+
 // Exportée pour vérifier l'envoi en local (même format que les alertes des fonctions)
-export async function sendSentryWarning(provider: string, fn: string, details: string, simulated: boolean) {
+export async function sendSentryWarning(provider: string, fn: string, details: string, simulated: boolean, alert: AlertKind = 'provider_quota') {
   if (!SENTRY_DSN) {
     console.warn('[quota] SENTRY_DSN absent : pas d\'alerte Sentry');
     return;
@@ -27,13 +32,17 @@ export async function sendSentryWarning(provider: string, fn: string, details: s
     timestamp: Date.now() / 1000,
     platform: 'javascript',
     level: 'warning',
-    logger: 'provider-quota',
+    logger: alert === 'push_failure' ? 'push-failure' : 'provider-quota',
     environment: simulated ? 'test' : 'production',
-    message: { formatted: `Quota ${provider} épuisé (${fn}) le ${day}${simulated ? ' [simulé]' : ''}` },
-    tags: { alert: 'provider_quota', provider, function: fn, day, simulated: String(simulated) },
+    message: {
+      formatted: alert === 'push_failure'
+        ? `Échec d'envoi des notifications push (${fn}) le ${day}${simulated ? ' [simulé]' : ''}`
+        : `Quota ${provider} épuisé (${fn}) le ${day}${simulated ? ' [simulé]' : ''}`,
+    },
+    tags: { alert, provider, function: fn, day, simulated: String(simulated) },
     extra: { details: details.slice(0, 500) },
-    // Un problème Sentry par fournisseur et par jour : chaque jour d'épuisement crée un nouveau problème
-    fingerprint: ['provider-quota', provider, day, simulated ? 'test' : 'production'],
+    // Un problème Sentry par fournisseur et par jour : chaque jour d'échec crée un nouveau problème
+    fingerprint: [alert === 'push_failure' ? 'push-failure' : 'provider-quota', provider, day, simulated ? 'test' : 'production'],
   };
   const body = [JSON.stringify({ event_id: eventId, dsn: SENTRY_DSN }), JSON.stringify({ type: 'event' }), JSON.stringify(event)].join('\n');
   const response = await fetch(`https://${dsn.host}/api/${projectId}/envelope/`, {
@@ -53,6 +62,16 @@ export async function sendSentryWarning(provider: string, fn: string, details: s
 // pour ce fournisseur
 export async function reportProviderQuota(provider: string, fn: string, details: string, simulated = false) {
   console.error(`[quota] QUOTA FOURNISSEUR ÉPUISÉ (provider_quota) : ${provider}, fonction ${fn}${simulated ? ' [simulé]' : ''} : ${details.slice(0, 200)}`);
+  await recordAndAlert(provider, fn, details, simulated, 'provider_quota');
+}
+
+// Échec d'envoi des notifications push : journal, base (fournisseur expo_push), alerte Sentry une fois par jour
+export async function reportPushFailure(fn: string, details: string, simulated = false) {
+  console.error(`[push] ÉCHEC D'ENVOI (expo_push) : fonction ${fn}${simulated ? ' [simulé]' : ''} : ${details.slice(0, 200)}`);
+  await recordAndAlert('expo_push', fn, details, simulated, 'push_failure');
+}
+
+async function recordAndAlert(provider: string, fn: string, details: string, simulated: boolean, alert: AlertKind) {
   try {
     const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/record_provider_quota`, {
       method: 'POST',
@@ -66,7 +85,7 @@ export async function reportProviderQuota(provider: string, fn: string, details:
       return;
     }
     const firstToday = await response.json();
-    if (firstToday === true) await sendSentryWarning(provider, fn, details, simulated);
+    if (firstToday === true) await sendSentryWarning(provider, fn, details, simulated, alert);
   } catch (error) {
     console.error('[quota] alerte impossible :', error);
   }

@@ -13,3 +13,7 @@ verify_jwt = false
 
 [functions.generate-recipe-image]
 verify_jwt = false
+
+# Appelée par pg_cron avec le secret CRON_SECRET (en-tête x-cron-secret), jamais par l'app
+[functions.daily-digest]
+verify_jwt = false
