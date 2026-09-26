@@ -1,6 +1,6 @@
 # Contexte du projet : app mobile anti-gaspi de recettes IA
 
-> Analyse rédigée le 2026-09-23, mise à jour à la fin de la phase 5. La feuille de route est dans `PLAN.md`.
+> Analyse rédigée le 2026-09-23, mise à jour à la fin de la phase 5 (validée). La feuille de route est dans `PLAN.md`.
 
 ## 1. Le produit
 
@@ -167,14 +167,14 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Sentry branché (région UE, erreurs JavaScript dans Expo Go) ; `README.md` et `.env.example` écrits ; logs `[scan]` retirés.
 - Anciens tests de la phase 1 faits sur appareil (inscription, déconnexion, mode avion, rechargement des onglets) : validés.
 
-### Phase 5 — le cœur anti-gaspi (branche `phase-5`, en attente de validation)
+### Phase 5 — le cœur anti-gaspi (branche `phase-5`, validée depuis l'app)
 - Migration : `expires_at`, `category`, `kind`, `storage_tip`, `barcode` sur `ingredients` (tests SQL `ingredients_expiry.sql`).
 - Scan : durée de conservation estimée par l'IA (`shelf_life_days`, 2 à 3 jours pour un plat) ; dates proposées au scan, à l'ajout manuel et au code-barres, modifiables (+3 j, +1 sem., +1 mois, calendrier), y compris depuis le garde-manger.
 - Garde-manger trié par urgence, badges expiré / bientôt / OK, conseil de conservation, badge « Reste ».
 - Génération : ingrédients urgents et choisis en priorité, mode « Transformer mes restes ».
 - Rappels : notification locale à 9 h, autorisation au premier ajout d'une date, ouverture de la génération avec les aliments présélectionnés ; bouton de test en développement.
 - « J'ai cuisiné ça » et scan de code-barres (Open Food Facts).
-- Retours de test : sélection d'ingrédients stricte (seuls ceux choisis, plus sel, poivre, huile, eau ; recette hors sélection écartée par le serveur), images en arrière-plan sur les cartes, fiche recette unique (`components/recipe/RecipeSheet.tsx`) pour la génération, les récentes et les favoris, quota images à 30 par jour, canal de notifications ignoré dans Expo Go.
+- Retours de test : sélection d'ingrédients stricte (seuls ceux choisis, plus sel, poivre, huile, eau ; recette hors sélection écartée par le serveur), images en arrière-plan sur les cartes, fiche recette unique (`components/recipe/RecipeSheet.tsx`) pour la génération, les récentes et les favoris, quota images à 30 par jour, canal de notifications ignoré dans Expo Go ; état des images partagé par tous les écrans et réservation côté serveur (une seule génération par recette, même pour des appels simultanés).
 - Tests : 38 tests Deno.
 
 ## 5. État actuel et problèmes connus
@@ -193,7 +193,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 
 ## 6. Prochaine étape
-Validation de la phase 5 dans l'app, puis phase 6 : build de développement EAS, puis donner envie de revenir. Phase 7 : design et ergonomie ; phase 8 : lancement. Détails dans `PLAN.md`.
+Phase 6 : build de développement EAS, puis donner envie de revenir. Phase 7 : design et ergonomie ; phase 8 : lancement. Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash
