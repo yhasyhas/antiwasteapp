@@ -1,4 +1,5 @@
 import { Alert, Platform } from 'react-native';
+import { isRunningInExpoGo } from 'expo';
 import * as Notifications from '@/lib/notificationsApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import i18n from '@/i18n';
@@ -71,13 +72,21 @@ export function reminderContent(today: ReminderItem[], tomorrow: ReminderItem[],
   };
 }
 
+// Canal Android « Aliments qui expirent ». Dans Expo Go, setNotificationChannelAsync plante
+// (NullPointerException dans NotificationsChannelsProvider) : on garde le canal par défaut d'Expo Go.
+// Le canal dédié sera créé dans un build de développement (phase 6).
+const useOwnChannel = Platform.OS === 'android' && !isRunningInExpoGo();
+
 async function ensureChannel() {
-  if (Platform.OS !== 'android') return;
+  if (!useOwnChannel) return;
   await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
     name: i18n.t('notifications.channelName'),
     importance: Notifications.AndroidImportance.DEFAULT,
   });
 }
+
+// Canal à indiquer dans le déclencheur : aucun (canal par défaut) si le nôtre n'est pas créé
+const channel = () => (useOwnChannel ? { channelId: CHANNEL_ID } : {});
 
 async function cancelReminders() {
   const scheduled = await Notifications.getAllScheduledNotificationsAsync();
@@ -128,7 +137,7 @@ async function scheduleReminders(userId: string | null) {
     await Notifications.scheduleNotificationAsync({
       identifier: `${ID_PREFIX}${day}`,
       content: reminderContent(today, tomorrow, pantry.length),
-      trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: fireAt, channelId: CHANNEL_ID },
+      trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: fireAt, ...channel() },
     });
   }
 }
@@ -198,7 +207,7 @@ export async function sendTestReminder(userId: string): Promise<'sent' | 'denied
   await Notifications.scheduleNotificationAsync({
     identifier: 'test-reminder',
     content: reminderContent(today, tomorrow, pantry.length),
-    trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 5, channelId: CHANNEL_ID },
+    trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 5, ...channel() },
   });
   return 'sent';
 }
