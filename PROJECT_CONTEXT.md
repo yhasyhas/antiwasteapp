@@ -182,6 +182,10 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Alerte Sentry une fois par jour et par fournisseur quand un quota de fournisseur est épuisé (`provider_quota_events`, secret `SENTRY_DSN`).
 - Écran « État des services » (développement) ; simulation des erreurs réservée à la clé secrète ; 45 tests Deno.
 
+### Cartes de recettes (branche `recipe-cards`)
+- Carte unique `components/recipe/RecipeListCard.tsx` (accueil, favoris, toutes les recettes, génération), avec cœur de favori en option ; remplace `RecentRecipeCard`, `RecipeCard` et `SavedRecipeCard`.
+- Image sur la carte si elle existe (`expo-image`, `cachePolicy="memory-disk"`, aussi dans la fiche), sinon vignette de remplacement ; aucune image demandée pour afficher une liste, seulement à l'ouverture de la fiche (état partagé `lib/recipeImage.ts`).
+
 ## 5. État actuel et problèmes connus
 
 ### Sécurité
