@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import { Check, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import type { DetectedIngredient } from '@/hooks/useScan';
 import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
 import { ExpiryPicker } from '@/components/expiry/ExpiryPicker';
@@ -20,6 +21,7 @@ interface Props {
 // changer la date de péremption proposée (toucher le badge de date)
 export function ConfirmIngredientsModal({ visible, ingredients, onToggle, onExpiryChange, onConfirm, onClose }: Props) {
   const { t } = useLanguage();
+  const safe = useSafeSpacing();
   // Ingrédient dont la date est en cours de modification
   const [editing, setEditing] = useState<number | null>(null);
 
@@ -31,7 +33,7 @@ export function ConfirmIngredientsModal({ visible, ingredients, onToggle, onExpi
       onRequestClose={onClose}
     >
       <View style={scanModalStyles.modalOverlay}>
-        <View style={scanModalStyles.modalContent}>
+        <View style={[scanModalStyles.modalContent, safe.bottom(24)]}>
           <View style={scanModalStyles.modalHeader}>
             <Text style={scanModalStyles.modalTitle}>{t('scan.confirmTitle')}</Text>
             <TouchableOpacity onPress={onClose}>

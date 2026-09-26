@@ -6,24 +6,29 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
-  TextInput,
   Alert,
 } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeSpacing } from '@/hooks/useSafeSpacing';
+import { Input } from '@/components/ui/Input';
+import { KeyboardAvoider } from '@/components/ui/KeyboardAvoider';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { supabase } from '@/lib/supabase';
-import { Search, Trash2, Plus, Package } from 'lucide-react-native';
+import { Search, Trash2, Plus, Package, Users } from 'lucide-react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { IngredientCard, type PantryIngredient } from '@/components/pantry/IngredientCard';
 import { ExpiryEditModal } from '@/components/pantry/ExpiryEditModal';
 import { sortByUrgency } from '@/lib/expiry';
 import { maybeAskNotificationPermission } from '@/lib/notifications';
-import { notifyPantryChanged } from '@/lib/pantryEvents';
+import { notifyPantryChanged, onPantryChanged } from '@/lib/pantryEvents';
+import { activeHouseholdId } from '@/lib/household';
+import { useHousehold } from '@/hooks/useHousehold';
 
 export default function IngredientsScreen() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const safe = useSafeSpacing();
   const [ingredients, setIngredients] = useState<PantryIngredient[]>([]);
   const [filteredIngredients, setFilteredIngredients] = useState<PantryIngredient[]>(
     []
@@ -33,6 +38,18 @@ export default function IngredientsScreen() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [editingExpiry, setEditingExpiry] = useState<PantryIngredient | null>(null);
   const [savingExpiry, setSavingExpiry] = useState(false);
+  const household = useHousehold();
+
+  // Garde-manger partagé : rechargé quand un membre le modifie (temps réel) ou qu'on change de foyer
+  useEffect(() => onPantryChanged(loadIngredients), [user]);
+
+  // « Ajouté par » (foyer partagé seulement) : moi, un membre, ou un ancien membre
+  const addedBy = (authorId: string | null): string | undefined => {
+    if (!household?.shared) return undefined;
+    const member = household.members.find((m) => m.user_id === authorId);
+    if (!member) return t('household.formerMember');
+    return member.is_me ? t('household.me') : member.name;
+  };
 
   // Rechargé à chaque retour sur l'onglet (ingrédients ajoutés depuis la caméra, par exemple)
   useFocusEffect(
@@ -55,12 +72,15 @@ export default function IngredientsScreen() {
   const loadIngredients = async () => {
     if (!user) return;
 
+    const householdId = await activeHouseholdId();
+    if (!householdId) return;
+
     // Pas de setLoading(true) : le spinner plein écran ne s'affiche qu'au premier chargement,
     // les rechargements au retour sur l'onglet se font en arrière-plan
     const { data, error } = await supabase
       .from('ingredients')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('household_id', householdId)
       .order('created_at', { ascending: false });
 
     if (data) {
@@ -131,13 +151,14 @@ export default function IngredientsScreen() {
           text: t('pantry.clearTitle'),
           style: 'destructive',
           onPress: async () => {
-            if (!user) return;
+            const householdId = await activeHouseholdId();
+            if (!user || !householdId) return;
 
             setLoading(true);
             const { error } = await supabase
               .from('ingredients')
               .delete()
-              .eq('user_id', user.id);
+              .eq('household_id', householdId);
 
             if (error) {
               alertWriteError(t, 'clearing ingredients', error);
@@ -162,27 +183,38 @@ export default function IngredientsScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View>
+    <KeyboardAvoider style={styles.container}>
+      <View style={[styles.header, safe.top(20)]}>
+        <View style={styles.headerText}>
           <Text style={styles.headerTitle}>{t('pantry.title')}</Text>
           <Text style={styles.headerSubtitle}>
-            {t('ingredientCount', { count: ingredients.length })}
+            {household?.shared
+              ? t('household.pantrySubtitle', { count: ingredients.length, members: household.members.length })
+              : t('ingredientCount', { count: ingredients.length })}
           </Text>
         </View>
-        {ingredients.length > 0 && (
+        <View style={styles.headerActions}>
           <TouchableOpacity
-            style={styles.clearButton}
-            onPress={clearAllIngredients}
+            style={styles.householdButton}
+            onPress={() => router.push('/household')}
+            accessibilityLabel={t('household.title')}
           >
-            <Trash2 size={20} color="#ef4444" />
+            <Users size={20} color="#10b981" />
           </TouchableOpacity>
-        )}
+          {ingredients.length > 0 && (
+            <TouchableOpacity
+              style={styles.clearButton}
+              onPress={clearAllIngredients}
+            >
+              <Trash2 size={20} color="#ef4444" />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <View style={styles.searchContainer}>
         <Search size={20} color="#9ca3af" style={styles.searchIcon} />
-        <TextInput
+        <Input
           style={styles.searchInput}
           placeholder={t('pantry.searchPlaceholder')}
           value={searchQuery}
@@ -225,6 +257,7 @@ export default function IngredientsScreen() {
                   deleting={deleting === ingredient.id}
                   onDelete={() => deleteIngredient(ingredient.id)}
                   onEditExpiry={() => setEditingExpiry(ingredient)}
+                  addedBy={addedBy(ingredient.user_id)}
                 />
               ))
             )}
@@ -248,7 +281,7 @@ export default function IngredientsScreen() {
         onSave={saveExpiry}
         onClose={() => setEditingExpiry(null)}
       />
-    </View>
+    </KeyboardAvoider>
   );
 }
 
@@ -268,7 +301,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 60,
     paddingBottom: 20,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
@@ -288,6 +320,18 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
     backgroundColor: '#fef2f2',
+  },
+  headerText: {
+    flex: 1,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  householdButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: '#f0fdf4',
   },
   searchContainer: {
     flexDirection: 'row',

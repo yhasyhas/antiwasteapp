@@ -16,6 +16,8 @@ export interface PantryIngredient {
   kind: FoodKind;
   storage_tip: string | null;
   barcode: string | null;
+  // Auteur (null : compte supprimé)
+  user_id: string | null;
 }
 
 interface Props {
@@ -23,6 +25,8 @@ interface Props {
   deleting: boolean;
   onDelete: () => void;
   onEditExpiry: () => void;
+  // Foyer partagé : nom de celui qui l'a ajouté (sinon non affiché)
+  addedBy?: string;
 }
 
 const ORIGIN_STYLES: Record<string, { background: string; text: string; labelKey: 'pantry.scanned' | 'pantry.manual' | 'pantry.barcode' }> = {
@@ -33,7 +37,7 @@ const ORIGIN_STYLES: Record<string, { background: string; text: string; labelKey
 
 // Ingrédient du garde-manger : nom, quantité, date de péremption (badge de couleur, modifiable),
 // reste de plat, origine, conseil de conservation, suppression
-export function IngredientCard({ ingredient, deleting, onDelete, onEditExpiry }: Props) {
+export function IngredientCard({ ingredient, deleting, onDelete, onEditExpiry, addedBy }: Props) {
   const { t } = useLanguage();
   const origin = ORIGIN_STYLES[ingredient.added_via] ?? ORIGIN_STYLES.manual;
 
@@ -57,6 +61,7 @@ export function IngredientCard({ ingredient, deleting, onDelete, onEditExpiry }:
             <Text style={[styles.badgeText, { color: origin.text }]}>{t(origin.labelKey)}</Text>
           </View>
         </View>
+        {addedBy ? <Text style={styles.addedBy}>{t('household.addedBy', { name: addedBy })}</Text> : null}
         {ingredient.storage_tip ? (
           <View style={styles.tip}>
             <Lightbulb size={14} color="#6b7280" />
@@ -128,6 +133,11 @@ const styles = StyleSheet.create({
   },
   badgeTextLeftover: {
     color: '#b45309',
+  },
+  addedBy: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginTop: 6,
   },
   tip: {
     flexDirection: 'row',

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { Check, CookingPot, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { supabase } from '@/lib/supabase';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { notifyPantryChanged } from '@/lib/pantryEvents';
@@ -23,6 +24,7 @@ interface PantryRow {
 // l'utilisateur décoche ce qu'il lui reste, puis les ingrédients cochés sont retirés du garde-manger
 export function CookedButton({ ingredientsUsed }: Props) {
   const { t } = useLanguage();
+  const safe = useSafeSpacing();
   const [rows, setRows] = useState<PantryRow[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [removing, setRemoving] = useState(false);
@@ -83,7 +85,7 @@ export function CookedButton({ ingredientsUsed }: Props) {
 
       <Modal visible={rows !== null} animationType="slide" transparent={true} onRequestClose={() => setRows(null)}>
         <View style={scanModalStyles.modalOverlay}>
-          <View style={scanModalStyles.modalContent}>
+          <View style={[scanModalStyles.modalContent, safe.bottom(24)]}>
             <View style={scanModalStyles.modalHeader}>
               <Text style={scanModalStyles.modalTitle}>{t('cooked.title')}</Text>
               <TouchableOpacity onPress={() => setRows(null)}>

@@ -2,23 +2,25 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeSpacing } from '@/hooks/useSafeSpacing';
+import { Input, PasswordInput } from '@/components/ui/Input';
+import { KeyboardAvoider, useKeyboardScroll } from '@/components/ui/KeyboardAvoider';
 import { authErrorMessage } from '@/lib/authErrors';
 import { ChefHat } from 'lucide-react-native';
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
   const { t } = useLanguage();
+  const safe = useSafeSpacing();
+  const keyboardScroll = useKeyboardScroll();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -47,12 +49,12 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <KeyboardAvoider style={styles.container}>
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        ref={keyboardScroll.scrollRef}
+        onScroll={keyboardScroll.onScroll}
+        scrollEventThrottle={keyboardScroll.scrollEventThrottle}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: safe.insets.top + 24, paddingBottom: safe.insets.bottom + 24 }]}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
@@ -68,7 +70,7 @@ export default function LoginScreen() {
         <View style={styles.form}>
           <View style={styles.inputGroup}>
             <Text style={styles.label}>{t('auth.email')}</Text>
-            <TextInput
+            <Input
               style={styles.input}
               placeholder={t('auth.emailPlaceholder')}
               value={email}
@@ -81,12 +83,11 @@ export default function LoginScreen() {
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>{t('auth.password')}</Text>
-            <TextInput
+            <PasswordInput
               style={styles.input}
               placeholder="••••••••"
               value={password}
               onChangeText={setPassword}
-              secureTextEntry
               editable={!loading}
             />
           </View>
@@ -115,7 +116,7 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </KeyboardAvoider>
   );
 }
 

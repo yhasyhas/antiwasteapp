@@ -10,6 +10,7 @@ import {
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { ChefHat, Soup, Sparkles } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { useRecipeGeneration } from '@/hooks/useRecipeGeneration';
 import { FilterSummary } from '@/components/recipe/FilterSummary';
 import { FiltersModal } from '@/components/recipe/FiltersModal';
@@ -43,6 +44,7 @@ export default function GenerateRecipeScreen() {
     toggleDietaryFilter,
   } = useRecipeGeneration(priority ? priority.split(',').filter(Boolean) : []);
   const { t } = useLanguage();
+  const safe = useSafeSpacing();
   const [showFilters, setShowFilters] = useState(false);
 
   if (loading) {
@@ -92,7 +94,7 @@ export default function GenerateRecipeScreen() {
           )}
         </ScrollView>
 
-        <View style={styles.footer}>
+        <View style={[styles.footer, safe.bottom(16)]}>
           {hasLeftovers && (
             <TouchableOpacity
               style={[styles.leftoversButton, generating && styles.generateButtonDisabled]}

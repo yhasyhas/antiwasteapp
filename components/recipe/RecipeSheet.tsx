@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator
 import { Image } from 'expo-image';
 import { Heart, ImageOff, Lightbulb, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { difficultyLabel } from '@/lib/labels';
+import { useSafeSpacing } from '@/hooks/useSafeSpacing';
+import { dietLabel, difficultyLabel } from '@/lib/labels';
 import { modalStyles, suggestionStyles } from './modalStyles';
 import { CookedButton } from './CookedButton';
 import type { Recipe } from './types';
@@ -23,12 +24,13 @@ interface Props {
 // garde-manger et à acheter, quantités, étapes, conseils, suggestion, favori et « J'ai cuisiné ça »
 export function RecipeSheet({ recipe, imageLoading, imageNotice, isFavorite, onToggleFavorite, onClose }: Props) {
   const { t } = useLanguage();
+  const safe = useSafeSpacing();
   const missing = recipe.missing_ingredients ?? [];
 
   return (
     <Modal visible animationType="slide" transparent={true} onRequestClose={onClose}>
       <View style={modalStyles.modalOverlay}>
-        <View style={modalStyles.modalContent}>
+        <View style={[modalStyles.modalContent, safe.bottom(24)]}>
           <View style={modalStyles.modalHeader}>
             <Text style={modalStyles.modalTitle}>{recipe.title}</Text>
             <TouchableOpacity onPress={onClose} hitSlop={8}>
@@ -74,7 +76,7 @@ export function RecipeSheet({ recipe, imageLoading, imageNotice, isFavorite, onT
                 <View style={styles.tags}>
                   {recipe.dietary_tags.map((tag, index) => (
                     <View key={index} style={styles.dietTag}>
-                      <Text style={styles.dietTagText}>{tag}</Text>
+                      <Text style={styles.dietTagText}>{dietLabel(t, tag)}</Text>
                     </View>
                   ))}
                 </View>

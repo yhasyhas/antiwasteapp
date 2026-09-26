@@ -42,3 +42,6 @@ supabase/.temp/
 
 # sauvegardes de la base (npx supabase db dump), jamais dans git
 backups/
+
+# Firebase (notifications push Android), fourni à EAS par une variable de type fichier
+google-services.json

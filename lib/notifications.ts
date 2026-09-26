@@ -6,11 +6,15 @@ import i18n from '@/i18n';
 import { supabase } from '@/lib/supabase';
 import { addDays, fromISODate, todayISO } from '@/lib/expiry';
 import { notifyPantryChanged } from '@/lib/pantryEvents';
+import { activeHouseholdId } from '@/lib/household';
+import { ensurePushRegistration } from '@/lib/pushNotifications';
 
-// Rappels de péremption : notifications locales (aucun serveur), une seule par jour à 9 h, qui regroupe
-// les aliments qui expirent ce jour-là ou le lendemain. Aucune notification les jours où rien n'expire.
-// Les rappels des 14 prochains jours sont programmés à l'avance et recalculés à chaque changement du
-// garde-manger, à l'ouverture de l'app et au changement de langue.
+// Rappels de péremption : une seule notification par jour à 9 h, qui regroupe les aliments du foyer qui
+// expirent ce jour-là ou le lendemain. Aucune notification les jours où rien n'expire.
+// Avec un jeton push enregistré, c'est le serveur qui l'envoie (lib/pushNotifications.ts) et les rappels
+// locaux de l'appareil sont annulés : jamais les deux. Sinon (secours), notifications locales : les rappels
+// des 14 prochains jours sont programmés à l'avance et recalculés à chaque changement du garde-manger, à
+// l'ouverture de l'app et au changement de langue.
 // Expo Go : les notifications locales fonctionnent (seules les notifications distantes en sont retirées).
 
 export const notificationsSupported = Platform.OS !== 'web';
@@ -72,9 +76,10 @@ export function reminderContent(today: ReminderItem[], tomorrow: ReminderItem[],
   };
 }
 
-// Canal Android « Aliments qui expirent ». Dans Expo Go, setNotificationChannelAsync plante
-// (NullPointerException dans NotificationsChannelsProvider) : on garde le canal par défaut d'Expo Go.
-// Le canal dédié sera créé dans un build de développement (phase 6).
+// Canal Android « Aliments qui expirent », créé normalement dans le build de développement et les builds
+// suivants, au démarrage : il sert aux notifications locales comme aux notifications push du serveur.
+// Seule exception, Expo Go : setNotificationChannelAsync y plante (NullPointerException dans
+// NotificationsChannelsProvider), on y garde le canal par défaut.
 const useOwnChannel = Platform.OS === 'android' && !isRunningInExpoGo();
 
 async function ensureChannel() {
@@ -83,6 +88,11 @@ async function ensureChannel() {
     name: i18n.t('notifications.channelName'),
     importance: Notifications.AndroidImportance.DEFAULT,
   });
+}
+
+// Au démarrage et au changement de langue (nom du canal traduit)
+export function setupNotificationChannel(): void {
+  ensureChannel().catch((error) => console.warn('[rappels] canal impossible à créer :', error));
 }
 
 // Canal à indiquer dans le déclencheur : aucun (canal par défaut) si le nôtre n'est pas créé
@@ -95,11 +105,14 @@ async function cancelReminders() {
     .map((request) => Notifications.cancelScheduledNotificationAsync(request.identifier)));
 }
 
-async function loadPantry(userId: string): Promise<ReminderItem[] | null> {
+// Garde-manger du foyer actif (partagé ou personnel)
+async function loadPantry(_userId: string): Promise<ReminderItem[] | null> {
+  const householdId = await activeHouseholdId();
+  if (!householdId) return null;
   const { data, error } = await supabase
     .from('ingredients')
     .select('id, name, expires_at')
-    .eq('user_id', userId);
+    .eq('household_id', householdId);
   if (error) {
     console.warn('[rappels] garde-manger illisible :', error.message);
     return null;
@@ -115,6 +128,12 @@ async function scheduleReminders(userId: string | null) {
   }
   const { status } = await Notifications.getPermissionsAsync();
   if (status !== 'granted') return;
+
+  // Résumé envoyé par le serveur à cet appareil : pas de rappels locaux (aucun doublon)
+  if (await ensurePushRegistration(userId, i18n.language)) {
+    await cancelReminders();
+    return;
+  }
 
   const pantry = await loadPantry(userId);
   // Hors connexion : on garde les rappels déjà programmés

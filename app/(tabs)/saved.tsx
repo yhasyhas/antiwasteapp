@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Heart } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { useSavedRecipes } from '@/hooks/useSavedRecipes';
 import { RecipeListCard } from '@/components/recipe/RecipeListCard';
 import { RecipeSheet } from '@/components/recipe/RecipeSheet';
@@ -15,6 +16,7 @@ import { RecipeSheet } from '@/components/recipe/RecipeSheet';
 export default function SavedScreen() {
   const { recipes, loading, selectedRecipe, setSelectedRecipe, isImageLoading, imageNotice, openRecipe, toggleFavorite } = useSavedRecipes();
   const { t } = useLanguage();
+  const safe = useSafeSpacing();
 
   const favoriteRecipes = recipes.filter((r) => r.is_favorite);
 
@@ -28,7 +30,7 @@ export default function SavedScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, safe.top(20)]}>
         <Text style={styles.headerTitle}>{t('saved.title')}</Text>
         <Text style={styles.headerSubtitle}>
           {t('saved.favoritesCount', { count: favoriteRecipes.length })}
@@ -109,7 +111,6 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 60,
     paddingBottom: 20,
     backgroundColor: '#fff',
     borderBottomWidth: 1,

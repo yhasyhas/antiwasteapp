@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput, Modal, ScrollView, Switch } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Modal, ScrollView, Switch } from 'react-native';
 import { router } from 'expo-router';
 import { Check, Plus, X } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeSpacing } from '@/hooks/useSafeSpacing';
+import { Input } from '@/components/ui/Input';
+import { KeyboardAvoider, useKeyboardScroll } from '@/components/ui/KeyboardAvoider';
 import { supabase } from '@/lib/supabase';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { expiryForPackagedProduct, expiryFromShelfLife, type FoodKind } from '@/lib/expiry';
@@ -45,6 +48,8 @@ interface Props {
 export function ManualAddModal({ visible, onClose, prefill }: Props) {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const safe = useSafeSpacing();
+  const keyboardScroll = useKeyboardScroll();
   const [manualIngredients, setManualIngredients] = useState<ManualIngredient[]>([]);
   const [newIngredientName, setNewIngredientName] = useState('');
   const [newIngredientQuantity, setNewIngredientQuantity] = useState('');
@@ -147,8 +152,9 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
       transparent={true}
       onRequestClose={onClose}
     >
+      <KeyboardAvoider>
       <View style={scanModalStyles.modalOverlay}>
-        <View style={scanModalStyles.modalContent}>
+        <View style={[scanModalStyles.modalContent, safe.bottom(24)]}>
           <View style={scanModalStyles.modalHeader}>
             <Text style={scanModalStyles.modalTitle}>{t('manual.title')}</Text>
             <TouchableOpacity onPress={onClose}>
@@ -156,11 +162,17 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
             </TouchableOpacity>
           </View>
 
-          <ScrollView style={styles.modalBody}>
+          <ScrollView
+            style={styles.modalBody}
+            ref={keyboardScroll.scrollRef}
+            onScroll={keyboardScroll.onScroll}
+            scrollEventThrottle={keyboardScroll.scrollEventThrottle}
+            keyboardShouldPersistTaps="handled"
+          >
             {pending && <BarcodeNotice barcode={pending.barcode} found={pending.found} />}
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>{t('manual.nameLabel')}</Text>
-              <TextInput
+              <Input
                 style={styles.input}
                 placeholder={t('manual.namePlaceholder')}
                 value={newIngredientName}
@@ -170,7 +182,7 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
 
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>{t('manual.quantityLabel')}</Text>
-              <TextInput
+              <Input
                 style={styles.input}
                 placeholder={t('manual.quantityPlaceholder')}
                 value={newIngredientQuantity}
@@ -248,6 +260,7 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
           </TouchableOpacity>
         </View>
       </View>
+      </KeyboardAvoider>
     </Modal>
   );
 }

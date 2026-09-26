@@ -11,6 +11,7 @@ import { supabase } from '@/lib/supabase';
 import { useRecipeImages } from '@/hooks/useRecipeImages';
 import { daysUntil, sortByUrgency } from '@/lib/expiry';
 import { onPantryChanged } from '@/lib/pantryEvents';
+import { activeHouseholdId } from '@/lib/household';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import type { Filters, Recipe } from '@/components/recipe/types';
 
@@ -68,11 +69,13 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
 
   const loadIngredients = async () => {
     if (!user) return;
+    const householdId = await activeHouseholdId();
+    if (!householdId) return;
 
     const { data, error } = await supabase
       .from('ingredients')
       .select('*')
-      .eq('user_id', user.id);
+      .eq('household_id', householdId);
 
     if (data) {
       setIngredients(sortByUrgency(data as PantryIngredient[]));
