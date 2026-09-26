@@ -79,6 +79,8 @@ $$;
 
 -- 2. Résumés (fonctions, clé secrète)
 RESET ROLE;
+-- Essais simulés du jour déjà en base (tests de daily-digest) : ignorés ici
+DELETE FROM public.provider_quota_events WHERE provider = 'expo_push' AND simulated AND day = (now() AT TIME ZONE 'utc')::date;
 SET LOCAL ROLE service_role;
 DO $$
 DECLARE
