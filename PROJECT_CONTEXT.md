@@ -98,7 +98,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 
 ### Configuration requise
 - `.env` (client) : `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `EXPO_PUBLIC_SENTRY_DSN` (facultatif) (relancer Expo avec `-c` après un changement)
-- Secrets des Edge Functions (`supabase secrets set ...`) : `GROQ_API_KEY`, `GEMINI_API_KEY` ; facultatifs (valeurs par défaut dans le code) : `GROQ_MODEL`, `GEMINI_MODEL`, `GROQ_VISION_MODEL`, `QUOTA_DAILY_GENERATIONS` (10), `QUOTA_DAILY_SCANS` (20), `QUOTA_DAILY_IMAGES` (10), `SCAN_HEDGE_DELAY_MS` (2500 en production), `RECIPE_PROVIDERS` (groq,gemini), `GEMINI_RECIPE_MODEL`, `CLOUDFLARE_IMAGE_MODEL`, `ALLOWED_ORIGINS` ; images : `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`
+- Secrets des Edge Functions (`supabase secrets set ...`) : `GROQ_API_KEY`, `GEMINI_API_KEY` ; facultatifs (valeurs par défaut dans le code) : `GROQ_MODEL`, `GEMINI_MODEL`, `GROQ_VISION_MODEL`, `QUOTA_DAILY_GENERATIONS` (10), `QUOTA_DAILY_SCANS` (20), `QUOTA_DAILY_IMAGES` (30), `SCAN_HEDGE_DELAY_MS` (2500 en production), `RECIPE_PROVIDERS` (groq,gemini), `GEMINI_RECIPE_MODEL`, `CLOUDFLARE_IMAGE_MODEL`, `ALLOWED_ORIGINS` ; images : `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`
 
 ## 4. Historique : ce qui a été réalisé
 
@@ -174,7 +174,8 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Génération : ingrédients urgents et choisis en priorité, mode « Transformer mes restes ».
 - Rappels : notification locale à 9 h, autorisation au premier ajout d'une date, ouverture de la génération avec les aliments présélectionnés ; bouton de test en développement.
 - « J'ai cuisiné ça » et scan de code-barres (Open Food Facts).
-- Tests : 35 tests Deno.
+- Retours de test : sélection d'ingrédients stricte (seuls ceux choisis, plus sel, poivre, huile, eau ; recette hors sélection écartée par le serveur), images en arrière-plan sur les cartes, fiche recette unique (`components/recipe/RecipeSheet.tsx`) pour la génération, les récentes et les favoris, quota images à 30 par jour, canal de notifications ignoré dans Expo Go.
+- Tests : 38 tests Deno.
 
 ## 5. État actuel et problèmes connus
 
@@ -182,17 +183,17 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - L'app filtre encore ses ingrédients par `user_id` (équivalent tant qu'il n'y a qu'un foyer personnel) : à passer à `household_id` en phase 6, avec `user_id` non modifiable.
 
 ### Dette et finitions
-- Offres gratuites partagées par toute l'app : Groq (scan : ~1 000 tokens de sortie par minute ; génération : 8 000 tokens par minute et 1 000 requêtes par jour) et Cloudflare (~150 images par jour estimées) ; au-delà, le secours prend le relais ou l'image n'est pas générée. À revoir avant la bêta (phase 7).
-- Confirmation d'email désactivée dans Supabase pendant le développement (à réactiver en phase 7).
-- Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`) : renommage en phase 7, nom pas encore choisi.
+- Offres gratuites partagées par toute l'app : Groq (scan : ~1 000 tokens de sortie par minute ; génération : 8 000 tokens par minute et 1 000 requêtes par jour) et Cloudflare (~150 images par jour estimées) ; au-delà, le secours prend le relais ou l'image n'est pas générée. À revoir avant la bêta (phase 8).
+- Confirmation d'email désactivée dans Supabase pendant le développement (à réactiver en phase 8).
+- Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`) : renommage en phase 8, nom pas encore choisi.
 - Sauvegardes de la base dans `backups/` : jamais commitées (`.gitignore`) ni exportées.
 - Rappels calculés sur le téléphone : un changement fait depuis un autre téléphone du foyer n'est pris en compte qu'à la prochaine ouverture de l'app.
 - « J'ai cuisiné ça » retire les ingrédients entiers (pas de quantité restante).
-- Sentry dans Expo Go : pas de plantages natifs ni de stack traces lisibles en production avant un build EAS.
+- Expo Go : pas de plantages natifs dans Sentry ni de canal de notifications dédié (canal par défaut) avant le build de développement EAS (début de la phase 6).
 - Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 
 ## 6. Prochaine étape
-Validation de la phase 5 dans l'app, puis phase 6 : donner envie de revenir. Détails dans `PLAN.md`.
+Validation de la phase 5 dans l'app, puis phase 6 : build de développement EAS, puis donner envie de revenir. Phase 7 : design et ergonomie ; phase 8 : lancement. Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash

@@ -30,7 +30,7 @@ Dernière mise à jour : 23/09/2026
 
 | Rôle | Aujourd'hui | Cible |
 |---|---|---|
-| App | Expo SDK 57, expo-router 57, RN 0.86 | SDK 57 dès la phase 0.5 (tests sur Android), build EAS en phase 7 |
+| App | Expo SDK 57, expo-router 57, RN 0.86 | SDK 57 dès la phase 0.5 (tests sur Android), build de développement EAS en phase 6 |
 | Backend | Supabase (clés `anon`, legacy) | Supabase (clés `sb_publishable_` / `sb_secret_`) |
 | Vision | Gemini Flash-Lite (`GEMINI_MODEL`) + secours Groq `qwen/qwen3.8-27b` (`GROQ_VISION_MODEL`), sortie structurée (phase 0.6) ; Clarifai fermé le 17/07/2026 | Idem, avec un temps d'analyse < 5 s pour 90 % des scans (phase 3) |
 | Recettes | Groq `llama-3.3-70b-versatile` (**retiré le 16/08/2026**) | Gemini (principal) + Groq `openai/gpt-oss-120b` (secours) |
@@ -101,7 +101,7 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 - [x] `setLanguage` : ajouter `onConflict: 'user_id'` à l'upsert de `user_preferences`
 - [x] Migration : colonnes `servings` (integer), `tips` (jsonb) et `suggestion` (text) sur `recipes`, et les enregistrer à la sauvegarde — migration `20260924190000` appliquée avec `db push`
 - [x] Supprimer le code mort (`generateFallbackRecipe`)
-- ~~Renommer l'app~~ → déplacé en phase 7 (nom pas encore choisi)
+- ~~Renommer l'app~~ → déplacé en phase 8, lancement (nom pas encore choisi)
 - [x] Inscription sans session (confirmation d'email active) : ne pas rediriger vers les onglets, afficher « Vérifie ta boîte mail »
 - [x] Connexion avec un email non confirmé : afficher un message clair au lieu de l'erreur brute
 - [x] Aucune écriture en base qui échoue en silence : vérifier `error` après chaque insert / update / delete et prévenir l'utilisateur
@@ -184,6 +184,7 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 
 ## Phase 6 — Donner envie de revenir
 
+- [ ] Passer à un build de développement EAS (Android) : canal de notifications dédié (impossible dans Expo Go), plantages natifs dans Sentry
 - [ ] Liste de courses construite à partir de `missing_ingredients`
 - [ ] Compteur de gaspillage évité (kg, et éventuellement argent économisé) sur l'accueil
 - [ ] Écran de préférences : régimes, ingrédients exclus, temps max ; utilisé par la génération
@@ -195,9 +196,17 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 
 **Terminé quand** : un nouvel utilisateur peut scanner et générer une recette sans créer de compte, puis garder ses données en créant son compte.
 
-## Phase 7 — Préparer le lancement
+## Phase 7 — Design et ergonomie
 
-- [ ] Créer un build de développement EAS
+- [ ] Identité visuelle : couleurs, typographie, composants (boutons, cartes, badges, fenêtres)
+- [ ] Maquettes des écrans principaux (accueil, scan, garde-manger, génération, fiche recette), **validées avant de coder**
+- [ ] Refonte des écrans d'après les maquettes validées
+- [ ] Boutons, transitions et fluidité (animations, retours visuels, temps de chargement ressentis)
+
+**Terminé quand** : les écrans principaux suivent les maquettes validées et l'app paraît fluide sur un téléphone Android d'entrée de gamme.
+
+## Phase 8 — Préparer le lancement
+
 - [ ] Réactiver la confirmation d'email dans Supabase (Authentication → Sign In / Providers → Email)
 - [ ] Revoir les limites de Groq (~3 scans/min en secours, modèle en preview) et de Gemini avant la bêta : offre payante ou autre modèle
 - [ ] Renommer l'app : `name`, `slug`, `scheme` dans `app.json`, `name` dans `package.json` — nom à choisir (pistes : Miette, Glana, Frigoscope)
@@ -288,4 +297,9 @@ Résultats du 25/09/2026 (temps vu par l'app, 4 photos de test en 800 px) : avan
 | 26/09/2026 | « J'ai cuisiné ça » : retire entièrement les ingrédients cochés (pas de quantité partielle) ; bouton visible seulement pour les recettes liées au garde-manger par identifiants (depuis la phase 3) | Une gestion des quantités restantes demanderait des quantités structurées ; l'utilisateur décoche ce qu'il garde |
 | 26/09/2026 | Code-barres : Open Food Facts appelé directement depuis l'app (base publique, sans clé), User-Agent « AntiGaspiRecettes/1.0 (adresse du dépôt GitHub) » plutôt qu'une adresse e-mail | Aucune donnée personnelle envoyée ; aucun quota à gérer côté serveur. Catégories Open Food Facts converties en catégories de l'app |
 | 26/09/2026 | expo-notifications importé fonction par fonction (`lib/notificationsApi.ts`), jamais par `import … from 'expo-notifications'` | Le point d'entrée du paquet charge l'enregistrement du jeton des notifications distantes, qui lève une erreur au démarrage dans Expo Go sur Android (SDK 53 et suivants) : l'app ne s'ouvrait plus. Les notifications locales fonctionnent sans ce module ; vérifié dans le bundle Android |
+| 26/09/2026 | Retours de test de la phase 5 — sélection d'ingrédients : si l'utilisateur en choisit (ou en reçoit d'une notification), seuls ceux-là sont envoyés au modèle, plus sel, poivre, huile, eau ; le reste du garde-manger est listé comme réservé et une recette qui l'utilise (même au pluriel ou précisé : « tomates cerises » pour « tomates ») est écartée par le serveur. Sans sélection, tout le garde-manger, priorité aux dates | Remplace la « priorité » des ingrédients touchés. Les ingrédients à acheter restent permis (2 au plus par recette, s'ils sont indispensables). Testé : courgettes + œufs choisis parmi 10 → recettes avec ces deux seuls ingrédients, aucune écartée |
+| 26/09/2026 | Images générées en arrière-plan dès l'affichage des recettes (cartes et fiche se remplissent à leur arrivée) ; quota porté de 10 à 30 images par jour et par utilisateur (3 par génération × 10 générations) | Taille réduite impossible avec FLUX schnell : le modèle refuse width/height (« Additional properties not allowed ») et sort toujours du 1024×1024. FLUX.2 klein 4B serait facturé à la tuile de sortie (≈ 26 neurones en 512×512 contre ≈ 58 pour schnell) mais exige un envoi multipart qui n'a pas abouti en test : à reprendre à la revue des coûts (phase 8). Mesure : 1,3 s de génération, 695 Ko → 122 Ko après compression ; coût d'après la grille Cloudflare 4 tuiles × 4,8 + 4 étapes × 9,6 ≈ 58 neurones par image, soit ≈ 170 images par jour pour tout le compte dans l'offre gratuite (10 000 neurones). Le jeton Cloudflare n'a pas accès aux statistiques d'usage : **consommation réelle à relever dans le dashboard (Workers AI → Utilisation)** |
+| 26/09/2026 | Fiche recette unique (`RecipeSheet`) pour la génération, les recettes récentes et les favoris : image (emplacement réservé, affiché tout de suite), temps, régimes, ingrédients du garde-manger et à acheter, quantités, étapes, conseils, suggestion, favori (ajout ou retrait) et « J'ai cuisiné ça » | Les trois fiches différaient (l'accueil n'affichait qu'un résumé). Les anciennes recettes (ingrédients en texte) sont converties par `recipeFromRow`. L'URL de l'image est enregistrée sur la recette par la fonction ; chaque écran est prévenu de son arrivée |
+| 26/09/2026 | Expo Go : `setNotificationChannelAsync` plante (NullPointerException, NotificationsChannelsProvider) ; le canal dédié n'est créé qu'en dehors d'Expo Go, sinon canal par défaut | Canal « Aliments qui expirent » dans le build de développement (phase 6, désormais en tête de phase) |
+| 26/09/2026 | Nouvelle phase 7 « Design et ergonomie » (identité visuelle, maquettes validées avant de coder, refonte des écrans et de la fluidité) ; le lancement devient la phase 8 ; le build de développement EAS passe au début de la phase 6 | Les mentions « phase 7 » plus haut dans ce journal désignent le lancement, désormais phase 8 |
 | | *(résultat du test Gemini vs Clarifai)* | |
