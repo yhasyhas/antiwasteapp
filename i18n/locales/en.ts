@@ -330,6 +330,7 @@ const en: Translations = {
     validUntil: 'Valid until {{date}}',
     full: 'Your household is full ({{max}} members at most).',
     shareMessage: 'Join my household in the anti-waste app to share our pantry: in "My household", enter the code {{code}} (valid until {{expires}}).',
+    shareLinkMessage: "Join my household in the anti-waste app: it suggests recipes with what we already have so nothing gets thrown away, and we'll share our pantry and shopping list. Open this link: {{link}} (code {{code}}, valid until {{expires}}).",
     joinTitle: 'Join a household',
     joinHint: 'Enter the 6-character code you received from a member.',
     join: 'Join',

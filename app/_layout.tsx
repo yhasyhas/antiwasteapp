@@ -34,6 +34,8 @@ function RootNavigator() {
         {/* Développement seulement (l'écran redirige ailleurs hors développement) */}
         <Stack.Screen name="dev/status" />
       </Stack.Protected>
+      {/* Lien d'invitation : accessible sans session (le code est gardé le temps de se connecter) */}
+      <Stack.Screen name="join" />
       <Stack.Screen name="+not-found" />
     </Stack>
   );

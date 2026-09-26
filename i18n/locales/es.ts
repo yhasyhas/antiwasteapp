@@ -330,6 +330,7 @@ const es: Translations = {
     validUntil: 'Válido hasta {{date}}',
     full: 'Tu hogar está completo ({{max}} miembros como máximo).',
     shareMessage: 'Únete a mi hogar en la app antidesperdicio para compartir nuestra despensa: en «Mi hogar», introduce el código {{code}} (válido hasta {{expires}}).',
+    shareLinkMessage: 'Únete a mi hogar en la app antidesperdicio: propone recetas con lo que ya tenemos para no tirar nada, y compartiremos la despensa y la lista de la compra. Abre este enlace: {{link}} (código {{code}}, válido hasta {{expires}}).',
     joinTitle: 'Unirse a un hogar',
     joinHint: 'Introduce el código de 6 caracteres que te ha enviado un miembro.',
     join: 'Unirse',

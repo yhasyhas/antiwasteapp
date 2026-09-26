@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Invitation</title>
+  <style>
+    :root {
+      --bg: #f0fdf4;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #4b5563;
+      --green: #10b981;
+      --green-dark: #047857;
+      --border: #d1fae5;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    main {
+      width: 100%;
+      max-width: 420px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+    }
+    .logo { font-size: 44px; line-height: 1; }
+    h1 { font-size: 22px; margin: 12px 0 8px; }
+    p { color: var(--muted); line-height: 1.5; margin: 0 0 12px; }
+    .code {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: 6px;
+      color: var(--green-dark);
+      background: var(--bg);
+      border-radius: 12px;
+      padding: 12px 0;
+      margin: 16px 0 6px;
+      user-select: all;
+    }
+    .hint { font-size: 13px; }
+    a.button {
+      display: block;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 16px;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-top: 12px;
+    }
+    a.primary { background: var(--green); color: #fff; }
+    a.secondary { background: var(--bg); color: var(--green-dark); border: 1px solid var(--border); }
+    .small { font-size: 13px; margin-top: 18px; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="logo" aria-hidden="true">🥕</div>
+    <h1 id="title"></h1>
+    <p id="pitch"></p>
+    <div id="code-block">
+      <div class="code" id="code"></div>
+      <p class="hint" id="code-hint"></p>
+    </div>
+    <p id="no-code" class="hidden"></p>
+    <a class="button primary" id="open"></a>
+    <p class="small" id="no-app"></p>
+    <a class="button secondary" id="download"></a>
+  </main>
+
+  <script>
+    // ---- Configuration (à changer au lancement : Play Store, paquet et schéma définitifs) ----
+    const CONFIG = {
+      // Schéma de l'app (app.json) et paquet Android du build installé
+      scheme: 'myapp',
+      androidPackage: 'com.yhasyhas.antiwasteapp.dev',
+      // Téléchargement : build de test pour l'instant, fiche du Play Store plus tard
+      downloadUrl: 'https://expo.dev/accounts/yhasyhas/projects/bolt-expo-nativewind/builds/342ba8b6-a4f1-494c-b6a4-8ee5abb41075',
+    };
+
+    const TEXTS = {
+      fr: {
+        title: 'Tu es invité dans un foyer',
+        pitch: "L'app anti-gaspi transforme ce qu'il y a dans ton frigo en recettes, pour ne plus rien jeter. Avec un foyer, vous partagez le garde-manger et la liste de courses, en temps réel.",
+        codeHint: "Code d'invitation, valable 48 heures",
+        noCode: "Ce lien ne contient pas de code d'invitation. Demande à la personne qui t'invite de t'en renvoyer un.",
+        open: "Ouvrir l'app et rejoindre le foyer",
+        noApp: "Pas encore l'app ? Installe-la, puis reviens sur ce lien (ou entre le code dans « Mon foyer »).",
+        download: "Télécharger l'app",
+      },
+      en: {
+        title: "You're invited to a household",
+        pitch: 'The anti-waste app turns what is in your fridge into recipes, so nothing gets thrown away. In a household, you share the pantry and the shopping list, in real time.',
+        codeHint: 'Invitation code, valid for 48 hours',
+        noCode: "This link doesn't contain an invitation code. Ask the person who invited you to send it again.",
+        open: 'Open the app and join the household',
+        noApp: "Don't have the app yet? Install it, then come back to this link (or enter the code in “My household”).",
+        download: 'Download the app',
+      },
+      es: {
+        title: 'Te han invitado a un hogar',
+        pitch: 'La app antidesperdicio convierte lo que hay en tu nevera en recetas, para no tirar nada. En un hogar compartís la despensa y la lista de la compra, en tiempo real.',
+        codeHint: 'Código de invitación, válido 48 horas',
+        noCode: 'Este enlace no contiene ningún código de invitación. Pide a quien te invitó que te lo vuelva a enviar.',
+        open: 'Abrir la app y unirme al hogar',
+        noApp: '¿Aún no tienes la app? Instálala y vuelve a este enlace (o introduce el código en «Mi hogar»).',
+        download: 'Descargar la app',
+      },
+    };
+
+    const language = (navigator.languages || [navigator.language || 'fr'])
+      .map((l) => String(l).slice(0, 2).toLowerCase())
+      .find((l) => l in TEXTS) || 'fr';
+    const text = TEXTS[language];
+    document.documentElement.lang = language;
+    document.title = text.title;
+
+    // Code : 6 caractères, sans 0, O, 1, I
+    const raw = new URLSearchParams(location.search).get('code') || '';
+    const code = /^[A-HJ-NP-Z2-9]{6}$/.test(raw.trim().toUpperCase()) ? raw.trim().toUpperCase() : null;
+
+    const set = (id, value) => { document.getElementById(id).textContent = value; };
+    set('title', text.title);
+    set('pitch', text.pitch);
+    set('code-hint', text.codeHint);
+    set('no-code', text.noCode);
+    set('open', text.open);
+    set('no-app', text.noApp);
+    set('download', text.download);
+
+    const openLink = document.getElementById('open');
+    const download = document.getElementById('download');
+    download.href = CONFIG.downloadUrl;
+
+    if (code) {
+      set('code', code);
+      const deepLink = `${CONFIG.scheme}://join?code=${code}`;
+      // Android (Chrome) : lien « intent » qui ouvre l'app si elle est installée, sinon le téléchargement
+      const isAndroid = /android/i.test(navigator.userAgent);
+      openLink.href = isAndroid
+        ? `intent://join?code=${code}#Intent;scheme=${CONFIG.scheme};package=${CONFIG.androidPackage};S.browser_fallback_url=${encodeURIComponent(CONFIG.downloadUrl)};end`
+        : deepLink;
+    } else {
+      document.getElementById('code-block').classList.add('hidden');
+      document.getElementById('no-code').classList.remove('hidden');
+      openLink.classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

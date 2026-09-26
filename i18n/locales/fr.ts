@@ -331,6 +331,7 @@ const fr = {
     validUntil: "Valable jusqu'à {{date}}",
     full: 'Ton foyer est complet ({{max}} membres au plus).',
     shareMessage: "Rejoins mon foyer sur l'app anti-gaspi pour partager notre garde-manger : dans « Mon foyer », entre le code {{code}} (valable jusqu'à {{expires}}).",
+    shareLinkMessage: "Rejoins mon foyer sur l'app anti-gaspi : elle propose des recettes avec ce qu'on a déjà, pour ne plus rien jeter, et on partagera notre garde-manger et nos courses. Ouvre ce lien : {{link}} (code {{code}}, valable jusqu'à {{expires}}).",
     joinTitle: 'Rejoindre un foyer',
     joinHint: "Entre le code à 6 caractères reçu d'un membre.",
     join: 'Rejoindre',
