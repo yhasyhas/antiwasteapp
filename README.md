@@ -59,7 +59,7 @@ sont intégrées au moment de la compilation.
 | `EXPO_PUBLIC_SENTRY_DSN` | Facultatif. DSN du projet Sentry (Settings → Projects → Client Keys) ; sans lui, Sentry est inactif |
 | `EXPO_PUBLIC_INVITE_URL` | Facultatif. Adresse de la page d'invitation (Cloudflare Pages, ex. `https://antigaspi-invite.pages.dev`) : lien dans le message de partage du foyer ; sans elle, le message ne contient que le code |
 | `EXPO_PUBLIC_TURNSTILE_SITE_KEY` | Facultatif. Clé de site Cloudflare Turnstile (publique) : vérification anti-robot des connexions et bouton « Essayer sans compte » ; sans elle, ni vérification ni essai sans compte |
-| `EXPO_PUBLIC_CAPTCHA_URL` | Facultatif. Page Turnstile (défaut : `<EXPO_PUBLIC_INVITE_URL>/captcha.html`) |
+| `EXPO_PUBLIC_CAPTCHA_URL` | Facultatif. Page Turnstile (défaut : `<EXPO_PUBLIC_INVITE_URL>/captcha`, servie par `captcha.html`) |
 
 La clé publishable n'a aucun droit particulier : la sécurité repose sur la RLS et sur la
 vérification de l'utilisateur dans les fonctions. Les anciennes clés `anon` / `service_role` sont désactivées.
@@ -189,7 +189,7 @@ Page web `web/invite/` (une seule page, trois langues selon le navigateur) hébe
 page : build de test pour l'instant, Play Store au lancement). `captcha.html` (Turnstile) est servie par le même site.
 
 ```bash
-npx wrangler pages deploy web/invite --project-name antigaspi-invite   # après « npx wrangler login »
+npx wrangler pages deploy web/invite --project-name antigaspi-invite --branch main   # après « npx wrangler login »
 ```
 
 Dans l'app, la route `join` ouvre « Mon foyer » avec le code prérempli ; sans session, le code est gardé le temps de se

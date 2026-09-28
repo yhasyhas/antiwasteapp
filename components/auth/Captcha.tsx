@@ -5,10 +5,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { INVITE_URL } from '@/lib/invite';
 
 // Cloudflare Turnstile (protection anti-robot des connexions, exigée par Supabase quand la protection
-// captcha est activée) : la page captcha.html, hébergée avec la page d'invitation, s'affiche dans une
+// captcha est activée) : la page captcha (captcha.html), hébergée avec la page d'invitation, s'affiche dans une
 // fenêtre et renvoie un jeton à usage unique. Sans clé de site configurée, aucune vérification.
 const SITE_KEY = process.env.EXPO_PUBLIC_TURNSTILE_SITE_KEY || '';
-const CAPTCHA_URL = process.env.EXPO_PUBLIC_CAPTCHA_URL || (INVITE_URL ? `${INVITE_URL.replace(/\/+$/, '')}/captcha.html` : '');
+const CAPTCHA_URL = process.env.EXPO_PUBLIC_CAPTCHA_URL || (INVITE_URL ? `${INVITE_URL.replace(/\/+$/, '')}/captcha` : '');
 
 export const captchaEnabled = SITE_KEY !== '' && CAPTCHA_URL !== '';
 

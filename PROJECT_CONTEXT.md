@@ -198,11 +198,11 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Tests : 48 tests Deno, 7 fichiers de tests SQL.
 
 ### Phase 6b — invitation par lien, courses, compteur, préférences, essai sans compte, fiches aliments (branche `phase-6b`)
-- Invitation par lien : route `app/join.tsx`, code gardé pendant la connexion (`lib/invite.ts`), page `web/invite/index.html` (Cloudflare Pages, à déployer), message de partage avec le lien (`EXPO_PUBLIC_INVITE_URL`).
+- Invitation par lien : route `app/join.tsx`, code gardé pendant la connexion (`lib/invite.ts`), page `web/invite/index.html` (Cloudflare Pages : `https://antigaspi-invite.pages.dev`), message de partage avec le lien (`EXPO_PUBLIC_INVITE_URL`).
 - Liste de courses du foyer (`app/shopping.tsx`, `lib/shopping.ts`, migration `shopping_list`), temps réel, manquants d'une recette en un geste (`AddMissingButton`), rangement au garde-manger.
 - Compteur anti-gaspi (`components/home/WasteCounter.tsx`, migration `food_events`).
 - Préférences de recettes (`app/preferences.tsx`, `lib/preferences.ts`, migration `user_preferences`), aliments exclus et nombre de personnes dans `generate-recipes`.
-- Essai sans compte (`components/auth/Captcha.tsx`, `app/auth/upgrade.tsx`, migration `anonymous_profiles`, quotas `QUOTA_ANON_*`). **En attente : clé Turnstile, captcha et connexion anonyme à activer dans Supabase.**
+- Essai sans compte (`components/auth/Captcha.tsx`, `app/auth/upgrade.tsx`, migration `anonymous_profiles`, quotas `QUOTA_ANON_*`). Clé de site Turnstile configurée, connexion anonyme activée dans Supabase. **En attente : protection captcha (Turnstile, clé secrète) à activer dans Supabase.**
 - Fiches aliments (fonction `food-fact`, `components/pantry/FoodFactSheet.tsx`, migration `food_facts`, scripts `scripts/food-facts/`), `food_key` renvoyé par le scan.
 - Tests : 59 tests Deno, 12 fichiers de tests SQL.
 
