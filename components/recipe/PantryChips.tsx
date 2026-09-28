@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Check, Soup } from 'lucide-react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Circle, Soup } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Chip } from '@/components/ui/Chip';
+import { Touchable } from '@/components/ui/Touchable';
 import { EXPIRY_COLORS, expiryStatus, type FoodKind } from '@/lib/expiry';
+import { colors, sizes, spacing, typography } from '@/constants/theme';
 
 export interface ChipIngredient {
   id: string;
@@ -20,8 +23,9 @@ interface Props {
 
 const COLLAPSED_COUNT = 8;
 
-// Ingrédients du garde-manger (triés par urgence) : pastille de couleur selon la date, icône pour les
-// restes. Toucher des ingrédients les sélectionne : la génération ne cuisine alors qu'avec eux.
+// « Avec tes aliments » : ingrédients du garde-manger (triés par urgence), point de couleur pour ceux qui
+// expirent, icône pour les restes. Toucher des ingrédients les sélectionne : la génération ne cuisine
+// alors qu'avec eux ; « Tout utiliser » revient à tout le garde-manger.
 export function PantryChips({ ingredients, selectedIds, onToggle, onClear }: Props) {
   const { t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
@@ -32,96 +36,69 @@ export function PantryChips({ ingredients, selectedIds, onToggle, onClear }: Pro
   const hidden = ingredients.length - visible.length;
 
   return (
-    <View>
-      <View style={styles.hintRow}>
-        <Text style={styles.hint}>
-          {selectedIds.length > 0 ? t('generate.selectionActive', { count: selectedIds.length }) : t('generate.priorityHint')}
-        </Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>{t('generate.withYourFoods')}</Text>
         {selectedIds.length > 0 && (
-          <TouchableOpacity onPress={onClear} hitSlop={8}>
-            <Text style={styles.clear}>{t('generate.clearSelection')}</Text>
-          </TouchableOpacity>
+          <Touchable onPress={onClear} style={styles.link} accessibilityRole="button">
+            <Text style={styles.linkText}>{t('generate.useAll')}</Text>
+          </Touchable>
         )}
       </View>
+      <Text style={styles.hint}>
+        {selectedIds.length > 0 ? t('generate.selectionActive', { count: selectedIds.length }) : t('generate.priorityHint')}
+      </Text>
       <View style={styles.grid}>
         {visible.map((ingredient) => {
-          const selected = selectedIds.includes(ingredient.id);
           const status = expiryStatus(ingredient.expires_at);
+          const urgent = status === 'expired' || status === 'soon';
           return (
-            <TouchableOpacity
+            <Chip
               key={ingredient.id}
-              style={[styles.chip, selected && styles.chipSelected]}
+              label={ingredient.name}
+              selected={selectedIds.includes(ingredient.id)}
+              showCheck
+              icon={ingredient.kind === 'dish' ? Soup : urgent ? Circle : undefined}
+              iconColor={ingredient.kind === 'dish' ? colors.primary : urgent ? EXPIRY_COLORS[status].text : undefined}
               onPress={() => onToggle(ingredient.id)}
-              accessibilityState={{ selected }}
-            >
-              {selected ? (
-                <Check size={14} color="#fff" />
-              ) : status === 'expired' || status === 'soon' ? (
-                <View style={[styles.dot, { backgroundColor: EXPIRY_COLORS[status].text }]} />
-              ) : null}
-              {ingredient.kind === 'dish' && <Soup size={14} color={selected ? '#fff' : '#b45309'} />}
-              <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{ingredient.name}</Text>
-            </TouchableOpacity>
+            />
           );
         })}
-        {hidden > 0 && (
-          <TouchableOpacity style={styles.chip} onPress={() => setExpanded(true)}>
-            <Text style={styles.chipText}>{t('generate.more', { count: hidden })}</Text>
-          </TouchableOpacity>
-        )}
+        {hidden > 0 && <Chip label={t('generate.more', { count: hidden })} onPress={() => setExpanded(true)} />}
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  hintRow: {
+  container: {
+    gap: spacing.sm,
+  },
+  header: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-    marginBottom: 10,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: sizes.touch,
+  },
+  title: {
+    ...typography.bodyStrong,
+  },
+  link: {
+    minHeight: sizes.touch,
+    justifyContent: 'center',
+    paddingLeft: spacing.md,
+  },
+  linkText: {
+    ...typography.bodyStrong,
+    color: colors.primary,
   },
   hint: {
-    flex: 1,
-    fontSize: 13,
-    color: '#6b7280',
-  },
-  clear: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#10b981',
+    ...typography.secondary,
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-  },
-  chip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: '#f3f4f6',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#f3f4f6',
-  },
-  chipSelected: {
-    backgroundColor: '#10b981',
-    borderColor: '#10b981',
-  },
-  chipText: {
-    fontSize: 14,
-    color: '#374151',
-    fontWeight: '500',
-  },
-  chipTextSelected: {
-    color: '#fff',
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    gap: spacing.sm,
+    marginTop: spacing.xs,
   },
 });

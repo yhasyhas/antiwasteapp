@@ -1,11 +1,7 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { router, useFocusEffect } from 'expo-router';
+import { Camera, Leaf, ShoppingCart, Sparkles, UtensilsCrossed } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
@@ -15,22 +11,35 @@ import { loadFavoriteIds, setFavorite } from '@/lib/favorites';
 import { activeHouseholdId } from '@/lib/household';
 import { onPantryChanged } from '@/lib/pantryEvents';
 import { loadShoppingList, onShoppingChanged } from '@/lib/shopping';
+import { sortByUrgency } from '@/lib/expiry';
 import { useRecipeImages } from '@/hooks/useRecipeImages';
 import { recipeFromRow, type Recipe } from '@/components/recipe/types';
 import { RecipeSheet } from '@/components/recipe/RecipeSheet';
-import { ChefHat, ShoppingCart, Sparkles, TrendingUp } from 'lucide-react-native';
-import { router, useFocusEffect } from 'expo-router';
 import { RecipeListCard } from '@/components/recipe/RecipeListCard';
 import { WasteCounter } from '@/components/home/WasteCounter';
+import type { PantryIngredient } from '@/components/pantry/IngredientCard';
+import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { IconChip } from '@/components/ui/IconChip';
+import { EmptyState } from '@/components/ui/Illustrations';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Touchable } from '@/components/ui/Touchable';
+import { colors, sizes, spacing, typography } from '@/constants/theme';
 
 type RecentRecipe = Recipe & { id: string };
 
+// Nombre d'aliments « à utiliser vite » affichés sur l'accueil
+const URGENT_COUNT = 3;
+
 export default function HomeScreen() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const { t } = useLanguage();
   const safe = useSafeSpacing();
-  const [ingredients, setIngredients] = useState<any[]>([]);
-  const [recipes, setRecipes] = useState<RecentRecipe[]>([]);
+  // null : pas encore chargé (squelettes)
+  const [ingredients, setIngredients] = useState<PantryIngredient[] | null>(null);
+  const [lastRecipe, setLastRecipe] = useState<RecentRecipe | null>(null);
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [selectedRecipe, setSelectedRecipe] = useState<RecentRecipe | null>(null);
   // Images lues dans l'état partagé : une image générée sur un autre écran apparaît ici aussi
@@ -60,30 +69,26 @@ export default function HomeScreen() {
     const householdId = await activeHouseholdId();
     if (!householdId) return;
 
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('ingredients')
       .select('*')
       .eq('household_id', householdId)
       .order('created_at', { ascending: false });
 
-    if (data) {
-      setIngredients(data);
-    }
+    if (data) setIngredients(sortByUrgency(data as PantryIngredient[]));
   };
 
   const loadRecipes = async () => {
     if (!user) return;
 
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('recipes')
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
-      .limit(5);
+      .limit(1);
 
-    if (data) {
-      setRecipes(data.map(recipeFromRow));
-    }
+    if (data) setLastRecipe(data.length > 0 ? recipeFromRow(data[0]) : null);
     setFavoriteIds(await loadFavoriteIds(user.id));
   };
 
@@ -108,103 +113,108 @@ export default function HomeScreen() {
     });
   };
 
-  const handleGenerateRecipes = () => {
-    if (ingredients.length === 0) {
-      return;
-    }
-    router.push('/recipe/generate');
+  // Les plus urgents (triés par date) ; la génération les présélectionne
+  const urgent = (ingredients ?? []).filter((ingredient) => ingredient.expires_at).slice(0, URGENT_COUNT);
+  const cookUrgent = () => {
+    if (urgent.length > 0) router.push({ pathname: '/recipe/generate', params: { priority: urgent.map((i) => i.id).join(',') } });
+    else router.push('/recipe/generate');
   };
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, safe.top(20)]}>
-        <View>
-          <Text style={styles.greeting}>{t('home.welcomeBack')}</Text>
-          <Text style={styles.email}>{user?.email || t('auth.guestName')}</Text>
-        </View>
-        <TouchableOpacity onPress={signOut} style={styles.logoutButton}>
-          <Text style={styles.logoutText}>{t('home.signOut')}</Text>
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.heroCard}>
-          <View style={styles.heroIcon}>
-            <ChefHat size={40} color="#10b981" strokeWidth={2} />
-          </View>
-          <Text style={styles.heroTitle}>{t('home.readyToCook')}</Text>
-          <Text style={styles.heroSubtitle}>
-            {t('home.ingredientsReady', { count: ingredients.length })}
-          </Text>
-          <TouchableOpacity
-            style={[
-              styles.generateButton,
-              ingredients.length === 0 && styles.generateButtonDisabled,
-            ]}
-            onPress={handleGenerateRecipes}
-            disabled={ingredients.length === 0}
-          >
-            <Sparkles size={20} color="#fff" strokeWidth={2} />
-            <Text style={styles.generateButtonText}>{t('home.generateRecipes')}</Text>
-          </TouchableOpacity>
-          {ingredients.length === 0 && (
-            <Text style={styles.helpText}>
-              {t('home.addIngredientsFirst')}
-            </Text>
-          )}
-        </View>
-
-        <View style={styles.quickActions}>
-          <TouchableOpacity
-            style={styles.actionCard}
-            onPress={() => router.push('/(tabs)/camera')}
-          >
-            <View style={styles.actionIconContainer}>
-              <ChefHat size={24} color="#10b981" />
-            </View>
-            <Text style={styles.actionTitle}>{t('home.scanFood')}</Text>
-            <Text style={styles.actionSubtitle}>{t('home.takePhoto')}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionCard}
-            onPress={() => router.push('/(tabs)/ingredients')}
-          >
-            <View style={styles.actionIconContainer}>
-              <TrendingUp size={24} color="#10b981" />
-            </View>
-            <Text style={styles.actionTitle}>{t('home.myPantry')}</Text>
-            <Text style={styles.actionSubtitle}>{t('ingredientCount', { count: ingredients.length })}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionCard}
-            onPress={() => router.push('/shopping')}
-          >
-            <View style={styles.actionIconContainer}>
-              <ShoppingCart size={24} color="#10b981" />
-            </View>
-            <Text style={styles.actionTitle}>{t('shopping.short')}</Text>
-            <Text style={styles.actionSubtitle}>{t('shopping.toBuyCount', { count: toBuy })}</Text>
-          </TouchableOpacity>
+      <ScrollView contentContainerStyle={[styles.content, safe.top(spacing.xxxl)]} showsVerticalScrollIndicator={false}>
+        <View style={styles.heading}>
+          <Text style={styles.hello}>{t('home.hello')}</Text>
+          <Text style={styles.headline}>{t('home.headline')}</Text>
         </View>
 
         <WasteCounter />
 
-        {recipes.length > 0 && (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>{t('home.recentRecipes')}</Text>
-              <TouchableOpacity onPress={() => router.push('/(tabs)/saved')}>
-                <Text style={styles.seeAllText}>{t('home.seeAll')}</Text>
-              </TouchableOpacity>
-            </View>
-
-            {recipes.map((recipe) => (
-              <RecipeListCard key={recipe.id} recipe={images.withImage(recipe)} imageLoading={images.isLoading(recipe.id)} onPress={() => openRecipe(recipe)} />
+        {ingredients === null ? (
+          <Card style={styles.urgentCard}>
+            {[0, 1, 2].map((row) => (
+              <View key={row} style={styles.skeletonRow}>
+                <Skeleton width={sizes.iconChip} height={sizes.iconChip} rounded={sizes.iconChip / 3} />
+                <View style={styles.rowText}>
+                  <Skeleton width="55%" height={typography.listTitle.fontSize!} />
+                  <Skeleton width="30%" height={typography.secondary.fontSize!} />
+                </View>
+              </View>
             ))}
-          </View>
+          </Card>
+        ) : ingredients.length === 0 ? (
+          <Card>
+            <EmptyState
+              kind="pantry"
+              title={t('home.emptyPantryTitle')}
+              text={t('home.emptyPantryText')}
+              action={<Button label={t('home.scanFood')} icon={Camera} onPress={() => router.push('/(tabs)/camera')} />}
+            />
+          </Card>
+        ) : (
+          <>
+            <Card style={styles.urgentCard}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardTitle}>{t('home.useSoon')}</Text>
+                <Touchable onPress={() => router.push('/(tabs)/ingredients')} style={styles.link} accessibilityRole="link">
+                  <Text style={styles.linkText}>{t('home.seeAll')}</Text>
+                </Touchable>
+              </View>
+              {urgent.length === 0 ? (
+                <Text style={styles.nothing}>{t('home.nothingUrgent')}</Text>
+              ) : (
+                urgent.map((ingredient) => (
+                  <View key={ingredient.id}>
+                    <View style={styles.divider} />
+                    <View style={styles.row}>
+                      <IconChip icon={ingredient.kind === 'dish' ? UtensilsCrossed : Leaf} />
+                      <View style={styles.rowText}>
+                        <Text style={styles.rowTitle} numberOfLines={1}>{ingredient.name}</Text>
+                        {ingredient.quantity ? <Text style={styles.rowSubtitle} numberOfLines={1}>{ingredient.quantity}</Text> : null}
+                      </View>
+                      <View style={styles.badges}>
+                        {ingredient.kind === 'dish' ? <Badge label={t('pantry.leftover')} tone="leftover" /> : null}
+                        <ExpiryBadge expiresAt={ingredient.expires_at} />
+                      </View>
+                    </View>
+                  </View>
+                ))
+              )}
+            </Card>
+
+            <Button
+              label={urgent.length > 0 ? t('home.cookThese') : t('home.generateRecipes')}
+              icon={Sparkles}
+              onPress={cookUrgent}
+            />
+          </>
         )}
+
+        <View style={styles.shortcuts}>
+          <Card onPress={() => router.push('/(tabs)/camera')} style={styles.shortcut} accessibilityLabel={t('home.scanFood')}>
+            <IconChip icon={Camera} />
+            <View style={styles.rowText}>
+              <Text style={styles.rowTitle}>{t('home.scanFood')}</Text>
+              <Text style={styles.rowSubtitle} numberOfLines={1}>{t('home.scanSubtitle')}</Text>
+            </View>
+          </Card>
+          <Card onPress={() => router.push('/shopping')} style={styles.shortcut} accessibilityLabel={t('shopping.title')}>
+            <IconChip icon={ShoppingCart} />
+            <View style={styles.rowText}>
+              <Text style={styles.rowTitle}>{t('shopping.short')}</Text>
+              <Text style={styles.rowSubtitle} numberOfLines={1}>{t('shopping.toBuyCount', { count: toBuy })}</Text>
+            </View>
+          </Card>
+        </View>
+
+        {lastRecipe ? (
+          <RecipeListCard
+            variant="compact"
+            recipe={images.withImage(lastRecipe)}
+            imageLoading={images.isLoading(lastRecipe.id)}
+            onPress={() => openRecipe(lastRecipe)}
+          />
+        ) : null}
       </ScrollView>
 
       {selectedRecipe && (
@@ -224,146 +234,90 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
-  },
-  greeting: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  email: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginTop: 2,
-  },
-  logoutButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: '#f3f4f6',
-  },
-  logoutText: {
-    color: '#6b7280',
-    fontSize: 14,
-    fontWeight: '600',
+    backgroundColor: colors.background,
   },
   content: {
-    flex: 1,
+    paddingHorizontal: spacing.screen,
+    paddingBottom: spacing.xxl,
+    gap: spacing.lg,
   },
-  heroCard: {
-    backgroundColor: '#fff',
-    margin: 20,
-    padding: 24,
-    borderRadius: 16,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+  heading: {
+    gap: spacing.xs,
+    marginBottom: spacing.sm,
   },
-  heroIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#f0fdf4',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
+  hello: {
+    ...typography.body,
+    color: colors.textSecondary,
   },
-  heroTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 8,
+  headline: {
+    ...typography.title1,
   },
-  heroSubtitle: {
-    fontSize: 16,
-    color: '#6b7280',
-    marginBottom: 20,
+  urgentCard: {
+    paddingVertical: spacing.sm,
   },
-  generateButton: {
+  cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#10b981',
-    paddingVertical: 14,
-    paddingHorizontal: 28,
-    borderRadius: 12,
-    gap: 8,
-  },
-  generateButtonDisabled: {
-    backgroundColor: '#d1d5db',
-  },
-  generateButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  helpText: {
-    marginTop: 12,
-    fontSize: 14,
-    color: '#9ca3af',
-  },
-  quickActions: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    gap: 12,
-    marginBottom: 24,
-  },
-  actionCard: {
-    flex: 1,
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  actionIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#f0fdf4',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  actionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 4,
-  },
-  actionSubtitle: {
-    fontSize: 12,
-    color: '#6b7280',
-  },
-  section: {
-    paddingHorizontal: 20,
-    marginBottom: 24,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
+    minHeight: sizes.touch,
+  },
+  cardTitle: {
+    ...typography.cardTitle,
+    fontSize: typography.title3.fontSize! - spacing.xs,
+  },
+  link: {
+    minHeight: sizes.touch,
+    justifyContent: 'center',
+    paddingLeft: spacing.md,
+  },
+  linkText: {
+    ...typography.bodyStrong,
+    color: colors.primary,
+  },
+  divider: {
+    height: sizes.borderWidth,
+    backgroundColor: colors.border,
+  },
+  row: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    gap: spacing.md,
+    paddingVertical: spacing.md,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#111827',
+  skeletonRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingVertical: spacing.md,
   },
-  seeAllText: {
-    fontSize: 14,
-    color: '#10b981',
-    fontWeight: '600',
+  rowText: {
+    flex: 1,
+    gap: spacing.xxs,
+  },
+  rowTitle: {
+    ...typography.cardTitle,
+  },
+  rowSubtitle: {
+    ...typography.secondary,
+    fontSize: typography.listTitle.fontSize,
+  },
+  badges: {
+    flexDirection: 'row',
+    gap: spacing.xs,
+  },
+  nothing: {
+    ...typography.secondary,
+    paddingBottom: spacing.md,
+  },
+  shortcuts: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  shortcut: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: spacing.md,
   },
 });

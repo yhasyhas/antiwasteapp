@@ -1,23 +1,21 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  Modal,
-} from 'react-native';
-import { Stack, useFocusEffect } from 'expo-router';
-import { Check, Plus, ShoppingCart, Trash2, X } from 'lucide-react-native';
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect } from 'expo-router';
+import { ListChecks, Plus } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { useHousehold } from '@/hooks/useHousehold';
-import { Input } from '@/components/ui/Input';
+import { Input, TextField } from '@/components/ui/Input';
 import { KeyboardAvoider, useKeyboardScroll } from '@/components/ui/KeyboardAvoider';
+import { BottomSheet, SheetHeader } from '@/components/ui/BottomSheet';
+import { Button } from '@/components/ui/Button';
+import { Card, cardStyles } from '@/components/ui/Card';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { EmptyState } from '@/components/ui/Illustrations';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
+import { SkeletonRow } from '@/components/ui/Skeleton';
+import { SwipeToDelete } from '@/components/ui/SwipeToDelete';
+import { Touchable } from '@/components/ui/Touchable';
 import { ExpiryPicker } from '@/components/expiry/ExpiryPicker';
-import { scanModalStyles } from '@/components/scan/scanModalStyles';
 import { expiryFromShelfLife } from '@/lib/expiry';
 import {
   addShoppingItem,
@@ -28,12 +26,12 @@ import {
   stockShoppingItems,
   type ShoppingItem,
 } from '@/lib/shopping';
+import { colors, opacity, radius, sizes, spacing, typography } from '@/constants/theme';
 
 // Liste de courses du foyer : ajout à la main (ou depuis une recette), coché quand c'est acheté, puis
 // rangé au garde-manger avec une date proposée. Partagée et mise à jour en temps réel.
 export default function ShoppingScreen() {
   const { t } = useLanguage();
-  const safe = useSafeSpacing();
   const keyboardScroll = useKeyboardScroll();
   const household = useHousehold();
   const [items, setItems] = useState<ShoppingItem[] | null>(null);
@@ -125,153 +123,207 @@ export default function ShoppingScreen() {
     }
   };
 
-  const renderItem = (item: ShoppingItem) => {
+  const renderItem = (item: ShoppingItem, index: number) => {
     const author = authorName(item.added_by);
-    const details = [item.quantity, item.recipe_title && t('shopping.forRecipe', { title: item.recipe_title }), author && t('household.addedBy', { name: author })]
-      .filter(Boolean)
-      .join(' · ');
+    // « Pour : recette » ou « Ajouté par … »
+    const details = item.recipe_title
+      ? t('shopping.forRecipeLine', { title: item.recipe_title })
+      : author ? t('household.addedBy', { name: author }) : null;
     return (
-      <View key={item.id} style={styles.item}>
-        <TouchableOpacity style={styles.itemMain} onPress={() => toggle(item)} accessibilityRole="checkbox" accessibilityState={{ checked: item.checked }}>
-          <View style={[styles.checkbox, item.checked && styles.checkboxChecked]}>
-            {item.checked && <Check size={16} color="#fff" />}
-          </View>
-          <View style={styles.itemText}>
-            <Text style={[styles.itemName, item.checked && styles.itemNameChecked]}>{item.name}</Text>
-            {details ? <Text style={styles.itemDetails}>{details}</Text> : null}
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => remove(item)} hitSlop={8} accessibilityLabel={t('common.delete')}>
-          <Trash2 size={18} color="#9ca3af" />
-        </TouchableOpacity>
+      <View key={item.id}>
+        {index > 0 ? <View style={cardStyles.divider} /> : null}
+        <SwipeToDelete onDelete={() => remove(item)}>
+          <Touchable
+            scale={false}
+            style={styles.item}
+            onPress={() => toggle(item)}
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: item.checked }}
+            accessibilityLabel={item.name}
+          >
+            <Checkbox checked={item.checked} />
+            <View style={styles.itemText}>
+              <Text style={[styles.itemName, item.checked && styles.itemNameChecked]}>{item.name}</Text>
+              {details ? <Text style={styles.itemDetails}>{details}</Text> : null}
+            </View>
+            {item.quantity ? <Text style={styles.quantity}>{item.quantity}</Text> : null}
+          </Touchable>
+        </SwipeToDelete>
       </View>
     );
   };
 
   return (
-    <>
-      <Stack.Screen options={{ headerShown: true, title: t('shopping.title') }} />
-      <KeyboardAvoider style={styles.container}>
-        <ScrollView
-          ref={keyboardScroll.scrollRef}
-          onScroll={keyboardScroll.onScroll}
-          scrollEventThrottle={keyboardScroll.scrollEventThrottle}
-          contentContainerStyle={[styles.content, safe.bottom(24)]}
-          keyboardShouldPersistTaps="handled"
-        >
-          {household?.shared && <Text style={styles.intro}>{t('shopping.sharedIntro')}</Text>}
-
-          <View style={styles.addRow}>
-            <Input
-              style={[styles.input, styles.nameInput]}
-              value={name}
-              onChangeText={setName}
-              placeholder={t('shopping.namePlaceholder')}
-              maxLength={80}
-              returnKeyType="done"
-              onSubmitEditing={add}
-            />
-            <Input
-              style={[styles.input, styles.quantityInput]}
-              value={quantity}
-              onChangeText={setQuantity}
-              placeholder={t('shopping.quantityPlaceholder')}
-              maxLength={40}
-              onSubmitEditing={add}
-            />
-            <TouchableOpacity style={styles.addButton} onPress={add} disabled={adding || !name.trim()} accessibilityLabel={t('shopping.add')}>
-              {adding ? <ActivityIndicator color="#fff" size="small" /> : <Plus size={22} color="#fff" />}
-            </TouchableOpacity>
-          </View>
-
-          {items === null ? (
-            <ActivityIndicator style={styles.loading} color="#10b981" />
-          ) : items.length === 0 ? (
-            <View style={styles.empty}>
-              <ShoppingCart size={56} color="#d1d5db" strokeWidth={1.5} />
-              <Text style={styles.emptyTitle}>{t('shopping.emptyTitle')}</Text>
-              <Text style={styles.emptyText}>{t('shopping.emptyText')}</Text>
-            </View>
-          ) : (
+    <KeyboardAvoider style={styles.container}>
+      <ScreenHeader
+        title={t('shopping.short')}
+        subtitle={household?.shared ? t('shopping.sharedSubtitle') : undefined}
+        back
+      />
+      <ScrollView
+        ref={keyboardScroll.scrollRef}
+        onScroll={keyboardScroll.onScroll}
+        scrollEventThrottle={keyboardScroll.scrollEventThrottle}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
+        <TextField
+          value={name}
+          onChangeText={setName}
+          placeholder={t('shopping.namePlaceholder')}
+          maxLength={80}
+          returnKeyType="done"
+          onSubmitEditing={add}
+          accessibilityLabel={t('shopping.namePlaceholder')}
+          trailing={
             <>
-              {toBuy.length > 0 && (
-                <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>{t('shopping.toBuy', { count: toBuy.length })}</Text>
-                  {toBuy.map(renderItem)}
-                </View>
-              )}
-              {inCart.length > 0 && (
-                <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>{t('shopping.inCart', { count: inCart.length })}</Text>
-                  {inCart.map(renderItem)}
-                  <TouchableOpacity style={styles.stockButton} onPress={openStock}>
-                    <Text style={styles.stockButtonText}>{t('shopping.stock', { count: inCart.length })}</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
+              <Input
+                style={styles.quantityInput}
+                value={quantity}
+                onChangeText={setQuantity}
+                placeholder={t('shopping.quantityPlaceholder')}
+                maxLength={40}
+                onSubmitEditing={add}
+              />
+              <Touchable
+                style={[styles.addButton, (!name.trim() || adding) && styles.addButtonDisabled]}
+                onPress={add}
+                disabled={adding || !name.trim()}
+                accessibilityRole="button"
+                accessibilityLabel={t('shopping.add')}
+              >
+                {adding ? <ActivityIndicator color={colors.onPrimary} size="small" /> : <Plus size={sizes.iconLarge} color={colors.onPrimary} />}
+              </Touchable>
             </>
-          )}
-        </ScrollView>
-      </KeyboardAvoider>
+          }
+        />
+
+        {items === null ? (
+          <View>
+            {[0, 1, 2].map((row) => <SkeletonRow key={row} />)}
+          </View>
+        ) : items.length === 0 ? (
+          <EmptyState kind="shopping" title={t('shopping.emptyTitle')} text={t('shopping.emptyText')} />
+        ) : (
+          <>
+            {toBuy.length > 0 && (
+              <Card style={styles.section}>
+                <Text style={styles.sectionTitle}>{t('shopping.toBuyTitle', { count: toBuy.length })}</Text>
+                <View style={cardStyles.divider} />
+                {toBuy.map(renderItem)}
+              </Card>
+            )}
+            {inCart.length > 0 && (
+              <Card style={styles.section}>
+                <Text style={styles.sectionTitle}>{t('shopping.inCartTitle', { count: inCart.length })}</Text>
+                <View style={cardStyles.divider} />
+                {inCart.map(renderItem)}
+                <Button label={t('shopping.stockTitle')} icon={ListChecks} onPress={openStock} style={styles.stock} />
+              </Card>
+            )}
+            <Text style={styles.hint}>{t('shopping.swipeHint')}</Text>
+          </>
+        )}
+      </ScrollView>
 
       {/* Ranger au garde-manger : une date proposée par article, modifiable */}
-      <Modal visible={stocking !== null} animationType="slide" transparent onRequestClose={() => setStocking(null)}>
-        <View style={scanModalStyles.modalOverlay}>
-          <View style={[scanModalStyles.modalContent, safe.bottom(24)]}>
-            <View style={scanModalStyles.modalHeader}>
-              <Text style={scanModalStyles.modalTitle}>{t('shopping.stockTitle')}</Text>
-              <TouchableOpacity onPress={() => setStocking(null)} hitSlop={8}>
-                <X size={24} color="#6b7280" />
-              </TouchableOpacity>
+      <BottomSheet visible={stocking !== null} onClose={() => setStocking(null)}>
+        <SheetHeader title={t('shopping.stockTitle')} subtitle={t('shopping.stockHint')} onClose={() => setStocking(null)} />
+        <ScrollView style={styles.stockList}>
+          {stocking?.map(({ item, expires_at }, index) => (
+            <View key={item.id} style={styles.stockItem}>
+              {index > 0 ? <View style={cardStyles.divider} /> : null}
+              <Text style={styles.itemName}>{item.name}{item.quantity ? ` · ${item.quantity}` : ''}</Text>
+              <ExpiryPicker
+                value={expires_at}
+                onChange={(value) => setStocking((current) => current?.map((entry, i) => (i === index ? { ...entry, expires_at: value } : entry)) ?? null)}
+              />
             </View>
-            <Text style={styles.stockHint}>{t('shopping.stockHint')}</Text>
-            <ScrollView style={styles.stockList}>
-              {stocking?.map(({ item, expires_at }, index) => (
-                <View key={item.id} style={styles.stockItem}>
-                  <Text style={styles.itemName}>{item.name}{item.quantity ? ` · ${item.quantity}` : ''}</Text>
-                  <ExpiryPicker
-                    value={expires_at}
-                    onChange={(value) => setStocking((current) => current?.map((entry, i) => (i === index ? { ...entry, expires_at: value } : entry)) ?? null)}
-                  />
-                </View>
-              ))}
-            </ScrollView>
-            <TouchableOpacity style={styles.stockButton} onPress={confirmStock} disabled={saving}>
-              {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.stockButtonText}>{t('shopping.stockConfirm', { count: stocking?.length ?? 0 })}</Text>}
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    </>
+          ))}
+        </ScrollView>
+        <Button label={t('shopping.stockConfirm', { count: stocking?.length ?? 0 })} onPress={confirmStock} loading={saving} style={styles.stock} />
+      </BottomSheet>
+    </KeyboardAvoider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9fafb' },
-  content: { padding: 20, gap: 16 },
-  intro: { fontSize: 14, color: '#4b5563', lineHeight: 20 },
-  addRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
-  input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15 },
-  nameInput: { flex: 2 },
-  quantityInput: { flex: 1 },
-  addButton: { backgroundColor: '#10b981', borderRadius: 10, width: 46, height: 46, alignItems: 'center', justifyContent: 'center' },
-  loading: { marginTop: 40 },
-  empty: { alignItems: 'center', paddingVertical: 48, gap: 8 },
-  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
-  emptyText: { fontSize: 14, color: '#6b7280', textAlign: 'center', lineHeight: 20 },
-  section: { gap: 8 },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: '#111827' },
-  item: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#fff', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#f3f4f6' },
-  itemMain: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 },
-  checkbox: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: '#10b981', alignItems: 'center', justifyContent: 'center' },
-  checkboxChecked: { backgroundColor: '#10b981' },
-  itemText: { flex: 1 },
-  itemName: { fontSize: 15, fontWeight: '600', color: '#111827' },
-  itemNameChecked: { color: '#9ca3af', textDecorationLine: 'line-through' },
-  itemDetails: { fontSize: 12, color: '#6b7280', marginTop: 2 },
-  stockButton: { backgroundColor: '#10b981', borderRadius: 12, paddingVertical: 14, alignItems: 'center', marginTop: 8 },
-  stockButtonText: { color: '#fff', fontWeight: '600', fontSize: 15 },
-  stockHint: { fontSize: 13, color: '#6b7280', marginBottom: 12 },
-  stockList: { maxHeight: 420 },
-  stockItem: { gap: 8, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f3f4f6' },
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  content: {
+    paddingHorizontal: spacing.screen,
+    paddingBottom: spacing.xxl,
+    gap: spacing.lg,
+  },
+  quantityInput: {
+    ...typography.body,
+    width: sizes.illustration - spacing.xxxl,
+    minHeight: sizes.touch,
+    borderLeftWidth: sizes.borderWidth,
+    borderLeftColor: colors.border,
+    paddingHorizontal: spacing.md,
+  },
+  addButton: {
+    width: sizes.touch,
+    height: sizes.touch,
+    borderRadius: radius.control - spacing.xs,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addButtonDisabled: {
+    opacity: opacity.disabled,
+  },
+  section: {
+    paddingVertical: spacing.sm,
+  },
+  sectionTitle: {
+    ...typography.cardTitle,
+    fontSize: typography.title3.fontSize! - spacing.xs,
+    paddingVertical: spacing.md,
+  },
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.lg,
+    minHeight: sizes.touch + spacing.xl,
+    paddingVertical: spacing.sm,
+    backgroundColor: colors.surface,
+  },
+  itemText: {
+    flex: 1,
+    gap: spacing.xxs,
+  },
+  itemName: {
+    ...typography.cardTitle,
+  },
+  itemNameChecked: {
+    color: colors.textSecondary,
+    textDecorationLine: 'line-through',
+  },
+  itemDetails: {
+    ...typography.secondary,
+    fontSize: typography.listTitle.fontSize,
+  },
+  quantity: {
+    ...typography.body,
+    color: colors.textSecondary,
+  },
+  hint: {
+    ...typography.secondary,
+    textAlign: 'center',
+  },
+  stock: {
+    marginTop: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  stockList: {
+    flexGrow: 0,
+  },
+  stockItem: {
+    gap: spacing.sm,
+    paddingBottom: spacing.md,
+  },
 });

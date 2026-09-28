@@ -1,49 +1,29 @@
 import React from 'react';
-import { Text, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Clock } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { EXPIRY_COLORS, expiryLabel, expiryStatus } from '@/lib/expiry';
+import { Badge, type BadgeTone } from '@/components/ui/Badge';
+import { expiryLabel, expiryStatus, type ExpiryStatus } from '@/lib/expiry';
 
 interface Props {
   expiresAt: string | null | undefined;
   onPress?: () => void;
 }
 
-// Badge de couleur : expiré (rouge), bientôt (orange), OK (vert), sans date (gris)
+export const EXPIRY_TONES: Record<ExpiryStatus, BadgeTone> = {
+  expired: 'expired',
+  soon: 'soon',
+  ok: 'ok',
+  none: 'neutral',
+};
+
+// Badge de date : expiré (rouge), bientôt (ambre), OK (vert), sans date (neutre) ; touchable pour la modifier
 export function ExpiryBadge({ expiresAt, onPress }: Props) {
   const { t, language } = useLanguage();
-  const colors = EXPIRY_COLORS[expiryStatus(expiresAt)];
-  const content = (
-    <>
-      <Clock size={12} color={colors.text} />
-      <Text style={[styles.text, { color: colors.text }]}>{expiryLabel(t, expiresAt, language)}</Text>
-    </>
-  );
-
-  if (!onPress) return <View style={[styles.badge, { backgroundColor: colors.background }]}>{content}</View>;
   return (
-    <TouchableOpacity
-      style={[styles.badge, { backgroundColor: colors.background }]}
+    <Badge
+      label={expiryLabel(t, expiresAt, language)}
+      tone={EXPIRY_TONES[expiryStatus(expiresAt)]}
       onPress={onPress}
-      accessibilityLabel={t('expiry.edit')}
-      hitSlop={8}
-    >
-      {content}
-    </TouchableOpacity>
+      accessibilityLabel={onPress ? `${expiryLabel(t, expiresAt, language)}, ${t('expiry.edit')}` : undefined}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 6,
-  },
-  text: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-});

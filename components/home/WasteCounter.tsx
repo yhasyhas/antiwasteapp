@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from 'expo-router';
-import { Leaf, Trash2 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { onPantryChanged } from '@/lib/pantryEvents';
+import { Card } from '@/components/ui/Card';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { colors, spacing, typography } from '@/constants/theme';
 
 interface Counts {
   saved: number;
@@ -17,8 +19,9 @@ interface Stats {
   shared: boolean;
 }
 
-// Compteur anti-gaspi du mois (fonction food_stats) : aliments sauvés (« J'ai cuisiné ça ») et gaspillés
-// (supprimés après leur date), pour le foyer et pour moi. En nombre d'aliments, sans kilos ni euros.
+// Compteur anti-gaspi du mois (fonction food_stats), en tête de l'accueil : grand chiffre des aliments
+// sauvés (« J'ai cuisiné ça ») par moi, et bilan du foyer (sauvés, gaspillés : supprimés après leur date).
+// En nombre d'aliments, sans kilos ni euros.
 export function WasteCounter() {
   const { t } = useLanguage();
   const [stats, setStats] = useState<Stats | null>(null);
@@ -33,39 +36,60 @@ export function WasteCounter() {
   useFocusEffect(load);
   useEffect(() => onPantryChanged(load), [load]);
 
-  if (!stats) return null;
+  if (!stats) {
+    return (
+      <Card variant="soft" style={styles.card}>
+        <Skeleton width={spacing.xxxl * 2} height={typography.display.lineHeight!} />
+        <View style={styles.text}>
+          <Skeleton width="80%" height={typography.cardTitle.fontSize!} />
+          <Skeleton width="60%" height={typography.secondary.fontSize!} />
+        </View>
+      </Card>
+    );
+  }
 
-  const row = (label: string, counts: Counts) => (
-    <View style={styles.row}>
-      <Text style={styles.rowLabel}>{label}</Text>
-      <View style={styles.value}>
-        <Leaf size={16} color="#10b981" />
-        <Text style={styles.saved}>{t('counter.saved', { count: counts.saved })}</Text>
-      </View>
-      <View style={styles.value}>
-        <Trash2 size={16} color="#9ca3af" />
-        <Text style={styles.wasted}>{t('counter.wasted', { count: counts.wasted })}</Text>
-      </View>
-    </View>
-  );
+  // Foyer partagé : mon chiffre en grand, le foyer en dessous ; sinon mon bilan (celui du foyer personnel)
+  const mine = stats.shared ? stats.me : stats.household;
+  const line = stats.shared
+    ? t('counter.householdLine', {
+      saved: t('counter.savedShort', { count: stats.household.saved }),
+      wasted: t('counter.wasted', { count: stats.household.wasted }),
+    })
+    : t('counter.wastedLine', { wasted: t('counter.wasted', { count: mine.wasted }) });
+  const empty = stats.household.saved + stats.household.wasted === 0;
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.title}>{t('counter.title')}</Text>
-      {stats.shared && row(t('counter.household'), stats.household)}
-      {row(stats.shared ? t('counter.me') : t('counter.mine'), stats.shared ? stats.me : stats.household)}
-      {stats.household.saved + stats.household.wasted === 0 && <Text style={styles.hint}>{t('counter.hint')}</Text>}
-    </View>
+    <Card variant="soft" style={styles.card}>
+      <Text style={styles.number} accessibilityLabel={`${mine.saved} ${t('counter.bigLabel', { count: mine.saved })}`}>{mine.saved}</Text>
+      <View style={styles.text}>
+        <Text style={styles.label}>{t('counter.bigLabel', { count: mine.saved })}</Text>
+        <Text style={styles.line}>{empty ? t('counter.hint') : line}</Text>
+      </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: '#fff', marginHorizontal: 20, marginBottom: 24, borderRadius: 12, padding: 16, gap: 10 },
-  title: { fontSize: 16, fontWeight: '700', color: '#111827' },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, flexWrap: 'wrap' },
-  rowLabel: { fontSize: 14, color: '#4b5563', minWidth: 72 },
-  value: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  saved: { fontSize: 14, fontWeight: '600', color: '#047857' },
-  wasted: { fontSize: 14, fontWeight: '600', color: '#6b7280' },
-  hint: { fontSize: 12, color: '#6b7280', lineHeight: 17 },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.lg,
+    paddingVertical: spacing.xl,
+    paddingHorizontal: spacing.xl,
+  },
+  number: {
+    ...typography.display,
+    color: colors.primary,
+  },
+  text: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  label: {
+    ...typography.cardTitle,
+  },
+  line: {
+    ...typography.secondary,
+    fontSize: typography.listTitle.fontSize,
+  },
 });

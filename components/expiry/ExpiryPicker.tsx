@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { CalendarDays } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
 import { addDays, addMonths, formatDate, fromISODate, todayISO, toISODate } from '@/lib/expiry';
+import { colors, spacing, typography } from '@/constants/theme';
 
 interface Props {
   value: string;
@@ -15,7 +18,6 @@ export function ExpiryPicker({ value, onChange }: Props) {
   const { t, language } = useLanguage();
   const [showCalendar, setShowCalendar] = useState(false);
   const today = todayISO();
-
   const quickChoices = [
     { label: t('expiry.plus3Days'), iso: addDays(today, 3) },
     { label: t('expiry.plus1Week'), iso: addDays(today, 7) },
@@ -32,22 +34,13 @@ export function ExpiryPicker({ value, onChange }: Props) {
     <View>
       <View style={styles.row}>
         {quickChoices.map((choice) => (
-          <TouchableOpacity
-            key={choice.label}
-            style={[styles.chip, value === choice.iso && styles.chipSelected]}
-            onPress={() => onChange(choice.iso)}
-          >
-            <Text style={[styles.chipText, value === choice.iso && styles.chipTextSelected]}>{choice.label}</Text>
-          </TouchableOpacity>
+          <Chip key={choice.label} label={choice.label} selected={value === choice.iso} onPress={() => onChange(choice.iso)} />
         ))}
         {Platform.OS !== 'web' && (
-          <TouchableOpacity style={styles.chip} onPress={() => setShowCalendar(true)} accessibilityLabel={t('expiry.pickDate')}>
-            <CalendarDays size={16} color="#374151" />
-          </TouchableOpacity>
+          <Chip label={t('expiry.pickDate')} icon={CalendarDays} onPress={() => setShowCalendar(true)} />
         )}
       </View>
       <Text style={styles.current}>{t('expiry.expiresOn', { date: formatDate(value, language) })}</Text>
-
       {showCalendar && (
         <View>
           <DateTimePicker
@@ -55,13 +48,12 @@ export function ExpiryPicker({ value, onChange }: Props) {
             mode="date"
             display={Platform.OS === 'ios' ? 'inline' : 'default'}
             minimumDate={fromISODate(today)}
+            accentColor={colors.primary}
             onValueChange={onCalendarValue}
             onDismiss={() => setShowCalendar(false)}
           />
           {Platform.OS === 'ios' && (
-            <TouchableOpacity style={styles.done} onPress={() => setShowCalendar(false)}>
-              <Text style={styles.doneText}>{t('common.ok')}</Text>
-            </TouchableOpacity>
+            <Button label={t('common.ok')} variant="ghost" size="small" onPress={() => setShowCalendar(false)} style={styles.done} />
           )}
         </View>
       )}
@@ -73,43 +65,13 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-  },
-  chip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 16,
-    backgroundColor: '#f3f4f6',
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-  },
-  chipSelected: {
-    backgroundColor: '#d1fae5',
-    borderColor: '#10b981',
-  },
-  chipText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#374151',
-  },
-  chipTextSelected: {
-    color: '#047857',
+    gap: spacing.sm,
   },
   current: {
-    fontSize: 13,
-    color: '#6b7280',
-    marginTop: 8,
+    ...typography.secondary,
+    marginTop: spacing.sm,
   },
   done: {
     alignSelf: 'flex-end',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-  },
-  doneText: {
-    color: '#10b981',
-    fontSize: 16,
-    fontWeight: '600',
   },
 });

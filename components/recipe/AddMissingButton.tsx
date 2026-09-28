@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { ShoppingCart } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { addMissingToShoppingList } from '@/lib/shopping';
+import { Button } from '@/components/ui/Button';
+import { spacing } from '@/constants/theme';
 
 interface Props {
   names: string[];
@@ -41,25 +43,21 @@ export function AddMissingButton({ names, recipeId, recipeTitle, onOpenList }: P
   };
 
   return (
-    <TouchableOpacity style={styles.button} onPress={add} disabled={adding}>
-      {adding ? <ActivityIndicator size="small" color="#be185d" /> : <ShoppingCart size={16} color="#be185d" />}
-      <Text style={styles.text}>{t('shopping.addMissing')}</Text>
-    </TouchableOpacity>
+    <Button
+      label={t('recipe.addToShopping')}
+      icon={ShoppingCart}
+      variant="outline"
+      size="medium"
+      onPress={add}
+      loading={adding}
+      style={styles.button}
+    />
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 10,
-    paddingVertical: 10,
-    borderRadius: 10,
-    backgroundColor: '#fdf2f8',
-    borderWidth: 1,
-    borderColor: '#fbcfe8',
+    marginTop: spacing.sm,
+    marginBottom: spacing.sm,
   },
-  text: { color: '#be185d', fontWeight: '600', fontSize: 14 },
 });

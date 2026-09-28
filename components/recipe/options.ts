@@ -2,12 +2,12 @@ import { Coffee, Sun, Moon, Cookie } from 'lucide-react-native';
 import type { TFunction } from 'i18next';
 import type { Cuisine } from './types';
 
-// Types de repas avec icônes, couleurs et libellés traduits
+// Types de repas avec icônes et libellés traduits
 export const mealTypes = [
-  { value: 'breakfast', labelKey: 'meal.breakfast', icon: Coffee, color: '#f59e0b' },
-  { value: 'lunch', labelKey: 'meal.lunch', icon: Sun, color: '#10b981' },
-  { value: 'dinner', labelKey: 'meal.dinner', icon: Moon, color: '#6366f1' },
-  { value: 'snack', labelKey: 'meal.snack', icon: Cookie, color: '#ec4899' },
+  { value: 'breakfast', labelKey: 'meal.breakfast', icon: Coffee },
+  { value: 'lunch', labelKey: 'meal.lunch', icon: Sun },
+  { value: 'dinner', labelKey: 'meal.dinner', icon: Moon },
+  { value: 'snack', labelKey: 'meal.snack', icon: Cookie },
 ] as const;
 
 // Langues des recettes (noms dans leur propre langue)

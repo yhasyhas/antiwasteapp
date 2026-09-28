@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView, ActivityIndicator, Alert } from 'react-native';
-import { Check, CookingPot, X } from 'lucide-react-native';
+import { Alert, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Check } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { supabase } from '@/lib/supabase';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { notifyPantryChanged } from '@/lib/pantryEvents';
-import { scanModalStyles } from '@/components/scan/scanModalStyles';
+import { BottomSheet, SheetHeader } from '@/components/ui/BottomSheet';
+import { Button } from '@/components/ui/Button';
+import { cardStyles } from '@/components/ui/Card';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { Touchable } from '@/components/ui/Touchable';
+import { colors, sizes, spacing, typography } from '@/constants/theme';
 
 interface Props {
   // Ingrédients de la recette ; pantry_id relie un ingrédient à celui du garde-manger (depuis la phase 3)
   ingredientsUsed: Array<{ name: string; pantry_id?: string | null }> | null | undefined;
+  // Conteneur du bouton (barre fixée en bas de la fiche recette)
+  style?: StyleProp<ViewStyle>;
 }
 
 interface PantryRow {
@@ -22,9 +28,8 @@ interface PantryRow {
 
 // « J'ai cuisiné ça » : liste les ingrédients du garde-manger utilisés par la recette, tous cochés ;
 // l'utilisateur décoche ce qu'il lui reste, puis les ingrédients cochés sont retirés du garde-manger
-export function CookedButton({ ingredientsUsed }: Props) {
+export function CookedButton({ ingredientsUsed, style }: Props) {
   const { t } = useLanguage();
-  const safe = useSafeSpacing();
   const [rows, setRows] = useState<PantryRow[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [removing, setRemoving] = useState(false);
@@ -78,128 +83,70 @@ export function CookedButton({ ingredientsUsed }: Props) {
   const checkedCount = (rows ?? []).filter((row) => row.checked).length;
 
   return (
-    <>
-      <TouchableOpacity style={styles.button} onPress={open} disabled={loading}>
-        {loading ? <ActivityIndicator color="#047857" /> : <CookingPot size={20} color="#047857" />}
-        <Text style={styles.buttonText}>{t('cooked.button')}</Text>
-      </TouchableOpacity>
+    <View style={style}>
+      <Button label={t('cooked.button')} icon={Check} onPress={open} loading={loading} />
 
-      <Modal visible={rows !== null} animationType="slide" transparent={true} onRequestClose={() => setRows(null)}>
-        <View style={scanModalStyles.modalOverlay}>
-          <View style={[scanModalStyles.modalContent, safe.bottom(24)]}>
-            <View style={scanModalStyles.modalHeader}>
-              <Text style={scanModalStyles.modalTitle}>{t('cooked.title')}</Text>
-              <TouchableOpacity onPress={() => setRows(null)}>
-                <X size={24} color="#6b7280" />
-              </TouchableOpacity>
+      <BottomSheet visible={rows !== null} onClose={() => setRows(null)}>
+        <SheetHeader title={t('cooked.title')} subtitle={t('cooked.subtitle')} onClose={() => setRows(null)} />
+        <ScrollView style={styles.list}>
+          {(rows ?? []).map((row, index) => (
+            <View key={row.id}>
+              {index > 0 ? <View style={cardStyles.divider} /> : null}
+              <Touchable
+                scale={false}
+                style={styles.item}
+                onPress={() => toggle(row.id)}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: row.checked }}
+              >
+                <Checkbox checked={row.checked} />
+                <View style={styles.itemText}>
+                  <Text style={[styles.name, !row.checked && styles.kept]}>{row.name}</Text>
+                  {row.quantity ? <Text style={styles.quantity}>{row.quantity}</Text> : null}
+                </View>
+                {!row.checked && <Text style={styles.keptLabel}>{t('cooked.kept')}</Text>}
+              </Touchable>
             </View>
-            <Text style={styles.subtitle}>{t('cooked.subtitle')}</Text>
-
-            <ScrollView style={styles.list}>
-              {(rows ?? []).map((row) => (
-                <TouchableOpacity key={row.id} style={styles.item} onPress={() => toggle(row.id)}>
-                  <View style={[styles.checkbox, row.checked && styles.checkboxChecked]}>
-                    {row.checked && <Check size={16} color="#fff" />}
-                  </View>
-                  <Text style={[styles.itemText, !row.checked && styles.itemTextKept]}>{row.name}</Text>
-                  {row.quantity ? <Text style={styles.itemQuantity}>{row.quantity}</Text> : null}
-                  {!row.checked && <Text style={styles.kept}>{t('cooked.kept')}</Text>}
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-
-            <TouchableOpacity style={styles.confirmButton} onPress={confirm} disabled={removing}>
-              {removing ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.confirmButtonText}>
-                  {checkedCount > 0 ? t('cooked.confirm', { count: checkedCount }) : t('cooked.keepAll')}
-                </Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    </>
+          ))}
+        </ScrollView>
+        <Button
+          label={checkedCount > 0 ? t('cooked.confirm', { count: checkedCount }) : t('cooked.keepAll')}
+          onPress={confirm}
+          loading={removing}
+          style={styles.confirm}
+        />
+      </BottomSheet>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 14,
-    borderRadius: 12,
-    backgroundColor: '#d1fae5',
-    marginTop: 12,
-  },
-  buttonText: {
-    color: '#047857',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginBottom: 16,
-    lineHeight: 20,
-  },
   list: {
-    maxHeight: 360,
-    marginBottom: 16,
+    flexGrow: 0,
   },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 6,
-    borderWidth: 2,
-    borderColor: '#d1d5db',
-    marginRight: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkboxChecked: {
-    backgroundColor: '#10b981',
-    borderColor: '#10b981',
+    gap: spacing.lg,
+    minHeight: sizes.touch + spacing.md,
   },
   itemText: {
-    fontSize: 16,
-    color: '#111827',
     flex: 1,
   },
-  itemTextKept: {
-    color: '#6b7280',
-  },
-  itemQuantity: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginLeft: 8,
+  name: {
+    ...typography.listTitle,
   },
   kept: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#047857',
-    marginLeft: 8,
+    color: colors.textSecondary,
   },
-  confirmButton: {
-    backgroundColor: '#10b981',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
+  quantity: {
+    ...typography.secondary,
   },
-  confirmButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
+  keptLabel: {
+    ...typography.badge,
+    color: colors.primary,
+  },
+  confirm: {
+    marginTop: spacing.lg,
   },
 });

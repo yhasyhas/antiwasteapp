@@ -1,4 +1,5 @@
 import type { TFunction } from 'i18next';
+import { colors } from '@/constants/theme';
 
 // Dates de péremption, au format de la colonne `expires_at` (date sans heure, 'AAAA-MM-JJ'),
 // toujours calculées dans le fuseau du téléphone.
@@ -65,12 +66,13 @@ export function expiryStatus(iso: string | null | undefined): ExpiryStatus {
 }
 
 // Texte court : « Expiré », « Aujourd'hui », « Demain », « Dans 5 jours », ou la date au-delà d'un mois
-export function expiryLabel(t: TFunction, iso: string | null | undefined, language: string): string {
+// short : libellé des badges (« Aujourd'hui », « Demain »)
+export function expiryLabel(t: TFunction, iso: string | null | undefined, language: string, short = true): string {
   if (!iso) return t('expiry.none');
   const days = daysUntil(iso);
   if (days < 0) return t('expiry.expiredDaysAgo', { count: -days });
-  if (days === 0) return t('expiry.today');
-  if (days === 1) return t('expiry.tomorrow');
+  if (days === 0) return short ? t('expiry.todayShort') : t('expiry.today');
+  if (days === 1) return short ? t('expiry.tomorrowShort') : t('expiry.tomorrow');
   if (days <= 31) return t('expiry.inDays', { count: days });
   return formatDate(iso, language);
 }
@@ -89,12 +91,21 @@ export function sortByUrgency<T extends { expires_at?: string | null; created_at
   });
 }
 
+// Couleurs des états (jetons du thème)
 export const EXPIRY_COLORS: Record<ExpiryStatus, { background: string; text: string }> = {
-  expired: { background: '#fee2e2', text: '#b91c1c' },
-  soon: { background: '#ffedd5', text: '#c2410c' },
-  ok: { background: '#d1fae5', text: '#047857' },
-  none: { background: '#f3f4f6', text: '#6b7280' },
+  expired: colors.expired,
+  soon: colors.soon,
+  ok: colors.ok,
+  none: { background: colors.primarySoft, text: colors.textSecondary },
 };
+
+// Durée courte jusqu'à la date (confirmation du scan) : « 5 jours », « 2 sem. », « 3 mois »
+export function shortDuration(t: TFunction, iso: string): string {
+  const days = Math.max(0, daysUntil(iso));
+  if (days < 14) return t('expiry.days', { count: days });
+  if (days < 60) return t('expiry.weeks', { count: Math.round(days / 7) });
+  return t('expiry.months', { count: Math.round(days / 30) });
+}
 
 // Produit emballé scanné par code-barres (non ouvert) : durée par défaut selon la catégorie, en jours.
 // Simple point de départ : l'utilisateur recopie la date imprimée sur l'emballage.

@@ -1,358 +1,369 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Modal } from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
-import { Heart, ImageOff, Lightbulb, X } from 'lucide-react-native';
+import { ChevronLeft, Clock, Flame, Heart, Sparkles, Users } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
+import { toSaveCount, usePantryUrgency } from '@/hooks/usePantryUrgency';
 import { dietLabel, difficultyLabel } from '@/lib/labels';
-import { modalStyles, suggestionStyles } from './modalStyles';
+import { Badge } from '@/components/ui/Badge';
+import { Card, cardStyles } from '@/components/ui/Card';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { RecipePlaceholder } from '@/components/ui/Illustrations';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Touchable } from '@/components/ui/Touchable';
+import { colors, motion, radius, sizes, spacing, typography } from '@/constants/theme';
 import { CookedButton } from './CookedButton';
 import { AddMissingButton } from './AddMissingButton';
 import type { Recipe } from './types';
 
 interface Props {
   recipe: Recipe;
-  // Image en cours de génération : l'emplacement affiche un indicateur, puis l'image à son arrivée
+  // Image en cours de génération : squelette dans l'emplacement, puis l'image à son arrivée
   imageLoading: boolean;
-  // Image impossible (quota du jour, panne) : message discret à son emplacement
+  // Image impossible (quota du jour, panne) : message discret sous le titre
   imageNotice?: string | null;
   isFavorite: boolean;
   onToggleFavorite: () => void;
   onClose: () => void;
 }
 
-// Fiche recette unique (génération, recettes récentes, favoris) : image, temps, ingrédients du
-// garde-manger et à acheter, quantités, étapes, conseils, suggestion, favori et « J'ai cuisiné ça »
+const normalize = (value: string) => value.trim().toLowerCase();
+
+// Fiche recette unique (génération, dernière recette, favoris), en plein écran : image (ou illustration),
+// temps, difficulté, personnes, régimes, ingrédients « Du garde-manger » et « À acheter » avec quantités,
+// étapes, astuces, suggestion, favori ; « J'ai cuisiné ça » toujours visible en bas
 export function RecipeSheet({ recipe, imageLoading, imageNotice, isFavorite, onToggleFavorite, onClose }: Props) {
   const { t } = useLanguage();
   const safe = useSafeSpacing();
+  const pantry = usePantryUrgency();
+  const toSave = toSaveCount(recipe, pantry);
   const missing = recipe.missing_ingredients ?? [];
 
+  // Quantité d'un ingrédient (recherchée dans ingredients_used par son nom)
+  const amountOf = (name: string) => {
+    const item = recipe.ingredients_used.find((used) => normalize(used.name) === normalize(name))
+      ?? recipe.ingredients_used.find((used) => normalize(used.name).includes(normalize(name)) || normalize(name).includes(normalize(used.name)));
+    return item ? [item.quantity, item.unit].filter(Boolean).join(' ') : '';
+  };
+  // Ingrédients qui ne sont ni « du garde-manger » ni « à acheter » (sel, huile…, anciennes recettes)
+  const listed = [...recipe.ingredients_from_list, ...missing].map(normalize);
+  const others = recipe.ingredients_used.filter((used) => !listed.some((name) => name === normalize(used.name) || normalize(used.name).includes(name) || name.includes(normalize(used.name))));
+
   return (
-    <Modal visible animationType="slide" transparent={true} onRequestClose={onClose}>
-      <View style={modalStyles.modalOverlay}>
-        <View style={[modalStyles.modalContent, safe.bottom(24)]}>
-          <View style={modalStyles.modalHeader}>
-            <Text style={modalStyles.modalTitle}>{recipe.title}</Text>
-            <TouchableOpacity onPress={onClose} hitSlop={8}>
-              <X size={24} color="#6b7280" />
-            </TouchableOpacity>
+    <Modal visible animationType="slide" statusBarTranslucent navigationBarTranslucent onRequestClose={onClose}>
+      <View style={styles.container}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+          {/* Image, ou illustration tant qu'il n'y en a pas */}
+          <View style={styles.hero}>
+            {recipe.image_url ? (
+              <Image source={{ uri: recipe.image_url }} style={styles.fill} contentFit="cover" cachePolicy="memory-disk" transition={motion.normal} />
+            ) : imageLoading ? (
+              <Skeleton height={sizes.recipeHero} rounded={0} />
+            ) : (
+              <RecipePlaceholder style={styles.fill} label={t('recipe.photoPlaceholder')} />
+            )}
           </View>
 
-          <ScrollView showsVerticalScrollIndicator={false}>
-            {/* Emplacement réservé : la fiche s'affiche tout de suite, l'image s'y place à son arrivée */}
-            <View style={styles.imageSlot}>
-              {recipe.image_url ? (
-                <Image source={{ uri: recipe.image_url }} style={styles.image} contentFit="cover" cachePolicy="memory-disk" transition={150} />
-              ) : imageLoading ? (
-                <ActivityIndicator color="#10b981" />
-              ) : (
-                <>
-                  <ImageOff size={32} color="#d1d5db" />
-                  {imageNotice ? <Text style={styles.imageNotice}>{imageNotice}</Text> : null}
-                </>
-              )}
-            </View>
-            {recipe.image_url ? <Text style={styles.imageCaption}>{t('recipe.imageCaption')}</Text> : null}
-
+          <View style={styles.sheet}>
+            <Text style={styles.title}>{recipe.title}</Text>
+            {recipe.image_url ? <Text style={styles.caption}>{t('recipe.imageCaption')}</Text> : null}
+            {!recipe.image_url && !imageLoading && imageNotice ? <Text style={styles.caption}>{imageNotice}</Text> : null}
             {recipe.description ? <Text style={styles.description}>{recipe.description}</Text> : null}
 
+            <View style={styles.pills}>
+              <Pill icon={Clock} label={t('common.minutes', { count: recipe.total_time })} />
+              {recipe.difficulty ? <Pill icon={Flame} label={difficultyLabel(t, recipe.difficulty)} /> : null}
+              {recipe.servings > 0 ? <Pill icon={Users} label={t('generate.servingsShort', { count: recipe.servings })} /> : null}
+            </View>
+            {recipe.prep_time > 0 || recipe.cook_time > 0 ? (
+              <Text style={styles.times}>{t('home.prepAndCook', { prep: recipe.prep_time, cook: recipe.cook_time })}</Text>
+            ) : null}
+
+            {recipe.dietary_tags.length > 0 && (
+              <View style={styles.tags}>
+                {recipe.dietary_tags.map((tag, index) => (
+                  <Badge key={index} label={dietLabel(t, tag)} tone="leftover" />
+                ))}
+              </View>
+            )}
+
             {recipe.suggestion ? (
-              <View style={suggestionStyles.suggestionBox}>
-                <Lightbulb size={16} color="#b45309" />
-                <Text style={suggestionStyles.suggestionText}>{recipe.suggestion}</Text>
+              <View style={styles.note}>
+                <Sparkles size={sizes.iconSmall} color={colors.onAccent} />
+                <Text style={styles.noteText}>{recipe.suggestion}</Text>
               </View>
             ) : null}
 
-            <View style={styles.meta}>
-              <Meta label={t('recipe.prepTime')} value={t('common.minutes', { count: recipe.prep_time })} />
-              <Meta label={t('recipe.cookTime')} value={t('common.minutes', { count: recipe.cook_time })} />
-              <Meta label={t('recipe.totalTime')} value={t('common.minutes', { count: recipe.total_time })} />
-              {recipe.servings > 0 && <Meta label={t('recipe.servings')} value={String(recipe.servings)} />}
-              {recipe.difficulty ? <Meta label={t('recipe.difficulty')} value={difficultyLabel(t, recipe.difficulty)} /> : null}
-            </View>
-
-            {recipe.dietary_tags.length > 0 && (
-              <Section title={t('recipe.dietaryInfo')}>
-                <View style={styles.tags}>
-                  {recipe.dietary_tags.map((tag, index) => (
-                    <View key={index} style={styles.dietTag}>
-                      <Text style={styles.dietTagText}>{dietLabel(t, tag)}</Text>
-                    </View>
-                  ))}
-                </View>
-              </Section>
-            )}
-
             {recipe.ingredients_from_list.length > 0 && (
-              <Section title={t('recipe.fromPantry')}>
-                <View style={styles.tags}>
-                  {recipe.ingredients_from_list.map((name, index) => (
-                    <View key={index} style={styles.pantryTag}>
-                      <Text style={styles.pantryTagText}>✓ {name}</Text>
-                    </View>
-                  ))}
+              <Card style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle}>{t('recipe.fromPantryShort')}</Text>
+                  {toSave > 0 ? <Badge label={t('recipe.toSave', { count: toSave })} tone="expired" /> : null}
                 </View>
-              </Section>
+                {recipe.ingredients_from_list.map((name, index) => (
+                  <IngredientRow key={index} name={name} amount={amountOf(name)} checkbox={<Checkbox checked shape="circle" />} />
+                ))}
+              </Card>
             )}
 
             {missing.length > 0 && (
-              <Section title={t('recipe.missing')}>
-                <View style={styles.tags}>
-                  {missing.map((name, index) => (
-                    <View key={index} style={styles.missingTag}>
-                      <Text style={styles.missingTagText}>+ {name}</Text>
-                    </View>
-                  ))}
+              <Card style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle}>{t('recipe.toBuy')}</Text>
                 </View>
+                {missing.map((name, index) => (
+                  <IngredientRow key={index} name={name} amount={amountOf(name)} checkbox={<Checkbox checked={false} shape="dashed" />} />
+                ))}
                 <AddMissingButton names={missing} recipeId={recipe.id} recipeTitle={recipe.title} onOpenList={onClose} />
-              </Section>
+              </Card>
             )}
 
-            {recipe.ingredients_used.length > 0 && (
-              <Section title={t('recipe.allIngredients')}>
-                {recipe.ingredients_used.map((ingredient, index) => {
-                  const amount = [ingredient.quantity, ingredient.unit].filter(Boolean).join(' ');
-                  return (
-                    <View key={index} style={styles.ingredientRow}>
-                      <View style={styles.bullet} />
-                      <Text style={styles.ingredientText}>{amount ? `${ingredient.name} : ${amount}` : ingredient.name}</Text>
-                    </View>
-                  );
-                })}
-              </Section>
+            {others.length > 0 && (
+              <Card style={styles.card}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle}>{t('recipe.otherIngredients')}</Text>
+                </View>
+                {others.map((item, index) => (
+                  <IngredientRow key={index} name={item.name} amount={[item.quantity, item.unit].filter(Boolean).join(' ')} />
+                ))}
+              </Card>
             )}
 
             {recipe.instructions.length > 0 && (
-              <Section title={t('recipe.instructions')}>
+              <View style={styles.steps}>
+                <Text style={styles.sectionTitle}>{t('recipe.instructions')}</Text>
                 {recipe.instructions.map((step, index) => (
-                  <View key={index} style={styles.stepRow}>
+                  <View key={index} style={styles.step}>
                     <View style={styles.stepNumber}>
                       <Text style={styles.stepNumberText}>{index + 1}</Text>
                     </View>
                     <Text style={styles.stepText}>{step}</Text>
                   </View>
                 ))}
-              </Section>
+              </View>
             )}
 
-            {recipe.tips.length > 0 && (
-              <Section title={t('recipe.tips')}>
-                {recipe.tips.map((tip, index) => (
-                  <View key={index} style={styles.tip}>
-                    <Text style={styles.tipText}>💡 {tip}</Text>
-                  </View>
-                ))}
-              </Section>
-            )}
-          </ScrollView>
+            {recipe.tips.map((tip, index) => (
+              <View key={index} style={styles.note}>
+                <Sparkles size={sizes.iconSmall} color={colors.onAccent} />
+                <Text style={styles.noteText}>
+                  <Text style={styles.noteStrong}>{t('recipe.tipLabel')} </Text>
+                  {tip}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </ScrollView>
 
-          <TouchableOpacity style={[styles.favoriteButton, isFavorite && styles.favoriteButtonActive]} onPress={onToggleFavorite}>
-            <Heart size={20} color={isFavorite ? '#ef4444' : '#fff'} fill={isFavorite ? '#ef4444' : 'transparent'} />
-            <Text style={[styles.favoriteButtonText, isFavorite && styles.favoriteButtonTextActive]}>
-              {isFavorite ? t('saved.removeFavorite') : t('recipe.saveToFavorites')}
-            </Text>
-          </TouchableOpacity>
-          <CookedButton ingredientsUsed={recipe.ingredients_used} />
+        {/* Retour et favori posés sur l'image */}
+        <View style={[styles.topBar, safe.top(spacing.md)]} pointerEvents="box-none">
+          <RoundButton onPress={onClose} label={t('common.back')}>
+            <ChevronLeft size={sizes.iconLarge} color={colors.text} />
+          </RoundButton>
+          <RoundButton onPress={onToggleFavorite} label={isFavorite ? t('saved.removeFavorite') : t('recipe.saveToFavorites')} selected={isFavorite}>
+            <Heart size={sizes.icon} color={colors.expired.text} fill={isFavorite ? colors.expired.text : colors.transparent} />
+          </RoundButton>
         </View>
+
+        {/* « J'ai cuisiné ça » toujours visible */}
+        <CookedButton ingredientsUsed={recipe.ingredients_used} style={[styles.bottomBar, safe.bottom(spacing.md)]} />
       </View>
     </Modal>
   );
 }
 
-function Meta({ label, value }: { label: string; value: string }) {
+function Pill({ icon: Icon, label }: { icon: typeof Clock; label: string }) {
   return (
-    <View style={styles.metaItem}>
-      <Text style={styles.metaLabel}>{label}</Text>
-      <Text style={styles.metaValue}>{value}</Text>
+    <View style={styles.pill}>
+      <Icon size={sizes.iconSmall} color={colors.text} />
+      <Text style={styles.pillText}>{label}</Text>
     </View>
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function IngredientRow({ name, amount, checkbox }: { name: string; amount: string; checkbox?: React.ReactNode }) {
   return (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      {children}
+    <View>
+      <View style={cardStyles.divider} />
+      <View style={styles.ingredient}>
+        {checkbox}
+        <Text style={styles.ingredientName}>{name}</Text>
+        {amount ? <Text style={styles.ingredientAmount}>{amount}</Text> : null}
+      </View>
     </View>
+  );
+}
+
+function RoundButton({ onPress, label, selected, children }: { onPress: () => void; label: string; selected?: boolean; children: React.ReactNode }) {
+  return (
+    <Touchable onPress={onPress} style={styles.round} accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ selected: !!selected }}>
+      {children}
+    </Touchable>
   );
 }
 
 const styles = StyleSheet.create({
-  imageSlot: {
-    height: 220,
-    borderRadius: 16,
-    overflow: 'hidden',
-    backgroundColor: '#f3f4f6',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
   },
-  image: {
+  scroll: {
+    paddingBottom: sizes.primaryButton + spacing.xxxl * 2,
+  },
+  hero: {
+    height: sizes.recipeHero,
+    backgroundColor: colors.illustration.background,
+  },
+  fill: {
     width: '100%',
     height: '100%',
   },
-  imageNotice: {
-    fontSize: 13,
-    color: '#9ca3af',
-    textAlign: 'center',
-    marginTop: 8,
-    paddingHorizontal: 24,
+  sheet: {
+    marginTop: -radius.sheet,
+    borderTopLeftRadius: radius.sheet,
+    borderTopRightRadius: radius.sheet,
+    backgroundColor: colors.background,
+    paddingHorizontal: spacing.screen,
+    paddingTop: spacing.xxl,
+    gap: spacing.lg,
   },
-  imageCaption: {
-    fontSize: 12,
-    color: '#6b7280',
-    textAlign: 'center',
-    fontStyle: 'italic',
+  title: {
+    ...typography.title1,
+  },
+  caption: {
+    ...typography.secondary,
+    marginTop: -spacing.sm,
   },
   description: {
-    fontSize: 16,
-    color: '#6b7280',
-    marginTop: 12,
-    marginBottom: 16,
-    lineHeight: 24,
+    ...typography.body,
+    color: colors.textSecondary,
   },
-  meta: {
+  pills: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 16,
-    marginTop: 4,
-    marginBottom: 20,
+    gap: spacing.sm,
   },
-  metaItem: {
-    minWidth: '40%',
-    flex: 1,
+  pill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm - 2,
+    minHeight: sizes.touch - spacing.xs,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radius.pill,
+    borderWidth: sizes.borderWidth,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
   },
-  metaLabel: {
-    fontSize: 12,
-    color: '#9ca3af',
-    marginBottom: 4,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+  pillText: {
+    ...typography.listTitle,
   },
-  metaValue: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  section: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 12,
+  times: {
+    ...typography.secondary,
+    marginTop: -spacing.sm,
   },
   tags: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: spacing.sm,
   },
-  dietTag: {
-    backgroundColor: '#dbeafe',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+  note: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    backgroundColor: colors.accentSoft,
+    borderRadius: radius.control,
+    padding: spacing.lg,
   },
-  dietTagText: {
-    color: '#1e40af',
-    fontSize: 12,
-    fontWeight: '600',
+  noteText: {
+    ...typography.body,
+    flex: 1,
+    fontSize: typography.listTitle.fontSize,
   },
-  pantryTag: {
-    backgroundColor: '#d1fae5',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+  noteStrong: {
+    fontFamily: typography.button.fontFamily,
   },
-  pantryTagText: {
-    color: '#065f46',
-    fontSize: 12,
-    fontWeight: '600',
+  card: {
+    paddingVertical: spacing.sm,
   },
-  missingTag: {
-    backgroundColor: '#fef3c7',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  missingTagText: {
-    color: '#92400e',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  ingredientRow: {
+  cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    justifyContent: 'space-between',
+    minHeight: sizes.touch,
+    gap: spacing.sm,
   },
-  bullet: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#10b981',
-    marginRight: 10,
+  cardTitle: {
+    ...typography.cardTitle,
   },
-  ingredientText: {
-    fontSize: 15,
-    color: '#374151',
+  ingredient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    minHeight: sizes.touch + spacing.xs,
+  },
+  ingredientName: {
+    ...typography.bodyMedium,
     flex: 1,
   },
-  stepRow: {
+  ingredientAmount: {
+    ...typography.body,
+    color: colors.textSecondary,
+  },
+  steps: {
+    gap: spacing.md,
+  },
+  sectionTitle: {
+    ...typography.cardTitle,
+    fontSize: typography.title3.fontSize! - spacing.xs,
+  },
+  step: {
     flexDirection: 'row',
-    marginBottom: 12,
+    alignItems: 'flex-start',
+    gap: spacing.md,
   },
   stepNumber: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: '#10b981',
-    justifyContent: 'center',
+    width: sizes.iconChip - spacing.xs,
+    height: sizes.iconChip - spacing.xs,
+    borderRadius: radius.small,
+    backgroundColor: colors.primarySoft,
     alignItems: 'center',
-    marginRight: 12,
+    justifyContent: 'center',
   },
   stepNumberText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '700',
+    ...typography.button,
+    color: colors.primary,
   },
   stepText: {
-    fontSize: 15,
-    color: '#374151',
+    ...typography.body,
     flex: 1,
-    lineHeight: 22,
   },
-  tip: {
-    backgroundColor: '#fef3c7',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 8,
-  },
-  tipText: {
-    fontSize: 14,
-    color: '#92400e',
-    lineHeight: 20,
-  },
-  favoriteButton: {
-    backgroundColor: '#10b981',
+  topBar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.screen,
+  },
+  round: {
+    width: sizes.touch + spacing.xs,
+    height: sizes.touch + spacing.xs,
+    borderRadius: radius.pill,
+    backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    borderRadius: 12,
-    gap: 8,
-    marginTop: 8,
   },
-  favoriteButtonActive: {
-    backgroundColor: '#fef2f2',
-  },
-  favoriteButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  favoriteButtonTextActive: {
-    color: '#ef4444',
+  bottomBar: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingHorizontal: spacing.screen,
+    paddingTop: spacing.md,
+    backgroundColor: colors.surface,
+    borderTopWidth: sizes.borderWidth,
+    borderTopColor: colors.border,
   },
 });
