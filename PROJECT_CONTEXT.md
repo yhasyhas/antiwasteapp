@@ -206,6 +206,12 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Fiches aliments (fonction `food-fact`, `components/pantry/FoodFactSheet.tsx`, migration `food_facts`, scripts `scripts/food-facts/`), `food_key` renvoyé par le scan.
 - Tests : 59 tests Deno, 12 fichiers de tests SQL.
 
+### Phase 7 — design et ergonomie (branche `phase-7`, partie de `phase-6b`)
+- Système de design : `constants/theme.ts` (seule source des couleurs, typographies, arrondis, espacements, tailles), polices Bricolage Grotesque (titres) et Figtree (texte) chargées dans `app/_layout.tsx`.
+- Composants : `components/ui/` (Button, Card, Badge, Chip, IconChip, Checkbox, TextField, ListRow, Switch, BottomSheet et SheetHeader, ScreenHeader, TabBar, Skeleton, Illustrations et EmptyState, SwipeToDelete, ListItemMotion, Touchable).
+- Écrans refaits d'après `docs/design/` ; captures dans `docs/design/implemente/`. Sous-écran Langue (`app/language.tsx`), courses en onglet caché (`app/(tabs)/shopping.tsx`), vérification anti-robot intégrée au formulaire (`CaptchaField`).
+- Badge « X à sauver » : `hooks/usePantryUrgency.ts`.
+
 ## 5. État actuel et problèmes connus
 
 ### Sécurité
