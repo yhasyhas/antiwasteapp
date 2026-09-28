@@ -12,6 +12,7 @@ import { RecipeSheet } from '@/components/recipe/RecipeSheet';
 import { PantryChips } from '@/components/recipe/PantryChips';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/Illustrations';
+import { ListItemMotion } from '@/components/ui/ListItemMotion';
 import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { Skeleton, SkeletonRecipeCard } from '@/components/ui/Skeleton';
 import { colors, radius, sizes, spacing } from '@/constants/theme';
@@ -74,13 +75,14 @@ export default function GenerateRecipeScreen() {
         ) : (
           <View>
             {recipes.map((recipe, index) => (
-              <RecipeListCard
-                key={recipe.id ?? index}
-                recipe={recipe}
-                imageLoading={isImageLoading(recipe.id)}
-                onPress={() => openRecipe(recipe)}
-                favorite={recipe.id ? { active: isFavorite(recipe), onToggle: () => toggleFavorite(recipe) } : undefined}
-              />
+              <ListItemMotion key={recipe.id ?? index} index={index}>
+                <RecipeListCard
+                  recipe={recipe}
+                  imageLoading={isImageLoading(recipe.id)}
+                  onPress={() => openRecipe(recipe)}
+                  favorite={recipe.id ? { active: isFavorite(recipe), onToggle: () => toggleFavorite(recipe) } : undefined}
+                />
+              </ListItemMotion>
             ))}
           </View>
         )}

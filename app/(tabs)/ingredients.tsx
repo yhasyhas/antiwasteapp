@@ -12,6 +12,7 @@ import { EmptyState } from '@/components/ui/Illustrations';
 import { ScreenHeader, SquareButton } from '@/components/ui/ScreenHeader';
 import { SkeletonRow } from '@/components/ui/Skeleton';
 import { Touchable } from '@/components/ui/Touchable';
+import { ListItemMotion } from '@/components/ui/ListItemMotion';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { supabase } from '@/lib/supabase';
 import { IngredientCard, type PantryIngredient } from '@/components/pantry/IngredientCard';
@@ -177,16 +178,17 @@ export default function IngredientsScreen() {
     { key: 'later', title: t('pantry.groupLater'), items: visible.filter((ingredient) => !isUrgent(ingredient)), color: colors.textSecondary },
   ].filter((group) => group.items.length > 0);
 
-  const renderCard = (ingredient: PantryIngredient) => (
-    <IngredientCard
-      key={ingredient.id}
-      ingredient={ingredient}
-      deleting={deleting === ingredient.id}
-      onDelete={() => deleteIngredient(ingredient.id)}
-      onEditExpiry={() => setEditingExpiry(ingredient)}
-      addedBy={addedBy(ingredient.user_id)}
-      onOpenFact={() => setFactIngredient(ingredient)}
-    />
+  const renderCard = (ingredient: PantryIngredient, index: number) => (
+    <ListItemMotion key={ingredient.id} index={index}>
+      <IngredientCard
+        ingredient={ingredient}
+        deleting={deleting === ingredient.id}
+        onDelete={() => deleteIngredient(ingredient.id)}
+        onEditExpiry={() => setEditingExpiry(ingredient)}
+        addedBy={addedBy(ingredient.user_id)}
+        onOpenFact={() => setFactIngredient(ingredient)}
+      />
+    </ListItemMotion>
   );
 
   return (

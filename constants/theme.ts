@@ -201,6 +201,12 @@ export const motion = {
   pressedOpacity: 0.85,
 } as const;
 
+// Listes : apparition des cartes (décalage entre deux cartes) et réarrangement
+export const listMotion = {
+  stagger: 40,
+  maxStaggered: 8,
+} as const;
+
 export const opacity = {
   disabled: 0.45,
 } as const;

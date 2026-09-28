@@ -5,6 +5,7 @@ import { useSavedRecipes } from '@/hooks/useSavedRecipes';
 import { RecipeListCard } from '@/components/recipe/RecipeListCard';
 import { RecipeSheet } from '@/components/recipe/RecipeSheet';
 import { EmptyState } from '@/components/ui/Illustrations';
+import { ListItemMotion } from '@/components/ui/ListItemMotion';
 import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { SkeletonRecipeCard } from '@/components/ui/Skeleton';
 import { colors, spacing, typography } from '@/constants/theme';
@@ -29,14 +30,15 @@ export default function SavedScreen() {
       ) : (
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <Text style={styles.sectionTitle}>{t('saved.yourFavorites')}</Text>
-          {favoriteRecipes.map((recipe) => (
-            <RecipeListCard
-              key={recipe.id}
-              recipe={recipe}
-              imageLoading={isImageLoading(recipe.id)}
-              onPress={() => openRecipe(recipe)}
-              favorite={{ active: true, onToggle: () => toggleFavorite(recipe.id) }}
-            />
+          {favoriteRecipes.map((recipe, index) => (
+            <ListItemMotion key={recipe.id} index={index}>
+              <RecipeListCard
+                recipe={recipe}
+                imageLoading={isImageLoading(recipe.id)}
+                onPress={() => openRecipe(recipe)}
+                favorite={{ active: true, onToggle: () => toggleFavorite(recipe.id) }}
+              />
+            </ListItemMotion>
           ))}
 
           {otherRecipes.length > 0 && (

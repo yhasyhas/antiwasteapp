@@ -15,6 +15,7 @@ import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { SkeletonRow } from '@/components/ui/Skeleton';
 import { SwipeToDelete } from '@/components/ui/SwipeToDelete';
 import { Touchable } from '@/components/ui/Touchable';
+import { ListItemMotion } from '@/components/ui/ListItemMotion';
 import { ExpiryPicker } from '@/components/expiry/ExpiryPicker';
 import { expiryFromShelfLife } from '@/lib/expiry';
 import {
@@ -130,7 +131,7 @@ export default function ShoppingScreen() {
       ? t('shopping.forRecipeLine', { title: item.recipe_title })
       : author ? t('household.addedBy', { name: author }) : null;
     return (
-      <View key={item.id}>
+      <ListItemMotion key={item.id} index={index}>
         {index > 0 ? <View style={cardStyles.divider} /> : null}
         <SwipeToDelete onDelete={() => remove(item)}>
           <Touchable
@@ -149,7 +150,7 @@ export default function ShoppingScreen() {
             {item.quantity ? <Text style={styles.quantity}>{item.quantity}</Text> : null}
           </Touchable>
         </SwipeToDelete>
-      </View>
+      </ListItemMotion>
     );
   };
 
