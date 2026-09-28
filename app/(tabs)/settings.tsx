@@ -1,31 +1,34 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { Globe, LogOut, UserRound, Users, UtensilsCrossed } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { useAuth } from '@/contexts/AuthContext';
-import { Globe, ChevronRight, User, LogOut, Users, SlidersHorizontal } from 'lucide-react-native';
+import { useHousehold } from '@/hooks/useHousehold';
+import { setDisplayName } from '@/lib/household';
 import { sendSentryTestError, sentryEnabled } from '@/lib/sentry';
 import { notificationsSupported, sendTestReminder } from '@/lib/notifications';
-import { router } from 'expo-router';
-
-const languages = [
-  { code: 'fr', label: 'Français', flag: '🇫🇷' },
-  { code: 'en', label: 'English', flag: '🇬🇧' },
-  { code: 'es', label: 'Español', flag: '🇪🇸' },
-] as const;
+import { BottomSheet, SheetHeader } from '@/components/ui/BottomSheet';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { TextField } from '@/components/ui/Input';
+import { ListRow } from '@/components/ui/ListRow';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
+import { Touchable } from '@/components/ui/Touchable';
+import { APP_LANGUAGES } from '@/lib/languages';
+import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 
 export default function SettingsScreen() {
-  const { language, setLanguage, t, loading } = useLanguage();
-  const safe = useSafeSpacing();
+  const { language, t } = useLanguage();
   const { user, signOut, isAnonymous } = useAuth();
+  const household = useHousehold();
+  const me = household?.members.find((member) => member.is_me);
+  // Nom affiché aux membres du foyer (feuille « Modifier »)
+  const [editingName, setEditingName] = useState(false);
+  const [name, setName] = useState('');
+  const [savingName, setSavingName] = useState(false);
+
+  useEffect(() => setName(me?.name ?? ''), [me?.name, editingName]);
 
   // Compte d'essai : se déconnecter perd l'accès aux données (aucun moyen de se reconnecter)
   const confirmSignOut = () => {
@@ -40,16 +43,16 @@ export default function SettingsScreen() {
     ]);
   };
 
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#10b981" />
-      </View>
-    );
-  }
-
-  const handleLanguageChange = async (newLang: 'fr' | 'en' | 'es') => {
-    await setLanguage(newLang);
+  const saveName = async () => {
+    setSavingName(true);
+    try {
+      await setDisplayName(name);
+      setEditingName(false);
+    } catch {
+      Alert.alert(t('common.error'), t('household.errors.unknown'));
+    } finally {
+      setSavingName(false);
+    }
   };
 
   const testNotification = async () => {
@@ -59,318 +62,166 @@ export default function SettingsScreen() {
     else Alert.alert(t('notifications.testButton'), t('notifications.testSent'));
   };
 
+  const displayName = me?.name || (isAnonymous ? t('auth.guestName') : t('settings.noName'));
+  const currentLanguage = APP_LANGUAGES.find((lang) => lang.code === language)?.label ?? language;
+
   return (
     <View style={styles.container}>
-      <View style={[styles.header, safe.top(20)]}>
-        <Text style={styles.headerTitle}>{t('settings.title')}</Text>
-      </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Section Langue */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Globe size={20} color="#10b981" />
-            <Text style={styles.sectionTitle}>{t('settings.language')}</Text>
+      <ScreenHeader title={t('settings.title')} />
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Profil */}
+        <Card style={styles.profile}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{displayName.charAt(0).toUpperCase()}</Text>
           </View>
-
-          {languages.map((lang) => (
-            <TouchableOpacity
-              key={lang.code}
-              style={[
-                styles.languageCard,
-                language === lang.code && styles.languageCardActive,
-              ]}
-              onPress={() => handleLanguageChange(lang.code)}
-            >
-              <Text style={styles.flag}>{lang.flag}</Text>
-              <Text
-                style={[
-                  styles.languageLabel,
-                  language === lang.code && styles.languageLabelActive,
-                ]}
-              >
-                {lang.label}
-              </Text>
-              {language === lang.code && (
-                <View style={styles.checkmark}>
-                  <Text style={styles.checkmarkText}>✓</Text>
-                </View>
-              )}
-              <ChevronRight
-                size={20}
-                color={language === lang.code ? '#10b981' : '#9ca3af'}
-                style={styles.chevron}
-              />
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Section Compte */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <User size={20} color="#10b981" />
-            <Text style={styles.sectionTitle}>{t('settings.account')}</Text>
+          <View style={styles.profileText}>
+            <Text style={styles.profileName} numberOfLines={1}>{displayName}</Text>
+            <Text style={styles.profileEmail} numberOfLines={1}>{user?.email || t('settings.notSignedIn')}</Text>
           </View>
+          <Touchable onPress={() => setEditingName(true)} style={styles.edit} accessibilityRole="button" accessibilityLabel={t('settings.editName')}>
+            <Text style={styles.editText}>{t('settings.edit')}</Text>
+          </Touchable>
+        </Card>
 
-          {isAnonymous ? (
-            <View style={styles.guestCard}>
-              <Text style={styles.guestTitle}>{t('settings.guestTitle')}</Text>
-              <Text style={styles.guestText}>{t('settings.guestText')}</Text>
-              <TouchableOpacity style={styles.guestButton} onPress={() => router.push('/auth/upgrade')}>
-                <Text style={styles.guestButtonText}>{t('upgrade.title')}</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <View style={styles.infoCard}>
-              <Text style={styles.infoLabel}>{t('settings.email')}</Text>
-              <Text style={styles.infoValue}>{user?.email || t('settings.notSignedIn')}</Text>
-            </View>
-          )}
+        {/* Compte d'essai : créer un vrai compte */}
+        {isAnonymous && (
+          <Card variant="soft" style={styles.guest}>
+            <Text style={styles.guestTitle}>{t('settings.guestTitle')}</Text>
+            <Text style={styles.guestText}>{t('settings.guestText')}</Text>
+            <Button label={t('upgrade.title')} size="medium" icon={UserRound} onPress={() => router.push('/auth/upgrade')} />
+          </Card>
+        )}
 
-          <TouchableOpacity style={[styles.householdRow, styles.rowSpacing]} onPress={() => router.push('/preferences')}>
-            <SlidersHorizontal size={20} color="#10b981" />
-            <Text style={styles.householdText}>{t('preferences.title')}</Text>
-            <ChevronRight size={20} color="#9ca3af" />
-          </TouchableOpacity>
+        <Card style={styles.list}>
+          <ListRow
+            icon={Users}
+            title={t('household.title')}
+            subtitle={household?.shared ? t('settings.householdShared', { count: household.members.length }) : t('settings.householdPersonal')}
+            onPress={() => router.push('/household')}
+          />
+          <ListRow
+            divider
+            icon={UtensilsCrossed}
+            title={t('preferences.title')}
+            subtitle={t('settings.preferencesSubtitle')}
+            onPress={() => router.push('/preferences')}
+          />
+          <ListRow divider icon={Globe} title={t('settings.language')} subtitle={currentLanguage} onPress={() => router.push('/language')} />
+        </Card>
 
-          <TouchableOpacity style={styles.householdRow} onPress={() => router.push('/household')}>
-            <Users size={20} color="#10b981" />
-            <Text style={styles.householdText}>{t('household.open')}</Text>
-            <ChevronRight size={20} color="#9ca3af" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.logoutButton} onPress={confirmSignOut}>
-            <LogOut size={20} color="#ef4444" />
-            <Text style={styles.logoutText}>{t('settings.signOut')}</Text>
-          </TouchableOpacity>
-        </View>
+        <Card style={styles.list}>
+          <ListRow icon={LogOut} title={t('settings.signOut')} danger onPress={confirmSignOut} />
+        </Card>
 
         {/* Développement seulement : vérifie que les erreurs remontent dans Sentry */}
         {__DEV__ && sentryEnabled && (
-          <TouchableOpacity style={styles.testButton} onPress={sendSentryTestError}>
-            <Text style={styles.testButtonText}>{t('settings.sentryTest')}</Text>
-          </TouchableOpacity>
+          <Button label={t('settings.sentryTest')} variant="ghost" size="small" onPress={sendSentryTestError} />
         )}
         {/* Développement seulement : compteurs du jour et quotas de fournisseurs épuisés */}
         {__DEV__ && user && (
-          <TouchableOpacity style={styles.testButton} onPress={() => router.push('/dev/status')}>
-            <Text style={styles.testButtonText}>{t('devStatus.open')}</Text>
-          </TouchableOpacity>
+          <Button label={t('devStatus.open')} variant="ghost" size="small" onPress={() => router.push('/dev/status')} />
         )}
         {/* Développement seulement : le rappel de péremption, sans attendre 9 h */}
         {__DEV__ && notificationsSupported && user && (
-          <TouchableOpacity style={styles.testButton} onPress={testNotification}>
-            <Text style={styles.testButtonText}>{t('notifications.testButton')}</Text>
-          </TouchableOpacity>
+          <Button label={t('notifications.testButton')} variant="ghost" size="small" onPress={testNotification} />
         )}
 
-        {/* Section Info */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>{t('settings.appVersion', { version: '1.0' })}</Text>
-          <Text style={styles.footerSubtext}>
-            {t('settings.tagline')}
-          </Text>
+          <Text style={styles.footerSubtext}>{t('settings.tagline')}</Text>
         </View>
       </ScrollView>
+
+      <BottomSheet visible={editingName} onClose={() => setEditingName(false)} keyboard>
+        <SheetHeader title={t('household.yourName')} subtitle={t('household.yourNameHint')} onClose={() => setEditingName(false)} />
+        <TextField value={name} onChangeText={setName} maxLength={40} placeholder={t('household.yourNamePlaceholder')} autoFocus />
+        <Button
+          label={t('household.save')}
+          onPress={saveName}
+          loading={savingName}
+          disabled={name.trim() === (me?.name ?? '')}
+          style={styles.saveName}
+        />
+      </BottomSheet>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  testButton: {
-    marginHorizontal: 20,
-    marginTop: 8,
-    paddingVertical: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderStyle: 'dashed',
-    alignItems: 'center',
-  },
-  testButtonText: {
-    color: '#6b7280',
-    fontSize: 14,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
-  },
-  header: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#111827',
+    backgroundColor: colors.background,
   },
   content: {
-    flex: 1,
-    padding: 16,
+    paddingHorizontal: spacing.screen,
+    paddingBottom: spacing.xxl,
+    gap: spacing.lg,
   },
-  section: {
-    marginBottom: 24,
-  },
-  sectionHeader: {
+  profile: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 12,
-    paddingHorizontal: 4,
+    gap: spacing.lg,
   },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#374151',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  languageCard: {
-    flexDirection: 'row',
+  avatar: {
+    width: sizes.iconChipLarge,
+    height: sizes.iconChipLarge,
+    borderRadius: radius.pill,
+    backgroundColor: colors.accent,
     alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 8,
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-  languageCardActive: {
-    borderColor: '#10b981',
-    backgroundColor: '#f0fdf4',
-  },
-  flag: {
-    fontSize: 24,
-    marginRight: 12,
-  },
-  languageLabel: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#374151',
-  },
-  languageLabelActive: {
-    color: '#10b981',
-    fontWeight: '600',
-  },
-  checkmark: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#10b981',
     justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
   },
-  checkmarkText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '700',
+  avatarText: {
+    ...typography.title3,
+    color: colors.onAccent,
   },
-  chevron: {
-    marginLeft: 'auto',
+  profileText: {
+    flex: 1,
+    gap: spacing.xxs,
   },
-  infoCard: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 8,
+  profileName: {
+    ...typography.cardTitle,
   },
-  infoLabel: {
-    fontSize: 12,
-    color: '#9ca3af',
-    marginBottom: 4,
-    textTransform: 'uppercase',
+  profileEmail: {
+    ...typography.secondary,
+    fontSize: typography.listTitle.fontSize,
   },
-  infoValue: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#111827',
+  edit: {
+    minHeight: sizes.touch,
+    justifyContent: 'center',
+    paddingLeft: spacing.sm,
   },
-  householdRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
+  editText: {
+    ...typography.bodyStrong,
+    color: colors.primary,
   },
-  guestCard: {
-    backgroundColor: '#f0fdf4',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 8,
-    gap: 6,
-    borderWidth: 1,
-    borderColor: '#d1fae5',
+  guest: {
+    gap: spacing.sm,
   },
   guestTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#047857',
+    ...typography.cardTitle,
+    color: colors.primary,
   },
   guestText: {
-    fontSize: 14,
-    color: '#374151',
-    lineHeight: 20,
+    ...typography.body,
+    fontSize: typography.listTitle.fontSize,
+    marginBottom: spacing.sm,
   },
-  guestButton: {
-    marginTop: 6,
-    backgroundColor: '#10b981',
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  guestButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 15,
-  },
-  rowSpacing: {
-    marginBottom: 8,
-  },
-  householdText: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
-    marginTop: 8,
-  },
-  logoutText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#ef4444',
+  list: {
+    paddingVertical: spacing.xs,
   },
   footer: {
     alignItems: 'center',
-    paddingVertical: 32,
+    paddingVertical: spacing.xxl,
+    gap: spacing.xs,
   },
   footerText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#9ca3af',
-    marginBottom: 4,
+    ...typography.secondaryStrong,
   },
   footerSubtext: {
-    fontSize: 12,
-    color: '#9ca3af',
+    ...typography.secondary,
     textAlign: 'center',
+  },
+  saveName: {
+    marginTop: spacing.lg,
   },
 });

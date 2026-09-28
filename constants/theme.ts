@@ -99,6 +99,8 @@ export const typography = {
   title1: title(28),
   title2: title(24),
   title3: title(22),
+  // Accroche de l'écran de connexion
+  hero: title(34),
   // Grand chiffre (compteur anti-gaspi)
   display: title(56),
   // Texte (Figtree)
@@ -172,6 +174,8 @@ export const sizes = {
   scanCorner: 40,
   scanCornerWidth: 4,
   scanFrame: 280,
+  // Cadre de la vérification Turnstile (widget normal ou compact)
+  captchaFrame: { normal: 80, compact: 150 },
 } as const;
 
 // Ombres légères (cartes flottantes : bouton « + », feuilles)

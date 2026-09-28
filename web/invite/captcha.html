@@ -29,8 +29,8 @@
           callback: function (token) { send({ type: 'token', token: token }); },
           'error-callback': function (code) { send({ type: 'error', code: String(code) }); return true; },
           'unsupported-callback': function () { send({ type: 'error', code: 'unsupported' }); },
-          // Jeton expiré ou délai dépassé : nouvelle vérification dans la même fenêtre
-          'expired-callback': function () { turnstile.reset('#widget'); },
+          // Jeton expiré (l'app l'oublie) ou délai dépassé : nouvelle vérification dans la même page
+          'expired-callback': function () { send({ type: 'expired' }); turnstile.reset('#widget'); },
           'timeout-callback': function () { turnstile.reset('#widget'); },
           // Suivi (affiché dans l'app en développement) : défi interactif, taille visible de la page
           'before-interactive-callback': function () { send({ type: 'state', code: 'interactive' }); },

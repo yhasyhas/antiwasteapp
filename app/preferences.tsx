@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { Stack, router } from 'expo-router';
-import { Check } from 'lucide-react-native';
+import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { KeyboardAvoider, useKeyboardScroll } from '@/components/ui/KeyboardAvoider';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
+import { SkeletonRow } from '@/components/ui/Skeleton';
+import { colors, sizes, spacing, typography } from '@/constants/theme';
 import { CookTimeChoice, ExcludedEditor, ServingsStepper } from '@/components/recipe/PreferenceControls';
 import { cuisineOptions, dietaryOptions } from '@/components/recipe/options';
 import { DEFAULT_PREFERENCES, loadPreferences, savePreferences, type Preferences } from '@/lib/preferences';
@@ -41,20 +46,15 @@ export default function PreferencesScreen() {
     }
   };
 
-  const chip = (key: string, label: string, selected: boolean, onPress: () => void) => (
-    <TouchableOpacity key={key} style={[styles.chip, selected && styles.chipSelected]} onPress={onPress}>
-      {selected && <Check size={16} color="#fff" />}
-      <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{label}</Text>
-    </TouchableOpacity>
-  );
-
   return (
-    <>
-      <Stack.Screen options={{ headerShown: true, title: t('preferences.title') }} />
+    <KeyboardAvoider style={styles.container}>
+      <ScreenHeader title={t('preferences.title')} back />
       {!preferences ? (
-        <View style={styles.loading}><ActivityIndicator size="large" color="#10b981" /></View>
+        <View style={styles.content}>
+          {[0, 1, 2].map((row) => <SkeletonRow key={row} />)}
+        </View>
       ) : (
-        <KeyboardAvoider style={styles.container}>
+        <>
           <ScrollView
             ref={keyboardScroll.scrollRef}
             onScroll={keyboardScroll.onScroll}
@@ -66,8 +66,15 @@ export default function PreferencesScreen() {
 
             <Section title={t('generate.dietary')}>
               <View style={styles.grid}>
-                {dietaryOptions.map((option) => chip(option.value, t(option.labelKey), preferences.dietary.includes(option.value), () =>
-                  update({ dietary: preferences.dietary.includes(option.value) ? preferences.dietary.filter((d) => d !== option.value) : [...preferences.dietary, option.value] })))}
+                {dietaryOptions.map((option) => (
+                  <Chip
+                    key={option.value}
+                    label={t(option.labelKey)}
+                    showCheck
+                    selected={preferences.dietary.includes(option.value)}
+                    onPress={() => update({ dietary: preferences.dietary.includes(option.value) ? preferences.dietary.filter((d) => d !== option.value) : [...preferences.dietary, option.value] })}
+                  />
+                ))}
               </View>
             </Section>
 
@@ -81,7 +88,9 @@ export default function PreferencesScreen() {
 
             <Section title={t('preferences.cuisine')}>
               <View style={styles.grid}>
-                {cuisineOptions.map((option) => chip(option.value, t(option.labelKey), preferences.cuisine === option.value, () => update({ cuisine: option.value })))}
+                {cuisineOptions.map((option) => (
+                  <Chip key={option.value} label={t(option.labelKey)} showCheck selected={preferences.cuisine === option.value} onPress={() => update({ cuisine: option.value })} />
+                ))}
               </View>
             </Section>
 
@@ -89,41 +98,58 @@ export default function PreferencesScreen() {
               <ServingsStepper value={preferences.servings} onChange={(servings) => update({ servings })} />
             </Section>
           </ScrollView>
-          <View style={[styles.footer, safe.bottom(16)]}>
-            <TouchableOpacity style={styles.saveButton} onPress={save} disabled={saving}>
-              {saving ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveText}>{t('preferences.save')}</Text>}
-            </TouchableOpacity>
+          <View style={[styles.footer, safe.bottom(spacing.lg)]}>
+            <Button label={t('preferences.save')} onPress={save} loading={saving} />
           </View>
-        </KeyboardAvoider>
+        </>
       )}
-    </>
+    </KeyboardAvoider>
   );
 }
 
 function Section({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
   return (
-    <View style={styles.section}>
+    <Card style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
       {hint ? <Text style={styles.hint}>{hint}</Text> : null}
       {children}
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  loading: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f9fafb' },
-  container: { flex: 1, backgroundColor: '#f9fafb' },
-  content: { padding: 20, gap: 20 },
-  intro: { fontSize: 14, color: '#4b5563', lineHeight: 20 },
-  section: { backgroundColor: '#fff', borderRadius: 12, padding: 16, gap: 10, borderWidth: 1, borderColor: '#f3f4f6' },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: '#111827' },
-  hint: { fontSize: 13, color: '#6b7280', lineHeight: 18 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: '#f3f4f6', borderWidth: 1, borderColor: '#e5e7eb' },
-  chipSelected: { backgroundColor: '#10b981', borderColor: '#10b981' },
-  chipText: { fontSize: 14, color: '#374151', fontWeight: '500' },
-  chipTextSelected: { color: '#fff' },
-  footer: { paddingHorizontal: 20, paddingTop: 12, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#f3f4f6' },
-  saveButton: { backgroundColor: '#10b981', borderRadius: 12, paddingVertical: 14, alignItems: 'center' },
-  saveText: { color: '#fff', fontWeight: '600', fontSize: 16 },
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  content: {
+    paddingHorizontal: spacing.screen,
+    paddingBottom: spacing.xxl,
+    gap: spacing.lg,
+  },
+  intro: {
+    ...typography.body,
+    color: colors.textSecondary,
+  },
+  section: {
+    gap: spacing.md,
+  },
+  sectionTitle: {
+    ...typography.cardTitle,
+  },
+  hint: {
+    ...typography.secondary,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  footer: {
+    paddingHorizontal: spacing.screen,
+    paddingTop: spacing.md,
+    backgroundColor: colors.surface,
+    borderTopWidth: sizes.borderWidth,
+    borderTopColor: colors.border,
+  },
 });

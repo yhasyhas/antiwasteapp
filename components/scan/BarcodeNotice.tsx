@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
   },
   code: {
     ...typography.bodyStrong,
-    letterSpacing: 1,
+    letterSpacing: spacing.xxs,
   },
   text: {
     ...typography.secondary,

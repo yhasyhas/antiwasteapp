@@ -1,6 +1,11 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
-import { Redirect, Stack, useFocusEffect } from 'expo-router';
+import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { Redirect, useFocusEffect } from 'expo-router';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
+import { colors, spacing, typography } from '@/constants/theme';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
@@ -54,20 +59,20 @@ export default function ServiceStatusScreen() {
   if (!__DEV__) return <Redirect href="/" />;
 
   return (
-    <>
-      <Stack.Screen options={{ headerShown: true, title: t('devStatus.title') }} />
+    <View style={styles.container}>
+      <ScreenHeader title={t('devStatus.title')} back />
       <ScrollView
         style={styles.container}
-        contentContainerStyle={[styles.content, safe.bottom(24)]}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={load} />}
+        contentContainerStyle={[styles.content, safe.bottom(spacing.xxl)]}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={load} colors={[colors.primary]} tintColor={colors.primary} />}
       >
         <Text style={styles.sectionTitle}>{t('devStatus.today')}</Text>
         <View style={styles.counters}>
           {(['scans', 'generations', 'images'] as const).map((kind) => (
-            <View key={kind} style={styles.counter}>
+            <Card key={kind} style={styles.counter}>
               <Text style={styles.counterValue}>{counters[kind]}</Text>
               <Text style={styles.counterLabel}>{t(`devStatus.${kind}`)}</Text>
-            </View>
+            </Card>
           ))}
         </View>
 
@@ -76,118 +81,83 @@ export default function ServiceStatusScreen() {
           <Text style={styles.empty}>{t('devStatus.none')}</Text>
         ) : (
           events.map((event) => (
-            <View key={event.id} style={styles.event}>
+            <Card key={event.id} style={styles.event}>
               <View style={styles.eventHeader}>
                 <Text style={styles.provider}>{event.provider}</Text>
-                {event.simulated && <Text style={styles.simulated}>{t('devStatus.simulated')}</Text>}
+                {event.simulated && <Badge label={t('devStatus.simulated')} tone="neutral" />}
                 <Text style={styles.eventMeta}>
                   {event.day} · {event.function_name} · {t('devStatus.occurrences', { count: event.occurrences })}
                 </Text>
               </View>
               <Text style={styles.eventTime}>{new Date(event.last_at).toLocaleString(language)}</Text>
               {event.last_error ? <Text style={styles.eventError} numberOfLines={3}>{event.last_error}</Text> : null}
-            </View>
+            </Card>
           ))
         )}
 
-        <TouchableOpacity style={styles.refresh} onPress={load}>
-          <Text style={styles.refreshText}>{t('devStatus.refresh')}</Text>
-        </TouchableOpacity>
+        <Button label={t('devStatus.refresh')} variant="ghost" size="small" onPress={load} style={styles.refresh} />
       </ScrollView>
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: colors.background,
   },
   content: {
-    padding: 20,
+    paddingHorizontal: spacing.screen,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 12,
-    marginTop: 8,
+    ...typography.cardTitle,
+    marginBottom: spacing.md,
+    marginTop: spacing.sm,
   },
   counters: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 24,
+    gap: spacing.md,
+    marginBottom: spacing.xxl,
   },
   counter: {
     flex: 1,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    paddingVertical: 16,
     alignItems: 'center',
   },
   counterValue: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#111827',
+    ...typography.title2,
   },
   counterLabel: {
-    fontSize: 13,
-    color: '#6b7280',
-    marginTop: 4,
+    ...typography.secondary,
+    marginTop: spacing.xs,
   },
   empty: {
-    fontSize: 14,
-    color: '#6b7280',
+    ...typography.secondary,
   },
   event: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 10,
+    marginBottom: spacing.md,
+    gap: spacing.xs,
   },
   eventHeader: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
-    gap: 8,
+    gap: spacing.sm,
   },
   provider: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#b91c1c',
-  },
-  simulated: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#6b7280',
-    backgroundColor: '#f3f4f6',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
+    ...typography.listTitle,
+    color: colors.expired.text,
   },
   eventMeta: {
-    fontSize: 13,
-    color: '#374151',
+    ...typography.secondary,
+    color: colors.text,
   },
   eventTime: {
-    fontSize: 12,
-    color: '#9ca3af',
-    marginTop: 4,
+    ...typography.secondary,
   },
   eventError: {
-    fontSize: 12,
-    color: '#6b7280',
-    marginTop: 6,
+    ...typography.secondary,
   },
   refresh: {
-    alignSelf: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    marginTop: 12,
-  },
-  refreshText: {
-    color: '#10b981',
-    fontSize: 15,
-    fontWeight: '600',
+    marginTop: spacing.md,
   },
 });
