@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { Globe, LogOut, UserRound, Users, UtensilsCrossed } from 'lucide-react-native';
+import { Globe, LogOut, UserRound, Users, Utensils } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHousehold } from '@/hooks/useHousehold';
@@ -101,7 +101,7 @@ export default function SettingsScreen() {
           />
           <ListRow
             divider
-            icon={UtensilsCrossed}
+            icon={Utensils}
             title={t('preferences.title')}
             subtitle={t('settings.preferencesSubtitle')}
             onPress={() => router.push('/preferences')}

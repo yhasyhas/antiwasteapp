@@ -116,6 +116,8 @@ const styles = StyleSheet.create({
   input: {
     ...typography.body,
     flex: 1,
+    // Web : sans largeur minimale nulle, le champ ne rétrécit pas et pousse les éléments à droite
+    minWidth: 0,
     minHeight: sizes.touch,
     paddingVertical: spacing.sm,
     paddingRight: spacing.md,

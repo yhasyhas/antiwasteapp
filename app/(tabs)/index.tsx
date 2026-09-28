@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
-import { Camera, Leaf, ShoppingCart, Sparkles, UtensilsCrossed } from 'lucide-react-native';
+import { Camera, Leaf, ShoppingCart, Sparkles } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
@@ -167,7 +167,7 @@ export default function HomeScreen() {
                   <View key={ingredient.id}>
                     <View style={styles.divider} />
                     <View style={styles.row}>
-                      <IconChip icon={ingredient.kind === 'dish' ? UtensilsCrossed : Leaf} />
+                      <IconChip icon={Leaf} />
                       <View style={styles.rowText}>
                         <Text style={styles.rowTitle} numberOfLines={1}>{ingredient.name}</Text>
                         {ingredient.quantity ? <Text style={styles.rowSubtitle} numberOfLines={1}>{ingredient.quantity}</Text> : null}
@@ -195,14 +195,14 @@ export default function HomeScreen() {
             <IconChip icon={Camera} />
             <View style={styles.rowText}>
               <Text style={styles.rowTitle}>{t('home.scanFood')}</Text>
-              <Text style={styles.rowSubtitle} numberOfLines={1}>{t('home.scanSubtitle')}</Text>
+              <Text style={styles.rowSubtitle}>{t('home.scanSubtitle')}</Text>
             </View>
           </Card>
           <Card onPress={() => router.push('/shopping')} style={styles.shortcut} accessibilityLabel={t('shopping.title')}>
             <IconChip icon={ShoppingCart} />
             <View style={styles.rowText}>
               <Text style={styles.rowTitle}>{t('shopping.short')}</Text>
-              <Text style={styles.rowSubtitle} numberOfLines={1}>{t('shopping.toBuyCount', { count: toBuy })}</Text>
+              <Text style={styles.rowSubtitle}>{t('shopping.toBuyCount', { count: toBuy })}</Text>
             </View>
           </Card>
         </View>

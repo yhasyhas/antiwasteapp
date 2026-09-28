@@ -117,7 +117,7 @@ export const typography = {
   overline: { ...text(13, 'bold', 1.25), letterSpacing: 0.8, textTransform: 'uppercase' } as TextStyle,
   // Étiquette au-dessus d'un champ
   label: text(14, 'semibold', 1.3),
-  tab: text(12, 'semibold', 1.25),
+  tab: text(11, 'semibold', 1.25),
 } satisfies Record<string, TextStyle>;
 
 // ── Formes, espacements, tailles ──────────────────────────────────────────────────────────────────

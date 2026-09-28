@@ -26,6 +26,8 @@
           language: params.get('lang') || 'auto',
           // compact sur les écrans étroits (choisi par l'app)
           size: params.get('size') === 'compact' ? 'compact' : 'normal',
+          // Thème clair, comme l'app (sinon le widget suit le mode sombre du téléphone)
+          theme: 'light',
           callback: function (token) { send({ type: 'token', token: token }); },
           'error-callback': function (code) { send({ type: 'error', code: String(code) }); return true; },
           'unsupported-callback': function () { send({ type: 'error', code: 'unsupported' }); },

@@ -29,7 +29,7 @@ export function Chip({ label, selected = false, onPress, showCheck = false, icon
       accessibilityLabel={accessibilityLabel ?? label}
     >
       {selected && showCheck ? <Check size={sizes.iconSmall} color={textColor} /> : null}
-      {Icon ? <Icon size={sizes.iconSmall} color={selected ? textColor : iconColor ?? colors.primary} /> : null}
+      {Icon && !(selected && showCheck) ? <Icon size={sizes.iconSmall} color={selected ? textColor : iconColor ?? colors.primary} /> : null}
       <Text style={[styles.label, { color: textColor }]} numberOfLines={1}>{label}</Text>
     </Touchable>
   );

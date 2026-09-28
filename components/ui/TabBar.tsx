@@ -61,9 +61,9 @@ function TabItem({ focused, label, onPress, children }: { focused: boolean; labe
     >
       <View style={styles.iconArea}>
         <Animated.View style={[styles.pill, pill]} />
-        {children}
+        <View style={styles.icon}>{children}</View>
       </View>
-      <Text style={[styles.label, focused && styles.labelFocused]} numberOfLines={1}>{label}</Text>
+      <Text style={[styles.label, focused && styles.labelFocused]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{label}</Text>
     </Touchable>
   );
 }
@@ -97,8 +97,12 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     backgroundColor: colors.primarySoft,
   },
+  icon: {
+    zIndex: 1,
+  },
   label: {
     ...typography.tab,
+    fontFamily: typography.body.fontFamily,
     color: colors.textSecondary,
   },
   labelFocused: {

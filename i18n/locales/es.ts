@@ -165,7 +165,7 @@ const es: Translations = {
     viewFact: "Ver la ficha",
     shopping: 'Compra',
     title: 'Mi despensa',
-    searchPlaceholder: 'Buscar ingredientes…',
+    searchPlaceholder: 'Buscar un alimento',
     emptyTitle: 'Todavía no hay ingredientes',
     emptyText: 'Añade ingredientes para generar recetas deliciosas',
     addIngredients: 'Añadir ingredientes',

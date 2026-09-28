@@ -166,7 +166,7 @@ const fr = {
     viewFact: "Voir la fiche",
     shopping: 'Courses',
     title: 'Mon garde-manger',
-    searchPlaceholder: 'Rechercher un ingrédient…',
+    searchPlaceholder: 'Rechercher un aliment',
     emptyTitle: "Pas encore d'ingrédients",
     emptyText: 'Ajoute des ingrédients pour générer de bonnes recettes',
     addIngredients: 'Ajouter des ingrédients',

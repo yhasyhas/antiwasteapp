@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
 import ReanimatedSwipeable, { type SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
-import { Info, Leaf, Trash2, UtensilsCrossed } from 'lucide-react-native';
+import { Info, Leaf, Trash2 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
 import { Badge } from '@/components/ui/Badge';
@@ -88,7 +88,7 @@ export function IngredientCard({ ingredient, deleting, onDelete, onEditExpiry, a
         style={styles.card}
         accessibilityLabel={openFact ? `${ingredient.name}, ${t('facts.open')}` : ingredient.name}
       >
-        <IconChip icon={isDish ? UtensilsCrossed : Leaf} tone={isDish ? 'accent' : 'soft'} />
+        <IconChip icon={Leaf} />
         <View style={styles.body}>
           <Text style={styles.name}>{ingredient.name}</Text>
           {details ? <Text style={styles.details}>{details}</Text> : null}

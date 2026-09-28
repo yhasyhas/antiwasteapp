@@ -165,7 +165,7 @@ const en: Translations = {
     viewFact: "View fact sheet",
     shopping: 'Shopping',
     title: 'My pantry',
-    searchPlaceholder: 'Search ingredients…',
+    searchPlaceholder: 'Search for a food',
     emptyTitle: 'No ingredients yet',
     emptyText: 'Add ingredients to generate tasty recipes',
     addIngredients: 'Add ingredients',

@@ -234,7 +234,7 @@ export default function HouseholdScreen() {
                       {member.is_me && member.role === 'owner' ? t('household.youManage') : joinedLabel(member.joined_at)}
                     </Text>
                   </View>
-                  {member.role === 'owner' && <Badge label={t('household.owner')} tone="soon" />}
+                  {member.role === 'owner' && <Badge label={t('household.owner')} tone="soon" style={styles.centered} />}
                   {isOwner && household.shared && !member.is_me && (
                     <Touchable
                       onPress={() => remove(member)}
@@ -383,6 +383,9 @@ const styles = StyleSheet.create({
   memberDetail: {
     ...typography.secondary,
     fontSize: typography.listTitle.fontSize,
+  },
+  centered: {
+    alignSelf: 'center',
   },
   remove: {
     width: sizes.touch,
