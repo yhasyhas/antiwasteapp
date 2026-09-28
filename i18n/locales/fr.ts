@@ -29,6 +29,7 @@ const fr = {
   auth: {
     captchaTitle: 'Vérification anti-robot',
     captchaFailed: 'La vérification anti-robot a échoué. Réessaie.',
+    captchaRetry: 'Réessayer',
     invitedBanner: 'Tu as reçu une invitation dans un foyer : connecte-toi, crée un compte ou essaie sans compte, puis le foyer te sera proposé.',
     tryWithoutAccount: 'Essayer sans compte',
     tryWithoutAccountHint: 'Tu pourras créer ton compte plus tard, sans rien perdre.',

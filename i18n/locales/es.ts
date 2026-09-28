@@ -28,6 +28,7 @@ const es: Translations = {
   auth: {
     captchaTitle: 'Verificación antirrobots',
     captchaFailed: 'La verificación antirrobots ha fallado. Inténtalo de nuevo.',
+    captchaRetry: 'Reintentar',
     invitedBanner: 'Te han invitado a un hogar: inicia sesión, crea una cuenta o prueba sin cuenta, y se te propondrá el hogar.',
     tryWithoutAccount: 'Probar sin cuenta',
     tryWithoutAccountHint: 'Podrás crear tu cuenta más tarde sin perder nada.',

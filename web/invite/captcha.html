@@ -6,30 +6,41 @@
   <meta name="robots" content="noindex">
   <title>Vérification</title>
   <!-- Cloudflare Turnstile : vérification anti-robot avant une connexion (dans l'app, affichée dans une
-       WebView). Le jeton obtenu est renvoyé à l'app, qui le transmet à Supabase (captchaToken). -->
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=start&render=explicit" async defer></script>
+       WebView). Le jeton obtenu est renvoyé à l'app, qui le transmet à Supabase (captchaToken).
+       Messages envoyés : ready (widget affiché), token, error (code Turnstile ou erreur de la page). -->
   <style>
     body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #fff; font-family: system-ui, sans-serif; }
     #widget { min-height: 70px; }
   </style>
+  <script>
+    var params = new URLSearchParams(location.search);
+    function send(message) {
+      if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify(message));
+      else window.parent.postMessage(message, '*');
+    }
+    window.onerror = function (message) { send({ type: 'error', code: 'page: ' + String(message).slice(0, 120) }); };
+    function start() {
+      try {
+        turnstile.render('#widget', {
+          sitekey: params.get('sitekey') || '',
+          language: params.get('lang') || 'auto',
+          callback: function (token) { send({ type: 'token', token: token }); },
+          'error-callback': function (code) { send({ type: 'error', code: String(code) }); return true; },
+          'unsupported-callback': function () { send({ type: 'error', code: 'unsupported' }); },
+          // Jeton expiré ou délai dépassé : nouvelle vérification dans la même fenêtre
+          'expired-callback': function () { turnstile.reset('#widget'); },
+          'timeout-callback': function () { turnstile.reset('#widget'); },
+        });
+        send({ type: 'ready' });
+      } catch (error) {
+        send({ type: 'error', code: 'render: ' + String(error && error.message || error).slice(0, 120) });
+      }
+    }
+  </script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=start&render=explicit" async defer
+          onerror="send({ type: 'error', code: 'script' })"></script>
 </head>
 <body>
   <div id="widget"></div>
-  <script>
-    const params = new URLSearchParams(location.search);
-    const send = (message) => {
-      if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify(message));
-      else window.parent.postMessage(message, '*');
-    };
-    function start() {
-      turnstile.render('#widget', {
-        sitekey: params.get('sitekey') || '',
-        language: params.get('lang') || 'auto',
-        callback: (token) => send({ type: 'token', token }),
-        'error-callback': (code) => send({ type: 'error', code: String(code) }),
-        'expired-callback': () => send({ type: 'expired' }),
-      });
-    }
-  </script>
 </body>
 </html>

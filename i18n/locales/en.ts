@@ -28,6 +28,7 @@ const en: Translations = {
   auth: {
     captchaTitle: 'Anti-bot check',
     captchaFailed: 'The anti-bot check failed. Try again.',
+    captchaRetry: 'Try again',
     invitedBanner: "You've been invited to a household: sign in, create an account or try without an account, and the household will be offered to you.",
     tryWithoutAccount: 'Try without an account',
     tryWithoutAccountHint: 'You can create your account later without losing anything.',
