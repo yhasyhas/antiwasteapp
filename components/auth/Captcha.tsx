@@ -1,5 +1,5 @@
 import React, { createElement, useCallback, useEffect, useRef, useState } from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
+import { Modal, View, Text, StyleSheet, TouchableOpacity, Platform, ActivityIndicator, useWindowDimensions } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { INVITE_URL } from '@/lib/invite';
@@ -17,6 +17,11 @@ export const captchaEnabled = SITE_KEY !== '' && CAPTCHA_URL !== '';
 const READY_TIMEOUT_MS = 20_000;
 const TOKEN_TIMEOUT_MS = 90_000;
 
+// Widget Turnstile : 300 × 65 (normal), 150 × 140 (compact, écrans étroits)
+const OVERLAY_PADDING = 16;
+const BOX_PADDING = 12;
+const NORMAL_WIDGET_WIDTH = 300;
+
 export class CaptchaCancelled extends Error {}
 
 type Status = { kind: 'loading' } | { kind: 'ready' } | { kind: 'error'; code: string };
@@ -24,6 +29,11 @@ type Status = { kind: 'loading' } | { kind: 'ready' } | { kind: 'error'; code: s
 // Renvoie getToken() (jeton, ou undefined sans captcha) et la fenêtre à placer dans l'écran
 export function useCaptcha() {
   const { t, language } = useLanguage();
+  const { width: screenWidth } = useWindowDimensions();
+  const frameWidth = screenWidth - 2 * OVERLAY_PADDING - 2 * BOX_PADDING - 2;
+  const widgetSize = frameWidth >= NORMAL_WIDGET_WIDTH ? 'normal' : 'compact';
+  // Hauteur du cadre posée sur le conteneur de la WebView (sinon il s'écrase à quelques pixels)
+  const frameHeight = widgetSize === 'normal' ? 80 : 150;
   const [visible, setVisible] = useState(false);
   const [status, setStatus] = useState<Status>({ kind: 'loading' });
   // Change à chaque essai : recharge la page
@@ -86,7 +96,7 @@ export function useCaptcha() {
     return () => clearTimeout(timer);
   }, [visible, status.kind, attempt, pageState]);
 
-  const captchaSource = `${CAPTCHA_URL}?sitekey=${encodeURIComponent(SITE_KEY)}&lang=${language}&attempt=${attempt}`;
+  const captchaSource = `${CAPTCHA_URL}?sitekey=${encodeURIComponent(SITE_KEY)}&lang=${language}&size=${widgetSize}&attempt=${attempt}`;
 
   // Web (Expo web) : la page est dans un cadre et envoie le jeton par postMessage
   useEffect(() => {
@@ -115,10 +125,11 @@ export function useCaptcha() {
               </TouchableOpacity>
             </View>
           )}
-          {showPage && Platform.OS === 'web' && createElement('iframe', { key: attempt, src: captchaSource, style: { border: 0, width: '100%', height: 90 }, title: 'captcha' })}
+          {showPage && Platform.OS === 'web' && createElement('iframe', { key: attempt, src: captchaSource, style: { border: 0, width: '100%', height: frameHeight }, title: 'captcha' })}
           {showPage && Platform.OS !== 'web' && (
             <WebView
               key={attempt}
+              containerStyle={[styles.webviewFrame, { height: frameHeight }]}
               style={styles.webview}
               source={{ uri: captchaSource }}
               onMessage={(event) => onMessage(event.nativeEvent.data)}
@@ -143,12 +154,13 @@ export function useCaptcha() {
 }
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 },
-  box: { backgroundColor: '#fff', borderRadius: 16, padding: 16, gap: 12 },
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: OVERLAY_PADDING },
+  box: { backgroundColor: '#fff', borderRadius: 16, padding: BOX_PADDING, gap: 12 },
   title: { fontSize: 16, fontWeight: '600', color: '#111827', textAlign: 'center' },
   // Fond opaque et fenêtre sans animation : une WebView transparente ou animée dans une fenêtre
   // superposée peut rester vide sur Android
-  webview: { height: 90, width: '100%', backgroundColor: '#fff', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 8 },
+  webviewFrame: { flex: 0, width: '100%', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 8, overflow: 'hidden' },
+  webview: { flex: 1, backgroundColor: '#fff' },
   errorBox: { alignItems: 'center', gap: 6 },
   errorText: { color: '#b91c1c', textAlign: 'center' },
   errorCode: { color: '#6b7280', fontSize: 12, textAlign: 'center' },
