@@ -3,6 +3,7 @@
 
 const fr = {
   common: {
+    back: "Retour",
     cancel: 'Annuler',
     delete: 'Supprimer',
     ok: 'OK',

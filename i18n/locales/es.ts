@@ -2,6 +2,7 @@ import type { Translations } from './fr';
 
 const es: Translations = {
   common: {
+    back: "Volver",
     cancel: 'Cancelar',
     delete: 'Eliminar',
     ok: 'OK',
