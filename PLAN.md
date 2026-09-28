@@ -249,6 +249,12 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 - [ ] Relire les 100 fiches aliments avant la bêta avec `scripts/food-facts/review.mjs` (exemple d'astuce douteuse : « vinaigre de banane »)
 - [ ] Renommer ou supprimer le sous-domaine inutile `bolt-expo-starter.workers.dev`
 
+### Obligatoire avant la bêta
+
+- [ ] « Mot de passe oublié » sur l'écran de connexion : e-mail de réinitialisation, protégé par la vérification anti-robot (captcha)
+- [ ] Interrupteur « Résumé quotidien » dans les Réglages, respecté par la fonction `daily-digest` et par les rappels locaux
+- [ ] « Aide et contact » dans les Réglages, avec l'adresse de contact du projet
+
 **Terminé quand** : au moins 5 testeurs utilisent l'app pendant une semaine sans plantage bloquant.
 
 ---
@@ -371,4 +377,6 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 | 29/09/2026 | Écarts assumés avec les maquettes (aucun changement de comportement) : pas de « Mot de passe oublié », d'« Aide et contact » ni d'interrupteur « Résumé quotidien » (fonctions absentes de l'app) ; « Rejoindre un foyer » reste caché dans un foyer partagé ; « Cuisiner cet aliment » au lieu de « Cuisiner avec la banane » (formulation valable pour tous les aliments et les trois langues) | À décider en phase 8 si ces fonctions doivent exister |
 | 29/09/2026 | Ergonomie : vérification anti-robot intégrée au formulaire de connexion (plus de fenêtre) ; nom affiché modifié depuis Réglages (« Modifier ») au lieu de « Mon foyer » ; suppression d'un aliment ou d'un article en glissant vers la gauche (ou appui long) ; liste de courses en onglet caché pour garder la barre d'onglets ; fiche recette en plein écran ; « Aujourd'hui » affiché en rouge | Suivre les maquettes sans perdre d'action existante |
 | 29/09/2026 | Captures de comparaison (`docs/design/implemente/`) prises sur la version web de l'app (Chrome, 390 × 844), avec deux comptes de test supprimés ensuite | Pas de capture de la confirmation du scan (il faut une vraie photo analysée) ; sur le web, les fonctions n'acceptent que le serveur Expo du port 8081 (CORS) |
+| 29/09/2026 | Suppression annulable dans le garde-manger et les courses : message « Aliment retiré · Annuler » (« Article retiré » pour les courses) pendant 5 secondes, qui remplace la fenêtre de confirmation ; la suppression n'est faite en base qu'à la fin du délai (ou plus tôt si on quitte l'écran ou l'app) ; bouton « Retirer du garde-manger » dans la fiche aliment | Une suppression annulée ne touche jamais la base, donc ne compte pas dans le compteur (déclencheur à la suppression) ; aucune migration |
+| 29/09/2026 | « Mot de passe oublié », « Résumé quotidien » et « Aide et contact » deviennent obligatoires avant la bêta (phase 8) | Présents dans les maquettes, absents de l'app |
 | | *(résultat du test Gemini vs Clarifai)* | |

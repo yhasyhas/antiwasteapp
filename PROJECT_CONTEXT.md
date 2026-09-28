@@ -211,6 +211,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Composants : `components/ui/` (Button, Card, Badge, Chip, IconChip, Checkbox, TextField, ListRow, Switch, BottomSheet et SheetHeader, ScreenHeader, TabBar, Skeleton, Illustrations et EmptyState, SwipeToDelete, ListItemMotion, Touchable).
 - Écrans refaits d'après `docs/design/` ; captures dans `docs/design/implemente/`. Sous-écran Langue (`app/language.tsx`), courses en onglet caché (`app/(tabs)/shopping.tsx`), vérification anti-robot intégrée au formulaire (`CaptchaField`).
 - Badge « X à sauver » : `hooks/usePantryUrgency.ts`.
+- Suppression annulable (garde-manger, courses, fiche aliment) : `hooks/useUndoableDelete.ts` et `components/ui/UndoToast.tsx` ; la suppression en base n'a lieu qu'après 5 secondes, donc une suppression annulée ne compte pas dans le compteur.
 
 ## 5. État actuel et problèmes connus
 
