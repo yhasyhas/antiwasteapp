@@ -245,6 +245,9 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 - [ ] Rédiger la politique de confidentialité (photos, données du garde-manger)
 - [ ] Bêta fermée : TestFlight (iOS) et tests internes Google Play, avec quelques proches
 - [ ] Fiches des stores : captures d'écran, description
+- [ ] Remplacer le schéma de liens `myapp` (hérité de bolt) par un schéma propre à l'app, avec le nom définitif ; nouveau build nécessaire
+- [ ] Relire les 100 fiches aliments avant la bêta avec `scripts/food-facts/review.mjs` (exemple d'astuce douteuse : « vinaigre de banane »)
+- [ ] Renommer ou supprimer le sous-domaine inutile `bolt-expo-starter.workers.dev`
 
 **Terminé quand** : au moins 5 testeurs utilisent l'app pendant une semaine sans plantage bloquant.
 
