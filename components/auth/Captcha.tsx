@@ -12,8 +12,10 @@ const CAPTCHA_URL = process.env.EXPO_PUBLIC_CAPTCHA_URL || (INVITE_URL ? `${INVI
 
 export const captchaEnabled = SITE_KEY !== '' && CAPTCHA_URL !== '';
 
-// Délai pour que la page affiche la vérification (sinon erreur avec « Réessayer »)
+// Délais : page qui n'affiche pas la vérification, puis vérification qui ne renvoie pas de jeton
+// (sinon erreur avec « Réessayer »)
 const READY_TIMEOUT_MS = 20_000;
+const TOKEN_TIMEOUT_MS = 90_000;
 
 export class CaptchaCancelled extends Error {}
 
@@ -26,6 +28,8 @@ export function useCaptcha() {
   const [status, setStatus] = useState<Status>({ kind: 'loading' });
   // Change à chaque essai : recharge la page
   const [attempt, setAttempt] = useState(0);
+  // Dernier état signalé par la page (affiché en développement, joint aux erreurs)
+  const [pageState, setPageState] = useState('');
   const pending = useRef<{ resolve: (token: string) => void; reject: (error: Error) => void } | null>(null);
 
   const getToken = useCallback((): Promise<string | undefined> => {
@@ -33,6 +37,7 @@ export function useCaptcha() {
     return new Promise<string>((resolve, reject) => {
       pending.current = { resolve, reject };
       setStatus({ kind: 'loading' });
+      setPageState('');
       setAttempt((n) => n + 1);
       setVisible(true);
     });
@@ -54,6 +59,7 @@ export function useCaptcha() {
 
   const retry = () => {
     setStatus({ kind: 'loading' });
+    setPageState('');
     setAttempt((n) => n + 1);
   };
 
@@ -63,17 +69,22 @@ export function useCaptcha() {
       if (message.type === 'token' && typeof message.token === 'string') finish(message.token);
       else if (message.type === 'ready') setStatus((s) => (s.kind === 'loading' ? { kind: 'ready' } : s));
       else if (message.type === 'error') fail(String(message.code));
+      else if (message.type === 'state') setPageState(String(message.code));
     } catch {
       // message inattendu : ignoré
     }
   };
 
-  // Page qui ne répond pas
+  // Page qui ne répond pas, ou vérification sans jeton
   useEffect(() => {
-    if (!visible || status.kind !== 'loading') return;
-    const timer = setTimeout(() => fail('timeout'), READY_TIMEOUT_MS);
+    if (!visible || status.kind === 'error') return;
+    const loading = status.kind === 'loading';
+    const timer = setTimeout(
+      () => fail(loading ? 'timeout' : `no-token${pageState ? ` (${pageState})` : ''}`),
+      loading ? READY_TIMEOUT_MS : TOKEN_TIMEOUT_MS,
+    );
     return () => clearTimeout(timer);
-  }, [visible, status.kind, attempt]);
+  }, [visible, status.kind, attempt, pageState]);
 
   const captchaSource = `${CAPTCHA_URL}?sitekey=${encodeURIComponent(SITE_KEY)}&lang=${language}&attempt=${attempt}`;
 
@@ -90,7 +101,7 @@ export function useCaptcha() {
   const showPage = visible && status.kind !== 'error';
 
   const captcha = (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={() => finish()}>
+    <Modal visible={visible} transparent animationType="none" onRequestClose={() => finish()}>
       <View style={styles.overlay}>
         <View style={styles.box}>
           <Text style={styles.title}>{t('auth.captchaTitle')}</Text>
@@ -119,6 +130,7 @@ export function useCaptcha() {
               originWhitelist={['https://*']}
             />
           )}
+          {__DEV__ && showPage && pageState !== '' && <Text style={styles.errorCode}>{pageState}</Text>}
           <TouchableOpacity onPress={() => finish()} style={styles.cancel}>
             <Text style={styles.cancelText}>{t('common.cancel')}</Text>
           </TouchableOpacity>
@@ -134,8 +146,9 @@ const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 },
   box: { backgroundColor: '#fff', borderRadius: 16, padding: 16, gap: 12 },
   title: { fontSize: 16, fontWeight: '600', color: '#111827', textAlign: 'center' },
-  // Fond opaque : une WebView transparente dans une fenêtre superposée peut rester vide sur Android
-  webview: { height: 90, width: '100%', backgroundColor: '#fff' },
+  // Fond opaque et fenêtre sans animation : une WebView transparente ou animée dans une fenêtre
+  // superposée peut rester vide sur Android
+  webview: { height: 90, width: '100%', backgroundColor: '#fff', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 8 },
   errorBox: { alignItems: 'center', gap: 6 },
   errorText: { color: '#b91c1c', textAlign: 'center' },
   errorCode: { color: '#6b7280', fontSize: 12, textAlign: 'center' },

@@ -30,8 +30,15 @@
           // Jeton expiré ou délai dépassé : nouvelle vérification dans la même fenêtre
           'expired-callback': function () { turnstile.reset('#widget'); },
           'timeout-callback': function () { turnstile.reset('#widget'); },
+          // Suivi (affiché dans l'app en développement) : défi interactif, taille visible de la page
+          'before-interactive-callback': function () { send({ type: 'state', code: 'interactive' }); },
+          'after-interactive-callback': function () { send({ type: 'state', code: 'interactive-done' }); },
         });
         send({ type: 'ready' });
+        setTimeout(function () {
+          var box = document.querySelector('#widget').getBoundingClientRect();
+          send({ type: 'state', code: 'page ' + window.innerWidth + 'x' + window.innerHeight + ', widget ' + Math.round(box.width) + 'x' + Math.round(box.height) });
+        }, 3000);
       } catch (error) {
         send({ type: 'error', code: 'render: ' + String(error && error.message || error).slice(0, 120) });
       }
