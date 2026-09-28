@@ -16,6 +16,8 @@ import { SkeletonRow } from '@/components/ui/Skeleton';
 import { SwipeToDelete } from '@/components/ui/SwipeToDelete';
 import { Touchable } from '@/components/ui/Touchable';
 import { ListItemMotion } from '@/components/ui/ListItemMotion';
+import { UndoToast } from '@/components/ui/UndoToast';
+import { useUndoableDelete } from '@/hooks/useUndoableDelete';
 import { ExpiryPicker } from '@/components/expiry/ExpiryPicker';
 import { expiryFromShelfLife } from '@/lib/expiry';
 import {
@@ -57,8 +59,21 @@ export default function ShoppingScreen() {
     load();
   }, [household?.id]);
 
-  const toBuy = (items ?? []).filter((item) => !item.checked);
-  const inCart = (items ?? []).filter((item) => item.checked);
+  // Suppression annulable (« Article retiré · Annuler ») : faite pour de bon après 5 secondes
+  const removal = useUndoableDelete<ShoppingItem>(async (item) => {
+    try {
+      await removeShoppingItem(item.id);
+      setItems((current) => current?.filter((i) => i.id !== item.id) ?? null);
+    } catch (error) {
+      failed(error);
+      throw error;
+    }
+  });
+
+  // Articles en attente de suppression : déjà cachés
+  const shown = items?.filter((item) => !removal.hiddenIds.has(item.id)) ?? null;
+  const toBuy = (shown ?? []).filter((item) => !item.checked);
+  const inCart = (shown ?? []).filter((item) => item.checked);
 
   const authorName = (userId: string | null) => {
     if (!household?.shared) return null;
@@ -97,16 +112,6 @@ export default function ShoppingScreen() {
     }
   };
 
-  const remove = async (item: ShoppingItem) => {
-    setItems((current) => current?.filter((i) => i.id !== item.id) ?? null);
-    try {
-      await removeShoppingItem(item.id);
-    } catch (error) {
-      failed(error);
-      load();
-    }
-  };
-
   // Date proposée : une semaine (modifiable pour chaque article)
   const openStock = () => setStocking(inCart.map((item) => ({ item, expires_at: expiryFromShelfLife(undefined) })));
 
@@ -133,7 +138,7 @@ export default function ShoppingScreen() {
     return (
       <ListItemMotion key={item.id} index={index}>
         {index > 0 ? <View style={cardStyles.divider} /> : null}
-        <SwipeToDelete onDelete={() => remove(item)}>
+        <SwipeToDelete onDelete={() => removal.remove(item)}>
           <Touchable
             scale={false}
             style={styles.item}
@@ -203,7 +208,7 @@ export default function ShoppingScreen() {
           <View>
             {[0, 1, 2].map((row) => <SkeletonRow key={row} />)}
           </View>
-        ) : items.length === 0 ? (
+        ) : shown!.length === 0 ? (
           <EmptyState kind="shopping" title={t('shopping.emptyTitle')} text={t('shopping.emptyText')} />
         ) : (
           <>
@@ -226,6 +231,8 @@ export default function ShoppingScreen() {
           </>
         )}
       </ScrollView>
+
+      <UndoToast message={removal.pending ? t('shopping.removed') : null} onUndo={removal.undo} />
 
       {/* Ranger au garde-manger : une date proposée par article, modifiable */}
       <BottomSheet visible={stocking !== null} onClose={() => setStocking(null)}>

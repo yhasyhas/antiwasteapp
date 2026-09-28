@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { Leaf, Sparkles, X } from 'lucide-react-native';
+import { Leaf, Sparkles, Trash2, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fetchFoodFact, reportFoodFact, type FoodFactResult } from '@/lib/foodFacts';
 import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
@@ -27,6 +27,8 @@ interface FactIngredient {
 interface Props {
   ingredient: FactIngredient | null;
   onClose: () => void;
+  // « Retirer du garde-manger » (suppression annulable, gérée par l'écran)
+  onRemove?: () => void;
 }
 
 const CATEGORIES = ['fruit', 'vegetable', 'meat', 'fish', 'dairy', 'egg', 'grain', 'legume', 'bakery', 'condiment', 'spice', 'beverage', 'snack', 'frozen', 'other'] as const;
@@ -34,7 +36,7 @@ const CATEGORIES = ['fruit', 'vegetable', 'meat', 'fish', 'dairy', 'egg', 'grain
 // Fiche d'un aliment du garde-manger : description, origine, saison, atouts nutritionnels, astuces
 // anti-gaspi, « Cuisiner cet aliment ». Informations générales seulement (mention en bas), avec
 // « Signaler une erreur ».
-export function FoodFactSheet({ ingredient, onClose }: Props) {
+export function FoodFactSheet({ ingredient, onClose, onRemove }: Props) {
   const { t, language } = useLanguage();
   const [result, setResult] = useState<FoodFactResult | null>(null);
   const [reporting, setReporting] = useState(false);
@@ -76,6 +78,16 @@ export function FoodFactSheet({ ingredient, onClose }: Props) {
     onClose();
     router.push({ pathname: '/recipe/generate', params: { priority: shown.id } });
   };
+
+  const remove = () => {
+    onClose();
+    onRemove?.();
+  };
+
+  // Toujours proposé, même si la fiche ne se charge pas
+  const removeButton = onRemove
+    ? <Button label={t('pantry.removeFromPantry')} icon={Trash2} variant="danger" size="medium" onPress={remove} />
+    : null;
 
   const errorText = result && !result.ok
     ? result.reason === 'not_food' ? t('facts.notFood')
@@ -149,6 +161,7 @@ export function FoodFactSheet({ ingredient, onClose }: Props) {
           )}
 
           <Button label={t('facts.cook')} icon={Sparkles} onPress={cook} />
+          {removeButton}
 
           {reporting ? (
             <View style={styles.report}>
@@ -175,6 +188,7 @@ export function FoodFactSheet({ ingredient, onClose }: Props) {
           )}
         </ScrollView>
       ) : null}
+      {section ? null : removeButton}
     </BottomSheet>
   );
 }

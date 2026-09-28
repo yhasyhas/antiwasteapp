@@ -2,6 +2,7 @@ import type { Translations } from './fr';
 
 const en: Translations = {
   common: {
+    undo: "Undo",
     back: "Back",
     cancel: 'Cancel',
     delete: 'Delete',
@@ -155,6 +156,8 @@ const en: Translations = {
     successTitle: 'Done!',
   },
   pantry: {
+    removed: "Item removed",
+    removeFromPantry: "Remove from pantry",
     sharedSubtitle_one: "Shared household · {{count}} member",
     sharedSubtitle_other: "Shared household · {{count}} members",
     filterAll: "All · {{count}}",
@@ -173,8 +176,6 @@ const en: Translations = {
     addMore: 'Add more ingredients',
     scanned: 'Scanned',
     manual: 'Manual',
-    deleteTitle: 'Delete ingredient',
-    deleteText: 'Do you really want to remove this ingredient?',
     clearTitle: 'Clear all',
     leftover: 'Leftover',
     barcode: 'Barcode',
@@ -448,6 +449,7 @@ const en: Translations = {
     },
   },
   shopping: {
+    removed: "Item removed",
     forRecipeLine: "For: {{title}}",
     sharedSubtitle: "Shared with your household",
     toBuyTitle: "To buy · {{count}}",

@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import ReanimatedSwipeable, { type SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { Info, Leaf, Trash2 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -30,7 +30,6 @@ export interface PantryIngredient {
 
 interface Props {
   ingredient: PantryIngredient;
-  deleting: boolean;
   onDelete: () => void;
   onEditExpiry: () => void;
   // Foyer partagé : nom de celui qui l'a ajouté (sinon non affiché)
@@ -42,7 +41,7 @@ interface Props {
 // Aliment du garde-manger : nom, quantité, auteur, conseil de conservation, badges de date (touchable
 // pour la modifier) et de reste. Toucher la carte ouvre la fiche de l'aliment ; glisser vers la gauche
 // ou appui long : supprimer (ou les autres actions).
-export function IngredientCard({ ingredient, deleting, onDelete, onEditExpiry, addedBy, onOpenFact }: Props) {
+export function IngredientCard({ ingredient, onDelete, onEditExpiry, addedBy, onOpenFact }: Props) {
   const { t } = useLanguage();
   const swipeable = useRef<SwipeableMethods>(null);
   const isDish = ingredient.kind === 'dish';
@@ -69,7 +68,7 @@ export function IngredientCard({ ingredient, deleting, onDelete, onEditExpiry, a
       accessibilityRole="button"
       accessibilityLabel={t('common.delete')}
     >
-      {deleting ? <ActivityIndicator color={colors.onPrimary} /> : <Trash2 size={sizes.iconLarge} color={colors.onPrimary} />}
+      <Trash2 size={sizes.iconLarge} color={colors.onPrimary} />
       <Text style={styles.deleteText}>{t('common.delete')}</Text>
     </Touchable>
   );

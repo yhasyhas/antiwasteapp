@@ -13,6 +13,7 @@ import { ScreenHeader, SquareButton } from '@/components/ui/ScreenHeader';
 import { SkeletonRow } from '@/components/ui/Skeleton';
 import { Touchable } from '@/components/ui/Touchable';
 import { ListItemMotion } from '@/components/ui/ListItemMotion';
+import { UndoToast } from '@/components/ui/UndoToast';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { supabase } from '@/lib/supabase';
 import { IngredientCard, type PantryIngredient } from '@/components/pantry/IngredientCard';
@@ -23,6 +24,7 @@ import { maybeAskNotificationPermission } from '@/lib/notifications';
 import { notifyPantryChanged, onPantryChanged } from '@/lib/pantryEvents';
 import { activeHouseholdId } from '@/lib/household';
 import { useHousehold } from '@/hooks/useHousehold';
+import { useUndoableDelete } from '@/hooks/useUndoableDelete';
 import { colors, radius, shadows, sizes, spacing, typography } from '@/constants/theme';
 
 type Filter = 'all' | 'urgent' | 'leftovers';
@@ -39,7 +41,6 @@ export default function IngredientsScreen() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
-  const [deleting, setDeleting] = useState<string | null>(null);
   const [editingExpiry, setEditingExpiry] = useState<PantryIngredient | null>(null);
   const [savingExpiry, setSavingExpiry] = useState(false);
   const household = useHousehold();
@@ -82,34 +83,20 @@ export default function IngredientsScreen() {
     setLoading(false);
   };
 
-  const deleteIngredient = async (id: string) => {
-    Alert.alert(
-      t('pantry.deleteTitle'),
-      t('pantry.deleteText'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.delete'),
-          style: 'destructive',
-          onPress: async () => {
-            setDeleting(id);
-            const { error } = await supabase
-              .from('ingredients')
-              .delete()
-              .eq('id', id);
+  // Suppression annulable (« Aliment retiré · Annuler ») : faite pour de bon après 5 secondes
+  const removal = useUndoableDelete<PantryIngredient>(async (ingredient) => {
+    const { error } = await supabase
+      .from('ingredients')
+      .delete()
+      .eq('id', ingredient.id);
 
-            if (error) {
-              alertWriteError(t, 'deleting ingredient', error);
-            } else {
-              setIngredients((current) => current.filter((ing) => ing.id !== id));
-              notifyPantryChanged();
-            }
-            setDeleting(null);
-          },
-        },
-      ]
-    );
-  };
+    if (error) {
+      alertWriteError(t, 'deleting ingredient', error);
+      throw error;
+    }
+    setIngredients((current) => current.filter((ing) => ing.id !== ingredient.id));
+    notifyPantryChanged();
+  });
 
   const saveExpiry = async (expiresAt: string | null) => {
     if (!editingExpiry) return;
@@ -163,8 +150,10 @@ export default function IngredientsScreen() {
     );
   };
 
+  // Aliments en attente de suppression : déjà cachés
+  const shown = ingredients.filter((ingredient) => !removal.hiddenIds.has(ingredient.id));
   const query = searchQuery.trim().toLowerCase();
-  const searched = query ? ingredients.filter((ingredient) => ingredient.name.toLowerCase().includes(query)) : ingredients;
+  const searched = query ? shown.filter((ingredient) => ingredient.name.toLowerCase().includes(query)) : shown;
   const counts = {
     all: searched.length,
     urgent: searched.filter(isUrgent).length,
@@ -182,8 +171,7 @@ export default function IngredientsScreen() {
     <ListItemMotion key={ingredient.id} index={index}>
       <IngredientCard
         ingredient={ingredient}
-        deleting={deleting === ingredient.id}
-        onDelete={() => deleteIngredient(ingredient.id)}
+        onDelete={() => removal.remove(ingredient)}
         onEditExpiry={() => setEditingExpiry(ingredient)}
         addedBy={addedBy(ingredient.user_id)}
         onOpenFact={() => setFactIngredient(ingredient)}
@@ -198,7 +186,7 @@ export default function IngredientsScreen() {
         subtitle={
           household?.shared
             ? t('pantry.sharedSubtitle', { count: household.members.length })
-            : t('ingredientCount', { count: ingredients.length })
+            : t('ingredientCount', { count: shown.length })
         }
         actions={
           <>
@@ -226,7 +214,7 @@ export default function IngredientsScreen() {
           <View style={styles.section}>
             {[0, 1, 2, 3].map((row) => <SkeletonRow key={row} />)}
           </View>
-        ) : ingredients.length === 0 ? (
+        ) : shown.length === 0 ? (
           <EmptyState
             kind="pantry"
             title={t('pantry.emptyTitle')}
@@ -269,7 +257,17 @@ export default function IngredientsScreen() {
         <Plus size={sizes.iconLarge + spacing.sm} color={colors.onPrimary} />
       </Touchable>
 
-      <FoodFactSheet ingredient={factIngredient} onClose={() => setFactIngredient(null)} />
+      <FoodFactSheet
+        ingredient={factIngredient}
+        onClose={() => setFactIngredient(null)}
+        onRemove={() => factIngredient && removal.remove(factIngredient)}
+      />
+
+      <UndoToast
+        message={removal.pending ? t('pantry.removed') : null}
+        onUndo={removal.undo}
+        bottom={spacing.xl + sizes.fab + spacing.md}
+      />
 
       <ExpiryEditModal
         ingredient={editingExpiry}

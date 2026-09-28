@@ -3,6 +3,7 @@
 
 const fr = {
   common: {
+    undo: "Annuler",
     back: "Retour",
     cancel: 'Annuler',
     delete: 'Supprimer',
@@ -156,6 +157,8 @@ const fr = {
     successTitle: "C'est fait !",
   },
   pantry: {
+    removed: "Aliment retiré",
+    removeFromPantry: "Retirer du garde-manger",
     sharedSubtitle_one: "Foyer partagé · {{count}} membre",
     sharedSubtitle_other: "Foyer partagé · {{count}} membres",
     filterAll: "Tous · {{count}}",
@@ -174,8 +177,6 @@ const fr = {
     addMore: "Ajouter d'autres ingrédients",
     scanned: 'Scanné',
     manual: 'Manuel',
-    deleteTitle: "Supprimer l'ingrédient",
-    deleteText: 'Veux-tu vraiment retirer cet ingrédient ?',
     clearTitle: 'Tout effacer',
     leftover: 'Reste',
     barcode: 'Code-barres',
@@ -449,6 +450,7 @@ const fr = {
     },
   },
   shopping: {
+    removed: "Article retiré",
     forRecipeLine: "Pour : {{title}}",
     sharedSubtitle: "Partagées avec ton foyer",
     toBuyTitle: "À acheter · {{count}}",

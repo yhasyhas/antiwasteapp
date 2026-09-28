@@ -34,6 +34,8 @@ export interface ThemeColors {
   illustration: { background: string; shape: string; line: string; leaf: string };
   // Squelettes de chargement
   skeleton: string;
+  // Message temporaire en bas de l'écran (« Aliment retiré · Annuler ») : fond sombre, action en citron vert
+  toast: { background: string; text: string; action: string };
   transparent: string;
 }
 
@@ -59,6 +61,7 @@ export const lightColors: ThemeColors = {
   cameraControl: 'rgba(255,255,255,0.16)',
   illustration: { background: '#D2E4CC', shape: '#E1EEDF', line: '#2E6A4A', leaf: '#B9D45A' },
   skeleton: '#E1EEDF',
+  toast: { background: '#15241B', text: '#FFFFFF', action: '#B9D45A' },
   transparent: 'transparent',
 };
 
@@ -199,6 +202,8 @@ export const motion = {
   // Retour visuel au toucher : échelle du bouton pressé
   pressedScale: 0.97,
   pressedOpacity: 0.85,
+  // Délai pour annuler une suppression (message « Annuler »)
+  undoWindow: 5000,
 } as const;
 
 // Listes : apparition des cartes (décalage entre deux cartes) et réarrangement
