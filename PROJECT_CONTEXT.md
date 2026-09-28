@@ -202,7 +202,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Liste de courses du foyer (`app/shopping.tsx`, `lib/shopping.ts`, migration `shopping_list`), temps réel, manquants d'une recette en un geste (`AddMissingButton`), rangement au garde-manger.
 - Compteur anti-gaspi (`components/home/WasteCounter.tsx`, migration `food_events`).
 - Préférences de recettes (`app/preferences.tsx`, `lib/preferences.ts`, migration `user_preferences`), aliments exclus et nombre de personnes dans `generate-recipes`.
-- Essai sans compte (`components/auth/Captcha.tsx`, `app/auth/upgrade.tsx`, migration `anonymous_profiles`, quotas `QUOTA_ANON_*`). Clé de site Turnstile configurée, connexion anonyme activée dans Supabase. **En attente : protection captcha (Turnstile, clé secrète) à activer dans Supabase.**
+- Essai sans compte (`components/auth/Captcha.tsx`, `app/auth/upgrade.tsx`, migration `anonymous_profiles`, quotas `QUOTA_ANON_*`). Turnstile configuré (clé de site dans l'app, clé secrète dans Supabase), connexion anonyme et protection captcha activées dans Supabase ; la vérification s'affiche dans une WebView dont la hauteur est posée sur le conteneur (format compact sur les écrans étroits).
 - Fiches aliments (fonction `food-fact`, `components/pantry/FoodFactSheet.tsx`, migration `food_facts`, scripts `scripts/food-facts/`), `food_key` renvoyé par le scan.
 - Tests : 59 tests Deno, 12 fichiers de tests SQL.
 
