@@ -51,9 +51,20 @@ function recipeCount(pantrySize: number): number {
   return pantrySize <= 2 ? 1 : pantrySize <= 5 ? 2 : 3;
 }
 
+// Plusieurs lots d'un même aliment le même jour : son nom une seule fois
+function uniqueNames(items: ReminderItem[]): string[] {
+  const seen = new Set<string>();
+  return items.map((item) => item.name).filter((name) => {
+    const key = name.trim().toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function listNames(items: ReminderItem[]): string {
   const t = i18n.t;
-  const names = items.map((item) => item.name);
+  const names = uniqueNames(items);
   if (names.length > MAX_NAMES) {
     return t('notifications.andMore', { items: names.slice(0, MAX_NAMES).join(', '), count: names.length - MAX_NAMES });
   }

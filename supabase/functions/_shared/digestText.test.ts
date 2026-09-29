@@ -23,3 +23,9 @@ Deno.test('plus de 3 aliments : « et N autres » ; une seule recette pour un pe
 Deno.test('langue inconnue : français', () => {
   assertEquals(digestContent([item('1', 'pain')], [], 1, 'de').title, 'À cuisiner vite');
 });
+
+Deno.test('deux lots du même aliment le même jour : nom une seule fois, les deux lots présélectionnés', () => {
+  const content = digestContent([item('1', 'tomates'), item('2', 'Tomates'), item('3', 'lait')], [], 4, 'fr');
+  assertEquals(content.body, "Aujourd'hui : tomates et lait. 2 recettes t’attendent.");
+  assertEquals(content.data.priority, '1,2,3');
+});

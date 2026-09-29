@@ -13,6 +13,7 @@ import { daysUntil, sortByUrgency } from '@/lib/expiry';
 import { onPantryChanged } from '@/lib/pantryEvents';
 import { activeHouseholdId } from '@/lib/household';
 import { loadPreferences } from '@/lib/preferences';
+import { groupLots, totalLabel } from '@/lib/pantryLots';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import type { Filters, Recipe } from '@/components/recipe/types';
 
@@ -62,13 +63,21 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
     if (initialKey) setSelectedIds(initialKey.split(','));
   }, [initialKey]);
 
+  // Un aliment par ligne (ses lots regroupés), représenté par son lot le plus ancien : quantité totale et
+  // date la plus proche. Une sélection reçue avec l'identifiant de n'importe quel lot choisit l'aliment.
+  const groups = groupLots(ingredients);
+  const foods = groups.map((group) => ({ ...group.first, quantity: totalLabel(group.lots, language) }));
+  const isSelected = (index: number) => groups[index].lots.some((lot) => selectedIds.includes(lot.id));
+
   const toggleSelected = (id: string) => {
-    setSelectedIds((current) => current.includes(id) ? current.filter((x) => x !== id) : [...current, id]);
+    const group = groups.find((candidate) => candidate.first.id === id);
+    const lotIds = group ? group.lots.map((lot) => lot.id) : [id];
+    setSelectedIds((current) => current.some((x) => lotIds.includes(x)) ? current.filter((x) => !lotIds.includes(x)) : [...current, id]);
   };
 
-  // Ingrédients envoyés au modèle : la sélection, ou tout le garde-manger
-  const selected = ingredients.filter((i) => selectedIds.includes(i.id));
-  const cookingWith = selected.length > 0 ? selected : ingredients;
+  // Aliments envoyés au modèle : la sélection, ou tout le garde-manger
+  const selected = foods.filter((_, index) => isSelected(index));
+  const cookingWith = selected.length > 0 ? selected : foods;
 
   const loadIngredients = async () => {
     if (!user) return;
@@ -129,7 +138,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
         // Avec une sélection : le reste du garde-manger, que les recettes ne doivent pas utiliser
         ...(selected.length > 0 && {
           selection: true,
-          other_pantry: ingredients.filter((i) => !selectedIds.includes(i.id)).map((i) => i.name),
+          other_pantry: foods.filter((_, index) => !isSelected(index)).map((i) => i.name),
         }),
         mode,
         preferences: {
@@ -281,8 +290,9 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
   };
 
   return {
-    ingredients,
-    selectedIds,
+    // Aliments (lots regroupés) et aliments choisis
+    ingredients: foods,
+    selectedIds: selected.map((food) => food.id),
     toggleSelected,
     clearSelection: () => setSelectedIds([]),
     hasLeftovers: cookingWith.some((i) => i.kind === 'dish'),
