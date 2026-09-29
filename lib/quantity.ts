@@ -1,5 +1,5 @@
-// Quantités en texte libre (« 4 œufs », « 500 g », « 1/2 », « 20 cl ») : lecture, et quantité restante
-// d'un aliment après une recette (« J'ai cuisiné ça ») quand les unités correspondent.
+// Quantités en texte libre (« 4 œufs », « 500 g », « 1/2 », « 20 cl ») : lecture, et quantité utilisée par une
+// recette dans l'unité du garde-manger (« J'ai cuisiné ça ») quand les unités correspondent.
 
 type Dimension = 'mass' | 'volume' | 'count' | `word:${string}`;
 
@@ -75,28 +75,23 @@ export function parseQuantity(text: string | null | undefined, itemName = ''): Q
   return { value: number.value, unit, dimension, base: number.value * factor };
 }
 
-// Même sorte d'unité : le reste peut être calculé
+// Même sorte d'unité : la quantité utilisée peut être comptée dans l'unité du garde-manger
 export const sameDimension = (a: Quantity, b: Quantity) => a.dimension === b.dimension;
 
-// Pas des boutons + et − : 1 pour des pièces, sinon selon l'ordre de grandeur (300 g → 50, 0,8 kg → 0,1)
-export function stepFor(quantity: Pick<Quantity, 'value' | 'dimension'>): number {
-  if (quantity.dimension === 'count') return quantity.value < 1 ? 0.25 : 1;
-  const magnitude = 10 ** Math.floor(Math.log10(quantity.value));
+// Quantité de la recette dans l'unité du garde-manger, limitée au stock (2 œufs sur 4 → 2 ; 250 g sur 1 kg →
+// 0,25), ou null si les unités ne correspondent pas
+export function usedFromRecipe(stock: Quantity | null, needed: Quantity | null): number | null {
+  if (!stock || !needed || !sameDimension(stock, needed)) return null;
+  const factor = stock.base / stock.value;
+  return Math.min(Number((needed.base / factor).toFixed(2)), stock.value);
+}
+
+// Pas des boutons + et − : 1 pour ce qui se compte (pièces, portions, tranches), sinon selon l'ordre de
+// grandeur du stock (500 g → 50, 1 kg → 0,1)
+export function stepOf(stock: Quantity): number {
+  if (stock.dimension !== 'mass' && stock.dimension !== 'volume') return stock.value < 1 ? 0.25 : 1;
+  const magnitude = 10 ** Math.floor(Math.log10(stock.value / 4));
   return magnitude >= 100 ? magnitude / 2 : magnitude;
-}
-
-// Quantité restante dans l'unité du garde-manger (4 œufs − 2 → 2 ; 1 kg − 200 g → 0,8), ou null si les
-// unités ne correspondent pas ou s'il ne reste rien
-export function remainingAfter(pantry: Quantity, used: Quantity): number | null {
-  if (!sameDimension(pantry, used)) return null;
-  const factor = pantry.base / pantry.value;
-  const left = (pantry.base - used.base) / factor;
-  return left > 0.001 ? Number(left.toFixed(2)) : null;
-}
-
-export function roundTo(value: number, step: number): number {
-  const rounded = Math.round(value / step) * step;
-  return Number((rounded > 0 ? rounded : step).toFixed(3));
 }
 
 // Nombre → texte (virgule décimale en français et en espagnol), suivi de l'unité du garde-manger

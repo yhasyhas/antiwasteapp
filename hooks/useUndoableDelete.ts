@@ -67,5 +67,5 @@ export function useUndoableDelete<T extends { id: string }>(commit: (item: T) =>
     };
   }, [flush]);
 
-  return { pending, hiddenIds, remove, undo };
+  return { pending, hiddenIds, remove, undo, flush };
 }

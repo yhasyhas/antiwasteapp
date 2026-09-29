@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { AccessibilityInfo, StyleSheet, Text } from 'react-native';
+import { AccessibilityInfo, StyleSheet, Text, type DimensionValue } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { colors, motion, radius, shadows, sizes, spacing, typography } from '@/constants/theme';
 import { Touchable } from './Touchable';
@@ -10,8 +10,8 @@ interface Props {
   // Action proposée (« Annuler », « Voir »)
   actionLabel: string;
   onAction: () => void;
-  // Hauteur au-dessus du bas de l'écran (pour laisser voir un bouton flottant)
-  bottom?: number;
+  // Hauteur au-dessus du bas de l'écran ou du conteneur (pour laisser voir un bouton flottant ou une barre)
+  bottom?: DimensionValue;
 }
 
 // Message temporaire en bas de l'écran, avec une action (« Annuler », « Voir »)
