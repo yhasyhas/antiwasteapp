@@ -7,8 +7,9 @@
 
 BEGIN;
 
--- Essais simulés du jour déjà en base (écran « État des services », simulations) : ignorés ici
-DELETE FROM provider_quota_events WHERE simulated AND day = (now() AT TIME ZONE 'utc')::date;
+-- Test indépendant des données existantes (vrais épuisements, simulations des jours passés) : table vidée
+-- dans cette transaction, rétablie telle quelle à la fin (ROLLBACK)
+DELETE FROM provider_quota_events;
 
 -- En tant que service_role (les fonctions, avec la clé secrète)
 SET LOCAL ROLE service_role;

@@ -14,6 +14,7 @@ Dernière mise à jour : 23/09/2026
 - **Une branche par phase** : `phase-0`, `phase-1`, etc. Fusion dans `master` quand la phase est terminée.
 - **Un commit par tâche**, avec un message clair en français.
 - **`npm run typecheck` doit passer avant chaque commit** (à partir de la fin de la phase 0).
+- **Tous les tests passent avant chaque fusion, sans exception connue** : tests SQL (`supabase/tests/`), tests des fonctions (Deno) et typecheck.
 - **Aucune clé secrète dans le code ni dans les réponses envoyées à l'app.** Les secrets vont dans `supabase secrets set`.
 - **Noms de modèles IA toujours dans des secrets** (`GROQ_MODEL`, `GEMINI_MODEL`…), jamais en dur : les fournisseurs retirent des modèles régulièrement.
 - **Rapports et messages en français.**
@@ -450,4 +451,5 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 | 29/09/2026 | Rappels et résumé quotidien : toujours lot par lot (chaque lot à sa propre date) ; un aliment en plusieurs lots le même jour n'est nommé qu'une fois | Tous les lots restent présélectionnés quand on touche la notification |
 | 29/09/2026 | Fluidité : regrouper 300 lots (30 aliments) prend 1 à 4 ms sur un PC ; le regroupement n'est refait que quand le garde-manger change | Vérification sur le Galaxy A30 aux tests de la phase |
 | 29/09/2026 | Test SQL `provider_quota_events.sql` en échec, avec ou sans la migration de la phase 7b : une alerte simulée d'un jour précédent est encore en base | Sans lien avec la phase ; test à rendre indépendant des données existantes (phase 8a) |
+| 29/09/2026 | Test `provider_quota_events.sql` corrigé : il vide la table dans sa transaction (annulée à la fin) et ne dépend plus des données existantes. Les 4 alertes simulées du 26/09 (essais) supprimées de la base, après sauvegarde | Nouvelle règle : tous les tests passent avant chaque fusion, sans exception connue |
 | | *(résultat du test Gemini vs Clarifai)* | |
