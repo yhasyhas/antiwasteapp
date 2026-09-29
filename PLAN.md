@@ -234,6 +234,21 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 
 **Terminé quand** : les écrans principaux suivent les maquettes validées et l'app paraît fluide sur un téléphone Android d'entrée de gamme. *(Validée le 29/09/2026 sur deux téléphones Android ; reste l'aperçu vide de la caméra sur le Samsung, repris en phase 7c.)*
 
+## Phase 7c — Caméra : passage à react-native-vision-camera
+
+À faire avant la phase 7b. Sur un Samsung, l'aperçu du Scanner reste vide au retour sur l'onglet malgré la réouverture différée et la relance automatique (expo-camera) ; le Redmi fonctionne.
+
+- [ ] Relever les événements Sentry « Caméra du Scanner » (modèle, version d'Android, relance ou erreur) et les noter au journal
+- [ ] Ajouter react-native-vision-camera (plugin de configuration, permission caméra) et créer un nouveau build de développement EAS
+- [ ] Réécrire l'aperçu du Scanner : caméra active seulement quand l'onglet est affiché, l'app au premier plan et aucune feuille par-dessus ; photo, retournement avant / arrière
+- [ ] Code-barres avec le lecteur de vision-camera (EAN-13, EAN-8, UPC-A, UPC-E) : un code à la fois, reprise à la fermeture de l'ajout manuel et au retour sur l'onglet
+- [ ] Erreurs de démarrage : message et « Réessayer », événement Sentry avec le modèle du téléphone et la version du système
+- [ ] Version web de l'app (captures, essais) : vision-camera n'existe pas sur le web, garder expo-camera sur le web ou afficher l'ajout à la main
+- [ ] Retirer expo-camera s'il ne sert plus
+- [ ] Tests sur les deux téléphones : cinq allers-retours Scanner → Garde-manger → Scanner en photo et en code-barres, arrière-plan puis retour, « À la main » ouvert puis fermé
+
+**Terminé quand** : l'aperçu du Scanner revient à chaque retour sur l'onglet, sur le Samsung comme sur le Redmi, en photo et en code-barres.
+
 ## Phase 8 — Préparer le lancement
 
 - [ ] Réactiver la confirmation d'email dans Supabase (Authentication → Sign In / Providers → Email)
@@ -392,4 +407,5 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 | 29/09/2026 | Aperçu de la caméra figé au retour sur le Scanner (après un passage au Garde-manger) : caméra montée seulement quand elle est visible (`useIsFocused`, app au premier plan, aucune feuille par-dessus), libérée sinon, en photo comme en code-barres ; erreur de démarrage (`onMountError`) : message et « Réessayer » | Les onglets restent montés en arrière-plan : la caméra n'était jamais libérée. La prop `active` d'expo-camera ne vaut que pour iOS, d'où le démontage. Vérifié sur le web : caméra libérée au Garde-manger et relancée à chaque retour (5 allers-retours, photo et code-barres), erreur simulée puis « Réessayer » |
 | 29/09/2026 | Aperçu vide (sans erreur) au retour sur le Scanner, sur un Samsung : caméra rouverte après 500 ms ; surveillance de `onCameraReady` (5 s) qui relance la caméra une fois, puis affiche l'erreur avec « Réessayer » ; événement Sentry avec la marque, le modèle et la version du système ; fond sombre sous l'aperçu | À vérifier sur le Samsung ; si ça ne suffit pas, piste suivante : react-native-vision-camera (nouveau build) |
 | 29/09/2026 | Cartes du garde-manger empilées sur Android après « Voir le garde-manger » depuis le Scanner : animations de liste seulement quand l'écran est affiché, réarrangement animé désactivé sur Android ; liens vers les onglets par `router.navigate` (plus de second écran empilé) | Liste mise à jour pendant que l'onglet était caché : les animations de réarrangement calculaient des positions fausses |
+| 29/09/2026 | Phases 6b et 7 validées et fusionnées dans master. Caméra : le Redmi fonctionne, l'aperçu reste vide sur le Samsung malgré la réouverture différée et la relance automatique | Nouvelle phase 7c (passage à react-native-vision-camera), avant la phase 7b. Événements Sentry de la caméra pas encore relevés : l'accès en lecture à Sentry manque (seul le DSN, qui ne permet que d'envoyer, est configuré) |
 | | *(résultat du test Gemini vs Clarifai)* | |
