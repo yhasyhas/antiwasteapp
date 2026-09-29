@@ -13,7 +13,13 @@ import { ConfirmIngredientsModal } from '@/components/scan/ConfirmIngredientsMod
 import { PermissionRequest } from '@/components/scan/PermissionRequest';
 import { Button } from '@/components/ui/Button';
 import { Touchable } from '@/components/ui/Touchable';
+import { reportCameraIssue } from '@/lib/sentry';
 import { colors, opacity, radius, sizes, spacing, typography } from '@/constants/theme';
+
+// Retour sur l'onglet : court délai avant de rouvrir la caméra (certains téléphones, Samsung notamment, ne
+// l'ont pas encore libérée) ; puis l'aperçu doit être prêt en quelques secondes
+const CAMERA_REOPEN_DELAY_MS = 500;
+const CAMERA_READY_TIMEOUT_MS = 5000;
 
 export default function CameraScreen() {
   const { t } = useLanguage();
@@ -51,13 +57,44 @@ export default function CameraScreen() {
     return () => subscription.remove();
   }, []);
   const cameraOn = isFocused && appActive && !showManualAdd && !showConfirmation;
-  // Démarrage impossible (caméra occupée, erreur du système) : message et « Réessayer » (nouvelle caméra)
+  // Caméra ouverte après le délai de réouverture
+  const [cameraMounted, setCameraMounted] = useState(false);
+  // Démarrage impossible (caméra occupée, erreur du système, aperçu jamais prêt) : message et « Réessayer »
   const [cameraError, setCameraError] = useState(false);
   const [cameraKey, setCameraKey] = useState(0);
+  const cameraReady = useRef(false);
+  const autoRestarted = useRef(false);
   const retryCamera = () => {
+    autoRestarted.current = false;
     setCameraError(false);
     setCameraKey((key) => key + 1);
   };
+  useEffect(() => {
+    if (!cameraOn) {
+      setCameraMounted(false);
+      return;
+    }
+    autoRestarted.current = false;
+    const timer = setTimeout(() => setCameraMounted(true), CAMERA_REOPEN_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [cameraOn]);
+  // Surveillance : aperçu pas prêt à temps (vide, sans erreur) → relancé une fois automatiquement, puis erreur
+  useEffect(() => {
+    if (!cameraMounted || cameraError) return;
+    cameraReady.current = false;
+    const timer = setTimeout(() => {
+      if (cameraReady.current) return;
+      if (!autoRestarted.current) {
+        autoRestarted.current = true;
+        reportCameraIssue('restart', 'ready_timeout');
+        setCameraKey((key) => key + 1);
+      } else {
+        reportCameraIssue('error', 'ready_timeout');
+        setCameraError(true);
+      }
+    }, CAMERA_READY_TIMEOUT_MS);
+    return () => clearTimeout(timer);
+  }, [cameraMounted, cameraKey, cameraError]);
   // Caméra de retour : le scan de code-barres reprend (verrou laissé par un code lu juste avant de partir)
   useEffect(() => {
     if (cameraOn) resume();
@@ -93,7 +130,7 @@ export default function CameraScreen() {
   };
 
   const takePicture = async () => {
-    if (!cameraRef.current || !cameraOn) return;
+    if (!cameraRef.current || !cameraMounted) return;
 
     try {
       const photo = await cameraRef.current.takePictureAsync();
@@ -108,7 +145,7 @@ export default function CameraScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.cameraContainer}>
-        {cameraOn && !cameraError ? (
+        {cameraOn && cameraMounted && !cameraError ? (
           <CameraView
             key={cameraKey}
             style={styles.camera}
@@ -116,8 +153,12 @@ export default function CameraScreen() {
             ref={cameraRef}
             barcodeScannerSettings={{ barcodeTypes: [...FOOD_BARCODE_TYPES] }}
             onBarcodeScanned={barcode && !showManualAdd && !lookingUp ? onBarcodeScanned : undefined}
+            onCameraReady={() => {
+              cameraReady.current = true;
+            }}
             onMountError={(event) => {
               console.warn('[caméra] démarrage impossible :', event.message);
+              reportCameraIssue('error', 'mount_error');
               setCameraError(true);
             }}
           />
@@ -209,11 +250,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.camera,
   },
+  // Fond sombre même sans aperçu (caméra en cours d'ouverture ou vide) : le titre blanc reste lisible
   cameraContainer: {
     flex: 1,
+    backgroundColor: colors.camera,
   },
   camera: {
     flex: 1,
+    backgroundColor: colors.camera,
   },
   header: {
     position: 'absolute',
