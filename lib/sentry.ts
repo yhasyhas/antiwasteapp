@@ -29,7 +29,7 @@ export function sendSentryTestError() {
 
 // Caméra du Scanner qui ne démarre pas (aperçu vide) : modèle du téléphone et version du système, pour
 // repérer les appareils concernés. stage : 'restart' (relancée automatiquement) ou 'error' (message affiché).
-export function reportCameraIssue(stage: 'restart' | 'error', reason: string) {
+export function reportCameraIssue(stage: 'restart' | 'error', reason: string, message?: string) {
   if (!DSN) return;
   Sentry.captureMessage(`Caméra du Scanner : ${stage === 'restart' ? 'relancée automatiquement' : 'erreur affichée'} (${reason})`, {
     level: 'warning',
@@ -40,6 +40,7 @@ export function reportCameraIssue(stage: 'restart' | 'error', reason: string) {
       device_model: Device.modelName ?? 'inconnu',
       os: `${Platform.OS} ${Device.osVersion ?? Platform.Version}`,
     },
+    extra: message ? { message } : undefined,
   });
 }
 
