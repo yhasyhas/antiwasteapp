@@ -46,6 +46,9 @@ export const ScannerCamera = forwardRef<ScannerCameraHandle, ScannerCameraProps>
       device={facing}
       outputs={outputs}
       resizeMode="cover"
+      // TextureView plutôt que SurfaceView (par défaut) : l'écran pose des vues par-dessus l'aperçu, ce que
+      // SurfaceView ne gère pas ; aperçu resté vide sur un Samsung
+      implementationMode="compatible"
       onPreviewStarted={onPreviewStarted}
       onError={(error) => onError('session_error', error.message)}
     />

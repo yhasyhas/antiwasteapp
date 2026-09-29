@@ -161,7 +161,7 @@ export default function CameraScreen() {
             }}
             onError={(reason, message) => {
               console.warn('[caméra] démarrage impossible :', reason, message);
-              reportCameraIssue('error', reason);
+              reportCameraIssue('error', reason, message);
               setCameraError(true);
             }}
           />
