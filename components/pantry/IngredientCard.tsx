@@ -50,8 +50,7 @@ export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry
   const name = displayName ?? ingredient.name;
   const openFact = onOpenFact && !isDish ? onOpenFact : undefined;
   // « ajouté par Awa » : seule la première lettre de la phrase passe en minuscule, le prénom garde sa majuscule
-  const author = addedBy ? t('household.addedBy', { name: addedBy }) : null;
-  const details = [ingredient.quantity, author ? author.charAt(0).toLowerCase() + author.slice(1) : null].filter(Boolean).join(' · ');
+  const details = [ingredient.quantity, addedBy ? addedBy.charAt(0).toLowerCase() + addedBy.slice(1) : null].filter(Boolean).join(' · ');
 
   // Appui long : toutes les actions de l'aliment
   const showActions = () => {

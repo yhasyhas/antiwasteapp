@@ -22,7 +22,7 @@ import { FoodFactSheet } from '@/components/pantry/FoodFactSheet';
 import { expiryStatus, sortByUrgency } from '@/lib/expiry';
 import { maybeAskNotificationPermission } from '@/lib/notifications';
 import { notifyPantryChanged, onPantryChanged } from '@/lib/pantryEvents';
-import { activeHouseholdId } from '@/lib/household';
+import { activeHouseholdId, addedByLabel } from '@/lib/household';
 import { useHousehold } from '@/hooks/useHousehold';
 import { useUndoableDelete } from '@/hooks/useUndoableDelete';
 import { linkPantryFoodKeys, useFoodNames } from '@/lib/foodNames';
@@ -52,13 +52,7 @@ export default function IngredientsScreen() {
   // Garde-manger partagé : rechargé quand un membre le modifie (temps réel) ou qu'on change de foyer
   useEffect(() => onPantryChanged(loadIngredients), [user]);
 
-  // « Ajouté par » (foyer partagé seulement) : moi, un membre, ou un ancien membre
-  const addedBy = (authorId: string | null): string | undefined => {
-    if (!household?.shared) return undefined;
-    const member = household.members.find((m) => m.user_id === authorId);
-    if (!member) return t('household.formerMember');
-    return member.is_me ? t('household.you').toLowerCase() : member.name ?? t('household.guest');
-  };
+
 
   // Rechargé à chaque retour sur l'onglet (ingrédients ajoutés depuis la caméra, par exemple)
   useFocusEffect(
@@ -180,7 +174,7 @@ export default function IngredientsScreen() {
         displayName={foodName(ingredient)}
         onDelete={() => removal.remove(ingredient)}
         onEditExpiry={() => setEditingExpiry(ingredient)}
-        addedBy={addedBy(ingredient.user_id)}
+        addedBy={addedByLabel(t, household, ingredient.user_id) ?? undefined}
         onOpenFact={() => setFactIngredient(ingredient)}
       />
     </ListItemMotion>

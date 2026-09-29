@@ -4,6 +4,7 @@ import { useFocusEffect } from 'expo-router';
 import { ListChecks, Plus } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHousehold } from '@/hooks/useHousehold';
+import { addedByLabel } from '@/lib/household';
 import { Input, TextField } from '@/components/ui/Input';
 import { KeyboardAvoider, useKeyboardScroll } from '@/components/ui/KeyboardAvoider';
 import { BottomSheet, SheetHeader } from '@/components/ui/BottomSheet';
@@ -75,13 +76,6 @@ export default function ShoppingScreen() {
   const toBuy = (shown ?? []).filter((item) => !item.checked);
   const inCart = (shown ?? []).filter((item) => item.checked);
 
-  const authorName = (userId: string | null) => {
-    if (!household?.shared) return null;
-    const member = household.members.find((m) => m.user_id === userId);
-    if (!member) return t('household.formerMember');
-    return member.is_me ? t('household.you').toLowerCase() : member.name ?? t('household.guest');
-  };
-
   const failed = (error: unknown) => {
     console.warn('[courses]', error);
     Alert.alert(t('errors.writeTitle'), t('errors.writeText'));
@@ -130,11 +124,10 @@ export default function ShoppingScreen() {
   };
 
   const renderItem = (item: ShoppingItem, index: number) => {
-    const author = authorName(item.added_by);
     // « Pour : recette » ou « Ajouté par … »
     const details = item.recipe_title
       ? t('shopping.forRecipeLine', { title: item.recipe_title })
-      : author ? t('household.addedBy', { name: author }) : null;
+      : addedByLabel(t, household, item.added_by);
     return (
       <ListItemMotion key={item.id} index={index}>
         {index > 0 ? <View style={cardStyles.divider} /> : null}
