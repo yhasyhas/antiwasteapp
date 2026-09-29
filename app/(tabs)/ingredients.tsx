@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { Camera, Plus, Search, ShoppingCart, Users } from 'lucide-react-native';
@@ -33,7 +33,7 @@ import { linkPantryFoodKeys, useFoodNames } from '@/lib/foodNames';
 import { colors, motion, radius, shadows, sizes, spacing, typography } from '@/constants/theme';
 
 type Filter = 'all' | 'urgent' | 'leftovers';
-type Group = LotGroup<PantryIngredient>;
+type Group = LotGroup<PantryIngredient> & { total?: string };
 
 // Ligne urgente : son lot le plus ancien est périmé ou proche de sa date
 const isUrgent = (group: Group) => {
@@ -185,9 +185,15 @@ export default function IngredientsScreen() {
     );
   };
 
-  // Lots en cours de suppression : déjà cachés (reviennent si l'enregistrement échoue)
-  const lots = ingredients.filter((ingredient) => !removal.hiddenIds.has(ingredient.id));
-  const allGroups = groupLots(lots).filter((group) => !removal.hiddenIds.has(group.key));
+  // Une ligne par aliment, avec sa quantité totale, recalculée seulement quand le garde-manger change (pas à
+  // chaque lettre de la recherche). Lots en cours de suppression : déjà cachés (reviennent si l'enregistrement
+  // échoue).
+  const allGroups = useMemo(() => {
+    const lots = ingredients.filter((ingredient) => !removal.hiddenIds.has(ingredient.id));
+    return groupLots(lots)
+      .filter((group) => !removal.hiddenIds.has(group.key))
+      .map((group) => ({ ...group, total: totalLabel(group.lots, language) }));
+  }, [ingredients, removal.hiddenIds, language]);
   const query = searchQuery.trim().toLowerCase();
   const searched = query
     ? allGroups.filter((group) => foodName(group.first).toLowerCase().includes(query) || group.lots.some((lot) => lot.name.toLowerCase().includes(query)))
@@ -228,7 +234,7 @@ export default function IngredientsScreen() {
         <IngredientCard
           ingredient={group.first}
           displayName={foodName(group.first)}
-          quantityLabel={totalLabel(group.lots, language)}
+          quantityLabel={group.total}
           lotCount={group.lots.length}
           onDelete={() => removeGroup(group)}
           onEditExpiry={() => (multiple ? setLotsKey(group.key) : setEditingExpiry(group.first))}
