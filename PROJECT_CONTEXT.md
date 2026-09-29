@@ -212,7 +212,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Écrans refaits d'après `docs/design/` ; captures dans `docs/design/implemente/`. Sous-écran Langue (`app/language.tsx`), courses en onglet caché (`app/(tabs)/shopping.tsx`), vérification anti-robot intégrée au formulaire (`CaptchaField`).
 - Badge « X à sauver » : `hooks/usePantryUrgency.ts`.
 - Suppression annulable (garde-manger, courses, fiche aliment) : `hooks/useUndoableDelete.ts` et `components/ui/Toast.tsx` (message temporaire avec une action, aussi pour « Voir » après l'ajout aux courses) ; la suppression en base n'a lieu qu'après 5 secondes, donc une suppression annulée ne compte pas dans le compteur.
-- « J'ai cuisiné ça » avec quantités : `lib/quantity.ts` (lecture des quantités, reste, pas des boutons + et −), `cook_ingredients(p_ids, p_leftovers)`.
+- « J'ai cuisiné ça » en quantité utilisée : `lib/quantity.ts` (lecture des quantités, quantité de la recette dans l'unité du garde-manger, pas des boutons + et −), `cook_ingredients(p_ids, p_leftovers)` appelé 5 secondes après la validation (message « Annuler », `useUndoableDelete`).
 - Noms des aliments dans la langue de l'app : `lib/foodNames.ts` (`useFoodNames`, `linkPantryFoodKeys` qui appelle `food-fact` en mode `link_only`).
 - Traduction des recettes : fonction `translate-recipe`, `lib/recipeTranslation.ts`, colonne `recipes.translations`. Quotas `links` et `translations` dans `usage_counters`.
 
@@ -227,7 +227,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`) : renommage en phase 8, nom pas encore choisi.
 - Sauvegardes de la base dans `backups/` : jamais commitées (`.gitignore`) ni exportées.
 - Rappels locaux (secours sans jeton push) calculés sur le téléphone ; avec le temps réel, un changement fait par un autre membre les recalcule dès que l'app est ouverte.
-- « J'ai cuisiné ça » : reste calculé seulement quand l'unité de la recette correspond à celle du garde-manger (sinon « La moitié » ou « Un peu »).
+- « J'ai cuisiné ça » : quantité utilisée réglable seulement quand l'unité de la recette correspond à celle du garde-manger (sinon « Tout », « La moitié » ou « Un peu ») ; fermer la fiche pendant le message « Annuler » enregistre tout de suite.
 - Développement avec le build « Antigaspi (dev) » (`npx expo start --dev-client`) ; nouveau build seulement après un changement natif (bibliothèque native, `app.json`, `app.config.js`, `eas.json`). Expo Go reste utilisable, sans notifications push (rappels locaux).
 - Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 
