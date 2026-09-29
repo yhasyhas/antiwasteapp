@@ -1,7 +1,7 @@
 -- Tests de « Récemment retirés » et des produits scannés : actions annulables 24 heures (fusion : 2 minutes),
 -- liste de mes actions du foyer actif, conflit si un autre membre a changé un aliment ou rajouté l'article
 -- de courses entre-temps, recette supprimée entre-temps, une seule fois, auteur uniquement ; informations
--- Open Food Facts enregistrées avec un produit.
+-- Open Food Facts enregistrées avec un produit (nom générique compris).
 --
 -- Lancement (base liée, mot de passe dans SUPABASE_DB_PASSWORD) :
 --   PGPASSWORD="$SUPABASE_DB_PASSWORD" psql "$(cat supabase/.temp/pooler-url)" -v ON_ERROR_STOP=1 -f supabase/tests/recent_actions.sql
@@ -133,11 +133,11 @@ BEGIN
 
   -- 8. Produit scanné : informations Open Food Facts enregistrées
   PERFORM public.add_pantry_items(jsonb_build_array(jsonb_build_object(
-    'name', 'Palmito L''original', 'quantity', '400 g', 'barcode', '3250390000013', 'added_via', 'barcode', 'category', 'vegetable',
-    'product_name', 'Palmito L''original', 'brand', 'Palmito', 'nova_group', 3, 'nutriscore_grade', 'b',
-    'off_categories', jsonb_build_array('en:canned-foods', 'en:canned-vegetables', 'en:palm-hearts'))));
-  IF NOT EXISTS (SELECT 1 FROM public.ingredients WHERE barcode = '3250390000013' AND added_via = 'barcode' AND brand = 'Palmito'
-                 AND nova_group = 3 AND nutriscore_grade = 'b' AND off_categories @> ARRAY['en:palm-hearts']) THEN
+    'name', 'Palmito L''original', 'quantity', '400 g', 'barcode', '3250390000013', 'added_via', 'barcode', 'category', 'snack',
+    'product_name', 'Palmito L''original', 'generic_name', 'Biscuits feuilletés', 'brand', 'LU', 'nova_group', 4, 'nutriscore_grade', 'e',
+    'off_categories', jsonb_build_array('en:snacks', 'en:biscuits', 'en:palmiers'))));
+  IF NOT EXISTS (SELECT 1 FROM public.ingredients WHERE barcode = '3250390000013' AND added_via = 'barcode' AND brand = 'LU' AND generic_name = 'Biscuits feuilletés'
+                 AND nova_group = 4 AND nutriscore_grade = 'e' AND off_categories @> ARRAY['en:palmiers']) THEN
     RAISE EXCEPTION 'ÉCHEC : produit mal enregistré';
   END IF;
   BEGIN
