@@ -109,7 +109,7 @@ const en: Translations = {
     yourPhoto: "Your photo",
     foundCount_one: "{{count}} food found",
     foundCount_other: "{{count}} foods found",
-    foundSubtitle: "Untick what's wrong, adjust the dates",
+    foundSubtitle: "Untick what's wrong, adjust quantities and dates",
     title: 'Scan ingredients',
     addManually: 'Add manually',
     pointCamera: 'Point at your fridge, your cupboard or a dish',

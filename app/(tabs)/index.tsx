@@ -12,7 +12,7 @@ import { activeHouseholdId } from '@/lib/household';
 import { onPantryChanged } from '@/lib/pantryEvents';
 import { loadShoppingList, onShoppingChanged } from '@/lib/shopping';
 import { expiryStatus, sortByUrgency } from '@/lib/expiry';
-import { groupLots } from '@/lib/pantryLots';
+import { groupLots, lotLabel } from '@/lib/pantryLots';
 import { useRecipeImages } from '@/hooks/useRecipeImages';
 import { useFoodNames } from '@/lib/foodNames';
 import { recipeFromRow, type Recipe } from '@/components/recipe/types';
@@ -37,7 +37,7 @@ const URGENT_COUNT = 3;
 
 export default function HomeScreen() {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const safe = useSafeSpacing();
   // null : pas encore chargé (squelettes)
   const [ingredients, setIngredients] = useState<PantryIngredient[] | null>(null);
@@ -118,7 +118,7 @@ export default function HomeScreen() {
 
   // Les plus urgents (périmés ou bientôt, triés par date), un par aliment : son lot le plus ancien ;
   // « Cuisiner ces aliments » les présélectionne
-  const urgent = groupLots(ingredients ?? []).map((group) => group.first)
+  const urgent = groupLots(ingredients ?? []).map((group) => ({ ...group.first, quantity: lotLabel(group.first, group.lots, language) }))
     .filter((ingredient) => ['expired', 'soon'].includes(expiryStatus(ingredient.expires_at)))
     .slice(0, URGENT_COUNT);
   const cookUrgent = () => router.push({ pathname: '/recipe/generate', params: { priority: urgent.map((i) => i.id).join(',') } });

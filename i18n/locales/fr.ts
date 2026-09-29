@@ -110,7 +110,7 @@ const fr = {
     yourPhoto: "Ta photo",
     foundCount_one: "{{count}} aliment trouvé",
     foundCount_other: "{{count}} aliments trouvés",
-    foundSubtitle: "Décoche ce qui ne va pas, ajuste les dates",
+    foundSubtitle: "Décoche ce qui ne va pas, ajuste quantités et dates",
     title: 'Scanner des ingrédients',
     addManually: 'Ajouter à la main',
     pointCamera: 'Vise ton frigo, ton placard ou un plat',

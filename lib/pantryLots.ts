@@ -107,6 +107,14 @@ export function totalLabel(lots: Lot[], language: string): string {
   return lots.map((lot) => lot.quantity).filter(Boolean).join(' + ');
 }
 
+// Quantité d'un lot, avec l'unité de la ligne s'il n'en a pas (« 2 » parmi des tomates → « 2 tomates »)
+export function lotLabel(lot: Lot, lots: Lot[], language: string): string {
+  const quantity = parseQuantity(lot.quantity, lot.name);
+  const stock = lotsStock(lots);
+  if (!quantity || quantity.unit !== '' || !stock || stock.unit === '') return lot.quantity ?? '';
+  return formatQuantity(quantity.value, stock.unit, language);
+}
+
 // Quantité utilisée (dans l'unité de lotsStock), prise du plus ancien lot au plus récent : lots finis et lots
 // entamés avec ce qu'il en reste (dans leur propre unité)
 export function consumeOldestFirst(lots: Lot[], used: number, language: string): { usedUp: string[]; leftovers: { id: string; quantity: string }[] } {

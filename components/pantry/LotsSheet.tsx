@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { cardStyles } from '@/components/ui/Card';
 import { Touchable } from '@/components/ui/Touchable';
 import { addedWhen, expiryFromShelfLife, expiryLabel } from '@/lib/expiry';
-import { mergeableLots, totalLabel, type LotGroup } from '@/lib/pantryLots';
+import { lotLabel, mergeableLots, totalLabel, type LotGroup } from '@/lib/pantryLots';
 import { colors, sizes, spacing, typography } from '@/constants/theme';
 import type { PantryIngredient } from './IngredientCard';
 
@@ -75,7 +75,7 @@ export function LotsSheet({ group, displayName, addedBy, onClose, onRemoveLot, o
               {index > 0 ? <View style={cardStyles.divider} /> : null}
               <View style={styles.lot}>
                 <View style={styles.lotText}>
-                  <Text style={styles.quantity}>{lot.quantity || shown?.name}</Text>
+                  <Text style={styles.quantity}>{lotLabel(lot, lots, language) || shown?.name}</Text>
                   <Text style={styles.details}>{by ? `${by} · ${when}` : t('lots.addedWhen', { when })}</Text>
                 </View>
                 <ExpiryBadge
