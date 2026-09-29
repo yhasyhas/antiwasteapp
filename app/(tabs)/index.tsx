@@ -149,7 +149,7 @@ export default function HomeScreen() {
               kind="pantry"
               title={t('home.emptyPantryTitle')}
               text={t('home.emptyPantryText')}
-              action={<Button label={t('home.scanFood')} icon={Camera} onPress={() => router.push('/(tabs)/camera')} />}
+              action={<Button label={t('home.scanFood')} icon={Camera} onPress={() => router.navigate('/(tabs)/camera')} />}
             />
           </Card>
         ) : (
@@ -159,7 +159,7 @@ export default function HomeScreen() {
               <Card style={styles.urgentCard}>
                 <View style={styles.cardHeader}>
                   <Text style={styles.cardTitle}>{t('home.useSoon')}</Text>
-                  <Touchable onPress={() => router.push('/(tabs)/ingredients')} style={styles.link} accessibilityRole="link">
+                  <Touchable onPress={() => router.navigate('/(tabs)/ingredients')} style={styles.link} accessibilityRole="link">
                     <Text style={styles.linkText}>{t('home.seeAll')}</Text>
                   </Touchable>
                 </View>
@@ -196,14 +196,14 @@ export default function HomeScreen() {
         )}
 
         <View style={styles.shortcuts}>
-          <Card onPress={() => router.push('/(tabs)/camera')} style={styles.shortcut} accessibilityLabel={t('home.scanFood')}>
+          <Card onPress={() => router.navigate('/(tabs)/camera')} style={styles.shortcut} accessibilityLabel={t('home.scanFood')}>
             <IconChip icon={Camera} />
             <View style={styles.rowText}>
               <Text style={styles.rowTitle}>{t('home.scanFood')}</Text>
               <Text style={styles.rowSubtitle}>{t('home.scanSubtitle')}</Text>
             </View>
           </Card>
-          <Card onPress={() => router.push('/shopping')} style={styles.shortcut} accessibilityLabel={t('shopping.title')}>
+          <Card onPress={() => router.navigate('/shopping')} style={styles.shortcut} accessibilityLabel={t('shopping.title')}>
             <IconChip icon={ShoppingCart} />
             <View style={styles.rowText}>
               <Text style={styles.rowTitle}>{t('shopping.short')}</Text>

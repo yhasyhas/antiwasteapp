@@ -144,7 +144,7 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
         [
           {
             text: t('scan.viewPantry'),
-            onPress: () => router.push('/(tabs)/ingredients'),
+            onPress: () => router.navigate('/(tabs)/ingredients'),
           },
           { text: t('common.ok'), style: 'cancel' },
         ]

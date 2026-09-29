@@ -84,7 +84,7 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
   }, []);
   const openShoppingList = () => {
     onClose();
-    router.push('/shopping');
+    router.navigate('/shopping');
   };
   const pantry = usePantryUrgency();
   const toSave = toSaveCount(recipe, pantry);

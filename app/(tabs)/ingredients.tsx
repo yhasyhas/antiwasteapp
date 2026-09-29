@@ -196,7 +196,7 @@ export default function IngredientsScreen() {
         actions={
           <>
             <SquareButton icon={Users} label={t('household.title')} onPress={() => router.push('/household')} />
-            <SquareButton icon={ShoppingCart} label={t('shopping.title')} onPress={() => router.push('/shopping')} />
+            <SquareButton icon={ShoppingCart} label={t('shopping.title')} onPress={() => router.navigate('/shopping')} />
           </>
         }
       />
@@ -224,7 +224,7 @@ export default function IngredientsScreen() {
             kind="pantry"
             title={t('pantry.emptyTitle')}
             text={t('pantry.emptyText')}
-            action={<Button label={t('pantry.addIngredients')} icon={Camera} onPress={() => router.push('/(tabs)/camera')} />}
+            action={<Button label={t('pantry.addIngredients')} icon={Camera} onPress={() => router.navigate('/(tabs)/camera')} />}
           />
         ) : (
           <>
@@ -254,7 +254,7 @@ export default function IngredientsScreen() {
 
       {/* Ajouter : scan ou ajout à la main */}
       <Touchable
-        onPress={() => router.push('/(tabs)/camera')}
+        onPress={() => router.navigate('/(tabs)/camera')}
         style={styles.fab}
         accessibilityRole="button"
         accessibilityLabel={t('pantry.addIngredients')}

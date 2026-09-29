@@ -182,7 +182,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
         t('scan.ingredientsAdded'),
         t('scan.addedToPantry', { count: confirmed.length }),
         [
-          { text: t('scan.viewPantry'), onPress: () => router.push('/(tabs)/ingredients') },
+          { text: t('scan.viewPantry'), onPress: () => router.navigate('/(tabs)/ingredients') },
           { text: t('scan.scanMore'), style: 'cancel' }
         ]
       );

@@ -264,7 +264,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
       [
         {
           text: t('generate.viewSaved'),
-          onPress: () => router.push('/(tabs)/saved'),
+          onPress: () => router.navigate('/(tabs)/saved'),
         },
         { text: t('common.ok'), style: 'cancel' },
       ]
