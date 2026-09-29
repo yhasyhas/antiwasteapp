@@ -35,6 +35,11 @@ interface Props {
   withFact?: boolean;
   // Message « Annuler », en bas de la feuille
   toast?: React.ReactNode;
+  // Nom affiché (celui du produit pour un code-barres) et nom générique en sous-titre
+  title?: string;
+  subtitle?: string | null;
+  // Fiche du produit (code-barres), sous la section du garde-manger
+  product?: React.ReactNode;
 }
 
 const CATEGORIES = ['fruit', 'vegetable', 'meat', 'fish', 'dairy', 'egg', 'grain', 'legume', 'bakery', 'condiment', 'spice', 'beverage', 'snack', 'frozen', 'other'] as const;
@@ -42,7 +47,7 @@ const CATEGORIES = ['fruit', 'vegetable', 'meat', 'fish', 'dairy', 'egg', 'grain
 // Feuille d'un aliment du garde-manger : en haut, « Dans ton garde-manger » (ses lots) ; en dessous, sa fiche :
 // description, origine, saison, atouts nutritionnels, astuces anti-gaspi, « Cuisiner cet aliment ».
 // Informations générales seulement (mention en bas), avec « Signaler une erreur ».
-export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact = true, toast }: Props) {
+export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact = true, toast, title, subtitle, product }: Props) {
   const { t, language } = useLanguage();
   const [result, setResult] = useState<FoodFactResult | null>(null);
   const [reporting, setReporting] = useState(false);
@@ -114,7 +119,8 @@ export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact 
       <View style={styles.header}>
         <IconChip icon={Leaf} tone="accent" size={sizes.iconChipLarge + spacing.sm} />
         <View style={styles.headerText}>
-          <Text style={styles.title}>{capitalize((withFact ? section?.name : null) ?? shown?.name ?? '')}</Text>
+          <Text style={styles.title}>{title ?? capitalize((withFact ? section?.name : null) ?? shown?.name ?? '')}</Text>
+          {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
           <View style={styles.badges}>
             {category ? <Badge label={t(`category.${category}`)} tone="soft" /> : null}
             {shown?.expires_at && !pantry ? <ExpiryBadge expiresAt={shown.expires_at} /> : null}
@@ -127,6 +133,7 @@ export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact 
 
       <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.body}>
         {pantry}
+        {product}
         {!withFact ? cookButton : null}
         {!withFact ? null : !result ? (
           <View style={styles.loading}>
@@ -231,6 +238,10 @@ const styles = StyleSheet.create({
   },
   title: {
     ...typography.title1,
+  },
+  subtitle: {
+    ...typography.body,
+    color: colors.textSecondary,
   },
   badges: {
     flexDirection: 'row',

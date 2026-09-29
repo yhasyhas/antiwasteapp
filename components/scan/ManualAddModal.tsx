@@ -36,6 +36,8 @@ interface ManualIngredient {
   // Produit scanné par code-barres
   barcode?: string;
   category?: string | null;
+  // Produit Open Food Facts (code-barres)
+  product?: ProductInfo | null;
   // Déjà dans le garde-manger : ajouté aux existants, séparément, ou pas du tout
   choice: AddChoice;
 }
@@ -49,6 +51,17 @@ export interface ManualPrefill {
   name: string;
   quantity: string;
   category: string | null;
+  product: ProductInfo | null;
+}
+
+// Informations d'Open Food Facts gardées avec le produit
+export interface ProductInfo {
+  product_name: string;
+  generic_name: string | null;
+  brand: string | null;
+  nova_group: number | null;
+  nutriscore_grade: string | null;
+  off_categories: string[];
 }
 
 interface Props {
@@ -73,7 +86,7 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
   const [newExpiry, setNewExpiry] = useState(() => expiryFromShelfLife(undefined));
   const [expiryChanged, setExpiryChanged] = useState(false);
   // Code-barres de l'ingrédient en cours de saisie
-  const [pending, setPending] = useState<{ barcode: string; found: boolean; category: string | null } | null>(null);
+  const [pending, setPending] = useState<{ barcode: string; found: boolean; category: string | null; product: ProductInfo | null } | null>(null);
 
   useEffect(() => {
     if (visible) loadPantry().then((rows) => rows && setGroups(pantryGroups(rows)));
@@ -86,7 +99,7 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
     setIsLeftover(false);
     setNewExpiry(expiryForPackagedProduct(prefill.category));
     setExpiryChanged(false);
-    setPending({ barcode: prefill.barcode, found: prefill.found, category: prefill.category });
+    setPending({ barcode: prefill.barcode, found: prefill.found, category: prefill.category, product: prefill.product });
   }, [prefill?.key]);
 
   const toggleLeftover = (value: boolean) => {
@@ -107,7 +120,7 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
       quantity: newIngredientQuantity.trim(),
       kind: (isLeftover ? 'dish' : 'ingredient') as FoodKind,
       expires_at: newExpiry,
-      ...(pending && { barcode: pending.barcode, category: pending.category }),
+      ...(pending && { barcode: pending.barcode, category: pending.category, product: pending.product }),
     };
     setManualIngredients([...manualIngredients, { ...ingredient, choice: defaultChoice(groups, ingredient, language) }]);
     setPending(null);
@@ -135,8 +148,9 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
     setSaving(true);
     let error: unknown = null;
     try {
-      await addPantryItems(toSave.map((ingredient) => ({
+      await addPantryItems(toSave.map(({ product, ...ingredient }) => ({
         ...ingredient,
+        ...product,
         barcode: ingredient.barcode ?? null,
         choice: ingredient.choice === 'merge' ? 'merge' : 'separate',
         added_via: ingredient.barcode ? 'barcode' : 'manual',

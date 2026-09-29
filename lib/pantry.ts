@@ -25,6 +25,12 @@ export type ExistingChoice = 'merge' | 'separate';
 export interface FoodToAdd extends NewFood {
   category?: string | null;
   storage_tip?: string | null;
+  product_name?: string | null;
+  generic_name?: string | null;
+  brand?: string | null;
+  nova_group?: number | null;
+  nutriscore_grade?: string | null;
+  off_categories?: string[] | null;
   added_via: 'camera' | 'barcode' | 'manual';
   choice?: ExistingChoice;
 }
@@ -47,6 +53,12 @@ export async function addPantryItems(foods: FoodToAdd[], groups: LotGroup<Pantry
       barcode: food.barcode ?? null,
       expires_at: food.expires_at,
       added_via: food.added_via,
+      product_name: food.product_name ?? null,
+      generic_name: food.generic_name ?? null,
+      brand: food.brand ?? null,
+      nova_group: food.nova_group ?? null,
+      nutriscore_grade: food.nutriscore_grade ?? null,
+      off_categories: food.off_categories ?? null,
     };
     const group = food.choice === 'merge' ? findExisting(groups, food) : null;
     if (!group) return base;

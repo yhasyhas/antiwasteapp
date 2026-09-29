@@ -14,6 +14,7 @@ import { onPantryChanged } from '@/lib/pantryEvents';
 import { activeHouseholdId } from '@/lib/household';
 import { loadPreferences } from '@/lib/preferences';
 import { groupLots, totalLabel } from '@/lib/pantryLots';
+import { useFoodNaming } from '@/lib/foodNames';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import type { Filters, Recipe } from '@/components/recipe/types';
 
@@ -68,6 +69,13 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
   const groups = groupLots(ingredients);
   const foods = groups.map((group) => ({ ...group.first, quantity: totalLabel(group.lots, language) }));
   const isSelected = (index: number) => groups[index].lots.some((lot) => selectedIds.includes(lot.id));
+  // Nom envoyé au modèle : un produit scanné garde son nom, suivi de son nom générique (« Palmito L'original
+  // (Biscuits feuilletés) »)
+  const naming = useFoodNaming(ingredients);
+  const modelName = (food: PantryIngredient) => {
+    const generic = naming.generic(food);
+    return generic ? `${food.name} (${generic})` : food.name;
+  };
 
   const toggleSelected = (id: string) => {
     const group = groups.find((candidate) => candidate.first.id === id);
@@ -130,7 +138,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
         // days_left (fuseau du téléphone) et kind : les plus urgents passent en premier.
         ingredients: cookingWith.map((i) => ({
           id: i.id,
-          name: i.name,
+          name: modelName(i),
           quantity: i.quantity || '',
           days_left: i.expires_at ? daysUntil(i.expires_at) : null,
           kind: i.kind,
@@ -138,7 +146,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
         // Avec une sélection : le reste du garde-manger, que les recettes ne doivent pas utiliser
         ...(selected.length > 0 && {
           selection: true,
-          other_pantry: foods.filter((_, index) => !isSelected(index)).map((i) => i.name),
+          other_pantry: foods.filter((_, index) => !isSelected(index)).map(modelName),
         }),
         mode,
         preferences: {

@@ -37,6 +37,14 @@ export function useBarcodeScan(onResult: (prefill: ManualPrefill) => void) {
       name: product?.name ?? '',
       quantity: product?.quantity ?? '',
       category: product?.category ?? null,
+      product: product ? {
+        product_name: product.name,
+        generic_name: product.genericName,
+        brand: product.brand,
+        nova_group: product.novaGroup,
+        nutriscore_grade: product.nutriscore,
+        off_categories: product.categories,
+      } : null,
     };
     if (failed) {
       // Hors connexion : l'ajout manuel reste possible, avec le code

@@ -2,7 +2,8 @@ import { formatQuantity, parseQuantity, type Quantity } from './quantity';
 
 // Lots du garde-manger : chaque ligne de la table `ingredients` est un lot. Les lots d'un même aliment (même
 // food_key ou même nom normalisé, et même sorte : aliment ou plat) forment une seule ligne à l'écran, avec la
-// quantité totale et la date la plus proche. Ils sont consommés du plus ancien (date la plus proche) au plus
+// quantité totale et la date la plus proche. Un produit de marque (code-barres) ne se regroupe qu'avec les lots
+// du même code-barres. Ils sont consommés du plus ancien (date la plus proche) au plus
 // récent.
 
 export interface Lot {
@@ -57,8 +58,8 @@ export function groupLots<T extends Lot>(rows: T[]): LotGroup<T>[] {
   const find = (index: number): number => (parent[index] === index ? index : (parent[index] = find(parent[index])));
   const seen = new Map<string, number>();
   rows.forEach((row, index) => {
-    const keys = [`n:${row.kind}:${foodIdentity(row.name)}`];
-    if (row.food_key) keys.push(`k:${row.kind}:${row.food_key}`);
+    const keys = row.barcode ? [`b:${row.barcode}`] : [`n:${row.kind}:${foodIdentity(row.name)}`];
+    if (row.food_key && !row.barcode) keys.push(`k:${row.kind}:${row.food_key}`);
     for (const key of keys) {
       const other = seen.get(key);
       if (other === undefined) seen.set(key, index);
@@ -74,7 +75,8 @@ export function groupLots<T extends Lot>(rows: T[]): LotGroup<T>[] {
     const lots = sortLots(groupRows);
     const keyed = lots.find((lot) => lot.food_key);
     return {
-      key: keyed ? `k:${keyed.kind}:${keyed.food_key}` : `n:${lots[0].kind}:${foodIdentity(lots[0].name)}`,
+      key: lots[0].barcode ? `b:${lots[0].barcode}`
+        : keyed ? `k:${keyed.kind}:${keyed.food_key}` : `n:${lots[0].kind}:${foodIdentity(lots[0].name)}`,
       lots,
       first: lots[0],
     };
@@ -148,13 +150,13 @@ export interface NewFood {
   expires_at: string | null;
 }
 
-// Ligne du garde-manger qui contient déjà cet aliment : même food_key, même nom normalisé ou même code-barres
+// Ligne du garde-manger qui contient déjà cet aliment : même code-barres pour un produit de marque ; sinon, parmi
+// les aliments sans code-barres, même food_key ou même nom normalisé
 export function findExisting<T extends Lot>(groups: LotGroup<T>[], food: NewFood): LotGroup<T> | null {
+  if (food.barcode) return groups.find((group) => group.lots.some((lot) => lot.barcode === food.barcode)) ?? null;
   const identity = foodIdentity(food.name);
-  return groups.find((group) => group.first.kind === food.kind && group.lots.some((lot) =>
-    (food.food_key && lot.food_key === food.food_key)
-    || foodIdentity(lot.name) === identity
-    || (food.barcode && lot.barcode === food.barcode))) ?? null;
+  return groups.find((group) => group.first.kind === food.kind && !group.first.barcode && group.lots.some((lot) =>
+    (food.food_key && lot.food_key === food.food_key) || foodIdentity(lot.name) === identity)) ?? null;
 }
 
 // « Ajouter aux existants » : lot qui reçoit la quantité (même date de préférence, sinon le plus récent) et

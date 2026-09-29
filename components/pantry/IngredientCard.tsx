@@ -26,6 +26,13 @@ export interface PantryIngredient {
   user_id: string | null;
   // Identifiant standard (fiche aliment) ; null avant la première ouverture de la fiche
   food_key?: string | null;
+  // Produit scanné par code-barres (Open Food Facts) ; vides pour les autres aliments
+  product_name?: string | null;
+  generic_name?: string | null;
+  brand?: string | null;
+  nova_group?: number | null;
+  nutriscore_grade?: string | null;
+  off_categories?: string[] | null;
 }
 
 interface Props {
@@ -38,6 +45,8 @@ interface Props {
   addedBy?: string;
   // Feuille de l'aliment : ses lots, puis sa fiche
   onOpenFact?: () => void;
+  // Produit par code-barres : nom générique, sous le nom
+  subtitle?: string | null;
   // Aliment en plusieurs lots : quantité totale et nombre de lots (date : la plus proche)
   quantityLabel?: string;
   lotCount?: number;
@@ -46,7 +55,7 @@ interface Props {
 // Aliment du garde-manger : nom, quantité, auteur, conseil de conservation, badges de date (touchable
 // pour la modifier) et de reste. Toucher la carte ouvre la feuille de l'aliment (lots, fiche) ; glisser vers la gauche
 // ou appui long : supprimer (ou les autres actions).
-export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry, addedBy, onOpenFact, quantityLabel, lotCount = 1 }: Props) {
+export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry, addedBy, onOpenFact, subtitle, quantityLabel, lotCount = 1 }: Props) {
   const { t } = useLanguage();
   const swipeable = useRef<SwipeableMethods>(null);
   const isDish = ingredient.kind === 'dish';
@@ -97,6 +106,7 @@ export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry
         <IconChip icon={Leaf} />
         <View style={styles.body}>
           <Text style={styles.name}>{name}</Text>
+          {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
           {details ? <Text style={styles.details}>{details}</Text> : null}
           {ingredient.storage_tip ? (
             <View style={styles.tip}>
@@ -130,6 +140,9 @@ const styles = StyleSheet.create({
   },
   name: {
     ...typography.cardTitle,
+  },
+  subtitle: {
+    ...typography.secondary,
   },
   details: {
     ...typography.secondary,

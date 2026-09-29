@@ -30,7 +30,8 @@ import { formatQuantity } from '@/lib/quantity';
 import { activeHouseholdId, addedByLabel } from '@/lib/household';
 import { useHousehold } from '@/hooks/useHousehold';
 import { useUndoableAction } from '@/hooks/useUndoableAction';
-import { linkPantryFoodKeys, useFoodNames } from '@/lib/foodNames';
+import { hasGenericFact, linkPantryFoodKeys, useFoodNaming } from '@/lib/foodNames';
+import { ProductCard } from '@/components/pantry/ProductCard';
 import { colors, radius, shadows, sizes, spacing, typography } from '@/constants/theme';
 
 type Filter = 'all' | 'urgent' | 'leftovers';
@@ -69,7 +70,9 @@ export default function IngredientsScreen() {
   const [editingExpiry, setEditingExpiry] = useState<PantryIngredient | null>(null);
   const [savingExpiry, setSavingExpiry] = useState(false);
   const household = useHousehold();
-  const foodName = useFoodNames(ingredients);
+  // Nom affiché ; nom générique d'un produit scanné (sous-titre)
+  const naming = useFoodNaming(ingredients);
+  const foodName = naming.name;
   // Feuille de l'aliment touché (sa ligne, et un de ses lots pour la retrouver si la ligne change de clé)
   const [sheet, setSheet] = useState<{ key: string; lotId: string } | null>(null);
 
@@ -234,6 +237,7 @@ export default function IngredientsScreen() {
         <IngredientCard
           ingredient={group.first}
           displayName={foodName(group.first)}
+          subtitle={naming.generic(group.first)}
           quantityLabel={group.total}
           lotCount={group.lots.length}
           onDelete={() => removeGroup(group)}
@@ -342,8 +346,12 @@ export default function IngredientsScreen() {
       {/* Feuille de l'aliment : ses lots (« Dans ton garde-manger »), puis sa fiche */}
       <FoodFactSheet
         ingredient={sheetGroup?.first ?? null}
+        title={sheetGroup ? foodName(sheetGroup.first) : undefined}
+        subtitle={sheetGroup ? naming.generic(sheetGroup.first) : null}
+        product={sheetGroup?.first.barcode ? <ProductCard ingredient={sheetGroup.first} /> : null}
         onClose={() => setSheet(null)}
-        withFact={sheetGroup?.first.kind !== 'dish'}
+        // Fiche générique : aliments bruts, et produits peu transformés (NOVA 1 ou 2)
+        withFact={!!sheetGroup && sheetGroup.first.kind !== 'dish' && (!sheetGroup.first.barcode || hasGenericFact(sheetGroup.first))}
         pantry={sheetGroup ? (
           <PantryLotsSection
             group={sheetGroup}
