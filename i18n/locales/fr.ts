@@ -3,6 +3,7 @@
 
 const fr = {
   common: {
+    view: "Voir",
     undo: "Annuler",
     back: "Retour",
     cancel: 'Annuler',
@@ -219,6 +220,17 @@ const fr = {
     removeFavorite: 'Retirer des favoris',
   },
   recipe: {
+    translate: "Traduire en français",
+    showOriginal: "Voir la version originale",
+    translatedNote: "Traduction automatique",
+    translateTitle: "Traduction impossible",
+    translateQuota: "Tu as traduit beaucoup de recettes aujourd'hui. Réessaie demain (les recettes déjà traduites restent disponibles).",
+    translateBusy: "Le service est saturé pour le moment. Réessaie plus tard.",
+    translateError: "La traduction est momentanément indisponible. Réessaie plus tard.",
+    addToShoppingCount_one: "Ajouter l'ingrédient aux courses",
+    addToShoppingCount_other: "Ajouter les {{count}} ingrédients aux courses",
+    addedToShopping_one: "Ajouté aux courses",
+    addedToShopping_other: "Ajoutés aux courses",
     photoShort: "Photo",
     photoPlaceholder: "Photo du plat",
     toSave_one: "{{count}} à sauver",
@@ -457,6 +469,8 @@ const fr = {
     },
   },
   shopping: {
+    addedToast_one: "{{count}} ingrédient ajouté aux courses",
+    addedToast_other: "{{count}} ingrédients ajoutés aux courses",
     removed: "Article retiré",
     forRecipeLine: "Pour : {{title}}",
     sharedSubtitle: "Partagées avec ton foyer",

@@ -209,7 +209,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
     const unused = [...data];
     return newRecipes.map((recipe) => {
       const index = unused.findIndex((row) => row.title === recipe.title);
-      return index === -1 ? recipe : { ...recipe, id: unused.splice(index, 1)[0].id as string };
+      return index === -1 ? recipe : { ...recipe, id: unused.splice(index, 1)[0].id as string, language: filters.language };
     });
   };
 

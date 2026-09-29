@@ -1,21 +1,26 @@
-import React from 'react';
-import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Alert, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
 import { Image } from 'expo-image';
-import { ChevronLeft, Clock, Flame, Heart, Sparkles, Users } from 'lucide-react-native';
+import { ChevronLeft, Clock, Flame, Heart, Languages, Sparkles, Users } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { toSaveCount, usePantryUrgency } from '@/hooks/usePantryUrgency';
 import { dietLabel, difficultyLabel } from '@/lib/labels';
+import { failureTitle } from '@/lib/quotaReason';
+import { cachedTranslation, translateRecipe } from '@/lib/recipeTranslation';
 import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { Card, cardStyles } from '@/components/ui/Card';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { RecipePlaceholder } from '@/components/ui/Illustrations';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { Toast } from '@/components/ui/Toast';
 import { Touchable } from '@/components/ui/Touchable';
 import { colors, motion, radius, sizes, spacing, typography } from '@/constants/theme';
 import { CookedButton } from './CookedButton';
 import { AddMissingButton } from './AddMissingButton';
-import type { Recipe } from './types';
+import { translatedRecipe, type Recipe, type RecipeText } from './types';
 
 interface Props {
   recipe: Recipe;
@@ -32,10 +37,55 @@ const normalize = (value: string) => value.trim().toLowerCase();
 
 // Fiche recette unique (génération, dernière recette, favoris), en plein écran : image (ou illustration),
 // temps, difficulté, personnes, régimes, ingrédients « Du garde-manger » et « À acheter » avec quantités,
-// étapes, astuces, suggestion, favori ; « J'ai cuisiné ça » toujours visible en bas
-export function RecipeSheet({ recipe, imageLoading, imageNotice, isFavorite, onToggleFavorite, onClose }: Props) {
-  const { t } = useLanguage();
+// étapes, astuces, suggestion, favori ; « J'ai cuisiné ça » toujours visible en bas. Recette dans une autre
+// langue que l'app : « Traduire en … » (traduction gardée en base, générée une seule fois).
+export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFavorite, onToggleFavorite, onClose }: Props) {
+  const { t, language } = useLanguage();
   const safe = useSafeSpacing();
+
+  // Traduction dans la langue de l'app : déjà faite (en base ou pendant la session), ou à la demande
+  const canTranslate = !!original.id && !!original.language && original.language !== language;
+  const savedTranslation = () => (original.id ? original.translations?.[language] ?? cachedTranslation(original.id, language) ?? null : null);
+  const [translation, setTranslation] = useState<RecipeText | null>(savedTranslation);
+  const [showOriginal, setShowOriginal] = useState(false);
+  const [translating, setTranslating] = useState(false);
+  useEffect(() => {
+    setTranslation(savedTranslation());
+    setShowOriginal(false);
+  }, [original.id, language]);
+  const recipe = canTranslate && translation && !showOriginal ? translatedRecipe(original, translation) : original;
+
+  const translate = async () => {
+    if (translation) return setShowOriginal(false);
+    setTranslating(true);
+    const result = await translateRecipe(original.id!, language);
+    setTranslating(false);
+    if (result.ok) {
+      setTranslation(result.translation);
+      setShowOriginal(false);
+      return;
+    }
+    Alert.alert(
+      failureTitle(t, result.reason, t('recipe.translateTitle')),
+      result.reason === 'user_quota' ? t('recipe.translateQuota') : result.reason === 'provider_quota' ? t('recipe.translateBusy') : t('recipe.translateError'),
+    );
+  };
+
+  // Confirmation d'ajout aux courses (« Voir »), 5 secondes
+  const [toast, setToast] = useState<string | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showToast = (message: string) => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    setToast(message);
+    toastTimer.current = setTimeout(() => setToast(null), motion.undoWindow);
+  };
+  useEffect(() => () => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+  }, []);
+  const openShoppingList = () => {
+    onClose();
+    router.push('/shopping');
+  };
   const pantry = usePantryUrgency();
   const toSave = toSaveCount(recipe, pantry);
   const missing = recipe.missing_ingredients ?? [];
@@ -69,6 +119,14 @@ export function RecipeSheet({ recipe, imageLoading, imageNotice, isFavorite, onT
             <Text style={styles.title}>{recipe.title}</Text>
             {recipe.image_url ? <Text style={styles.caption}>{t('recipe.imageCaption')}</Text> : null}
             {!recipe.image_url && !imageLoading && imageNotice ? <Text style={styles.caption}>{imageNotice}</Text> : null}
+            {canTranslate && translation && !showOriginal ? (
+              <Text style={styles.caption}>
+                {t('recipe.translatedNote')} ·{' '}
+                <Text style={styles.captionLink} onPress={() => setShowOriginal(true)} accessibilityRole="link">{t('recipe.showOriginal')}</Text>
+              </Text>
+            ) : canTranslate ? (
+              <Button label={t('recipe.translate')} icon={Languages} variant="soft" size="small" onPress={translate} loading={translating} style={styles.translate} />
+            ) : null}
             {recipe.description ? <Text style={styles.description}>{recipe.description}</Text> : null}
 
             <View style={styles.pills}>
@@ -115,7 +173,14 @@ export function RecipeSheet({ recipe, imageLoading, imageNotice, isFavorite, onT
                 {missing.map((name, index) => (
                   <IngredientRow key={index} name={name} amount={amountOf(name)} checkbox={<Checkbox checked={false} shape="dashed" />} />
                 ))}
-                <AddMissingButton names={missing} recipeId={recipe.id} recipeTitle={recipe.title} onOpenList={onClose} />
+                <AddMissingButton
+                  names={missing}
+                  quantities={missing.map(amountOf)}
+                  recipeId={recipe.id}
+                  recipeTitle={recipe.title}
+                  onAdded={showToast}
+                  onOpenList={openShoppingList}
+                />
               </Card>
             )}
 
@@ -165,6 +230,13 @@ export function RecipeSheet({ recipe, imageLoading, imageNotice, isFavorite, onT
             <Heart size={sizes.icon} color={colors.expired.text} fill={isFavorite ? colors.expired.text : colors.transparent} />
           </RoundButton>
         </View>
+
+        <Toast
+          message={toast}
+          actionLabel={t('common.view')}
+          onAction={openShoppingList}
+          bottom={safe.insets.bottom + sizes.primaryButton + spacing.md * 2 + spacing.sm}
+        />
 
         {/* « J'ai cuisiné ça » toujours visible */}
         <CookedButton ingredientsUsed={recipe.ingredients_used} style={[styles.bottomBar, safe.bottom(spacing.md)]} />
@@ -234,6 +306,14 @@ const styles = StyleSheet.create({
   caption: {
     ...typography.secondary,
     marginTop: -spacing.sm,
+  },
+  captionLink: {
+    ...typography.secondaryStrong,
+    color: colors.primary,
+    textDecorationLine: 'underline',
+  },
+  translate: {
+    alignSelf: 'flex-start',
   },
   description: {
     ...typography.body,

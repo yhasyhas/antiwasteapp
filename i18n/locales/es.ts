@@ -2,6 +2,7 @@ import type { Translations } from './fr';
 
 const es: Translations = {
   common: {
+    view: "Ver",
     undo: "Deshacer",
     back: "Volver",
     cancel: 'Cancelar',
@@ -218,6 +219,17 @@ const es: Translations = {
     removeFavorite: 'Quitar de favoritos',
   },
   recipe: {
+    translate: "Traducir al español",
+    showOriginal: "Ver el original",
+    translatedNote: "Traducción automática",
+    translateTitle: "Traducción imposible",
+    translateQuota: "Has traducido muchas recetas hoy. Vuelve a intentarlo mañana (las recetas ya traducidas siguen disponibles).",
+    translateBusy: "El servicio está saturado en este momento. Vuelve a intentarlo más tarde.",
+    translateError: "La traducción no está disponible por el momento. Vuelve a intentarlo más tarde.",
+    addToShoppingCount_one: "Añadir el ingrediente a la compra",
+    addToShoppingCount_other: "Añadir los {{count}} ingredientes a la compra",
+    addedToShopping_one: "Añadido a la compra",
+    addedToShopping_other: "Añadidos a la compra",
     photoShort: "Foto",
     photoPlaceholder: "Foto del plato",
     toSave_one: "{{count}} por salvar",
@@ -456,6 +468,8 @@ const es: Translations = {
     },
   },
   shopping: {
+    addedToast_one: "{{count}} ingrediente añadido a la compra",
+    addedToast_other: "{{count}} ingredientes añadidos a la compra",
     removed: "Artículo retirado",
     forRecipeLine: "Para: {{title}}",
     sharedSubtitle: "Compartida con tu hogar",

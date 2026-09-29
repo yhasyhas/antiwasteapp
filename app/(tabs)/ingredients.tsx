@@ -13,7 +13,7 @@ import { ScreenHeader, SquareButton } from '@/components/ui/ScreenHeader';
 import { SkeletonRow } from '@/components/ui/Skeleton';
 import { Touchable } from '@/components/ui/Touchable';
 import { ListItemMotion } from '@/components/ui/ListItemMotion';
-import { UndoToast } from '@/components/ui/UndoToast';
+import { Toast } from '@/components/ui/Toast';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { supabase } from '@/lib/supabase';
 import { IngredientCard, type PantryIngredient } from '@/components/pantry/IngredientCard';
@@ -270,9 +270,10 @@ export default function IngredientsScreen() {
         onRemove={() => factIngredient && removal.remove(factIngredient)}
       />
 
-      <UndoToast
+      <Toast
         message={removal.pending ? t('pantry.removed') : null}
-        onUndo={removal.undo}
+        actionLabel={t('common.undo')}
+        onAction={removal.undo}
         bottom={spacing.xl + sizes.fab + spacing.md}
       />
 

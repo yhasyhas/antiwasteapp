@@ -2,6 +2,7 @@ import type { Translations } from './fr';
 
 const en: Translations = {
   common: {
+    view: "View",
     undo: "Undo",
     back: "Back",
     cancel: 'Cancel',
@@ -218,6 +219,17 @@ const en: Translations = {
     removeFavorite: 'Remove from favorites',
   },
   recipe: {
+    translate: "Translate into English",
+    showOriginal: "Show the original",
+    translatedNote: "Automatic translation",
+    translateTitle: "Translation unavailable",
+    translateQuota: "You've translated a lot of recipes today. Try again tomorrow (recipes already translated stay available).",
+    translateBusy: "The service is busy right now. Try again later.",
+    translateError: "Translation is temporarily unavailable. Try again later.",
+    addToShoppingCount_one: "Add the ingredient to shopping",
+    addToShoppingCount_other: "Add the {{count}} ingredients to shopping",
+    addedToShopping_one: "Added to shopping",
+    addedToShopping_other: "Added to shopping",
     photoShort: "Photo",
     photoPlaceholder: "Dish photo",
     toSave_one: "{{count}} to save",
@@ -456,6 +468,8 @@ const en: Translations = {
     },
   },
   shopping: {
+    addedToast_one: "{{count}} ingredient added to shopping",
+    addedToast_other: "{{count}} ingredients added to shopping",
     removed: "Item removed",
     forRecipeLine: "For: {{title}}",
     sharedSubtitle: "Shared with your household",

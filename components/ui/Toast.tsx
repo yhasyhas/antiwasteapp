@@ -1,24 +1,23 @@
 import React, { useEffect } from 'react';
 import { AccessibilityInfo, StyleSheet, Text } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, motion, radius, shadows, sizes, spacing, typography } from '@/constants/theme';
 import { Touchable } from './Touchable';
 
 interface Props {
   // Message affiché (« Aliment retiré »), ou null pour cacher
   message: string | null;
-  onUndo: () => void;
+  // Action proposée (« Annuler », « Voir »)
+  actionLabel: string;
+  onAction: () => void;
   // Hauteur au-dessus du bas de l'écran (pour laisser voir un bouton flottant)
   bottom?: number;
 }
 
-// Message temporaire en bas de l'écran, avec « Annuler »
-export function UndoToast({ message, onUndo, bottom = spacing.xl }: Props) {
-  const { t } = useLanguage();
-
+// Message temporaire en bas de l'écran, avec une action (« Annuler », « Voir »)
+export function Toast({ message, actionLabel, onAction, bottom = spacing.xl }: Props) {
   useEffect(() => {
-    if (message) AccessibilityInfo.announceForAccessibility(`${message}. ${t('common.undo')}`);
+    if (message) AccessibilityInfo.announceForAccessibility(`${message}. ${actionLabel}`);
   }, [message]);
 
   if (!message) return null;
@@ -31,8 +30,8 @@ export function UndoToast({ message, onUndo, bottom = spacing.xl }: Props) {
       accessibilityLiveRegion="polite"
     >
       <Text style={styles.message} numberOfLines={2}>{message}</Text>
-      <Touchable onPress={onUndo} style={styles.action} accessibilityRole="button">
-        <Text style={styles.actionText}>{t('common.undo')}</Text>
+      <Touchable onPress={onAction} style={styles.action} accessibilityRole="button">
+        <Text style={styles.actionText}>{actionLabel}</Text>
       </Touchable>
     </Animated.View>
   );

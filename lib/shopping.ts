@@ -52,10 +52,12 @@ export const setShoppingItemChecked = (id: string, checked: boolean) =>
 export const removeShoppingItem = (id: string) =>
   write(supabase.from('shopping_items').delete().eq('id', id));
 
-// Ingrédients manquants d'une recette, en un geste ; renvoie le nombre d'articles ajoutés (sans doublon)
-export const addMissingToShoppingList = (names: string[], recipeId?: string, recipeTitle?: string) =>
+// Ingrédients manquants d'une recette, en un geste, avec leurs quantités (même ordre que les noms) ;
+// renvoie le nombre d'articles ajoutés (sans doublon)
+export const addMissingToShoppingList = (names: string[], quantities: string[], recipeId?: string, recipeTitle?: string) =>
   write(supabase.rpc('add_to_shopping_list', {
     p_names: names,
+    p_quantities: quantities,
     p_recipe_id: recipeId ?? null,
     p_recipe_title: recipeTitle ?? null,
   })) as Promise<number>;

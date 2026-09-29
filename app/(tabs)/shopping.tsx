@@ -16,7 +16,7 @@ import { SkeletonRow } from '@/components/ui/Skeleton';
 import { SwipeToDelete } from '@/components/ui/SwipeToDelete';
 import { Touchable } from '@/components/ui/Touchable';
 import { ListItemMotion } from '@/components/ui/ListItemMotion';
-import { UndoToast } from '@/components/ui/UndoToast';
+import { Toast } from '@/components/ui/Toast';
 import { useUndoableDelete } from '@/hooks/useUndoableDelete';
 import { ExpiryPicker } from '@/components/expiry/ExpiryPicker';
 import { expiryFromShelfLife } from '@/lib/expiry';
@@ -232,7 +232,7 @@ export default function ShoppingScreen() {
         )}
       </ScrollView>
 
-      <UndoToast message={removal.pending ? t('shopping.removed') : null} onUndo={removal.undo} />
+      <Toast message={removal.pending ? t('shopping.removed') : null} actionLabel={t('common.undo')} onAction={removal.undo} />
 
       {/* Ranger au garde-manger : une date proposée par article, modifiable */}
       <BottomSheet visible={stocking !== null} onClose={() => setStocking(null)}>
