@@ -18,6 +18,7 @@ import { alertWriteError } from '@/lib/alertWriteError';
 import { expiryForPackagedProduct, expiryFromShelfLife, type FoodKind } from '@/lib/expiry';
 import { maybeAskNotificationPermission } from '@/lib/notifications';
 import { notifyPantryChanged } from '@/lib/pantryEvents';
+import { linkPantryFoodKeys } from '@/lib/foodNames';
 import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
 import { ExpiryPicker } from '@/components/expiry/ExpiryPicker';
 import { BarcodeNotice } from './BarcodeNotice';
@@ -133,6 +134,8 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
       setManualIngredients([]);
       onClose();
       notifyPantryChanged();
+      // Reliés à leur fiche en arrière-plan (nom dans la langue de l'app)
+      linkPantryFoodKeys();
       // Premier ajout d'une date : proposition des rappels avant le message de confirmation
       await maybeAskNotificationPermission();
       Alert.alert(

@@ -1,6 +1,7 @@
 import { supabase } from './supabase';
 import { activeHouseholdId } from './household';
 import { notifyPantryChanged, notifyShoppingChanged } from './pantryEvents';
+import { linkPantryFoodKeys } from './foodNames';
 
 export { onShoppingChanged } from './pantryEvents';
 
@@ -63,5 +64,7 @@ export const addMissingToShoppingList = (names: string[], recipeId?: string, rec
 export async function stockShoppingItems(items: { id: string; expires_at: string | null }[]): Promise<number> {
   const count = (await write(supabase.rpc('stock_shopping_items', { p_items: items }))) as number;
   notifyPantryChanged();
+  // Aliments rangés : reliés à leur fiche en arrière-plan
+  linkPantryFoodKeys();
   return count;
 }

@@ -13,6 +13,7 @@ import { onPantryChanged } from '@/lib/pantryEvents';
 import { loadShoppingList, onShoppingChanged } from '@/lib/shopping';
 import { sortByUrgency } from '@/lib/expiry';
 import { useRecipeImages } from '@/hooks/useRecipeImages';
+import { useFoodNames } from '@/lib/foodNames';
 import { recipeFromRow, type Recipe } from '@/components/recipe/types';
 import { RecipeSheet } from '@/components/recipe/RecipeSheet';
 import { RecipeListCard } from '@/components/recipe/RecipeListCard';
@@ -44,6 +45,7 @@ export default function HomeScreen() {
   const [selectedRecipe, setSelectedRecipe] = useState<RecentRecipe | null>(null);
   // Images lues dans l'état partagé : une image générée sur un autre écran apparaît ici aussi
   const images = useRecipeImages();
+  const foodName = useFoodNames(ingredients);
 
   // Rechargé à chaque retour sur l'onglet : ingrédients scannés, recettes générées entre-temps
   useFocusEffect(
@@ -169,7 +171,7 @@ export default function HomeScreen() {
                     <View style={styles.row}>
                       <IconChip icon={Leaf} />
                       <View style={styles.rowText}>
-                        <Text style={styles.rowTitle} numberOfLines={1}>{ingredient.name}</Text>
+                        <Text style={styles.rowTitle} numberOfLines={1}>{foodName(ingredient)}</Text>
                         {ingredient.quantity ? <Text style={styles.rowSubtitle} numberOfLines={1}>{ingredient.quantity}</Text> : null}
                       </View>
                       <View style={styles.badges}>

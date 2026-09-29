@@ -24,7 +24,9 @@ export interface GeneratedFact {
   aliases: string[];
 }
 
-const LIMITS = { name: 60, description: 320, origin: 220, season: 220, item: 160, minItems: 2, maxItems: 4 };
+// Origine : quelques mots (« Asie du Sud-Est »), affichée dans une petite carte
+export const ORIGIN_MAX = 48;
+const LIMITS = { name: 60, description: 320, origin: ORIGIN_MAX, season: 220, item: 160, minItems: 2, maxItems: 4 };
 
 // Promesses de santé ou conseils médicaux : la fiche est refusée (les trois langues). Liste volontairement
 // étroite : « cured ham », « a sweet treat » ou « évite qu'il se dessèche » restent permis.
@@ -35,7 +37,7 @@ const section = {
   properties: {
     name: { type: 'string', description: 'Nom courant de l\'aliment dans cette langue, au singulier' },
     description: { type: 'string', description: 'Description courte (1 à 2 phrases)' },
-    origin: { type: 'string', description: 'Origine géographique et historique, en une phrase' },
+    origin: { type: 'string', description: 'Origine géographique en quelques mots (2 à 5), sans phrase ni point final (ex. « Asie du Sud-Est », « Amérique centrale », « Bassin méditerranéen »)' },
     season: { type: 'string', description: 'Saison (hémisphère nord) ou « toute l\'année », en une phrase' },
     nutrition: { type: 'array', items: { type: 'string' }, description: '2 à 4 atouts nutritionnels généraux, factuels' },
     tips: { type: 'array', items: { type: 'string' }, description: '2 à 4 astuces anti-gaspi (conservation, restes, parties souvent jetées)' },
@@ -81,7 +83,8 @@ RÈGLES STRICTES :
 - "nutrition" : atouts nutritionnels généraux et prudents (ex. « Source de fibres », « Riche en potassium », « Apporte de la vitamine C »), sans chiffres précis ni superlatifs.
 - "tips" : astuces anti-gaspi concrètes (bien le conserver, utiliser les restes ou les parties souvent jetées, reconnaître quand il est encore bon).
 - "season" : pour l'hémisphère nord ; « toute l'année » pour un produit d'épicerie ou transformé.
-- Phrases courtes : description 1 à 2 phrases, origine et saison 1 phrase chacune, 2 à 4 éléments par liste.
+- "origin" : quelques mots seulement (2 à 5), sans phrase ni point final, ex. « Asie du Sud-Est », « Amérique centrale », « Bassin méditerranéen ».
+- Phrases courtes : description 1 à 2 phrases, saison 1 phrase, 2 à 4 éléments par liste.
 - Si ce n'est pas un aliment, "is_food" : false et des textes vides.`;
 
 export function factPrompt(name: string, foodKey: string | null): string {
@@ -96,7 +99,7 @@ function cleanSection(raw: any): FactSection | string {
   if (!raw || typeof raw !== 'object') return 'section absente';
   const name = text(raw.name, LIMITS.name);
   const description = text(raw.description, LIMITS.description);
-  const origin = text(raw.origin, LIMITS.origin);
+  const origin = text(typeof raw.origin === 'string' ? raw.origin.trim().replace(/\.$/, '') : raw.origin, LIMITS.origin);
   const season = text(raw.season, LIMITS.season);
   if (!name || !description || !origin || !season) return 'texte manquant ou trop long';
   const list = (value: unknown) => Array.isArray(value)
@@ -153,4 +156,35 @@ export function parseResolution(textResponse: string): ParseResult<{ food_key: s
   } catch {
     return { ok: false, failure: `JSON invalide (${textResponse.slice(0, 120)})`, code: 'invalid_response' };
   }
+}
+
+// Origines trop longues des fiches existantes : réécrites en quelques mots, sans toucher au reste
+export const ORIGIN_SCHEMA = {
+  type: 'object',
+  properties: Object.fromEntries(LANGUAGES.map((language) => [language, { type: 'string', description: 'Origine en quelques mots (2 à 5)' }])),
+  required: [...LANGUAGES],
+  additionalProperties: false,
+};
+
+export function originPrompt(content: FactContent): string {
+  const lines = LANGUAGES.map((language) => `- ${language} (${content[language].name}) : « ${content[language].origin} »`).join('\n');
+  return `Voici l'origine d'un aliment dans trois langues :
+${lines}
+Réécris chacune en quelques mots seulement (2 à 5), dans la même langue, sans phrase ni point final : seulement le lieu d'origine (ex. « Asie du Sud-Est », « Southeast Asia », « Sudeste asiático »).`;
+}
+
+export function parseOrigins(textResponse: string): ParseResult<Record<FactLanguage, string>> {
+  let raw: any;
+  try {
+    raw = JSON.parse(textResponse);
+  } catch {
+    return { ok: false, failure: `JSON invalide (${textResponse.slice(0, 120)})`, code: 'invalid_response' };
+  }
+  const origins = {} as Record<FactLanguage, string>;
+  for (const language of LANGUAGES) {
+    const origin = typeof raw?.[language] === 'string' ? raw[language].trim().replace(/\.$/, '') : '';
+    if (!origin || origin.length > ORIGIN_MAX) return { ok: false, failure: `${language} : origine absente ou trop longue`, code: 'invalid_response' };
+    origins[language] = origin;
+  }
+  return { ok: true, value: origins };
 }

@@ -30,6 +30,8 @@ export interface PantryIngredient {
 
 interface Props {
   ingredient: PantryIngredient;
+  // Nom affiché (celui de la fiche dans la langue de l'app, sinon le nom enregistré)
+  displayName?: string;
   onDelete: () => void;
   onEditExpiry: () => void;
   // Foyer partagé : nom de celui qui l'a ajouté (sinon non affiché)
@@ -41,16 +43,17 @@ interface Props {
 // Aliment du garde-manger : nom, quantité, auteur, conseil de conservation, badges de date (touchable
 // pour la modifier) et de reste. Toucher la carte ouvre la fiche de l'aliment ; glisser vers la gauche
 // ou appui long : supprimer (ou les autres actions).
-export function IngredientCard({ ingredient, onDelete, onEditExpiry, addedBy, onOpenFact }: Props) {
+export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry, addedBy, onOpenFact }: Props) {
   const { t } = useLanguage();
   const swipeable = useRef<SwipeableMethods>(null);
   const isDish = ingredient.kind === 'dish';
+  const name = displayName ?? ingredient.name;
   const openFact = onOpenFact && !isDish ? onOpenFact : undefined;
   const details = [ingredient.quantity, addedBy ? t('household.addedBy', { name: addedBy }).toLowerCase() : null].filter(Boolean).join(' · ');
 
   // Appui long : toutes les actions de l'aliment
   const showActions = () => {
-    Alert.alert(ingredient.name, undefined, [
+    Alert.alert(name, undefined, [
       ...(openFact ? [{ text: t('pantry.viewFact'), onPress: openFact }] : []),
       { text: t('expiry.edit'), onPress: onEditExpiry },
       { text: t('common.delete'), style: 'destructive' as const, onPress: onDelete },
@@ -85,11 +88,11 @@ export function IngredientCard({ ingredient, onDelete, onEditExpiry, addedBy, on
         onPress={openFact ?? showActions}
         onLongPress={showActions}
         style={styles.card}
-        accessibilityLabel={openFact ? `${ingredient.name}, ${t('facts.open')}` : ingredient.name}
+        accessibilityLabel={openFact ? `${name}, ${t('facts.open')}` : name}
       >
         <IconChip icon={Leaf} />
         <View style={styles.body}>
-          <Text style={styles.name}>{ingredient.name}</Text>
+          <Text style={styles.name}>{name}</Text>
           {details ? <Text style={styles.details}>{details}</Text> : null}
           {ingredient.storage_tip ? (
             <View style={styles.tip}>

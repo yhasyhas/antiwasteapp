@@ -2,7 +2,7 @@
 // Lancement : deno test --no-config --allow-env supabase/functions/
 
 import { assert, assertEquals } from 'jsr:@std/assert@1';
-import { FACT_SCHEMA, parseFact, parseResolution } from './facts.ts';
+import { FACT_SCHEMA, ORIGIN_MAX, parseFact, parseOrigins, parseResolution } from './facts.ts';
 
 const section = (name: string, overrides: Record<string, unknown> = {}) => ({
   name,
@@ -62,4 +62,14 @@ Deno.test('pas un aliment, ou résolution du nom', () => {
   assertEquals(parseResolution('{"is_food": true, "food_key": "Cherry Tomato"}'), { ok: true, value: { food_key: 'cherry_tomato', is_food: true } });
   assertEquals(parseResolution('{"is_food": false, "food_key": ""}'), { ok: true, value: { food_key: null, is_food: false } });
   assert(!parseResolution('pas du json').ok);
+});
+
+Deno.test('origine en quelques mots : point final retiré, origine trop longue refusée', () => {
+  const ok = parseOrigins(JSON.stringify({ fr: 'Asie du Sud-Est.', en: 'Southeast Asia', es: 'Sudeste asiático' }));
+  assert(ok.ok);
+  assertEquals(ok.value.fr, 'Asie du Sud-Est');
+  const long = parseOrigins(JSON.stringify({ fr: 'x'.repeat(ORIGIN_MAX + 1), en: 'Asia', es: 'Asia' }));
+  assert(!long.ok);
+  const fiche = parseFact(fact({ fr: section('Banane', { origin: "Originaire d'Asie du Sud-Est, cultivée depuis des millénaires en Inde et en Afrique." }) }), 'banane', null);
+  assert(!fiche.ok);
 });

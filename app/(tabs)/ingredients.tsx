@@ -25,6 +25,7 @@ import { notifyPantryChanged, onPantryChanged } from '@/lib/pantryEvents';
 import { activeHouseholdId } from '@/lib/household';
 import { useHousehold } from '@/hooks/useHousehold';
 import { useUndoableDelete } from '@/hooks/useUndoableDelete';
+import { linkPantryFoodKeys, useFoodNames } from '@/lib/foodNames';
 import { colors, radius, shadows, sizes, spacing, typography } from '@/constants/theme';
 
 type Filter = 'all' | 'urgent' | 'leftovers';
@@ -44,6 +45,7 @@ export default function IngredientsScreen() {
   const [editingExpiry, setEditingExpiry] = useState<PantryIngredient | null>(null);
   const [savingExpiry, setSavingExpiry] = useState(false);
   const household = useHousehold();
+  const foodName = useFoodNames(ingredients);
   // Fiche de l'aliment touché
   const [factIngredient, setFactIngredient] = useState<PantryIngredient | null>(null);
 
@@ -81,6 +83,8 @@ export default function IngredientsScreen() {
     // Par urgence : expirés et proches d'abord, sans date à la fin
     if (data) setIngredients(sortByUrgency(data as PantryIngredient[]));
     setLoading(false);
+    // Aliments ajoutés sans identifiant (ajout manuel, code-barres, courses) : reliés à leur fiche
+    if (data?.some((row) => !row.food_key && row.kind !== 'dish')) linkPantryFoodKeys();
   };
 
   // Suppression annulable (« Aliment retiré · Annuler ») : faite pour de bon après 5 secondes
@@ -153,7 +157,9 @@ export default function IngredientsScreen() {
   // Aliments en attente de suppression : déjà cachés
   const shown = ingredients.filter((ingredient) => !removal.hiddenIds.has(ingredient.id));
   const query = searchQuery.trim().toLowerCase();
-  const searched = query ? shown.filter((ingredient) => ingredient.name.toLowerCase().includes(query)) : shown;
+  const searched = query
+    ? shown.filter((ingredient) => ingredient.name.toLowerCase().includes(query) || foodName(ingredient).toLowerCase().includes(query))
+    : shown;
   const counts = {
     all: searched.length,
     urgent: searched.filter(isUrgent).length,
@@ -171,6 +177,7 @@ export default function IngredientsScreen() {
     <ListItemMotion key={ingredient.id} index={index}>
       <IngredientCard
         ingredient={ingredient}
+        displayName={foodName(ingredient)}
         onDelete={() => removal.remove(ingredient)}
         onEditExpiry={() => setEditingExpiry(ingredient)}
         addedBy={addedBy(ingredient.user_id)}

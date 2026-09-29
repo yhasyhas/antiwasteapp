@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Chip } from '@/components/ui/Chip';
 import { Touchable } from '@/components/ui/Touchable';
 import { EXPIRY_COLORS, expiryStatus, type FoodKind } from '@/lib/expiry';
+import { useFoodNames } from '@/lib/foodNames';
 import { colors, sizes, spacing, typography } from '@/constants/theme';
 
 export interface ChipIngredient {
@@ -12,6 +13,7 @@ export interface ChipIngredient {
   name: string;
   expires_at: string | null;
   kind: FoodKind;
+  food_key?: string | null;
 }
 
 interface Props {
@@ -29,6 +31,7 @@ const COLLAPSED_COUNT = 8;
 export function PantryChips({ ingredients, selectedIds, onToggle, onClear }: Props) {
   const { t } = useLanguage();
   const [expanded, setExpanded] = useState(false);
+  const foodName = useFoodNames(ingredients);
   // Les ingrédients choisis restent visibles même repliés
   const visible = expanded
     ? ingredients
@@ -55,7 +58,7 @@ export function PantryChips({ ingredients, selectedIds, onToggle, onClear }: Pro
           return (
             <Chip
               key={ingredient.id}
-              label={ingredient.name}
+              label={foodName(ingredient)}
               selected={selectedIds.includes(ingredient.id)}
               showCheck
               icon={ingredient.kind === 'dish' ? Soup : urgent ? Circle : undefined}
