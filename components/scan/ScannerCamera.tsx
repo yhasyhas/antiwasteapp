@@ -10,11 +10,17 @@ import type { ScannerCameraHandle, ScannerCameraProps, ScannerPermission } from 
 // Codes des produits alimentaires, comme avant (expo-camera : ean13, ean8, upc_a, upc_e)
 const FOOD_BARCODE_FORMATS = ['ean-13', 'ean-8', 'upc-a', 'upc-e'] as const;
 
+// Photo en 1,2 Mpx (portrait 4:3) au lieu des 12 Mpx par défaut : l'analyse la réduit à 800 px de large
+// (useScan), cette marge garde une image nette ; la caméra prépare moins de mémoire sur les téléphones
+// modestes (aperçu resté vide sur un Galaxy A30). L'aperçu suit la taille de l'écran et le lecteur de
+// codes-barres utilise déjà la résolution de l'aperçu.
+const PHOTO_RESOLUTION = { width: 960, height: 1280 };
+
 export const ScannerCamera = forwardRef<ScannerCameraHandle, ScannerCameraProps>(function ScannerCamera(
   { facing, barcodeEnabled, onBarcode, onPreviewStarted, onError, style },
   ref,
 ) {
-  const photoOutput = usePhotoOutput({});
+  const photoOutput = usePhotoOutput({ targetResolution: PHOTO_RESOLUTION });
   const formats = useMemo(() => [...FOOD_BARCODE_FORMATS], []);
   const barcodeOutput = useBarcodeScannerOutput({
     barcodeFormats: formats,
