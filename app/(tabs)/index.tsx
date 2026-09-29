@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
-import { Camera, Leaf, ShoppingCart, Sparkles } from 'lucide-react-native';
+import { Camera, ChefHat, Leaf, ShoppingCart, Sparkles } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
@@ -11,7 +11,7 @@ import { loadFavoriteIds, setFavorite } from '@/lib/favorites';
 import { activeHouseholdId } from '@/lib/household';
 import { onPantryChanged } from '@/lib/pantryEvents';
 import { loadShoppingList, onShoppingChanged } from '@/lib/shopping';
-import { sortByUrgency } from '@/lib/expiry';
+import { expiryStatus, sortByUrgency } from '@/lib/expiry';
 import { useRecipeImages } from '@/hooks/useRecipeImages';
 import { useFoodNames } from '@/lib/foodNames';
 import { recipeFromRow, type Recipe } from '@/components/recipe/types';
@@ -115,12 +115,11 @@ export default function HomeScreen() {
     });
   };
 
-  // Les plus urgents (triés par date) ; la génération les présélectionne
-  const urgent = (ingredients ?? []).filter((ingredient) => ingredient.expires_at).slice(0, URGENT_COUNT);
-  const cookUrgent = () => {
-    if (urgent.length > 0) router.push({ pathname: '/recipe/generate', params: { priority: urgent.map((i) => i.id).join(',') } });
-    else router.push('/recipe/generate');
-  };
+  // Les plus urgents (périmés ou bientôt, triés par date) ; « Cuisiner ces aliments » les présélectionne
+  const urgent = (ingredients ?? [])
+    .filter((ingredient) => ['expired', 'soon'].includes(expiryStatus(ingredient.expires_at)))
+    .slice(0, URGENT_COUNT);
+  const cookUrgent = () => router.push({ pathname: '/recipe/generate', params: { priority: urgent.map((i) => i.id).join(',') } });
 
   return (
     <View style={styles.container}>
@@ -155,17 +154,16 @@ export default function HomeScreen() {
           </Card>
         ) : (
           <>
-            <Card style={styles.urgentCard}>
-              <View style={styles.cardHeader}>
-                <Text style={styles.cardTitle}>{t('home.useSoon')}</Text>
-                <Touchable onPress={() => router.push('/(tabs)/ingredients')} style={styles.link} accessibilityRole="link">
-                  <Text style={styles.linkText}>{t('home.seeAll')}</Text>
-                </Touchable>
-              </View>
-              {urgent.length === 0 ? (
-                <Text style={styles.nothing}>{t('home.nothingUrgent')}</Text>
-              ) : (
-                urgent.map((ingredient) => (
+            {/* Sans aliment urgent, pas de carte */}
+            {urgent.length > 0 ? (
+              <Card style={styles.urgentCard}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle}>{t('home.useSoon')}</Text>
+                  <Touchable onPress={() => router.push('/(tabs)/ingredients')} style={styles.link} accessibilityRole="link">
+                    <Text style={styles.linkText}>{t('home.seeAll')}</Text>
+                  </Touchable>
+                </View>
+                {urgent.map((ingredient) => (
                   <View key={ingredient.id}>
                     <View style={styles.divider} />
                     <View style={styles.row}>
@@ -180,15 +178,20 @@ export default function HomeScreen() {
                       </View>
                     </View>
                   </View>
-                ))
-              )}
-            </Card>
+                ))}
+                <Button
+                  label={t('home.cookTheseCount', { count: urgent.length })}
+                  icon={Sparkles}
+                  variant="soft"
+                  size="medium"
+                  onPress={cookUrgent}
+                  style={styles.cookUrgent}
+                />
+              </Card>
+            ) : null}
 
-            <Button
-              label={urgent.length > 0 ? t('home.cookThese') : t('home.generateRecipes')}
-              icon={Sparkles}
-              onPress={cookUrgent}
-            />
+            {/* Génération avec tout le garde-manger */}
+            <Button label={t('home.findRecipe')} icon={ChefHat} onPress={() => router.push('/recipe/generate')} />
           </>
         )}
 
@@ -307,9 +310,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: spacing.xs,
   },
-  nothing: {
-    ...typography.secondary,
-    paddingBottom: spacing.md,
+  cookUrgent: {
+    marginTop: spacing.sm,
+    marginBottom: spacing.md,
   },
   shortcuts: {
     flexDirection: 'row',

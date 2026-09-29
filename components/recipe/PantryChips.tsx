@@ -69,6 +69,8 @@ export function PantryChips({ ingredients, selectedIds, onToggle, onClear }: Pro
         })}
         {hidden > 0 && <Chip label={t('generate.more', { count: hidden })} onPress={() => setExpanded(true)} />}
       </View>
+      {/* Sélection (présélectionnée depuis l'accueil ou la fiche d'un aliment) : modifiable */}
+      {selectedIds.length > 0 ? <Text style={styles.hint}>{t('generate.canEditSelection')}</Text> : null}
     </View>
   );
 }
