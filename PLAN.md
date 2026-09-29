@@ -263,7 +263,13 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 - [ ] Remplacer le schéma de liens `myapp` (hérité de bolt) par un schéma propre à l'app, avec le nom définitif ; nouveau build nécessaire
 - [ ] Relire les 100 fiches aliments avant la bêta avec `scripts/food-facts/review.mjs` (exemple d'astuce douteuse : « vinaigre de banane »)
 - [ ] Renommer ou supprimer le sous-domaine inutile `bolt-expo-starter.workers.dev`
+
+### Phase 8a
+
+Section complétée avec la phase 7b.
+
 - [ ] Créer un jeton Sentry en lecture seule (`event:read`, `project:read`) pour analyser les erreurs après le lancement
+- [ ] Test de performance et de mémoire sur un téléphone modeste de référence (Galaxy A30, 4 Go) : scan, génération, listes, transitions
 
 ### Obligatoire avant la bêta
 
@@ -412,4 +418,6 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 | 29/09/2026 | Sentry : aucun événement « Caméra du Scanner » après les allers-retours sur le Samsung | Sentry démarre avec l'app et expo-device est dans le build : un événement aurait pu partir. Explication la plus probable : `onCameraReady` arrive sur le Samsung alors que l'aperçu reste vide, donc la surveillance ne se déclenche pas (ni relance automatique, ni erreur, ni événement). La surveillance ne peut pas détecter ce cas : raison de plus pour la phase 7c |
 | 29/09/2026 | Phase 7c : react-native-vision-camera 5.2.3 avec react-native-nitro-modules 0.37.1 et react-native-nitro-image 0.15.2 ; codes-barres par react-native-vision-camera-barcode-scanner 5.2.3 (ML Kit, modèle inclus, sortie de caméra sans frame processors) | Version 5 : Nitro, nouvelle architecture obligatoire (celle du projet) ; publiée en août 2026, après React Native 0.86 ; testée par ses auteurs avec React Native 0.85, compilée ici avec 0.86.3 (build EAS réussi). Surveillance basée sur `onPreviewStarted` (première image reçue), signal qu'expo-camera n'offrait pas |
 | 29/09/2026 | Phase 7c, premier build : l'aperçu reste vide sur le Samsung. Événement Sentry « relancée automatiquement (ready_timeout) » : Galaxy A30 (SM-A305F), Android 11, appareil classé « low » (4 Go de mémoire, 0,5 Go libre), autorisation caméra accordée, juste après un passage en arrière-plan puis un retour | Avec vision-camera, la surveillance se déclenche : la première image n'arrive jamais, sans erreur de la caméra. L'aperçu Android passe de SurfaceView (réglage par défaut, qui ne gère pas les vues posées par-dessus) à TextureView (mode « compatible »), sans nouveau build. Le texte des erreurs caméra est désormais joint à l'événement Sentry |
+| 29/09/2026 | Galaxy A30 = téléphone de référence pour les appareils modestes | Samsung Galaxy A30 (SM-A305F), Android 11, 4 Go de mémoire : les tests du Scanner n'y passent qu'après avoir vidé la mémoire |
+| 29/09/2026 | Phase 7c : photo demandée en 960 × 1280 (1,2 Mpx) au lieu de la résolution par défaut de vision-camera (UHD 4:3, environ 12 Mpx) ; TextureView gardé | L'analyse réduit la photo à 800 px de large : la marge garde une image nette. Autres ressources de la caméra vérifiées : l'aperçu suit la taille de l'écran, le lecteur de codes-barres lit déjà à la résolution de l'aperçu, la photo et le lecteur ne sont jamais actifs ensemble, aucune contrainte de cadence ni de HDR demandée |
 | | *(résultat du test Gemini vs Clarifai)* | |
