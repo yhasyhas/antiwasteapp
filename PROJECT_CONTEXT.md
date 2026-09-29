@@ -228,6 +228,8 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Scan et ajout manuel : quantité avec + et − (`QuantityField`), aliment déjà présent (`ExistingFoodChoice`).
 - Historique : table `pantry_history` (déclencheur `log_pantry_history`), sans écran.
 - Génération, accueil, « J'ai cuisiné ça » : par aliment. Tests : `supabase/tests/pantry_lots.sql`.
+- Message « Annuler » (`components/ui/Toast.tsx`, `hooks/useUndoableAction.ts`) : 10 secondes, dans la mise en page, réaffiché au retour dans l'app pendant 2 minutes. « Récemment retirés » (`components/pantry/RecentlyRemoved.tsx`, `recent_pantry_actions`) : actions rétablissables 24 heures. Tests : `supabase/tests/recent_actions.sql`.
+- Produits scannés par code-barres : colonnes `product_name`, `generic_name`, `brand`, `nova_group`, `nutriscore_grade`, `off_categories` (`lib/openFoodFacts.ts`) ; nom du produit gardé, nom générique en sous-titre (`useFoodNaming`), fiche générique pour NOVA 1 ou 2, sinon `components/pantry/ProductCard.tsx`. Relecture des produits existants : `scripts/products/refresh-products.ts`.
 
 ## 5. État actuel et problèmes connus
 
