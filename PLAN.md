@@ -250,6 +250,17 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 
 **Terminé quand** : l'aperçu du Scanner revient à chaque retour sur l'onglet, sur le Samsung comme sur le Redmi, en photo et en code-barres.
 
+## Phase 7b — Fiabilité du garde-manger
+
+- [ ] Quantités modifiables au scan (photo avec un ou plusieurs aliments, et code-barres) : boutons + et − pour ce qui se compte, saisie libre sinon
+- [ ] Doublons : si le foyer a déjà le même aliment (`food_key` ou nom normalisé), la confirmation affiche « Déjà dans ton garde-manger : [quantité], ajouté [quand] » avec trois choix : ajouter aux existants, ajouter séparément, ne pas ajouter. Même chose pour l'ajout manuel
+- [ ] Lots : une ligne par aliment (quantité totale, date la plus proche), détail des lots en touchant la ligne, consommation du plus ancien d'abord ; fusion possible des lots de même date et même unité ; compteur et notifications lot par lot
+- [ ] Annulation (enregistrement immédiat, rétablissement tout ou rien, conflits) quand « J'ai cuisiné ça » consomme plusieurs lots, avec tests SQL
+- [ ] Historique des ajouts, utilisations (totales ou partielles) et suppressions : aliment, quantité, membre du foyer. Aucun écran pour l'instant
+- [ ] Fluidité vérifiée sur le Galaxy A30 : listes regroupées, détail des lots
+
+**Terminé quand** : un aliment scanné deux fois n'apparaît qu'une fois dans le garde-manger avec ses lots, et « J'ai cuisiné ça » consomme les lots du plus ancien au plus récent, annulation comprise.
+
 ## Phase 8 — Préparer le lancement
 
 - [ ] Réactiver la confirmation d'email dans Supabase (Authentication → Sign In / Providers → Email)
@@ -265,12 +276,17 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 - [ ] Relire les 100 fiches aliments avant la bêta avec `scripts/food-facts/review.mjs` (exemple d'astuce douteuse : « vinaigre de banane »)
 - [ ] Renommer ou supprimer le sous-domaine inutile `bolt-expo-starter.workers.dev`
 
-### Phase 8a
-
-Section complétée avec la phase 7b.
+### Phase 8a — Audit qualité et sécurité
 
 - [ ] Créer un jeton Sentry en lecture seule (`event:read`, `project:read`) pour analyser les erreurs après le lancement
 - [ ] Test de performance et de mémoire sur un téléphone modeste de référence (Galaxy A30, 4 Go) : scan, génération, listes, transitions
+- [ ] Relire toutes les règles de sécurité de la base (RLS, fonctions SECURITY DEFINER, droits)
+- [ ] Traiter les avertissements de sécurité et de performance de Supabase
+- [ ] `npm audit` et mise à jour des dépendances
+- [ ] Vérifier qu'aucun secret n'est exposé (code, historique git, build, fonctions)
+- [ ] Suppression de compte depuis l'app et depuis une page web (obligatoire pour le Play Store)
+- [ ] Sauvegardes automatiques de la base et test de restauration
+- [ ] Tests automatisés des parcours critiques sur téléphone : connexion, scan, génération, « J'ai cuisiné ça », foyer
 
 ### Obligatoire avant la bêta
 
@@ -279,6 +295,11 @@ Section complétée avec la phase 7b.
 - [ ] « Aide et contact » dans les Réglages, avec l'adresse de contact du projet
 
 **Terminé quand** : au moins 5 testeurs utilisent l'app pendant une semaine sans plantage bloquant.
+
+## Après le lancement (v1.1)
+
+- [ ] Écran de statistiques : aliments les plus utilisés et les plus gaspillés, avec conseils
+- [ ] Seuils de réapprovisionnement pour les aliments essentiels, intégrés au résumé quotidien, avec ajout aux courses en un toucher
 
 ---
 
