@@ -16,6 +16,7 @@ import { QuantityField } from '@/components/pantry/QuantityField';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import { shortDuration } from '@/lib/expiry';
 import { existingFor } from '@/lib/pantry';
+import { capitalizeFirst } from '@/lib/foodNames';
 import type { LotGroup } from '@/lib/pantryLots';
 import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 
@@ -76,12 +77,12 @@ export function ConfirmIngredientsModal({ visible, ingredients, photo, onToggle,
                 style={styles.itemMain}
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked: ing.confirmed }}
-                accessibilityLabel={ing.name}
+                accessibilityLabel={capitalizeFirst(ing.name)}
               >
                 <Checkbox checked={ing.confirmed} />
                 <View style={styles.itemText}>
                   <View style={styles.nameRow}>
-                    <Text style={[styles.name, !ing.confirmed && styles.unchecked]}>{ing.name}</Text>
+                    <Text style={[styles.name, !ing.confirmed && styles.unchecked]}>{capitalizeFirst(ing.name)}</Text>
                     {ing.kind === 'dish' && <Badge label={t('pantry.leftover')} tone="leftover" />}
                   </View>
                   {!ing.confirmed && ing.quantity !== '' && <Text style={styles.quantity}>{ing.quantity}</Text>}
@@ -134,7 +135,12 @@ export function ConfirmIngredientsModal({ visible, ingredients, photo, onToggle,
         })}
       </ScrollView>
 
-      <Button label={t('scan.addCount', { count: confirmedCount })} icon={Check} onPress={onConfirm} loading={saving} style={styles.confirm} />
+      {/* Rien à ajouter : « Terminer » ferme la feuille */}
+      {confirmedCount > 0 ? (
+        <Button label={t('scan.addCount', { count: confirmedCount })} icon={Check} onPress={onConfirm} loading={saving} style={styles.confirm} />
+      ) : (
+        <Button label={t('scan.finish')} variant="outline" onPress={onConfirm} style={styles.confirm} />
+      )}
     </BottomSheet>
   );
 }

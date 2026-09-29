@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Alert } from 'react-native';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { router } from 'expo-router';
@@ -15,6 +15,9 @@ import { addPantryItems, defaultChoice, loadPantry, PantryConflictError, pantryG
 import type { LotGroup } from '@/lib/pantryLots';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import type { AddChoice } from '@/components/pantry/ExistingFoodChoice';
+
+// Durée de l'information « Aucun aliment ajouté »
+const NOTICE_MS = 3000;
 
 // Ingrédient renvoyé par l'Edge Function analyze-image
 interface ScannedIngredient {
@@ -55,10 +58,28 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
   // Garde-manger au moment de la confirmation (aliments déjà présents)
   const [groups, setGroups] = useState<LotGroup<PantryIngredient>[]>([]);
   const [saving, setSaving] = useState(false);
+  // Information brève sur le Scanner (« Aucun aliment ajouté »), sans alerte
+  const [notice, setNotice] = useState<string | null>(null);
+  const noticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showNotice = (message: string) => {
+    if (noticeTimer.current) clearTimeout(noticeTimer.current);
+    setNotice(message);
+    noticeTimer.current = setTimeout(() => setNotice(null), NOTICE_MS);
+  };
+
+  // Confirmation fermée : la photo prise (vignette « Ta photo ») est oubliée
+  const closeConfirmation = () => {
+    setShowConfirmation(false);
+    setDetectedIngredients([]);
+    setCapturedImage(null);
+  };
 
   const analyzeImage = async (imageUri: string) => {
     setCapturedImage(imageUri);
     setAnalyzing(true);
+    // Photo gardée pour la vignette de la confirmation
+    let confirming = false;
 
     try {
       // 1. Compresser et convertir en base64 avec expo-image-manipulator
@@ -123,6 +144,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
           };
           return { ...detected, choice: defaultChoice(current, detected, language) };
         }));
+        confirming = true;
         setShowConfirmation(true);
       } else {
         Alert.alert(
@@ -139,7 +161,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
       Alert.alert(t('common.error'), t('scan.analyzeError', { message: error instanceof Error ? error.message : String(error) }));
     } finally {
       setAnalyzing(false);
-      setCapturedImage(null);
+      if (!confirming) setCapturedImage(null);
     }
   };
 
@@ -184,30 +206,31 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
 
   const confirmDetected = async () => {
     const confirmed = detectedIngredients.filter(i => i.confirmed);
-    if (confirmed.length > 0) {
-      // En cas d'échec, le modal reste ouvert pour pouvoir réessayer
-      setSaving(true);
-      const saved = await saveIngredients(confirmed);
-      setSaving(false);
-      if (!saved) return;
-      setShowConfirmation(false);
-      setDetectedIngredients([]);
-      notifyPantryChanged();
-      // Aliments sans identifiant renvoyé par le scan : reliés à leur fiche en arrière-plan
-      linkPantryFoodKeys();
-      // Premier ajout d'une date : proposition des rappels avant le message de confirmation
-      await maybeAskNotificationPermission();
-      Alert.alert(
-        t('scan.ingredientsAdded'),
-        t('scan.addedToPantry', { count: confirmed.length }),
-        [
-          { text: t('scan.viewPantry'), onPress: () => router.navigate('/(tabs)/ingredients') },
-          { text: t('scan.scanMore'), style: 'cancel' }
-        ]
-      );
-    } else {
-      Alert.alert(t('scan.noneSelectedTitle'), t('scan.noneSelectedText'));
+    // Rien à ajouter (tout décoché ou « Ne pas ajouter ») : « Terminer » ferme la feuille, sans alerte
+    if (confirmed.length === 0) {
+      closeConfirmation();
+      showNotice(t('scan.nothingAdded'));
+      return;
     }
+    // En cas d'échec, le modal reste ouvert pour pouvoir réessayer
+    setSaving(true);
+    const saved = await saveIngredients(confirmed);
+    setSaving(false);
+    if (!saved) return;
+    closeConfirmation();
+    notifyPantryChanged();
+    // Aliments sans identifiant renvoyé par le scan : reliés à leur fiche en arrière-plan
+    linkPantryFoodKeys();
+    // Premier ajout d'une date : proposition des rappels avant le message de confirmation
+    await maybeAskNotificationPermission();
+    Alert.alert(
+      t('scan.ingredientsAdded'),
+      t('scan.addedToPantry', { count: confirmed.length }),
+      [
+        { text: t('scan.viewPantry'), onPress: () => router.navigate('/(tabs)/ingredients') },
+        { text: t('scan.scanMore'), style: 'cancel' }
+      ]
+    );
   };
 
   return {
@@ -216,6 +239,8 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
     detectedIngredients,
     showConfirmation,
     setShowConfirmation,
+    closeConfirmation,
+    notice,
     analyzeImage,
     toggleDetected,
     setDetectedExpiry,

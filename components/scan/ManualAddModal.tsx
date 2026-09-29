@@ -25,6 +25,7 @@ import { ExistingFoodChoice, type AddChoice } from '@/components/pantry/Existing
 import { QuantityField } from '@/components/pantry/QuantityField';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import { addPantryItems, defaultChoice, existingFor, loadPantry, PantryConflictError, pantryGroups } from '@/lib/pantry';
+import { capitalizeFirst } from '@/lib/foodNames';
 import type { LotGroup } from '@/lib/pantryLots';
 
 interface ManualIngredient {
@@ -222,7 +223,7 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
                   {index > 0 ? <View style={cardStyles.divider} /> : null}
                   <View style={styles.item}>
                     <View style={styles.itemText}>
-                      <Text style={[styles.itemName, ingredient.choice === 'skip' && styles.skipped]}>{ingredient.name}</Text>
+                      <Text style={[styles.itemName, ingredient.choice === 'skip' && styles.skipped]}>{capitalizeFirst(ingredient.name)}</Text>
                       {ingredient.quantity ? <Text style={styles.itemQuantity}>{ingredient.quantity}</Text> : null}
                     </View>
                     {ingredient.kind === 'dish' && <Badge label={t('pantry.leftover')} tone="leftover" />}
