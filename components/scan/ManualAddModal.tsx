@@ -13,7 +13,6 @@ import { cardStyles } from '@/components/ui/Card';
 import { Switch } from '@/components/ui/Switch';
 import { Touchable } from '@/components/ui/Touchable';
 import { colors, sizes, spacing, typography } from '@/constants/theme';
-import { supabase } from '@/lib/supabase';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { expiryForPackagedProduct, expiryFromShelfLife, type FoodKind } from '@/lib/expiry';
 import { maybeAskNotificationPermission } from '@/lib/notifications';
@@ -22,6 +21,11 @@ import { linkPantryFoodKeys } from '@/lib/foodNames';
 import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
 import { ExpiryPicker } from '@/components/expiry/ExpiryPicker';
 import { BarcodeNotice } from './BarcodeNotice';
+import { ExistingFoodChoice, type AddChoice } from '@/components/pantry/ExistingFoodChoice';
+import { QuantityField } from '@/components/pantry/QuantityField';
+import type { PantryIngredient } from '@/components/pantry/IngredientCard';
+import { addPantryItems, defaultChoice, existingFor, loadPantry, PantryConflictError, pantryGroups } from '@/lib/pantry';
+import type { LotGroup } from '@/lib/pantryLots';
 
 interface ManualIngredient {
   name: string;
@@ -31,6 +35,8 @@ interface ManualIngredient {
   // Produit scanné par code-barres
   barcode?: string;
   category?: string | null;
+  // Déjà dans le garde-manger : ajouté aux existants, séparément, ou pas du tout
+  choice: AddChoice;
 }
 
 // Saisie préremplie après un scan de code-barres : produit trouvé dans Open Food Facts, ou code seul
@@ -53,7 +59,10 @@ interface Props {
 // Ajout manuel d'ingrédients. La saisie est conservée quand la fenêtre est fermée sans enregistrer.
 export function ManualAddModal({ visible, onClose, prefill }: Props) {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  // Garde-manger du foyer, relu à chaque ouverture : aliments déjà présents
+  const [groups, setGroups] = useState<LotGroup<PantryIngredient>[]>([]);
+  const [saving, setSaving] = useState(false);
   const keyboardScroll = useKeyboardScroll();
   const [manualIngredients, setManualIngredients] = useState<ManualIngredient[]>([]);
   const [newIngredientName, setNewIngredientName] = useState('');
@@ -64,6 +73,10 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
   const [expiryChanged, setExpiryChanged] = useState(false);
   // Code-barres de l'ingrédient en cours de saisie
   const [pending, setPending] = useState<{ barcode: string; found: boolean; category: string | null } | null>(null);
+
+  useEffect(() => {
+    if (visible) loadPantry().then((rows) => rows && setGroups(pantryGroups(rows)));
+  }, [visible]);
 
   useEffect(() => {
     if (!prefill) return;
@@ -88,16 +101,14 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
   const addManualIngredient = () => {
     if (!newIngredientName.trim()) return;
 
-    setManualIngredients([
-      ...manualIngredients,
-      {
-        name: newIngredientName.trim(),
-        quantity: newIngredientQuantity.trim(),
-        kind: isLeftover ? 'dish' : 'ingredient',
-        expires_at: newExpiry,
-        ...(pending && { barcode: pending.barcode, category: pending.category }),
-      },
-    ]);
+    const ingredient = {
+      name: newIngredientName.trim(),
+      quantity: newIngredientQuantity.trim(),
+      kind: (isLeftover ? 'dish' : 'ingredient') as FoodKind,
+      expires_at: newExpiry,
+      ...(pending && { barcode: pending.barcode, category: pending.category }),
+    };
+    setManualIngredients([...manualIngredients, { ...ingredient, choice: defaultChoice(groups, ingredient, language) }]);
     setPending(null);
     setNewIngredientName('');
     setNewIngredientQuantity('');
@@ -110,25 +121,35 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
     setManualIngredients(manualIngredients.filter((_, i) => i !== index));
   };
 
+  const setChoice = (index: number, choice: AddChoice) => {
+    setManualIngredients((current) => current.map((item, i) => (i === index ? { ...item, choice } : item)));
+  };
+
+  // Aliments à enregistrer (« Ne pas ajouter » exclus)
+  const toSave = manualIngredients.filter((ingredient) => ingredient.choice !== 'skip');
+
   const saveManualIngredients = async () => {
-    if (!user || manualIngredients.length === 0) return;
+    if (!user || toSave.length === 0) return;
 
-    const ingredientsToInsert = manualIngredients.map((ingredient) => ({
-      user_id: user.id,
-      name: ingredient.name,
-      quantity: ingredient.quantity,
-      kind: ingredient.kind,
-      expires_at: ingredient.expires_at,
-      category: ingredient.category ?? null,
-      barcode: ingredient.barcode ?? null,
-      added_via: ingredient.barcode ? 'barcode' : 'manual',
-    }));
+    setSaving(true);
+    let error: unknown = null;
+    try {
+      await addPantryItems(toSave.map((ingredient) => ({
+        ...ingredient,
+        barcode: ingredient.barcode ?? null,
+        choice: ingredient.choice === 'merge' ? 'merge' : 'separate',
+        added_via: ingredient.barcode ? 'barcode' : 'manual',
+      })), groups, language);
+    } catch (caught) {
+      error = caught;
+    }
+    setSaving(false);
 
-    const { error } = await supabase
-      .from('ingredients')
-      .insert(ingredientsToInsert);
-
-    if (error) {
+    if (error instanceof PantryConflictError) {
+      // Un membre du foyer vient de changer un lot : garde-manger relu, choix à vérifier
+      loadPantry().then((rows) => rows && setGroups(pantryGroups(rows)));
+      Alert.alert(t('existing.conflictTitle'), t('existing.conflictText'));
+    } else if (error) {
       alertWriteError(t, 'saving manual ingredients', error);
     } else {
       setManualIngredients([]);
@@ -140,7 +161,7 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
       await maybeAskNotificationPermission();
       Alert.alert(
         t('manual.successTitle'),
-        t('scan.addedToPantry', { count: ingredientsToInsert.length }),
+        t('scan.addedToPantry', { count: toSave.length }),
         [
           {
             text: t('scan.viewPantry'),
@@ -171,11 +192,12 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
           value={newIngredientName}
           onChangeText={setNewIngredientName}
         />
-        <TextField
+        <QuantityField
           label={t('manual.quantityLabel')}
           placeholder={t('manual.quantityPlaceholder')}
           value={newIngredientQuantity}
-          onChangeText={setNewIngredientQuantity}
+          onChange={setNewIngredientQuantity}
+          itemName={newIngredientName}
         />
 
         <View style={styles.switchRow}>
@@ -193,31 +215,43 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
         {manualIngredients.length > 0 && (
           <View>
             <Text style={styles.label}>{t('manual.addedList')}</Text>
-            {manualIngredients.map((ingredient, index) => (
-              <View key={index}>
-                {index > 0 ? <View style={cardStyles.divider} /> : null}
-                <View style={styles.item}>
-                  <View style={styles.itemText}>
-                    <Text style={styles.itemName}>{ingredient.name}</Text>
-                    {ingredient.quantity ? <Text style={styles.itemQuantity}>{ingredient.quantity}</Text> : null}
+            {manualIngredients.map((ingredient, index) => {
+              const existing = existingFor(groups, ingredient, language);
+              return (
+                <View key={index}>
+                  {index > 0 ? <View style={cardStyles.divider} /> : null}
+                  <View style={styles.item}>
+                    <View style={styles.itemText}>
+                      <Text style={[styles.itemName, ingredient.choice === 'skip' && styles.skipped]}>{ingredient.name}</Text>
+                      {ingredient.quantity ? <Text style={styles.itemQuantity}>{ingredient.quantity}</Text> : null}
+                    </View>
+                    {ingredient.kind === 'dish' && <Badge label={t('pantry.leftover')} tone="leftover" />}
+                    <ExpiryBadge expiresAt={ingredient.expires_at} />
+                    <Touchable onPress={() => removeManualIngredient(index)} style={styles.remove} accessibilityRole="button" accessibilityLabel={t('common.delete')}>
+                      <X size={sizes.icon} color={colors.expired.text} />
+                    </Touchable>
                   </View>
-                  {ingredient.kind === 'dish' && <Badge label={t('pantry.leftover')} tone="leftover" />}
-                  <ExpiryBadge expiresAt={ingredient.expires_at} />
-                  <Touchable onPress={() => removeManualIngredient(index)} style={styles.remove} accessibilityRole="button" accessibilityLabel={t('common.delete')}>
-                    <X size={sizes.icon} color={colors.expired.text} />
-                  </Touchable>
+                  {existing ? (
+                    <ExistingFoodChoice
+                      group={existing.group}
+                      choice={ingredient.choice === 'merge' && existing.mergedTotal === null ? 'separate' : ingredient.choice}
+                      mergedTotal={existing.mergedTotal}
+                      onChange={(choice) => setChoice(index, choice)}
+                    />
+                  ) : null}
                 </View>
-              </View>
-            ))}
+              );
+            })}
           </View>
         )}
       </ScrollView>
 
       <Button
-        label={t('manual.saveCount', { count: manualIngredients.length })}
+        label={t('manual.saveCount', { count: toSave.length })}
         icon={Check}
         onPress={saveManualIngredients}
-        disabled={manualIngredients.length === 0}
+        loading={saving}
+        disabled={toSave.length === 0}
         style={styles.save}
       />
     </BottomSheet>
@@ -261,6 +295,10 @@ const styles = StyleSheet.create({
   },
   itemQuantity: {
     ...typography.secondary,
+  },
+  skipped: {
+    color: colors.textSecondary,
+    textDecorationLine: 'line-through',
   },
   remove: {
     width: sizes.touch,

@@ -11,7 +11,12 @@ import { cardStyles } from '@/components/ui/Card';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { RecipePlaceholder } from '@/components/ui/Illustrations';
 import { Touchable } from '@/components/ui/Touchable';
+import { ExistingFoodChoice, type AddChoice } from '@/components/pantry/ExistingFoodChoice';
+import { QuantityField } from '@/components/pantry/QuantityField';
+import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import { shortDuration } from '@/lib/expiry';
+import { existingFor } from '@/lib/pantry';
+import type { LotGroup } from '@/lib/pantryLots';
 import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 
 interface Props {
@@ -21,14 +26,20 @@ interface Props {
   photo?: string | null;
   onToggle: (index: number) => void;
   onExpiryChange: (index: number, expiresAt: string) => void;
+  onQuantityChange: (index: number, quantity: string) => void;
+  onChoiceChange: (index: number, choice: AddChoice) => void;
+  // Garde-manger du foyer : aliments déjà présents
+  groups: LotGroup<PantryIngredient>[];
+  saving?: boolean;
   onConfirm: () => void;
   onClose: () => void;
 }
 
-// Aliments détectés sur la photo : l'utilisateur décoche ceux qu'il ne veut pas ajouter et peut changer
-// la durée de conservation proposée (toucher la pastille de durée)
-export function ConfirmIngredientsModal({ visible, ingredients, photo, onToggle, onExpiryChange, onConfirm, onClose }: Props) {
-  const { t } = useLanguage();
+// Aliments détectés sur la photo : l'utilisateur décoche ceux qu'il ne veut pas ajouter, corrige la quantité
+// (+ et − pour ce qui se compte) et peut changer la durée de conservation proposée (toucher la pastille de
+// durée). Aliment déjà dans le garde-manger : ajouter aux existants, séparément ou pas du tout.
+export function ConfirmIngredientsModal({ visible, ingredients, photo, onToggle, onExpiryChange, onQuantityChange, onChoiceChange, groups, saving, onConfirm, onClose }: Props) {
+  const { t, language } = useLanguage();
   // Aliment dont la date est en cours de modification
   const [editing, setEditing] = useState<number | null>(null);
   const confirmedCount = ingredients.filter((i) => i.confirmed).length;
@@ -45,15 +56,17 @@ export function ConfirmIngredientsModal({ visible, ingredients, photo, onToggle,
   );
 
   return (
-    <BottomSheet visible={visible} onClose={onClose}>
+    <BottomSheet visible={visible} onClose={onClose} keyboard>
       <SheetHeader
         leading={thumbnail}
         title={t('scan.foundCount', { count: ingredients.length })}
         subtitle={t('scan.foundSubtitle')}
       />
 
-      <ScrollView style={styles.list} showsVerticalScrollIndicator={false}>
-        {ingredients.map((ing, index) => (
+      <ScrollView style={styles.list} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+        {ingredients.map((ing, index) => {
+          const existing = existingFor(groups, ing, language);
+          return (
           <View key={index}>
             <View style={cardStyles.divider} />
             <View style={styles.item}>
@@ -71,7 +84,7 @@ export function ConfirmIngredientsModal({ visible, ingredients, photo, onToggle,
                     <Text style={[styles.name, !ing.confirmed && styles.unchecked]}>{ing.name}</Text>
                     {ing.kind === 'dish' && <Badge label={t('pantry.leftover')} tone="leftover" />}
                   </View>
-                  {ing.quantity !== '' && <Text style={styles.quantity}>{ing.quantity}</Text>}
+                  {!ing.confirmed && ing.quantity !== '' && <Text style={styles.quantity}>{ing.quantity}</Text>}
                   {ing.storage_tip ? (
                     <View style={styles.tip}>
                       <Info size={sizes.iconSmall - 2} color={colors.textSecondary} />
@@ -96,11 +109,32 @@ export function ConfirmIngredientsModal({ visible, ingredients, photo, onToggle,
                 <ExpiryPicker value={ing.expires_at} onChange={(iso) => onExpiryChange(index, iso)} />
               </View>
             )}
+            {ing.confirmed || existing ? (
+              <View style={styles.extra}>
+                {ing.confirmed ? (
+                  <QuantityField
+                    value={ing.quantity}
+                    onChange={(quantity) => onQuantityChange(index, quantity)}
+                    itemName={ing.name}
+                    placeholder={t('manual.quantityPlaceholder')}
+                  />
+                ) : null}
+                {existing ? (
+                  <ExistingFoodChoice
+                    group={existing.group}
+                    choice={ing.confirmed ? (existing.mergedTotal === null ? 'separate' : ing.choice) : 'skip'}
+                    mergedTotal={existing.mergedTotal}
+                    onChange={(choice) => onChoiceChange(index, choice)}
+                  />
+                ) : null}
+              </View>
+            ) : null}
           </View>
-        ))}
+          );
+        })}
       </ScrollView>
 
-      <Button label={t('scan.addCount', { count: confirmedCount })} icon={Check} onPress={onConfirm} style={styles.confirm} />
+      <Button label={t('scan.addCount', { count: confirmedCount })} icon={Check} onPress={onConfirm} loading={saving} style={styles.confirm} />
     </BottomSheet>
   );
 }
@@ -192,5 +226,10 @@ const styles = StyleSheet.create({
   },
   confirm: {
     marginTop: spacing.md,
+  },
+  extra: {
+    gap: spacing.md,
+    paddingLeft: sizes.checkbox + spacing.lg,
+    paddingBottom: spacing.md,
   },
 });

@@ -45,7 +45,11 @@ export default function CameraScreen() {
     analyzeImage,
     toggleDetected,
     setDetectedExpiry,
+    setDetectedQuantity,
+    setDetectedChoice,
     confirmDetected,
+    groups,
+    saving,
   } = useScan({ onManualAdd: () => setShowManualAdd(true) });
 
   // Caméra montée seulement quand elle est visible : onglet Scanner affiché (les onglets restent montés en
@@ -238,6 +242,10 @@ export default function CameraScreen() {
         photo={capturedImage}
         onToggle={toggleDetected}
         onExpiryChange={setDetectedExpiry}
+        onQuantityChange={setDetectedQuantity}
+        onChoiceChange={setDetectedChoice}
+        groups={groups}
+        saving={saving}
         onConfirm={confirmDetected}
         onClose={() => setShowConfirmation(false)}
       />

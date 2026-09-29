@@ -63,3 +63,16 @@ export async function addPantryItems(foods: FoodToAdd[], groups: LotGroup<Pantry
 
 // Lignes du garde-manger (aliments regroupés), pour repérer ce qui y est déjà
 export const pantryGroups = (rows: PantryIngredient[] | null) => groupLots(rows ?? []);
+
+// Aliment déjà présent : sa ligne et le total après « Ajouter aux existants » (null : unités différentes)
+export function existingFor(groups: LotGroup<PantryIngredient>[], food: NewFood, language: string) {
+  const group = findExisting(groups, food);
+  if (!group) return null;
+  const target = mergeTarget(group, food, language);
+  return { group, mergedTotal: target?.total ?? null, sameDate: target?.sameDate ?? false };
+}
+
+// Choix proposé : ajouté au lot de même date s'il y en a un, sinon lot séparé (chaque lot garde sa date)
+export function defaultChoice(groups: LotGroup<PantryIngredient>[], food: NewFood, language: string): ExistingChoice {
+  return existingFor(groups, food, language)?.sameDate ? 'merge' : 'separate';
+}
