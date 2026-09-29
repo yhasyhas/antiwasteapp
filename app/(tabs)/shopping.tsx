@@ -222,6 +222,7 @@ export default function ShoppingScreen() {
         )}
       </ScrollView>
 
+      {/* Message « Annuler » sous la liste (il ne la couvre pas) */}
       <Toast message={removal.pending ? t('shopping.removed') : null} actionLabel={t('common.undo')} onAction={removal.undo} />
 
       {/* Ranger au garde-manger : une date proposée par article, modifiable */}

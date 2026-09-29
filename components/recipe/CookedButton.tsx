@@ -170,7 +170,7 @@ export function CookedButton({ ingredientsUsed, style }: Props) {
 
   return (
     <View style={style}>
-      <Toast message={cooking.pending ? t('cooked.removed') : null} actionLabel={t('common.undo')} onAction={cooking.undo} bottom="100%" />
+      <Toast message={cooking.pending ? t('cooked.removed') : null} actionLabel={t('common.undo')} onAction={cooking.undo} inset={false} />
       <Button label={t('cooked.button')} icon={Check} onPress={open} loading={loading} />
 
       <BottomSheet visible={rows !== null} onClose={() => setRows(null)}>

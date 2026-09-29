@@ -231,15 +231,13 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
           </RoundButton>
         </View>
 
-        <Toast
-          message={toast}
-          actionLabel={t('common.view')}
-          onAction={openShoppingList}
-          bottom={safe.insets.bottom + sizes.primaryButton + spacing.md * 2 + spacing.sm}
-        />
-
-        {/* « J'ai cuisiné ça » toujours visible */}
-        <CookedButton ingredientsUsed={recipe.ingredients_used} style={[styles.bottomBar, safe.bottom(spacing.md)]} />
+        {/* Barre du bas : messages (« Voir », « Annuler ») et « J'ai cuisiné ça » toujours visible */}
+        {toast || recipe.ingredients_used.some((item) => item.pantry_id) ? (
+          <View style={[styles.bottomBar, safe.bottom(spacing.md)]}>
+            <Toast message={toast} actionLabel={t('common.view')} onAction={openShoppingList} inset={false} />
+            <CookedButton ingredientsUsed={recipe.ingredients_used} />
+          </View>
+        ) : null}
       </View>
     </Modal>
   );
@@ -280,8 +278,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  // La barre du bas est dans la mise en page : le contenu s'arrête au-dessus d'elle
   scroll: {
-    paddingBottom: sizes.primaryButton + spacing.xxxl * 2,
+    paddingBottom: spacing.xxxl,
   },
   hero: {
     height: sizes.recipeHero,
@@ -436,10 +435,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bottomBar: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
     paddingHorizontal: spacing.screen,
     paddingTop: spacing.md,
     backgroundColor: colors.surface,

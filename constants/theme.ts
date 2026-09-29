@@ -202,8 +202,9 @@ export const motion = {
   // Retour visuel au toucher : échelle du bouton pressé
   pressedScale: 0.97,
   pressedOpacity: 0.85,
-  // Délai pour annuler une suppression (message « Annuler »)
-  undoWindow: 5000,
+  // Message « Annuler » (et « Voir ») : durée d'affichage ; revient au retour dans l'app pendant undoRedisplay
+  undoWindow: 10000,
+  undoRedisplay: 120000,
 } as const;
 
 // Listes : apparition des cartes (décalage entre deux cartes) et réarrangement

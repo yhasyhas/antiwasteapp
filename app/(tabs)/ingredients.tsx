@@ -20,6 +20,7 @@ import { IngredientCard, type PantryIngredient } from '@/components/pantry/Ingre
 import { ExpiryEditModal } from '@/components/pantry/ExpiryEditModal';
 import { FoodFactSheet } from '@/components/pantry/FoodFactSheet';
 import { PantryLotsSection } from '@/components/pantry/PantryLotsSection';
+import { RecentlyRemoved } from '@/components/pantry/RecentlyRemoved';
 import { expiryStatus, sortByUrgency } from '@/lib/expiry';
 import { maybeAskNotificationPermission } from '@/lib/notifications';
 import { notifyPantryChanged, onPantryChanged } from '@/lib/pantryEvents';
@@ -266,6 +267,7 @@ export default function IngredientsScreen() {
         }
       />
 
+      <View style={styles.list}>
       <ScrollView
         style={styles.list}
         contentContainerStyle={styles.listContent}
@@ -310,11 +312,17 @@ export default function IngredientsScreen() {
               ))
             )}
 
-            <Touchable onPress={clearAllIngredients} style={styles.clear} accessibilityRole="button">
-              <Text style={styles.clearText}>{t('pantry.clearTitle')}</Text>
-            </Touchable>
           </>
         )}
+
+        {/* Retraits et « J'ai cuisiné ça » des dernières 24 heures, rétablissables */}
+        {!loading ? <RecentlyRemoved /> : null}
+
+        {!loading && allGroups.length > 0 ? (
+          <Touchable onPress={clearAllIngredients} style={styles.clear} accessibilityRole="button">
+            <Text style={styles.clearText}>{t('pantry.clearTitle')}</Text>
+          </Touchable>
+        ) : null}
       </ScrollView>
 
       {/* Ajouter : scan ou ajout à la main */}
@@ -326,6 +334,10 @@ export default function IngredientsScreen() {
       >
         <Plus size={sizes.iconLarge + spacing.sm} color={colors.onPrimary} />
       </Touchable>
+      </View>
+
+      {/* Message « Annuler » sous la liste (il ne la couvre pas) */}
+      <Toast message={toastMessage} actionLabel={t('common.undo')} onAction={toastAction} />
 
       {/* Feuille de l'aliment : ses lots (« Dans ton garde-manger »), puis sa fiche */}
       <FoodFactSheet
@@ -345,14 +357,7 @@ export default function IngredientsScreen() {
             onMerge={mergeLots}
           />
         ) : null}
-        toast={<Toast message={toastMessage} actionLabel={t('common.undo')} onAction={toastAction} bottom="100%" />}
-      />
-
-      <Toast
-        message={toastMessage}
-        actionLabel={t('common.undo')}
-        onAction={toastAction}
-        bottom={spacing.xl + sizes.fab + spacing.md}
+        toast={<Toast message={toastMessage} actionLabel={t('common.undo')} onAction={toastAction} inset={false} />}
       />
 
       <ExpiryEditModal

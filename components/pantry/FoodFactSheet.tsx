@@ -33,7 +33,7 @@ interface Props {
   pantry?: React.ReactNode;
   // Fiche d'information (pas pour un reste de plat)
   withFact?: boolean;
-  // Message « Annuler » affiché au-dessus de la feuille
+  // Message « Annuler », en bas de la feuille
   toast?: React.ReactNode;
 }
 
@@ -111,7 +111,6 @@ export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact 
 
   return (
     <BottomSheet visible={ingredient !== null} onClose={onClose} background={colors.background} keyboard>
-      {toast}
       <View style={styles.header}>
         <IconChip icon={Leaf} tone="accent" size={sizes.iconChipLarge + spacing.sm} />
         <View style={styles.headerText}>
@@ -211,6 +210,8 @@ export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact 
         ) : null}
         {withFact && section ? null : removeButton}
       </ScrollView>
+      {/* Message « Annuler » en bas de la feuille, sous son contenu */}
+      {toast}
     </BottomSheet>
   );
 }
