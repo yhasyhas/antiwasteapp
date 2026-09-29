@@ -222,6 +222,13 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - expo-camera exclu de l'autolinking mobile (`expo.autolinking.exclude` dans `package.json`) ; permission caméra déclarée dans `app.json`.
 - Aperçu Android en TextureView (`implementationMode="compatible"`) et photo demandée en 960 × 1280 (1,2 Mpx, réduite à 800 px pour l'analyse) : sans ces réglages, l'aperçu restait vide sur le Galaxy A30, téléphone de référence pour les appareils modestes.
 
+### Phase 7b — fiabilité du garde-manger (branche `phase-7b`)
+- Lots : chaque ligne de `ingredients` est un lot ; `lib/pantryLots.ts` les regroupe par aliment (`food_key` ou nom normalisé), calcule la quantité totale, consomme du plus ancien au plus récent, repère un aliment déjà présent. `lib/pantry.ts` : lecture du garde-manger et ajout en une opération (`add_pantry_items`).
+- Garde-manger : une ligne par aliment, détail des lots (`components/pantry/LotsSheet.tsx`) : date, auteur, date d'ajout, retrait d'un lot, fusion (`merge_lots`), suppression de l'aliment entier (`delete_ingredients_with_undo`).
+- Scan et ajout manuel : quantité avec + et − (`QuantityField`), aliment déjà présent (`ExistingFoodChoice`).
+- Historique : table `pantry_history` (déclencheur `log_pantry_history`), sans écran.
+- Génération, accueil, « J'ai cuisiné ça » : par aliment. Tests : `supabase/tests/pantry_lots.sql`.
+
 ## 5. État actuel et problèmes connus
 
 ### Sécurité
@@ -238,7 +245,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 
 ## 6. Prochaine étape
-Phase 7b, puis phase 8 (lancement, avec la phase 8a). Détails dans `PLAN.md`.
+Tests de la phase 7b sur téléphone (dont la fluidité sur le Galaxy A30), puis phase 8 (lancement, avec la phase 8a). Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash
