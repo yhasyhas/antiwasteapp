@@ -1,5 +1,6 @@
-import React, { useRef, useState } from 'react';
-import { ActivityIndicator, Image, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, AppState, Image, StyleSheet, Text, View } from 'react-native';
+import { useIsFocused } from 'expo-router';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { Plus, RefreshCw } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -10,8 +11,9 @@ import { ManualAddModal, type ManualPrefill } from '@/components/scan/ManualAddM
 import { ScanModeToggle, type ScanMode } from '@/components/scan/ScanModeToggle';
 import { ConfirmIngredientsModal } from '@/components/scan/ConfirmIngredientsModal';
 import { PermissionRequest } from '@/components/scan/PermissionRequest';
+import { Button } from '@/components/ui/Button';
 import { Touchable } from '@/components/ui/Touchable';
-import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
+import { colors, opacity, radius, sizes, spacing, typography } from '@/constants/theme';
 
 export default function CameraScreen() {
   const { t } = useLanguage();
@@ -38,6 +40,28 @@ export default function CameraScreen() {
     setDetectedExpiry,
     confirmDetected,
   } = useScan({ onManualAdd: () => setShowManualAdd(true) });
+
+  // Caméra montée seulement quand elle est visible : onglet Scanner affiché (les onglets restent montés en
+  // arrière-plan), app au premier plan, aucune feuille par-dessus. Sinon elle est libérée : sur Android, un
+  // aperçu resté ouvert pendant qu'on est ailleurs peut rester figé au retour.
+  const isFocused = useIsFocused();
+  const [appActive, setAppActive] = useState(AppState.currentState === 'active');
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => setAppActive(state === 'active'));
+    return () => subscription.remove();
+  }, []);
+  const cameraOn = isFocused && appActive && !showManualAdd && !showConfirmation;
+  // Démarrage impossible (caméra occupée, erreur du système) : message et « Réessayer » (nouvelle caméra)
+  const [cameraError, setCameraError] = useState(false);
+  const [cameraKey, setCameraKey] = useState(0);
+  const retryCamera = () => {
+    setCameraError(false);
+    setCameraKey((key) => key + 1);
+  };
+  // Caméra de retour : le scan de code-barres reprend (verrou laissé par un code lu juste avant de partir)
+  useEffect(() => {
+    if (cameraOn) resume();
+  }, [cameraOn]);
 
   const manualAddModal = (
     <ManualAddModal
@@ -69,7 +93,7 @@ export default function CameraScreen() {
   };
 
   const takePicture = async () => {
-    if (!cameraRef.current) return;
+    if (!cameraRef.current || !cameraOn) return;
 
     try {
       const photo = await cameraRef.current.takePictureAsync();
@@ -84,22 +108,39 @@ export default function CameraScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.cameraContainer}>
-        <CameraView
-          style={styles.camera}
-          facing={facing}
-          ref={cameraRef}
-          barcodeScannerSettings={{ barcodeTypes: [...FOOD_BARCODE_TYPES] }}
-          onBarcodeScanned={barcode && !showManualAdd && !lookingUp ? onBarcodeScanned : undefined}
-        />
-        {/* CameraView n'accepte pas d'enfants : le cadre de visée est superposé en position absolue */}
-        <View style={styles.overlay} pointerEvents="none">
-          <View style={[styles.frame, barcode && styles.barcodeFrame]}>
-            <View style={[styles.corner, styles.topLeft]} />
-            <View style={[styles.corner, styles.topRight]} />
-            <View style={[styles.corner, styles.bottomLeft]} />
-            <View style={[styles.corner, styles.bottomRight]} />
+        {cameraOn && !cameraError ? (
+          <CameraView
+            key={cameraKey}
+            style={styles.camera}
+            facing={facing}
+            ref={cameraRef}
+            barcodeScannerSettings={{ barcodeTypes: [...FOOD_BARCODE_TYPES] }}
+            onBarcodeScanned={barcode && !showManualAdd && !lookingUp ? onBarcodeScanned : undefined}
+            onMountError={(event) => {
+              console.warn('[caméra] démarrage impossible :', event.message);
+              setCameraError(true);
+            }}
+          />
+        ) : (
+          <View style={styles.camera} />
+        )}
+        {cameraError ? (
+          <View style={styles.cameraError}>
+            <Text style={styles.cameraErrorTitle}>{t('scan.cameraErrorTitle')}</Text>
+            <Text style={styles.cameraErrorText}>{t('scan.cameraErrorText')}</Text>
+            <Button label={t('common.retry')} icon={RefreshCw} variant="accent" size="medium" onPress={retryCamera} />
           </View>
-        </View>
+        ) : (
+          // CameraView n'accepte pas d'enfants : le cadre de visée est superposé en position absolue
+          <View style={styles.overlay} pointerEvents="none">
+            <View style={[styles.frame, barcode && styles.barcodeFrame]}>
+              <View style={[styles.corner, styles.topLeft]} />
+              <View style={[styles.corner, styles.topRight]} />
+              <View style={[styles.corner, styles.bottomLeft]} />
+              <View style={[styles.corner, styles.bottomRight]} />
+            </View>
+          </View>
+        )}
 
         {analyzing && capturedImage && (
           // La photo prise reste affichée pendant l'analyse, sous le message d'attente
@@ -136,7 +177,7 @@ export default function CameraScreen() {
             // Le code est lu dès qu'il est dans le cadre
             <View style={styles.capturePlaceholder} />
           ) : (
-            <Touchable onPress={takePicture} disabled={analyzing} style={styles.capture} accessibilityRole="button" accessibilityLabel={t('scan.takePhoto')}>
+            <Touchable onPress={takePicture} disabled={analyzing || cameraError} style={[styles.capture, cameraError && styles.captureDisabled]} accessibilityRole="button" accessibilityLabel={t('scan.takePhoto')}>
               <View style={styles.captureInner} />
             </Touchable>
           )}
@@ -200,6 +241,31 @@ const styles = StyleSheet.create({
   manualText: {
     ...typography.button,
     color: colors.onCamera,
+  },
+  captureDisabled: {
+    opacity: opacity.disabled,
+  },
+  cameraError: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.md,
+    paddingHorizontal: spacing.xxxl,
+  },
+  cameraErrorTitle: {
+    ...typography.title3,
+    color: colors.onCamera,
+    textAlign: 'center',
+  },
+  cameraErrorText: {
+    ...typography.body,
+    color: colors.onCameraMuted,
+    textAlign: 'center',
+    marginBottom: spacing.sm,
   },
   overlay: {
     position: 'absolute',

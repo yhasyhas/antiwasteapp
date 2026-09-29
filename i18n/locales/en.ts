@@ -100,6 +100,8 @@ const en: Translations = {
   ingredientCount_one: '{{count}} ingredient',
   ingredientCount_other: '{{count}} ingredients',
   scan: {
+    cameraErrorTitle: "The camera couldn't start",
+    cameraErrorText: "Another app may be using it. Try again, or add your food by hand.",
     shortTitle: "Scan",
     byHand: "By hand",
     flipCamera: "Switch camera",

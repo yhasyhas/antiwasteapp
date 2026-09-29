@@ -101,6 +101,8 @@ const fr = {
   ingredientCount_one: '{{count}} ingrédient',
   ingredientCount_other: '{{count}} ingrédients',
   scan: {
+    cameraErrorTitle: "La caméra n'a pas pu démarrer",
+    cameraErrorText: "Elle est peut-être utilisée par une autre app. Réessaie, ou ajoute tes aliments à la main.",
     shortTitle: "Scanner",
     byHand: "À la main",
     flipCamera: "Changer de caméra",
