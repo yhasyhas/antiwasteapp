@@ -263,6 +263,7 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 - [ ] Remplacer le schéma de liens `myapp` (hérité de bolt) par un schéma propre à l'app, avec le nom définitif ; nouveau build nécessaire
 - [ ] Relire les 100 fiches aliments avant la bêta avec `scripts/food-facts/review.mjs` (exemple d'astuce douteuse : « vinaigre de banane »)
 - [ ] Renommer ou supprimer le sous-domaine inutile `bolt-expo-starter.workers.dev`
+- [ ] Créer un jeton Sentry en lecture seule (`event:read`, `project:read`) pour analyser les erreurs après le lancement
 
 ### Obligatoire avant la bêta
 
