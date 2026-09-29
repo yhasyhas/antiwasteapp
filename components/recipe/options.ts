@@ -12,9 +12,9 @@ export const mealTypes = [
 
 // Langues des recettes (noms dans leur propre langue)
 export const languages = [
-  { value: 'fr', label: 'Français', flag: '🇫🇷' },
-  { value: 'en', label: 'English', flag: '🇬🇧' },
-  { value: 'es', label: 'Español', flag: '🇪🇸' },
+  { value: 'fr', label: 'Français' },
+  { value: 'en', label: 'English' },
+  { value: 'es', label: 'Español' },
 ];
 
 // value : code envoyé à generate-recipes (et enregistré dans les préférences) ; labelKey : libellé affiché

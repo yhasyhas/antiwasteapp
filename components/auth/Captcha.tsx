@@ -41,7 +41,6 @@ export const CaptchaField = forwardRef<CaptchaHandle, Props>(function CaptchaFie
   const [phase, setPhase] = useState<Phase>({ kind: 'loading' });
   // Change à chaque essai : recharge la page
   const [attempt, setAttempt] = useState(0);
-  const [pageState, setPageState] = useState('');
   const onTokenRef = useRef(onToken);
   onTokenRef.current = onToken;
 
@@ -53,7 +52,6 @@ export const CaptchaField = forwardRef<CaptchaHandle, Props>(function CaptchaFie
 
   const restart = () => {
     onTokenRef.current(null);
-    setPageState('');
     setPhase({ kind: 'loading' });
     setAttempt((n) => n + 1);
   };
@@ -80,8 +78,6 @@ export const CaptchaField = forwardRef<CaptchaHandle, Props>(function CaptchaFie
         setPhase({ kind: 'widget' });
       } else if (message.type === 'error') {
         fail(String(message.code));
-      } else if (message.type === 'state') {
-        setPageState(String(message.code));
       }
     } catch {
       // message inattendu : ignoré
@@ -157,7 +153,6 @@ export const CaptchaField = forwardRef<CaptchaHandle, Props>(function CaptchaFie
             )}
         </View>
       )}
-      {__DEV__ && pageState !== '' && phase.kind === 'widget' ? <Text style={styles.code}>{pageState}</Text> : null}
     </View>
   );
 });

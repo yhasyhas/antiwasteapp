@@ -95,7 +95,7 @@ export function FiltersModal({ visible, filters, onChange, onToggleDietary, onCl
           {languages.map((lang) => (
             <Chip
               key={lang.value}
-              label={`${lang.flag} ${lang.label}`}
+              label={lang.label}
               selected={filters.language === lang.value}
               onPress={() => onChange({ ...filters, language: lang.value })}
             />

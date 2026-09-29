@@ -68,6 +68,13 @@ export function subscribeHousehold(listener: () => void): () => void {
 
 export const getHousehold = () => current;
 
+// Prénom affiché avec une majuscule au début de chaque mot (« marie-claire » → « Marie-Claire »),
+// tel qu'il a été saisi pour le reste
+export function capitalizeName(name: string | null): string | null {
+  if (!name) return name;
+  return name.replace(/(^|[\s-])(\p{Ll})/gu, (_, before: string, letter: string) => before + letter.toUpperCase());
+}
+
 // Recharge le foyer depuis le serveur (connexion, retour dans l'app, changement des membres)
 export function loadHousehold(): Promise<Household | null> {
   if (!userId) return Promise.resolve(null);
@@ -80,7 +87,8 @@ export function loadHousehold(): Promise<Household | null> {
       console.warn('[foyer] chargement impossible :', error.message);
       return current;
     }
-    setHousehold((data as Household | null) ?? null);
+    const household = (data as Household | null) ?? null;
+    setHousehold(household && { ...household, members: household.members.map((m) => ({ ...m, name: capitalizeName(m.name) })) });
     return current;
   })();
   loading = request;

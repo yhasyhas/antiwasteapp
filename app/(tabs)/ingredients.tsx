@@ -289,8 +289,8 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: spacing.screen,
-    // Place pour le bouton « + » au-dessus du dernier aliment
-    paddingBottom: sizes.fab + spacing.xxxl,
+    // Place pour le bouton « + » (sa hauteur et son écart au bord) sous le dernier élément, en fin de liste
+    paddingBottom: spacing.xl + sizes.fab + spacing.xxxl,
     gap: spacing.lg,
   },
   filters: {

@@ -6,7 +6,7 @@ import { Card, cardStyles } from '@/components/ui/Card';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { Touchable } from '@/components/ui/Touchable';
-import { colors, sizes, spacing, typography } from '@/constants/theme';
+import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 
 // Réglages → Langue : langue de l'interface (les recettes suivent la langue choisie dans les filtres)
 export default function LanguageScreen() {
@@ -30,7 +30,9 @@ export default function LanguageScreen() {
                   accessibilityState={{ selected }}
                   accessibilityLabel={lang.label}
                 >
-                  <Text style={styles.flag}>{lang.flag}</Text>
+                  <View style={styles.code}>
+                    <Text style={[styles.codeText, selected && styles.codeTextSelected]}>{lang.short}</Text>
+                  </View>
                   <Text style={[styles.label, selected && styles.labelSelected]}>{lang.label}</Text>
                   {selected ? <Checkbox checked shape="circle" /> : null}
                 </Touchable>
@@ -60,8 +62,21 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     minHeight: sizes.touch + spacing.lg,
   },
-  flag: {
-    ...typography.title3,
+  // Code de la langue dans une pastille de largeur fixe : noms alignés
+  code: {
+    width: sizes.iconChip,
+    height: sizes.iconChip - spacing.sm,
+    borderRadius: radius.iconChip - spacing.xs,
+    backgroundColor: colors.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  codeText: {
+    ...typography.badge,
+    color: colors.textSecondary,
+  },
+  codeTextSelected: {
+    color: colors.primary,
   },
   label: {
     ...typography.bodyMedium,

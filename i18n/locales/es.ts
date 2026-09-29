@@ -363,7 +363,7 @@ const es: Translations = {
     email: 'Correo electrónico',
     notSignedIn: 'Sin sesión iniciada',
     signOut: 'Cerrar sesión',
-    appVersion: 'Anti-Waste Recipe App v{{version}}',
+    appVersion: 'Antigaspi, versión {{version}}',
     tagline: 'Reduce el desperdicio de alimentos, una receta a la vez.',
     sentryTest: 'Enviar un error de prueba a Sentry',
   },
