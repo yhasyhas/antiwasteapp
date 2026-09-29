@@ -84,8 +84,11 @@ export function groupLots<T extends Lot>(rows: T[]): LotGroup<T>[] {
 }
 
 // Quantité de référence d'une ligne : unité du plus ancien lot qui en a une (« 2 » + « 3 tomates » → tomates)
+// (pour ce qui se compte, au pluriel de préférence : « 1 paquet » + « 2 paquets » → « 3 paquets »)
 function referenceOf(parsed: Quantity[]): Quantity {
-  return parsed.find((quantity) => quantity.unit !== '') ?? parsed[0];
+  const counted = parsed[0].dimension !== 'mass' && parsed[0].dimension !== 'volume';
+  return (counted ? parsed.find((quantity) => quantity.unit !== '' && quantity.value > 1) : undefined)
+    ?? parsed.find((quantity) => quantity.unit !== '') ?? parsed[0];
 }
 
 // Quantité totale des lots dans une même unité, ou null si elle ne peut pas être calculée (lot sans nombre,

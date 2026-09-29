@@ -98,7 +98,11 @@ export function stepOf(stock: Quantity): number {
 export function formatQuantity(value: number, unit: string, language: string): string {
   const number = Number(value.toFixed(2)).toString();
   const text = language === 'en' ? number : number.replace('.', ',');
-  // « 1 œuf », « 1 tranche » : unité au singulier (sauf les unités de mesure : « 1 l », « 1 kg »)
-  const word = value <= 1 && /^\p{L}{3,}s$/u.test(unit) && !(normalize(unit) in MASS) && !(normalize(unit) in VOLUME) ? unit.slice(0, -1) : unit;
+  // « 1 œuf », « 1 tranche » : unité au singulier (sauf les unités de mesure : « 1 l », « 1 kg ») ; au-delà de 1,
+  // un mot simple prend un « s » en français et en espagnol (« 3 paquets », « 2 paquetes »)
+  const measure = normalize(unit) in MASS || normalize(unit) in VOLUME;
+  const word = value <= 1 && /^\p{L}{3,}s$/u.test(unit) && !measure ? unit.slice(0, -1)
+    : value > 1 && (language === 'fr' || language === 'es') && /^\p{L}{3,}$/u.test(unit) && !/[sxz]$/.test(unit) && !measure ? `${unit}s`
+      : unit;
   return word ? `${text} ${word}` : text;
 }
