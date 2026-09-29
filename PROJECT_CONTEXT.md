@@ -216,10 +216,11 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Noms des aliments dans la langue de l'app : `lib/foodNames.ts` (`useFoodNames`, `linkPantryFoodKeys` qui appelle `food-fact` en mode `link_only`).
 - Traduction des recettes : fonction `translate-recipe`, `lib/recipeTranslation.ts`, colonne `recipes.translations`. Quotas `links` et `translations` dans `usage_counters`.
 
-### Phase 7c — caméra sur react-native-vision-camera (branche `phase-7c`)
+### Phase 7c — caméra sur react-native-vision-camera
 - `components/scan/ScannerCamera.tsx` (téléphone, vision-camera : aperçu, photo dans un fichier temporaire, code-barres EAN-13 / EAN-8 / UPC-A / UPC-E par le lecteur ML Kit, sans frame processors) et `ScannerCamera.web.tsx` (web, expo-camera), même interface (`scannerCameraTypes.ts`).
 - `app/(tabs)/camera.tsx` : caméra montée seulement quand elle est visible, réouverte après 500 ms, surveillance sur la première image reçue (`onPreviewStarted`) avec une relance automatique puis « Réessayer », événements Sentry avec le modèle du téléphone (`reportCameraIssue`).
-- expo-camera exclu de l'autolinking mobile (`expo.autolinking.exclude` dans `package.json`) ; permission caméra déclarée dans `app.json`. Nouveau build de développement nécessaire.
+- expo-camera exclu de l'autolinking mobile (`expo.autolinking.exclude` dans `package.json`) ; permission caméra déclarée dans `app.json`.
+- Aperçu Android en TextureView (`implementationMode="compatible"`) et photo demandée en 960 × 1280 (1,2 Mpx, réduite à 800 px pour l'analyse) : sans ces réglages, l'aperçu restait vide sur le Galaxy A30, téléphone de référence pour les appareils modestes.
 
 ## 5. État actuel et problèmes connus
 
@@ -237,7 +238,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 
 ## 6. Prochaine étape
-Phase 7c : caméra sur react-native-vision-camera (tests sur les deux téléphones), puis phase 7b et phase 8 (lancement). Détails dans `PLAN.md`.
+Phase 7b, puis phase 8 (lancement, avec la phase 8a). Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash

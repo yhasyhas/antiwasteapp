@@ -245,7 +245,8 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 - [x] Erreurs de démarrage : message et « Réessayer », événement Sentry avec le modèle du téléphone et la version du système
 - [x] Version web de l'app (captures, essais) : vision-camera n'existe pas sur le web, expo-camera gardé sur le web seulement
 - [x] Retirer expo-camera du mobile (exclu de l'autolinking, gardé pour le web)
-- [ ] Tests sur les deux téléphones : cinq allers-retours Scanner → Garde-manger → Scanner en photo et en code-barres, arrière-plan puis retour, « À la main » ouvert puis fermé
+- [x] Aperçu Android en TextureView (mode « compatible ») et photo demandée en 960 × 1280 : aperçu resté vide sur le Galaxy A30 avec les réglages par défaut
+- [x] Tests sur les deux téléphones : cinq allers-retours Scanner → Garde-manger → Scanner en photo et en code-barres, arrière-plan puis retour, « À la main » ouvert puis fermé, vrai scan photo et vrai code-barres, retournement (validés le 29/09/2026 sur le Galaxy A30, plusieurs applis ouvertes, et sur le Redmi ; reconnaissance aussi bonne qu'avant)
 
 **Terminé quand** : l'aperçu du Scanner revient à chaque retour sur l'onglet, sur le Samsung comme sur le Redmi, en photo et en code-barres.
 
@@ -420,4 +421,5 @@ Section complétée avec la phase 7b.
 | 29/09/2026 | Phase 7c, premier build : l'aperçu reste vide sur le Samsung. Événement Sentry « relancée automatiquement (ready_timeout) » : Galaxy A30 (SM-A305F), Android 11, appareil classé « low » (4 Go de mémoire, 0,5 Go libre), autorisation caméra accordée, juste après un passage en arrière-plan puis un retour | Avec vision-camera, la surveillance se déclenche : la première image n'arrive jamais, sans erreur de la caméra. L'aperçu Android passe de SurfaceView (réglage par défaut, qui ne gère pas les vues posées par-dessus) à TextureView (mode « compatible »), sans nouveau build. Le texte des erreurs caméra est désormais joint à l'événement Sentry |
 | 29/09/2026 | Galaxy A30 = téléphone de référence pour les appareils modestes | Samsung Galaxy A30 (SM-A305F), Android 11, 4 Go de mémoire : les tests du Scanner n'y passent qu'après avoir vidé la mémoire |
 | 29/09/2026 | Phase 7c : photo demandée en 960 × 1280 (1,2 Mpx) au lieu de la résolution par défaut de vision-camera (UHD 4:3, environ 12 Mpx) ; TextureView gardé | L'analyse réduit la photo à 800 px de large : la marge garde une image nette. Autres ressources de la caméra vérifiées : l'aperçu suit la taille de l'écran, le lecteur de codes-barres lit déjà à la résolution de l'aperçu, la photo et le lecteur ne sont jamais actifs ensemble, aucune contrainte de cadence ni de HDR demandée |
+| 29/09/2026 | Phase 7c validée sur le Galaxy A30 (plusieurs applis ouvertes, mémoire non vidée) et sur le Redmi, reconnaissance aussi bonne qu'avant ; fusionnée dans master | TextureView et photo en 1,2 Mpx retenus |
 | | *(résultat du test Gemini vs Clarifai)* | |
