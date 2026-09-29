@@ -1,36 +1,37 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, AppState, Image, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, AppState, Image, Linking, StyleSheet, Text, View } from 'react-native';
 import { useIsFocused } from 'expo-router';
-import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { Plus, RefreshCw } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { useScan } from '@/hooks/useScan';
-import { FOOD_BARCODE_TYPES, useBarcodeScan } from '@/hooks/useBarcodeScan';
+import { useBarcodeScan } from '@/hooks/useBarcodeScan';
 import { ManualAddModal, type ManualPrefill } from '@/components/scan/ManualAddModal';
 import { ScanModeToggle, type ScanMode } from '@/components/scan/ScanModeToggle';
 import { ConfirmIngredientsModal } from '@/components/scan/ConfirmIngredientsModal';
 import { PermissionRequest } from '@/components/scan/PermissionRequest';
+import { ScannerCamera, useScannerPermission } from '@/components/scan/ScannerCamera';
+import type { ScannerCameraHandle, ScannerFacing } from '@/components/scan/scannerCameraTypes';
 import { Button } from '@/components/ui/Button';
 import { Touchable } from '@/components/ui/Touchable';
 import { reportCameraIssue } from '@/lib/sentry';
 import { colors, opacity, radius, sizes, spacing, typography } from '@/constants/theme';
 
 // Retour sur l'onglet : court délai avant de rouvrir la caméra (certains téléphones, Samsung notamment, ne
-// l'ont pas encore libérée) ; puis l'aperçu doit être prêt en quelques secondes
+// l'ont pas encore libérée) ; puis l'aperçu doit recevoir sa première image en quelques secondes
 const CAMERA_REOPEN_DELAY_MS = 500;
 const CAMERA_READY_TIMEOUT_MS = 5000;
 
 export default function CameraScreen() {
   const { t } = useLanguage();
   const safe = useSafeSpacing();
-  const [permission, requestPermission] = useCameraPermissions();
-  const [facing, setFacing] = useState<CameraType>('back');
+  const permission = useScannerPermission();
+  const [facing, setFacing] = useState<ScannerFacing>('back');
   const [showManualAdd, setShowManualAdd] = useState(false);
   const [mode, setMode] = useState<ScanMode>('photo');
   // Ajout manuel prérempli après un scan de code-barres
   const [prefill, setPrefill] = useState<ManualPrefill | null>(null);
-  const cameraRef = useRef<any>(null);
+  const cameraRef = useRef<ScannerCameraHandle>(null);
   const { lookingUp, onBarcodeScanned, resume } = useBarcodeScan((result) => {
     setPrefill(result);
     setShowManualAdd(true);
@@ -59,7 +60,7 @@ export default function CameraScreen() {
   const cameraOn = isFocused && appActive && !showManualAdd && !showConfirmation;
   // Caméra ouverte après le délai de réouverture
   const [cameraMounted, setCameraMounted] = useState(false);
-  // Démarrage impossible (caméra occupée, erreur du système, aperçu jamais prêt) : message et « Réessayer »
+  // Démarrage impossible (caméra occupée, erreur du système, aucune image reçue) : message et « Réessayer »
   const [cameraError, setCameraError] = useState(false);
   const [cameraKey, setCameraKey] = useState(0);
   const cameraReady = useRef(false);
@@ -78,7 +79,8 @@ export default function CameraScreen() {
     const timer = setTimeout(() => setCameraMounted(true), CAMERA_REOPEN_DELAY_MS);
     return () => clearTimeout(timer);
   }, [cameraOn]);
-  // Surveillance : aperçu pas prêt à temps (vide, sans erreur) → relancé une fois automatiquement, puis erreur
+  // Surveillance : aucune image reçue à temps (aperçu vide, sans erreur) → caméra relancée une fois
+  // automatiquement, puis erreur. Signal fiable : la première image de l'aperçu (onPreviewStarted)
   useEffect(() => {
     if (!cameraMounted || cameraError) return;
     cameraReady.current = false;
@@ -119,7 +121,11 @@ export default function CameraScreen() {
   if (!permission.granted) {
     return (
       <>
-        <PermissionRequest onRequest={requestPermission} onManualAdd={() => setShowManualAdd(true)} />
+        {/* Autorisation refusée pour de bon : la demande ne s'affiche plus, on ouvre les réglages du téléphone */}
+        <PermissionRequest
+          onRequest={() => (permission.canAsk ? permission.request() : Linking.openSettings())}
+          onManualAdd={() => setShowManualAdd(true)}
+        />
         {manualAddModal}
       </>
     );
@@ -132,12 +138,9 @@ export default function CameraScreen() {
   const takePicture = async () => {
     if (!cameraRef.current || !cameraMounted) return;
 
-    try {
-      const photo = await cameraRef.current.takePictureAsync();
-      analyzeImage(photo.uri);
-    } catch (error) {
-      console.error('Error taking picture:', error);
-    }
+    // Même compression qu'avant l'envoi à analyze-image (useScan)
+    const uri = await cameraRef.current.takePhoto();
+    if (uri) analyzeImage(uri);
   };
 
   const barcode = mode === 'barcode';
@@ -146,19 +149,19 @@ export default function CameraScreen() {
     <View style={styles.container}>
       <View style={styles.cameraContainer}>
         {cameraOn && cameraMounted && !cameraError ? (
-          <CameraView
+          <ScannerCamera
             key={cameraKey}
+            ref={cameraRef}
             style={styles.camera}
             facing={facing}
-            ref={cameraRef}
-            barcodeScannerSettings={{ barcodeTypes: [...FOOD_BARCODE_TYPES] }}
-            onBarcodeScanned={barcode && !showManualAdd && !lookingUp ? onBarcodeScanned : undefined}
-            onCameraReady={() => {
+            barcodeEnabled={barcode && !showManualAdd && !lookingUp}
+            onBarcode={onBarcodeScanned}
+            onPreviewStarted={() => {
               cameraReady.current = true;
             }}
-            onMountError={(event) => {
-              console.warn('[caméra] démarrage impossible :', event.message);
-              reportCameraIssue('error', 'mount_error');
+            onError={(reason, message) => {
+              console.warn('[caméra] démarrage impossible :', reason, message);
+              reportCameraIssue('error', reason);
               setCameraError(true);
             }}
           />
@@ -172,7 +175,7 @@ export default function CameraScreen() {
             <Button label={t('common.retry')} icon={RefreshCw} variant="accent" size="medium" onPress={retryCamera} />
           </View>
         ) : (
-          // CameraView n'accepte pas d'enfants : le cadre de visée est superposé en position absolue
+          // La caméra n'accepte pas d'enfants : le cadre de visée est superposé en position absolue
           <View style={styles.overlay} pointerEvents="none">
             <View style={[styles.frame, barcode && styles.barcodeFrame]}>
               <View style={[styles.corner, styles.topLeft]} />

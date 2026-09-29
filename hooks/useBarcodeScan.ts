@@ -1,22 +1,19 @@
 import { useRef, useState } from 'react';
 import { Alert } from 'react-native';
-import type { BarcodeScanningResult } from 'expo-camera';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { lookupBarcode, type OffProduct } from '@/lib/openFoodFacts';
 import type { ManualPrefill } from '@/components/scan/ManualAddModal';
 
-// Codes des produits alimentaires (EAN-13, EAN-8, UPC)
-export const FOOD_BARCODE_TYPES = ['ean13', 'ean8', 'upc_a', 'upc_e'] as const;
-
-// Scan de code-barres : un seul code à la fois (la caméra en signale plusieurs par seconde), recherche
-// dans Open Food Facts, puis ajout manuel prérempli : produit trouvé, ou code seul s'il est inconnu.
+// Scan de code-barres (codes lus par ScannerCamera) : un seul code à la fois (la caméra en signale plusieurs
+// par seconde), recherche dans Open Food Facts, puis ajout manuel prérempli : produit trouvé, ou code seul
+// s'il est inconnu.
 // resume() relance le scan (à la fermeture de l'ajout manuel).
 export function useBarcodeScan(onResult: (prefill: ManualPrefill) => void) {
   const { language, t } = useLanguage();
   const [lookingUp, setLookingUp] = useState(false);
   const locked = useRef(false);
 
-  const onBarcodeScanned = async ({ data }: BarcodeScanningResult) => {
+  const onBarcodeScanned = async (data: string) => {
     if (locked.current) return;
     const code = data.replace(/\D/g, '');
     if (code.length < 6 || code.length > 14) return;
