@@ -37,8 +37,8 @@ const CATEGORY_RULES: Array<[string, string[]]> = [
   ['condiment', ['en:sauces', 'en:condiments', 'en:vegetable-oils', 'en:vinegars', 'en:jams', 'en:spreads', 'en:honeys', 'en:mustards']],
   ['snack', ['en:snacks', 'en:chocolates', 'en:confectioneries', 'en:sweet-snacks', 'en:salty-snacks', 'en:biscuits', 'en:biscuits-and-cakes', 'en:cakes']],
   ['beverage', ['en:beverages', 'en:juices', 'en:waters', 'en:coffees', 'en:teas']],
-  ['fruit', ['en:fruits', 'en:fruits-based-foods', 'en:dried-fruits']],
-  ['vegetable', ['en:vegetables', 'en:vegetables-based-foods', 'en:potatoes']],
+  ['fruit', ['en:fruits', 'en:fruit-based-foods', 'en:fruits-based-foods', 'en:dried-fruits', 'en:compotes']],
+  ['vegetable', ['en:vegetables', 'en:vegetable-based-foods', 'en:vegetables-based-foods', 'en:potatoes']],
   ['frozen', ['en:frozen-foods']],
 ];
 
