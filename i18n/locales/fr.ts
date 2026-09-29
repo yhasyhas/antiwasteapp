@@ -587,6 +587,12 @@ const fr = {
     frozen: "Surgelé",
     other: "Autre",
   },
+  undo: {
+    failedTitle: "Annulation impossible",
+    conflictText: "Un membre du foyer a modifié un de ces aliments entre-temps. Rien n’a été rétabli, pour ne pas effacer son changement.",
+    expiredText: "Il est trop tard pour annuler.",
+    failedText: "L’annulation n’a pas pu être enregistrée. Vérifie ta connexion et réessaie.",
+  },
   notFound: {
     title: 'Oups !',
     text: "Cet écran n'existe pas.",

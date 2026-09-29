@@ -49,8 +49,9 @@ export const addShoppingItem = (name: string, quantity: string) =>
 export const setShoppingItemChecked = (id: string, checked: boolean) =>
   write(supabase.from('shopping_items').update({ checked }).eq('id', id));
 
+// Article retiré, annulable (undo_pantry_action) ; renvoie l'identifiant de l'action
 export const removeShoppingItem = (id: string) =>
-  write(supabase.from('shopping_items').delete().eq('id', id));
+  write(supabase.rpc('delete_shopping_item_with_undo', { p_id: id })) as Promise<string>;
 
 // Ingrédients manquants d'une recette, en un geste, avec leurs quantités (même ordre que les noms) ;
 // renvoie le nombre d'articles ajoutés (sans doublon)

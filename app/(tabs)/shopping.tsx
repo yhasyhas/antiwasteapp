@@ -18,7 +18,7 @@ import { SwipeToDelete } from '@/components/ui/SwipeToDelete';
 import { Touchable } from '@/components/ui/Touchable';
 import { ListItemMotion } from '@/components/ui/ListItemMotion';
 import { Toast } from '@/components/ui/Toast';
-import { useUndoableDelete } from '@/hooks/useUndoableDelete';
+import { useUndoableAction } from '@/hooks/useUndoableAction';
 import { ExpiryPicker } from '@/components/expiry/ExpiryPicker';
 import { expiryFromShelfLife } from '@/lib/expiry';
 import {
@@ -60,18 +60,15 @@ export default function ShoppingScreen() {
     load();
   }, [household?.id]);
 
-  // Suppression annulable (« Article retiré · Annuler ») : faite pour de bon après 5 secondes
-  const removal = useUndoableDelete<ShoppingItem>(async (item) => {
-    try {
-      await removeShoppingItem(item.id);
-      setItems((current) => current?.filter((i) => i.id !== item.id) ?? null);
-    } catch (error) {
-      failed(error);
-      throw error;
-    }
+  // Suppression enregistrée tout de suite, annulable (« Article retiré · Annuler ») : l'article revient tel quel
+  const removal = useUndoableAction<ShoppingItem>({
+    label: 'deleting shopping item',
+    perform: (item) => removeShoppingItem(item.id),
+    onDone: (item) => setItems((current) => current?.filter((i) => i.id !== item.id) ?? null),
+    onUndone: () => load(),
   });
 
-  // Articles en attente de suppression : déjà cachés
+  // Articles en cours de suppression : déjà cachés (reviennent si l'enregistrement échoue)
   const shown = items?.filter((item) => !removal.hiddenIds.has(item.id)) ?? null;
   const toBuy = (shown ?? []).filter((item) => !item.checked);
   const inCart = (shown ?? []).filter((item) => item.checked);
@@ -131,7 +128,7 @@ export default function ShoppingScreen() {
     return (
       <ListItemMotion key={item.id} index={index}>
         {index > 0 ? <View style={cardStyles.divider} /> : null}
-        <SwipeToDelete onDelete={() => removal.remove(item)}>
+        <SwipeToDelete onDelete={() => removal.run(item)}>
           <Touchable
             scale={false}
             style={styles.item}

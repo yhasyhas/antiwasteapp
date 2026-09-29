@@ -586,6 +586,12 @@ const en: Translations = {
     frozen: "Frozen",
     other: "Other",
   },
+  undo: {
+    failedTitle: "Can’t undo",
+    conflictText: "A household member changed one of these foods in the meantime. Nothing was restored, so their change is kept.",
+    expiredText: "It’s too late to undo.",
+    failedText: "The undo couldn’t be saved. Check your connection and try again.",
+  },
   notFound: {
     title: 'Oops!',
     text: "This screen doesn't exist.",

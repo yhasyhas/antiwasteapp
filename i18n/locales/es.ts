@@ -586,6 +586,12 @@ const es: Translations = {
     frozen: "Congelado",
     other: "Otro",
   },
+  undo: {
+    failedTitle: "No se puede deshacer",
+    conflictText: "Un miembro del hogar ha cambiado uno de estos alimentos mientras tanto. No se ha restablecido nada, para no borrar su cambio.",
+    expiredText: "Ya es demasiado tarde para deshacer.",
+    failedText: "No se ha podido deshacer. Comprueba tu conexión e inténtalo de nuevo.",
+  },
   notFound: {
     title: '¡Vaya!',
     text: 'Esta pantalla no existe.',

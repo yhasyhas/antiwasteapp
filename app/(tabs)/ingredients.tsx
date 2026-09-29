@@ -24,7 +24,7 @@ import { maybeAskNotificationPermission } from '@/lib/notifications';
 import { notifyPantryChanged, onPantryChanged } from '@/lib/pantryEvents';
 import { activeHouseholdId, addedByLabel } from '@/lib/household';
 import { useHousehold } from '@/hooks/useHousehold';
-import { useUndoableDelete } from '@/hooks/useUndoableDelete';
+import { useUndoableAction } from '@/hooks/useUndoableAction';
 import { linkPantryFoodKeys, useFoodNames } from '@/lib/foodNames';
 import { colors, radius, shadows, sizes, spacing, typography } from '@/constants/theme';
 
@@ -81,19 +81,23 @@ export default function IngredientsScreen() {
     if (data?.some((row) => !row.food_key && row.kind !== 'dish')) linkPantryFoodKeys();
   };
 
-  // Suppression annulable (« Aliment retiré · Annuler ») : faite pour de bon après 5 secondes
-  const removal = useUndoableDelete<PantryIngredient>(async (ingredient) => {
-    const { error } = await supabase
-      .from('ingredients')
-      .delete()
-      .eq('id', ingredient.id);
-
-    if (error) {
-      alertWriteError(t, 'deleting ingredient', error);
-      throw error;
-    }
-    setIngredients((current) => current.filter((ing) => ing.id !== ingredient.id));
-    notifyPantryChanged();
+  // Suppression enregistrée tout de suite, annulable (« Aliment retiré · Annuler ») : l'aliment revient tel
+  // quel et le compteur est rétabli
+  const removal = useUndoableAction<PantryIngredient>({
+    label: 'deleting ingredient',
+    perform: async (ingredient) => {
+      const { data, error } = await supabase.rpc('delete_ingredient_with_undo', { p_id: ingredient.id });
+      if (error) throw error;
+      return data as string;
+    },
+    onDone: (ingredient) => {
+      setIngredients((current) => current.filter((ing) => ing.id !== ingredient.id));
+      notifyPantryChanged();
+    },
+    onUndone: () => {
+      loadIngredients();
+      notifyPantryChanged();
+    },
   });
 
   const saveExpiry = async (expiresAt: string | null) => {
@@ -148,7 +152,7 @@ export default function IngredientsScreen() {
     );
   };
 
-  // Aliments en attente de suppression : déjà cachés
+  // Aliments en cours de suppression : déjà cachés (reviennent si l'enregistrement échoue)
   const shown = ingredients.filter((ingredient) => !removal.hiddenIds.has(ingredient.id));
   const query = searchQuery.trim().toLowerCase();
   const searched = query
@@ -172,7 +176,7 @@ export default function IngredientsScreen() {
       <IngredientCard
         ingredient={ingredient}
         displayName={foodName(ingredient)}
-        onDelete={() => removal.remove(ingredient)}
+        onDelete={() => removal.run(ingredient)}
         onEditExpiry={() => setEditingExpiry(ingredient)}
         addedBy={addedByLabel(t, household, ingredient.user_id) ?? undefined}
         onOpenFact={() => setFactIngredient(ingredient)}
@@ -261,7 +265,7 @@ export default function IngredientsScreen() {
       <FoodFactSheet
         ingredient={factIngredient}
         onClose={() => setFactIngredient(null)}
-        onRemove={() => factIngredient && removal.remove(factIngredient)}
+        onRemove={() => factIngredient && removal.run(factIngredient)}
       />
 
       <Toast

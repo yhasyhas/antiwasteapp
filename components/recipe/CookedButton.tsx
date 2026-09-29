@@ -3,11 +3,10 @@ import { Alert, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewSty
 import { Check, Minus, Plus } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
-import { alertWriteError } from '@/lib/alertWriteError';
 import { notifyPantryChanged } from '@/lib/pantryEvents';
 import { useFoodNames } from '@/lib/foodNames';
 import { formatQuantity, parseQuantity, stepOf, usedFromRecipe, type Quantity } from '@/lib/quantity';
-import { useUndoableDelete } from '@/hooks/useUndoableDelete';
+import { useUndoableAction } from '@/hooks/useUndoableAction';
 import { BottomSheet, SheetHeader } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/Button';
 import { cardStyles } from '@/components/ui/Card';
@@ -45,7 +44,7 @@ interface PantryRow {
   used: Used;
 }
 
-// Changements enregistrés 5 secondes après la validation (message « Annuler ») : retirés et restes
+// Changements de la validation : aliments retirés et restes
 interface Cooking {
   id: string;
   usedUp: string[];
@@ -54,22 +53,25 @@ interface Cooking {
 
 // « J'ai cuisiné ça » : pour chaque ingrédient du garde-manger utilisé par la recette, la quantité utilisée,
 // préremplie avec celle de la recette ; en dessous, ce qu'il en restera. Les aliments finis sont retirés et
-// comptés « sauvés », les autres gardent leur date et prennent la quantité restante. Rien n'est enregistré
-// avant la fin du message « Retiré du garde-manger · Annuler » (5 secondes).
+// comptés « sauvés », les autres gardent leur date et prennent la quantité restante. Enregistré tout de suite,
+// puis « Retiré du garde-manger · Annuler » pendant 5 secondes (état d'avant rétabli par le serveur).
 export function CookedButton({ ingredientsUsed, style }: Props) {
   const { t, language } = useLanguage();
   const [rows, setRows] = useState<PantryRow[] | null>(null);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const foodName = useFoodNames(rows);
 
-  const cooking = useUndoableDelete<Cooking>(async ({ usedUp, leftovers }) => {
+  const cooking = useUndoableAction<Cooking>({
+    label: 'removing cooked ingredients',
     // Retirés et comptés « sauvés » ; restes mis à jour sans être comptés
-    const { error } = await supabase.rpc('cook_ingredients', { p_ids: usedUp, p_leftovers: leftovers });
-    if (error) {
-      alertWriteError(t, 'removing cooked ingredients', error);
-      throw error;
-    }
-    notifyPantryChanged();
+    perform: async ({ usedUp, leftovers }) => {
+      const { data, error } = await supabase.rpc('cook_with_undo', { p_ids: usedUp, p_leftovers: leftovers });
+      if (error) throw error;
+      return data as string;
+    },
+    onDone: () => notifyPantryChanged(),
+    onUndone: () => notifyPantryChanged(),
   });
 
   const used = (ingredientsUsed ?? []).filter((item) => !!item?.pantry_id);
@@ -78,8 +80,6 @@ export function CookedButton({ ingredientsUsed, style }: Props) {
   if (pantryIds.length === 0) return null;
 
   const open = async () => {
-    // Validation précédente encore annulable : enregistrée d'abord
-    cooking.flush();
     setLoading(true);
     // Seulement ceux encore présents (d'autres ont pu être retirés entre-temps)
     const { data, error } = await supabase
@@ -135,11 +135,15 @@ export function CookedButton({ ingredientsUsed, style }: Props) {
 
   const changes = (rows ?? []).map((row) => ({ row, left: remaining(row) })).filter(({ left }) => left !== '');
 
-  const confirm = () => {
+  // Enregistré avant de fermer la fiche : en cas d'échec (hors connexion), erreur et fiche gardée ouverte
+  const confirm = async () => {
     const usedUp = changes.filter(({ left }) => left === null).map(({ row }) => row.id);
     const leftovers = changes.filter(({ left }) => left !== null).map(({ row, left }) => ({ id: row.id, quantity: left as string }));
-    setRows(null);
-    if (usedUp.length + leftovers.length > 0) cooking.remove({ id: `cooking-${Date.now()}`, usedUp, leftovers });
+    if (usedUp.length + leftovers.length === 0) return setRows(null);
+    setSaving(true);
+    const saved = await cooking.run({ id: `cooking-${Date.now()}`, usedUp, leftovers });
+    setSaving(false);
+    if (saved) setRows(null);
   };
 
   return (
@@ -182,6 +186,7 @@ export function CookedButton({ ingredientsUsed, style }: Props) {
           label={changes.length > 0 ? t('cooked.confirm', { count: changes.length }) : t('common.close')}
           variant={changes.length > 0 ? 'primary' : 'outline'}
           onPress={confirm}
+          loading={saving}
           style={styles.confirm}
         />
       </BottomSheet>
