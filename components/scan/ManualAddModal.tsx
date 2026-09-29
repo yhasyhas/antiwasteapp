@@ -1,20 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Modal, ScrollView, Switch } from 'react-native';
+import { View, Text, StyleSheet, Alert, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { Check, Plus, X } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useSafeSpacing } from '@/hooks/useSafeSpacing';
-import { Input } from '@/components/ui/Input';
-import { KeyboardAvoider, useKeyboardScroll } from '@/components/ui/KeyboardAvoider';
+import { TextField } from '@/components/ui/Input';
+import { useKeyboardScroll } from '@/components/ui/KeyboardAvoider';
+import { BottomSheet, SheetHeader } from '@/components/ui/BottomSheet';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { cardStyles } from '@/components/ui/Card';
+import { Switch } from '@/components/ui/Switch';
+import { Touchable } from '@/components/ui/Touchable';
+import { colors, sizes, spacing, typography } from '@/constants/theme';
 import { supabase } from '@/lib/supabase';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { expiryForPackagedProduct, expiryFromShelfLife, type FoodKind } from '@/lib/expiry';
 import { maybeAskNotificationPermission } from '@/lib/notifications';
 import { notifyPantryChanged } from '@/lib/pantryEvents';
+import { linkPantryFoodKeys } from '@/lib/foodNames';
 import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
 import { ExpiryPicker } from '@/components/expiry/ExpiryPicker';
-import { scanModalStyles } from './scanModalStyles';
 import { BarcodeNotice } from './BarcodeNotice';
 
 interface ManualIngredient {
@@ -48,7 +54,6 @@ interface Props {
 export function ManualAddModal({ visible, onClose, prefill }: Props) {
   const { user } = useAuth();
   const { t } = useLanguage();
-  const safe = useSafeSpacing();
   const keyboardScroll = useKeyboardScroll();
   const [manualIngredients, setManualIngredients] = useState<ManualIngredient[]>([]);
   const [newIngredientName, setNewIngredientName] = useState('');
@@ -129,6 +134,8 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
       setManualIngredients([]);
       onClose();
       notifyPantryChanged();
+      // Reliés à leur fiche en arrière-plan (nom dans la langue de l'app)
+      linkPantryFoodKeys();
       // Premier ajout d'une date : proposition des rappels avant le message de confirmation
       await maybeAskNotificationPermission();
       Alert.alert(
@@ -137,7 +144,7 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
         [
           {
             text: t('scan.viewPantry'),
-            onPress: () => router.push('/(tabs)/ingredients'),
+            onPress: () => router.navigate('/(tabs)/ingredients'),
           },
           { text: t('common.ok'), style: 'cancel' },
         ]
@@ -146,234 +153,122 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
   };
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      transparent={true}
-      onRequestClose={onClose}
-    >
-      <KeyboardAvoider>
-      <View style={scanModalStyles.modalOverlay}>
-        <View style={[scanModalStyles.modalContent, safe.bottom(24)]}>
-          <View style={scanModalStyles.modalHeader}>
-            <Text style={scanModalStyles.modalTitle}>{t('manual.title')}</Text>
-            <TouchableOpacity onPress={onClose}>
-              <X size={24} color="#6b7280" />
-            </TouchableOpacity>
-          </View>
+    <BottomSheet visible={visible} onClose={onClose} keyboard>
+      <SheetHeader title={t('manual.title')} onClose={onClose} />
 
-          <ScrollView
-            style={styles.modalBody}
-            ref={keyboardScroll.scrollRef}
-            onScroll={keyboardScroll.onScroll}
-            scrollEventThrottle={keyboardScroll.scrollEventThrottle}
-            keyboardShouldPersistTaps="handled"
-          >
-            {pending && <BarcodeNotice barcode={pending.barcode} found={pending.found} />}
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{t('manual.nameLabel')}</Text>
-              <Input
-                style={styles.input}
-                placeholder={t('manual.namePlaceholder')}
-                value={newIngredientName}
-                onChangeText={setNewIngredientName}
-              />
-            </View>
+      <ScrollView
+        style={styles.body}
+        ref={keyboardScroll.scrollRef}
+        onScroll={keyboardScroll.onScroll}
+        scrollEventThrottle={keyboardScroll.scrollEventThrottle}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={styles.bodyContent}
+      >
+        {pending && <BarcodeNotice barcode={pending.barcode} found={pending.found} />}
+        <TextField
+          label={t('manual.nameLabel')}
+          placeholder={t('manual.namePlaceholder')}
+          value={newIngredientName}
+          onChangeText={setNewIngredientName}
+        />
+        <TextField
+          label={t('manual.quantityLabel')}
+          placeholder={t('manual.quantityPlaceholder')}
+          value={newIngredientQuantity}
+          onChangeText={setNewIngredientQuantity}
+        />
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{t('manual.quantityLabel')}</Text>
-              <Input
-                style={styles.input}
-                placeholder={t('manual.quantityPlaceholder')}
-                value={newIngredientQuantity}
-                onChangeText={setNewIngredientQuantity}
-              />
-            </View>
-
-            <View style={styles.switchRow}>
-              <Text style={styles.switchLabel}>{t('manual.isLeftover')}</Text>
-              <Switch
-                value={isLeftover}
-                onValueChange={toggleLeftover}
-                trackColor={{ true: '#6ee7b7', false: '#d1d5db' }}
-                thumbColor={isLeftover ? '#10b981' : '#f9fafb'}
-              />
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{t('expiry.label')}</Text>
-              <ExpiryPicker value={newExpiry} onChange={changeExpiry} />
-            </View>
-
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={addManualIngredient}
-            >
-              <Plus size={20} color="#10b981" />
-              <Text style={styles.addButtonText}>{t('manual.addToList')}</Text>
-            </TouchableOpacity>
-
-            {manualIngredients.length > 0 && (
-              <View style={styles.ingredientList}>
-                <Text style={styles.listTitle}>{t('manual.addedList')}</Text>
-                {manualIngredients.map((ingredient, index) => (
-                  <View key={index} style={styles.ingredientItem}>
-                    <View style={styles.ingredientInfo}>
-                      <Text style={styles.ingredientName}>
-                        {ingredient.name}
-                      </Text>
-                      {ingredient.quantity ? (
-                        <Text style={styles.ingredientQuantity}>
-                          {ingredient.quantity}
-                        </Text>
-                      ) : null}
-                      <View style={styles.itemBadges}>
-                        <ExpiryBadge expiresAt={ingredient.expires_at} />
-                        {ingredient.kind === 'dish' && (
-                          <Text style={styles.leftoverText}>{t('pantry.leftover')}</Text>
-                        )}
-                      </View>
-                    </View>
-                    <TouchableOpacity
-                      onPress={() => removeManualIngredient(index)}
-                    >
-                      <X size={20} color="#ef4444" />
-                    </TouchableOpacity>
-                  </View>
-                ))}
-              </View>
-            )}
-          </ScrollView>
-
-          <TouchableOpacity
-            style={[
-              styles.saveButton,
-              manualIngredients.length === 0 && styles.saveButtonDisabled,
-            ]}
-            onPress={saveManualIngredients}
-            disabled={manualIngredients.length === 0}
-          >
-            <Check size={20} color="#fff" />
-            <Text style={styles.saveButtonText}>
-              {t('manual.saveCount', { count: manualIngredients.length })}
-            </Text>
-          </TouchableOpacity>
+        <View style={styles.switchRow}>
+          <Text style={styles.switchLabel}>{t('manual.isLeftover')}</Text>
+          <Switch value={isLeftover} onValueChange={toggleLeftover} accessibilityLabel={t('manual.isLeftover')} />
         </View>
-      </View>
-      </KeyboardAvoider>
-    </Modal>
+
+        <View>
+          <Text style={styles.label}>{t('expiry.label')}</Text>
+          <ExpiryPicker value={newExpiry} onChange={changeExpiry} />
+        </View>
+
+        <Button label={t('manual.addToList')} icon={Plus} variant="outline" size="medium" onPress={addManualIngredient} disabled={!newIngredientName.trim()} />
+
+        {manualIngredients.length > 0 && (
+          <View>
+            <Text style={styles.label}>{t('manual.addedList')}</Text>
+            {manualIngredients.map((ingredient, index) => (
+              <View key={index}>
+                {index > 0 ? <View style={cardStyles.divider} /> : null}
+                <View style={styles.item}>
+                  <View style={styles.itemText}>
+                    <Text style={styles.itemName}>{ingredient.name}</Text>
+                    {ingredient.quantity ? <Text style={styles.itemQuantity}>{ingredient.quantity}</Text> : null}
+                  </View>
+                  {ingredient.kind === 'dish' && <Badge label={t('pantry.leftover')} tone="leftover" />}
+                  <ExpiryBadge expiresAt={ingredient.expires_at} />
+                  <Touchable onPress={() => removeManualIngredient(index)} style={styles.remove} accessibilityRole="button" accessibilityLabel={t('common.delete')}>
+                    <X size={sizes.icon} color={colors.expired.text} />
+                  </Touchable>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+      </ScrollView>
+
+      <Button
+        label={t('manual.saveCount', { count: manualIngredients.length })}
+        icon={Check}
+        onPress={saveManualIngredients}
+        disabled={manualIngredients.length === 0}
+        style={styles.save}
+      />
+    </BottomSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  modalBody: {
-    maxHeight: 400,
+  body: {
+    flexGrow: 0,
   },
-  inputGroup: {
-    marginBottom: 16,
+  bodyContent: {
+    gap: spacing.lg,
+    paddingBottom: spacing.lg,
   },
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
+  label: {
+    ...typography.label,
+    marginBottom: spacing.sm,
   },
   switchRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    gap: spacing.md,
+    minHeight: sizes.touch,
   },
   switchLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
+    ...typography.bodyMedium,
     flex: 1,
   },
-  itemBadges: {
+  item: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginTop: 6,
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
   },
-  leftoverText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#b45309',
-  },
-  addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#10b981',
-    borderStyle: 'dashed',
-    marginBottom: 24,
-  },
-  addButtonText: {
-    color: '#10b981',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  ingredientList: {
-    marginBottom: 16,
-  },
-  listTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 12,
-  },
-  ingredientItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: '#f9fafb',
-    borderRadius: 12,
-    marginBottom: 8,
-  },
-  ingredientInfo: {
+  itemText: {
     flex: 1,
   },
-  ingredientName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
+  itemName: {
+    ...typography.listTitle,
   },
-  ingredientQuantity: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginTop: 2,
+  itemQuantity: {
+    ...typography.secondary,
   },
-  saveButton: {
-    flexDirection: 'row',
+  remove: {
+    width: sizes.touch,
+    height: sizes.touch,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    backgroundColor: '#10b981',
-    paddingVertical: 16,
-    borderRadius: 12,
-    marginTop: 8,
   },
-  saveButtonDisabled: {
-    backgroundColor: '#d1d5db',
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+  save: {
+    marginTop: spacing.sm,
   },
 });

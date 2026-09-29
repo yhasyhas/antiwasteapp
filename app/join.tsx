@@ -1,5 +1,8 @@
 import { useEffect } from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { Leaf } from 'lucide-react-native';
+import { IconChip } from '@/components/ui/IconChip';
+import { colors, sizes, spacing } from '@/constants/theme';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { normalizeInviteCode, setPendingInvite } from '@/lib/invite';
@@ -24,11 +27,11 @@ export default function JoinScreen() {
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#10b981" />
+      <IconChip icon={Leaf} tone="primary" size={sizes.iconChipLarge + spacing.xxl} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' },
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background },
 });

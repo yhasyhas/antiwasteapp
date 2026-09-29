@@ -1,8 +1,14 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { BookOpen, Lightbulb, Trash2 } from 'lucide-react-native';
+import React, { useRef } from 'react';
+import { Alert, StyleSheet, Text, View } from 'react-native';
+import ReanimatedSwipeable, { type SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
+import { Info, Leaf, Trash2 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
+import { Badge } from '@/components/ui/Badge';
+import { Card } from '@/components/ui/Card';
+import { IconChip } from '@/components/ui/IconChip';
+import { Touchable } from '@/components/ui/Touchable';
+import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 import type { FoodKind } from '@/lib/expiry';
 
 export interface PantryIngredient {
@@ -24,7 +30,8 @@ export interface PantryIngredient {
 
 interface Props {
   ingredient: PantryIngredient;
-  deleting: boolean;
+  // Nom affiché (celui de la fiche dans la langue de l'app, sinon le nom enregistré)
+  displayName?: string;
   onDelete: () => void;
   onEditExpiry: () => void;
   // Foyer partagé : nom de celui qui l'a ajouté (sinon non affiché)
@@ -33,144 +40,123 @@ interface Props {
   onOpenFact?: () => void;
 }
 
-const ORIGIN_STYLES: Record<string, { background: string; text: string; labelKey: 'pantry.scanned' | 'pantry.manual' | 'pantry.barcode' | 'pantry.shopping' }> = {
-  camera: { background: '#ede9fe', text: '#7c3aed', labelKey: 'pantry.scanned' },
-  barcode: { background: '#e0e7ff', text: '#4338ca', labelKey: 'pantry.barcode' },
-  manual: { background: '#dbeafe', text: '#2563eb', labelKey: 'pantry.manual' },
-  shopping: { background: '#fce7f3', text: '#be185d', labelKey: 'pantry.shopping' },
-};
-
-// Ingrédient du garde-manger : nom, quantité, date de péremption (badge de couleur, modifiable),
-// reste de plat, origine, conseil de conservation, suppression
-export function IngredientCard({ ingredient, deleting, onDelete, onEditExpiry, addedBy, onOpenFact }: Props) {
+// Aliment du garde-manger : nom, quantité, auteur, conseil de conservation, badges de date (touchable
+// pour la modifier) et de reste. Toucher la carte ouvre la fiche de l'aliment ; glisser vers la gauche
+// ou appui long : supprimer (ou les autres actions).
+export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry, addedBy, onOpenFact }: Props) {
   const { t } = useLanguage();
-  const origin = ORIGIN_STYLES[ingredient.added_via] ?? ORIGIN_STYLES.manual;
+  const swipeable = useRef<SwipeableMethods>(null);
+  const isDish = ingredient.kind === 'dish';
+  const name = displayName ?? ingredient.name;
+  const openFact = onOpenFact && !isDish ? onOpenFact : undefined;
+  // « ajouté par Awa » : seule la première lettre de la phrase passe en minuscule, le prénom garde sa majuscule
+  const details = [ingredient.quantity, addedBy ? addedBy.charAt(0).toLowerCase() + addedBy.slice(1) : null].filter(Boolean).join(' · ');
+
+  // Appui long : toutes les actions de l'aliment
+  const showActions = () => {
+    Alert.alert(name, undefined, [
+      ...(openFact ? [{ text: t('pantry.viewFact'), onPress: openFact }] : []),
+      { text: t('expiry.edit'), onPress: onEditExpiry },
+      { text: t('common.delete'), style: 'destructive' as const, onPress: onDelete },
+      { text: t('common.cancel'), style: 'cancel' as const },
+    ]);
+  };
+
+  const deleteAction = () => (
+    <Touchable
+      onPress={() => {
+        swipeable.current?.close();
+        onDelete();
+      }}
+      style={styles.deleteAction}
+      accessibilityRole="button"
+      accessibilityLabel={t('common.delete')}
+    >
+      <Trash2 size={sizes.iconLarge} color={colors.onPrimary} />
+      <Text style={styles.deleteText}>{t('common.delete')}</Text>
+    </Touchable>
+  );
 
   return (
-    <View style={styles.ingredientCard}>
-      <View style={styles.ingredientInfo}>
-        {onOpenFact && ingredient.kind !== 'dish' ? (
-          <TouchableOpacity onPress={onOpenFact} style={styles.nameButton} accessibilityHint={t('facts.open')}>
-            <Text style={styles.ingredientName}>{ingredient.name}</Text>
-            <BookOpen size={15} color="#10b981" />
-          </TouchableOpacity>
-        ) : (
-          <Text style={styles.ingredientName}>{ingredient.name}</Text>
-        )}
-        {ingredient.quantity ? (
-          <Text style={styles.ingredientQuantity}>
-            {ingredient.quantity}
-          </Text>
-        ) : null}
-        <View style={styles.ingredientMeta}>
-          <ExpiryBadge expiresAt={ingredient.expires_at} onPress={onEditExpiry} />
-          {ingredient.kind === 'dish' && (
-            <View style={[styles.badge, styles.badgeLeftover]}>
-              <Text style={[styles.badgeText, styles.badgeTextLeftover]}>{t('pantry.leftover')}</Text>
-            </View>
-          )}
-          <View style={[styles.badge, { backgroundColor: origin.background }]}>
-            <Text style={[styles.badgeText, { color: origin.text }]}>{t(origin.labelKey)}</Text>
-          </View>
-        </View>
-        {addedBy ? <Text style={styles.addedBy}>{t('household.addedBy', { name: addedBy })}</Text> : null}
-        {ingredient.storage_tip ? (
-          <View style={styles.tip}>
-            <Lightbulb size={14} color="#6b7280" />
-            <Text style={styles.tipText}>{ingredient.storage_tip}</Text>
-          </View>
-        ) : null}
-      </View>
-      <TouchableOpacity
-        onPress={onDelete}
-        disabled={deleting}
-        style={styles.deleteButton}
+    <ReanimatedSwipeable
+      ref={swipeable}
+      renderRightActions={deleteAction}
+      rightThreshold={sizes.fab}
+      overshootRight={false}
+      containerStyle={styles.swipe}
+    >
+      <Card
+        onPress={openFact ?? showActions}
+        onLongPress={showActions}
+        style={styles.card}
+        accessibilityLabel={openFact ? `${name}, ${t('facts.open')}` : name}
       >
-        {deleting ? (
-          <ActivityIndicator size="small" color="#ef4444" />
-        ) : (
-          <Trash2 size={20} color="#ef4444" />
-        )}
-      </TouchableOpacity>
-    </View>
+        <IconChip icon={Leaf} />
+        <View style={styles.body}>
+          <Text style={styles.name}>{name}</Text>
+          {details ? <Text style={styles.details}>{details}</Text> : null}
+          {ingredient.storage_tip ? (
+            <View style={styles.tip}>
+              <Info size={sizes.iconSmall - 2} color={colors.textSecondary} />
+              <Text style={styles.tipText}>{ingredient.storage_tip}</Text>
+            </View>
+          ) : null}
+        </View>
+        <View style={styles.badges}>
+          <ExpiryBadge expiresAt={ingredient.expires_at} onPress={onEditExpiry} />
+          {isDish ? <Badge label={t('pantry.leftover')} tone="leftover" /> : null}
+        </View>
+      </Card>
+    </ReanimatedSwipeable>
   );
 }
 
 const styles = StyleSheet.create({
-  ingredientCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+  swipe: {
+    marginBottom: spacing.md,
+    borderRadius: radius.card,
   },
-  ingredientInfo: {
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  body: {
     flex: 1,
+    gap: spacing.xxs,
   },
-  nameButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    alignSelf: 'flex-start',
+  name: {
+    ...typography.cardTitle,
   },
-  ingredientName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 4,
-  },
-  ingredientQuantity: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginBottom: 8,
-  },
-  ingredientMeta: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    gap: 6,
-  },
-  badge: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 6,
-  },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  badgeLeftover: {
-    backgroundColor: '#fef3c7',
-  },
-  badgeTextLeftover: {
-    color: '#b45309',
-  },
-  addedBy: {
-    fontSize: 12,
-    color: '#6b7280',
-    marginTop: 6,
+  details: {
+    ...typography.secondary,
+    fontSize: typography.listTitle.fontSize,
   },
   tip: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 6,
-    marginTop: 8,
+    gap: spacing.xs,
+    marginTop: spacing.xxs,
   },
   tipText: {
+    ...typography.secondary,
     flex: 1,
-    fontSize: 13,
-    color: '#6b7280',
-    lineHeight: 18,
   },
-  deleteButton: {
-    padding: 8,
-    marginLeft: 12,
+  badges: {
+    alignItems: 'flex-end',
+    gap: spacing.sm,
+  },
+  deleteAction: {
+    width: sizes.fab + spacing.xxl,
+    marginLeft: spacing.sm,
+    borderRadius: radius.card,
+    backgroundColor: colors.expired.text,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+  },
+  deleteText: {
+    ...typography.badge,
+    color: colors.onPrimary,
   },
 });

@@ -1,37 +1,51 @@
-import React, { useState } from 'react';
-import { Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { router } from 'expo-router';
-import { ShoppingCart } from 'lucide-react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, StyleSheet } from 'react-native';
+import { Check, ShoppingCart } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { addMissingToShoppingList } from '@/lib/shopping';
+import { addMissingToShoppingList, loadShoppingList } from '@/lib/shopping';
+import { Button } from '@/components/ui/Button';
+import { spacing } from '@/constants/theme';
 
 interface Props {
   names: string[];
+  // Quantité de chaque ingrédient (même ordre que names), qui arrive dans la liste de courses
+  quantities: string[];
   recipeId?: string;
   recipeTitle: string;
-  // Avant d'ouvrir la liste : fermer la fiche
+  // Message de confirmation (avec « Voir ») affiché par la fiche recette
+  onAdded: (message: string) => void;
+  // « Voir » : ouvre la liste de courses
   onOpenList: () => void;
 }
 
-// Ingrédients manquants d'une recette ajoutés à la liste de courses du foyer, en un geste (sans doublon)
-export function AddMissingButton({ names, recipeId, recipeTitle, onOpenList }: Props) {
+const normalize = (value: string) => value.trim().toLowerCase();
+
+// « Ajouter les 2 ingrédients aux courses » : ingrédients manquants d'une recette ajoutés à la liste de
+// courses du foyer, avec leurs quantités, en un geste (sans doublon). Ensuite, le bouton indique que c'est
+// fait (et ouvre la liste). Déjà tous sur la liste (pas encore achetés) : fait dès l'ouverture.
+export function AddMissingButton({ names, quantities, recipeId, recipeTitle, onAdded, onOpenList }: Props) {
   const { t } = useLanguage();
   const [adding, setAdding] = useState(false);
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    loadShoppingList().then((items) => {
+      if (!active || !items) return;
+      const onList = new Set(items.filter((item) => !item.checked).map((item) => normalize(item.name)));
+      setDone(names.length > 0 && names.every((name) => onList.has(normalize(name))));
+    });
+    return () => {
+      active = false;
+    };
+  }, [names.join('|')]);
 
   const add = async () => {
     setAdding(true);
     try {
-      const count = await addMissingToShoppingList(names, recipeId, recipeTitle);
-      Alert.alert(t('shopping.addedTitle'), count > 0 ? t('shopping.addedText', { count }) : t('shopping.alreadyOnList'), [
-        { text: t('common.ok'), style: 'cancel' },
-        {
-          text: t('shopping.viewList'),
-          onPress: () => {
-            onOpenList();
-            router.push('/shopping');
-          },
-        },
-      ]);
+      const count = await addMissingToShoppingList(names, quantities, recipeId, recipeTitle);
+      setDone(true);
+      onAdded(count > 0 ? t('shopping.addedToast', { count }) : t('shopping.alreadyOnList'));
     } catch (error) {
       console.warn('[courses] ajout impossible :', error);
       Alert.alert(t('errors.writeTitle'), t('errors.writeText'));
@@ -40,26 +54,32 @@ export function AddMissingButton({ names, recipeId, recipeTitle, onOpenList }: P
     }
   };
 
-  return (
-    <TouchableOpacity style={styles.button} onPress={add} disabled={adding}>
-      {adding ? <ActivityIndicator size="small" color="#be185d" /> : <ShoppingCart size={16} color="#be185d" />}
-      <Text style={styles.text}>{t('shopping.addMissing')}</Text>
-    </TouchableOpacity>
+  return done ? (
+    <Button
+      label={t('recipe.addedToShopping', { count: names.length })}
+      icon={Check}
+      variant="soft"
+      size="medium"
+      onPress={onOpenList}
+      accessibilityLabel={`${t('recipe.addedToShopping', { count: names.length })}, ${t('shopping.viewList')}`}
+      style={styles.button}
+    />
+  ) : (
+    <Button
+      label={t('recipe.addToShoppingCount', { count: names.length })}
+      icon={ShoppingCart}
+      variant="outline"
+      size="medium"
+      onPress={add}
+      loading={adding}
+      style={styles.button}
+    />
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 10,
-    paddingVertical: 10,
-    borderRadius: 10,
-    backgroundColor: '#fdf2f8',
-    borderWidth: 1,
-    borderColor: '#fbcfe8',
+    marginTop: spacing.sm,
+    marginBottom: spacing.sm,
   },
-  text: { color: '#be185d', fontWeight: '600', fontSize: 14 },
 });

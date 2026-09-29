@@ -21,3 +21,6 @@ verify_jwt = false
 # Fiche aliment : chaque fonction vérifie l'utilisateur elle-même (ou la clé secrète pour le pré-remplissage)
 [functions.food-fact]
 verify_jwt = false
+
+[functions.translate-recipe]
+verify_jwt = false

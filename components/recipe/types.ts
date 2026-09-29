@@ -21,6 +21,41 @@ export interface Recipe {
   // Description de la photo (en anglais), utilisée par generate-recipe-image
   image_prompt?: string;
   image_url?: string;
+  // Langue de la recette (celle choisie à la génération) et traductions déjà faites (« Traduire en … »)
+  language?: string;
+  translations?: Partial<Record<string, RecipeText>>;
+}
+
+// Textes traduits d'une recette (fonction translate-recipe) : même ordre et même nombre d'éléments que
+// l'original ; quantités, liens vers le garde-manger et régimes inchangés
+export interface RecipeText {
+  title: string;
+  description: string;
+  suggestion: string;
+  ingredients_used: { name: string; unit: string }[];
+  ingredients_from_list: string[];
+  missing_ingredients: string[];
+  instructions: string[];
+  tips: string[];
+}
+
+// Recette affichée dans sa traduction
+export function translatedRecipe<T extends Recipe>(recipe: T, text: RecipeText): T {
+  return {
+    ...recipe,
+    title: text.title,
+    description: text.description,
+    suggestion: text.suggestion || undefined,
+    ingredients_used: recipe.ingredients_used.map((item, index) => ({
+      ...item,
+      name: text.ingredients_used[index]?.name ?? item.name,
+      unit: text.ingredients_used[index]?.unit ?? item.unit,
+    })),
+    ingredients_from_list: text.ingredients_from_list,
+    missing_ingredients: text.missing_ingredients,
+    instructions: text.instructions,
+    tips: text.tips,
+  };
 }
 
 // Cuisines du monde (paramètre cuisine de generate-recipes)
@@ -78,5 +113,7 @@ export function recipeFromRow(row: any): Recipe & { id: string } {
     suggestion: typeof row?.suggestion === 'string' && row.suggestion !== '' ? row.suggestion : undefined,
     image_prompt: row?.image_prompt ?? undefined,
     image_url: imageOf(row?.image_url),
+    language: typeof row?.language === 'string' ? row.language : undefined,
+    translations: row?.translations && typeof row.translations === 'object' ? row.translations : {},
   };
 }

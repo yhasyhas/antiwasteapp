@@ -1,25 +1,21 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  ActivityIndicator,
-} from 'react-native';
+import React, { useRef, useState } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
+import { Leaf, Mail } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
-import { Input, PasswordInput } from '@/components/ui/Input';
+import { TextField } from '@/components/ui/Input';
 import { KeyboardAvoider, useKeyboardScroll } from '@/components/ui/KeyboardAvoider';
-import { CaptchaCancelled, useCaptcha } from '@/components/auth/Captcha';
+import { Button } from '@/components/ui/Button';
+import { IconChip } from '@/components/ui/IconChip';
+import { Touchable } from '@/components/ui/Touchable';
+import { CaptchaField, captchaEnabled, type CaptchaHandle } from '@/components/auth/Captcha';
 import { authErrorMessage } from '@/lib/authErrors';
-import { ChefHat, Mail } from 'lucide-react-native';
+import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 
 export default function SignUpScreen() {
   const { signUp } = useAuth();
-  const { getToken, captcha } = useCaptcha();
   const { t } = useLanguage();
   const safe = useSafeSpacing();
   const keyboardScroll = useKeyboardScroll();
@@ -30,6 +26,9 @@ export default function SignUpScreen() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
+  // Jeton anti-robot (Turnstile), à usage unique : nouvelle vérification après chaque essai
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captcha = useRef<CaptchaHandle>(null);
 
   const handleSignUp = async () => {
     if (!email || !password || !confirmPassword) {
@@ -48,13 +47,8 @@ export default function SignUpScreen() {
     }
 
     setError('');
-    let token: string | undefined;
-    try {
-      token = await getToken();
-    } catch (captchaError) {
-      if (!(captchaError instanceof CaptchaCancelled)) setError(t('auth.captchaFailed'));
-      return;
-    }
+    const token = captchaToken ?? undefined;
+    if (captchaEnabled) captcha.current?.reset();
     setLoading(true);
 
     const { error: signUpError, needsEmailConfirmation } = await signUp(email, password, token);
@@ -79,19 +73,11 @@ export default function SignUpScreen() {
 
   if (awaitingConfirmation) {
     return (
-      <View style={[styles.container, styles.scrollContent]}>
-        <View style={styles.header}>
-          <View style={styles.iconContainer}>
-            <Mail size={48} color="#10b981" strokeWidth={2} />
-          </View>
-          <Text style={styles.title}>{t('auth.checkYourEmail')}</Text>
-          <Text style={[styles.subtitle, styles.confirmationText]}>
-            {t('auth.checkYourEmailText', { email })}
-          </Text>
-        </View>
-        <TouchableOpacity style={styles.button} onPress={() => router.replace('/auth/login')}>
-          <Text style={styles.buttonText}>{t('auth.backToLogin')}</Text>
-        </TouchableOpacity>
+      <View style={[styles.container, styles.centered, { paddingTop: safe.insets.top, paddingBottom: safe.insets.bottom + spacing.xxl }]}>
+        <IconChip icon={Mail} size={sizes.iconChipLarge + spacing.xxl} style={styles.logo} />
+        <Text style={styles.title}>{t('auth.checkYourEmail')}</Text>
+        <Text style={styles.subtitle}>{t('auth.checkYourEmailText', { email })}</Text>
+        <Button label={t('auth.backToLogin')} onPress={() => router.replace('/auth/login')} style={styles.confirmationButton} />
       </View>
     );
   }
@@ -102,83 +88,41 @@ export default function SignUpScreen() {
         ref={keyboardScroll.scrollRef}
         onScroll={keyboardScroll.onScroll}
         scrollEventThrottle={keyboardScroll.scrollEventThrottle}
-        contentContainerStyle={[styles.scrollContent, { paddingTop: safe.insets.top + 24, paddingBottom: safe.insets.bottom + 24 }]}
+        contentContainerStyle={[styles.content, { paddingTop: safe.insets.top + spacing.xxxl * 2, paddingBottom: safe.insets.bottom + spacing.xxl }]}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.header}>
-          <View style={styles.iconContainer}>
-            <ChefHat size={48} color="#10b981" strokeWidth={2} />
-          </View>
-          <Text style={styles.title}>{t('auth.createAccount')}</Text>
-          <Text style={styles.subtitle}>
-            {t('auth.signUpSubtitle')}
-          </Text>
-        </View>
+        <IconChip icon={Leaf} tone="primary" size={sizes.iconChipLarge + spacing.xxl} style={styles.logo} />
+        <Text style={styles.title}>{t('auth.createAccount')}</Text>
+        <Text style={styles.subtitle}>{t('auth.signUpSubtitle')}</Text>
 
         <View style={styles.form}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.email')}</Text>
-            <Input
-              style={styles.input}
-              placeholder={t('auth.emailPlaceholder')}
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              editable={!loading}
-            />
-          </View>
+          <TextField
+            label={t('auth.email')}
+            placeholder={t('auth.emailPlaceholder')}
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            autoComplete="email"
+            editable={!loading}
+          />
+          <TextField label={t('auth.password')} password placeholder="••••••••" value={password} onChangeText={setPassword} editable={!loading} />
+          <TextField label={t('auth.confirmPassword')} password placeholder="••••••••" value={confirmPassword} onChangeText={setConfirmPassword} editable={!loading} />
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.password')}</Text>
-            <PasswordInput
-              style={styles.input}
-              placeholder="••••••••"
-              value={password}
-              onChangeText={setPassword}
-              editable={!loading}
-            />
-          </View>
+          <CaptchaField ref={captcha} onToken={setCaptchaToken} />
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.confirmPassword')}</Text>
-            <PasswordInput
-              style={styles.input}
-              placeholder="••••••••"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              editable={!loading}
-            />
-          </View>
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+          {success ? <Text style={styles.success}>{t('auth.accountCreated')}</Text> : null}
 
-          {error ? <Text style={styles.errorText}>{error}</Text> : null}
-          {success ? (
-            <Text style={styles.successText}>{t('auth.accountCreated')}</Text>
-          ) : null}
-
-          <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={handleSignUp}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>{t('auth.createAccount')}</Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => router.push('/auth/login')}
-            disabled={loading}
-          >
-            <Text style={styles.linkText}>
-              {t('auth.haveAccount')}<Text style={styles.linkBold}>{t('auth.signIn')}</Text>
-            </Text>
-          </TouchableOpacity>
+          <Button label={t('auth.createAccount')} onPress={handleSignUp} loading={loading} disabled={captchaEnabled && !captchaToken} />
         </View>
+
+        <Touchable onPress={() => router.push('/auth/login')} disabled={loading} style={styles.switch} accessibilityRole="link">
+          <Text style={styles.switchText}>
+            {t('auth.haveAccount')}<Text style={styles.switchStrong}>{t('auth.signIn')}</Text>
+          </Text>
+        </Touchable>
       </ScrollView>
-      {captcha}
     </KeyboardAvoider>
   );
 }
@@ -186,97 +130,59 @@ export default function SignUpScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
   },
-  scrollContent: {
+  centered: {
+    justifyContent: 'center',
+    paddingHorizontal: spacing.screen,
+  },
+  content: {
     flexGrow: 1,
-    justifyContent: 'center',
-    padding: 24,
+    paddingHorizontal: spacing.screen,
   },
-  header: {
-    alignItems: 'center',
-    marginBottom: 48,
-  },
-  iconContainer: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: '#f0fdf4',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
+  logo: {
+    borderRadius: radius.card + spacing.xs,
+    marginBottom: spacing.xxl,
   },
   title: {
-    fontSize: 32,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 8,
+    ...typography.hero,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#6b7280',
-    textAlign: 'center',
-  },
-  confirmationText: {
-    marginTop: 12,
-    lineHeight: 24,
+    ...typography.body,
+    color: colors.textSecondary,
+    marginTop: spacing.md,
   },
   form: {
-    width: '100%',
+    marginTop: spacing.xxl,
+    gap: spacing.lg,
   },
-  inputGroup: {
-    marginBottom: 20,
+  error: {
+    ...typography.body,
+    fontSize: typography.listTitle.fontSize,
+    color: colors.expired.text,
+    textAlign: 'center',
   },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 8,
+  success: {
+    ...typography.bodyStrong,
+    color: colors.primary,
+    textAlign: 'center',
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 12,
-    padding: 16,
-    fontSize: 16,
-    backgroundColor: '#fff',
+  confirmationButton: {
+    marginTop: spacing.xxl,
   },
-  button: {
-    backgroundColor: '#10b981',
-    borderRadius: 12,
-    padding: 16,
+  switch: {
+    marginTop: 'auto',
+    paddingTop: spacing.xxl,
+    minHeight: sizes.touch,
     alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 16,
+    justifyContent: 'center',
   },
-  buttonDisabled: {
-    opacity: 0.6,
+  switchText: {
+    ...typography.body,
+    color: colors.textSecondary,
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  linkText: {
-    textAlign: 'center',
-    color: '#6b7280',
-    fontSize: 14,
-  },
-  linkBold: {
-    color: '#10b981',
-    fontWeight: '600',
-  },
-  errorText: {
-    color: '#ef4444',
-    fontSize: 14,
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  successText: {
-    color: '#10b981',
-    fontSize: 14,
-    marginBottom: 12,
-    textAlign: 'center',
-    fontWeight: '600',
+  switchStrong: {
+    fontFamily: typography.button.fontFamily,
+    color: colors.primary,
   },
 });

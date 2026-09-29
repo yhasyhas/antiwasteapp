@@ -1,171 +1,218 @@
-import React, { createElement, useCallback, useEffect, useRef, useState } from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity, Platform, ActivityIndicator, useWindowDimensions } from 'react-native';
+import React, { createElement, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { Platform, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { WebView } from 'react-native-webview';
+import { RefreshCw } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { INVITE_URL } from '@/lib/invite';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Touchable } from '@/components/ui/Touchable';
+import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 
 // Cloudflare Turnstile (protection anti-robot des connexions, exigée par Supabase quand la protection
-// captcha est activée) : la page captcha (captcha.html), hébergée avec la page d'invitation, s'affiche dans une
-// fenêtre et renvoie un jeton à usage unique. Sans clé de site configurée, aucune vérification.
+// captcha est activée) : la page captcha (captcha.html), hébergée avec la page d'invitation, s'affiche dans le
+// formulaire et renvoie un jeton à usage unique. Sans clé de site configurée, aucune vérification.
 const SITE_KEY = process.env.EXPO_PUBLIC_TURNSTILE_SITE_KEY || '';
 const CAPTCHA_URL = process.env.EXPO_PUBLIC_CAPTCHA_URL || (INVITE_URL ? `${INVITE_URL.replace(/\/+$/, '')}/captcha` : '');
 
 export const captchaEnabled = SITE_KEY !== '' && CAPTCHA_URL !== '';
 
-// Délais : page qui n'affiche pas la vérification, puis vérification qui ne renvoie pas de jeton
-// (sinon erreur avec « Réessayer »)
+// Délai pour que la page affiche la vérification (sinon erreur avec « Réessayer »)
 const READY_TIMEOUT_MS = 20_000;
-const TOKEN_TIMEOUT_MS = 90_000;
-
 // Widget Turnstile : 300 × 65 (normal), 150 × 140 (compact, écrans étroits)
-const OVERLAY_PADDING = 16;
-const BOX_PADDING = 12;
 const NORMAL_WIDGET_WIDTH = 300;
 
-export class CaptchaCancelled extends Error {}
+type Phase = { kind: 'loading' } | { kind: 'widget' } | { kind: 'done' } | { kind: 'error'; code: string };
 
-type Status = { kind: 'loading' } | { kind: 'ready' } | { kind: 'error'; code: string };
+export interface CaptchaHandle {
+  // Jeton utilisé (usage unique) : nouvelle vérification pour l'essai suivant
+  reset: () => void;
+}
 
-// Renvoie getToken() (jeton, ou undefined sans captcha) et la fenêtre à placer dans l'écran
-export function useCaptcha() {
+interface Props {
+  // Jeton reçu (ou null : pas encore, expiré, consommé)
+  onToken: (token: string | null) => void;
+}
+
+// Champ « Vérification de sécurité » du formulaire : widget Turnstile, puis « Vérification réussie »
+export const CaptchaField = forwardRef<CaptchaHandle, Props>(function CaptchaField({ onToken }, ref) {
   const { t, language } = useLanguage();
   const { width: screenWidth } = useWindowDimensions();
-  const frameWidth = screenWidth - 2 * OVERLAY_PADDING - 2 * BOX_PADDING - 2;
-  const widgetSize = frameWidth >= NORMAL_WIDGET_WIDTH ? 'normal' : 'compact';
-  // Hauteur du cadre posée sur le conteneur de la WebView (sinon il s'écrase à quelques pixels)
-  const frameHeight = widgetSize === 'normal' ? 80 : 150;
-  const [visible, setVisible] = useState(false);
-  const [status, setStatus] = useState<Status>({ kind: 'loading' });
+  const [phase, setPhase] = useState<Phase>({ kind: 'loading' });
   // Change à chaque essai : recharge la page
   const [attempt, setAttempt] = useState(0);
-  // Dernier état signalé par la page (affiché en développement, joint aux erreurs)
-  const [pageState, setPageState] = useState('');
-  const pending = useRef<{ resolve: (token: string) => void; reject: (error: Error) => void } | null>(null);
+  const onTokenRef = useRef(onToken);
+  onTokenRef.current = onToken;
 
-  const getToken = useCallback((): Promise<string | undefined> => {
-    if (!captchaEnabled) return Promise.resolve(undefined);
-    return new Promise<string>((resolve, reject) => {
-      pending.current = { resolve, reject };
-      setStatus({ kind: 'loading' });
-      setPageState('');
-      setAttempt((n) => n + 1);
-      setVisible(true);
-    });
-  }, []);
+  // Largeur du cadre : écran moins les marges de l'écran de connexion
+  const frameWidth = screenWidth - 2 * spacing.screen - 2 * sizes.borderWidth;
+  const widgetSize = frameWidth >= NORMAL_WIDGET_WIDTH ? 'normal' : 'compact';
+  // Hauteur posée sur le conteneur de la WebView (sinon il s'écrase à quelques pixels)
+  const frameHeight = sizes.captchaFrame[widgetSize];
 
-  const finish = (token?: string) => {
-    setVisible(false);
-    const current = pending.current;
-    pending.current = null;
-    if (token) current?.resolve(token);
-    else current?.reject(new CaptchaCancelled());
+  const restart = () => {
+    onTokenRef.current(null);
+    setPhase({ kind: 'loading' });
+    setAttempt((n) => n + 1);
   };
 
-  // Erreur affichée dans la fenêtre (avec son code) plutôt qu'une fermeture silencieuse
+  useImperativeHandle(ref, () => ({ reset: restart }), []);
+
   const fail = (code: string) => {
     console.warn(`[captcha] ${code}`);
-    setStatus({ kind: 'error', code });
-  };
-
-  const retry = () => {
-    setStatus({ kind: 'loading' });
-    setPageState('');
-    setAttempt((n) => n + 1);
+    onTokenRef.current(null);
+    setPhase({ kind: 'error', code });
   };
 
   const onMessage = (data: string) => {
     try {
       const message = JSON.parse(data);
-      if (message.type === 'token' && typeof message.token === 'string') finish(message.token);
-      else if (message.type === 'ready') setStatus((s) => (s.kind === 'loading' ? { kind: 'ready' } : s));
-      else if (message.type === 'error') fail(String(message.code));
-      else if (message.type === 'state') setPageState(String(message.code));
+      if (message.type === 'token' && typeof message.token === 'string') {
+        onTokenRef.current(message.token);
+        setPhase({ kind: 'done' });
+      } else if (message.type === 'ready') {
+        setPhase((current) => (current.kind === 'loading' ? { kind: 'widget' } : current));
+      } else if (message.type === 'expired') {
+        // Jeton expiré : la page relance la vérification
+        onTokenRef.current(null);
+        setPhase({ kind: 'widget' });
+      } else if (message.type === 'error') {
+        fail(String(message.code));
+      }
     } catch {
       // message inattendu : ignoré
     }
   };
 
-  // Page qui ne répond pas, ou vérification sans jeton
+  // Page qui ne répond pas
   useEffect(() => {
-    if (!visible || status.kind === 'error') return;
-    const loading = status.kind === 'loading';
-    const timer = setTimeout(
-      () => fail(loading ? 'timeout' : `no-token${pageState ? ` (${pageState})` : ''}`),
-      loading ? READY_TIMEOUT_MS : TOKEN_TIMEOUT_MS,
-    );
+    if (!captchaEnabled || phase.kind !== 'loading') return;
+    const timer = setTimeout(() => fail('timeout'), READY_TIMEOUT_MS);
     return () => clearTimeout(timer);
-  }, [visible, status.kind, attempt, pageState]);
-
-  const captchaSource = `${CAPTCHA_URL}?sitekey=${encodeURIComponent(SITE_KEY)}&lang=${language}&size=${widgetSize}&attempt=${attempt}`;
+  }, [phase.kind, attempt]);
 
   // Web (Expo web) : la page est dans un cadre et envoie le jeton par postMessage
   useEffect(() => {
-    if (Platform.OS !== 'web' || !visible) return;
+    if (!captchaEnabled || Platform.OS !== 'web') return;
     const listener = (event: MessageEvent) => {
       if (event.data && typeof event.data === 'object') onMessage(JSON.stringify(event.data));
     };
     window.addEventListener('message', listener);
     return () => window.removeEventListener('message', listener);
-  }, [visible]);
+  }, []);
 
-  const showPage = visible && status.kind !== 'error';
+  if (!captchaEnabled) return null;
 
-  const captcha = (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={() => finish()}>
-      <View style={styles.overlay}>
-        <View style={styles.box}>
-          <Text style={styles.title}>{t('auth.captchaTitle')}</Text>
-          {status.kind === 'loading' && <ActivityIndicator color="#10b981" />}
-          {status.kind === 'error' && (
-            <View style={styles.errorBox}>
-              <Text style={styles.errorText}>{t('auth.captchaFailed')}</Text>
-              <Text style={styles.errorCode}>{status.code}</Text>
-              <TouchableOpacity onPress={retry} style={styles.retry}>
-                <Text style={styles.retryText}>{t('auth.captchaRetry')}</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          {showPage && Platform.OS === 'web' && createElement('iframe', { key: attempt, src: captchaSource, style: { border: 0, width: '100%', height: frameHeight }, title: 'captcha' })}
-          {showPage && Platform.OS !== 'web' && (
-            <WebView
-              key={attempt}
-              containerStyle={[styles.webviewFrame, { height: frameHeight }]}
-              style={styles.webview}
-              source={{ uri: captchaSource }}
-              onMessage={(event) => onMessage(event.nativeEvent.data)}
-              onError={(event) => fail(`network: ${event.nativeEvent.description}`)}
-              onHttpError={(event) => fail(`http ${event.nativeEvent.statusCode}`)}
-              javaScriptEnabled
-              domStorageEnabled
-              thirdPartyCookiesEnabled
-              originWhitelist={['https://*']}
-            />
-          )}
-          {__DEV__ && showPage && pageState !== '' && <Text style={styles.errorCode}>{pageState}</Text>}
-          <TouchableOpacity onPress={() => finish()} style={styles.cancel}>
-            <Text style={styles.cancelText}>{t('common.cancel')}</Text>
-          </TouchableOpacity>
+  const source = `${CAPTCHA_URL}?sitekey=${encodeURIComponent(SITE_KEY)}&lang=${language}&size=${widgetSize}&attempt=${attempt}`;
+  // En attente ou vérification réussie : la page reste chargée (cachée), pour signaler l'expiration du jeton
+  const hidden = phase.kind === 'done' || phase.kind === 'loading';
+
+  return (
+    <View style={styles.box}>
+      {phase.kind === 'done' ? (
+        <View style={styles.row}>
+          <Checkbox checked />
+          <Text style={styles.text}>{t('auth.captchaDone')}</Text>
         </View>
-      </View>
-    </Modal>
-  );
+      ) : phase.kind === 'error' ? (
+        <View style={styles.row}>
+          <View style={styles.errorText}>
+            <Text style={styles.error}>{t('auth.captchaFailed')}</Text>
+            <Text style={styles.code}>{phase.code}</Text>
+          </View>
+          <Touchable onPress={restart} style={styles.retry} accessibilityRole="button" accessibilityLabel={t('auth.captchaRetry')}>
+            <RefreshCw size={sizes.icon} color={colors.primary} />
+            <Text style={styles.retryText}>{t('auth.captchaRetry')}</Text>
+          </Touchable>
+        </View>
+      ) : phase.kind === 'loading' ? (
+        <View style={styles.row}>
+          <Skeleton width={sizes.checkbox} height={sizes.checkbox} rounded={radius.small} />
+          <Text style={styles.text}>{t('auth.captchaTitle')}</Text>
+        </View>
+      ) : null}
 
-  return { getToken, captcha };
-}
+      {phase.kind !== 'error' && (
+        <View style={hidden ? styles.offscreen : { height: frameHeight }}>
+          {Platform.OS === 'web'
+            ? createElement('iframe', { key: attempt, src: source, style: { border: 0, width: '100%', height: frameHeight }, title: 'captcha' })
+            : (
+              <WebView
+                key={attempt}
+                containerStyle={{ height: frameHeight }}
+                style={styles.webview}
+                source={{ uri: source }}
+                onMessage={(event) => onMessage(event.nativeEvent.data)}
+                onError={(event) => fail(`network: ${event.nativeEvent.description}`)}
+                onHttpError={(event) => fail(`http ${event.nativeEvent.statusCode}`)}
+                javaScriptEnabled
+                domStorageEnabled
+                thirdPartyCookiesEnabled
+                originWhitelist={['https://*']}
+              />
+            )}
+        </View>
+      )}
+    </View>
+  );
+});
 
 const styles = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: OVERLAY_PADDING },
-  box: { backgroundColor: '#fff', borderRadius: 16, padding: BOX_PADDING, gap: 12 },
-  title: { fontSize: 16, fontWeight: '600', color: '#111827', textAlign: 'center' },
-  // Fond opaque et fenêtre sans animation : une WebView transparente ou animée dans une fenêtre
-  // superposée peut rester vide sur Android
-  webviewFrame: { flex: 0, width: '100%', borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 8, overflow: 'hidden' },
-  webview: { flex: 1, backgroundColor: '#fff' },
-  errorBox: { alignItems: 'center', gap: 6 },
-  errorText: { color: '#b91c1c', textAlign: 'center' },
-  errorCode: { color: '#6b7280', fontSize: 12, textAlign: 'center' },
-  retry: { backgroundColor: '#10b981', borderRadius: 10, paddingVertical: 8, paddingHorizontal: 16, marginTop: 4 },
-  retryText: { color: '#fff', fontWeight: '600' },
-  cancel: { alignItems: 'center', paddingVertical: 8 },
-  cancelText: { color: '#6b7280', fontWeight: '600' },
+  box: {
+    borderRadius: radius.control,
+    borderWidth: sizes.borderWidth,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    overflow: 'hidden',
+    justifyContent: 'center',
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    minHeight: sizes.input,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+  },
+  text: {
+    ...typography.body,
+    color: colors.textSecondary,
+    flex: 1,
+  },
+  errorText: {
+    flex: 1,
+  },
+  error: {
+    ...typography.bodyMedium,
+    color: colors.expired.text,
+  },
+  code: {
+    ...typography.secondary,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xs,
+  },
+  retry: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    minHeight: sizes.touch,
+  },
+  retryText: {
+    ...typography.bodyStrong,
+    color: colors.primary,
+  },
+  // Page chargée mais cachée : le conteneur garde sa hauteur (la page doit pouvoir s'afficher), il est
+  // simplement sorti de l'écran
+  offscreen: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: -sizes.captchaFrame.compact * 2,
+    height: sizes.captchaFrame.compact,
+    opacity: 0,
+  },
+  webview: {
+    flex: 1,
+    backgroundColor: colors.surface,
+  },
 });

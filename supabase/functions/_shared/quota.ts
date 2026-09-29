@@ -4,7 +4,7 @@
 import { SUPABASE_SECRET_KEY, SUPABASE_URL } from './keys.ts';
 import type { AuthenticatedUser } from './auth.ts';
 
-export type QuotaKind = 'scans' | 'generations' | 'images' | 'facts';
+export type QuotaKind = 'scans' | 'generations' | 'images' | 'facts' | 'links' | 'translations';
 
 // Limites réglables par secret, sans redéployer
 export const DAILY_LIMITS: Record<QuotaKind, number> = {
@@ -15,6 +15,10 @@ export const DAILY_LIMITS: Record<QuotaKind, number> = {
   images: Number(Deno.env.get('QUOTA_DAILY_IMAGES') || 30),
   // Fiches aliments générées (lire une fiche existante ne compte pas)
   facts: Number(Deno.env.get('QUOTA_DAILY_FACTS') || 15),
+  // Aliments reliés à leur fiche par l'IA (nom inconnu des fiches) ; un nom déjà connu ne compte pas
+  links: Number(Deno.env.get('QUOTA_DAILY_LINKS') || 60),
+  // Recettes traduites (« Traduire en … ») ; relire une traduction déjà faite ne compte pas
+  translations: Number(Deno.env.get('QUOTA_DAILY_TRANSLATIONS') || 10),
 };
 
 // Essai sans compte (connexion anonyme) : quotas réduits, pour limiter les abus
@@ -23,6 +27,8 @@ export const ANONYMOUS_LIMITS: Record<QuotaKind, number> = {
   generations: Number(Deno.env.get('QUOTA_ANON_GENERATIONS') || 3),
   images: Number(Deno.env.get('QUOTA_ANON_IMAGES') || 9),
   facts: Number(Deno.env.get('QUOTA_ANON_FACTS') || 5),
+  links: Number(Deno.env.get('QUOTA_ANON_LINKS') || 20),
+  translations: Number(Deno.env.get('QUOTA_ANON_TRANSLATIONS') || 3),
 };
 
 type QuotaUser = Pick<AuthenticatedUser, 'id' | 'isAnonymous'>;

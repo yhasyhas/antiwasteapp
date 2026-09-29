@@ -1,21 +1,17 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  Share,
-  ActivityIndicator,
-  RefreshControl,
-} from 'react-native';
-import { Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { Crown, LogOut, Share2, UserMinus, UserPlus, Users } from 'lucide-react-native';
+import { Alert, RefreshControl, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { Share2, UserMinus } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { Input } from '@/components/ui/Input';
 import { KeyboardAvoider, useKeyboardScroll } from '@/components/ui/KeyboardAvoider';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Card, cardStyles } from '@/components/ui/Card';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
+import { SkeletonRow } from '@/components/ui/Skeleton';
+import { Touchable } from '@/components/ui/Touchable';
 import { useHousehold } from '@/hooks/useHousehold';
 import {
   createInvite,
@@ -26,13 +22,13 @@ import {
   personalPantryCount,
   previewInvite,
   removeMember,
-  setDisplayName,
   type HouseholdMember,
 } from '@/lib/household';
 import { inviteLink, normalizeInviteCode } from '@/lib/invite';
+import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 
-// Écran « Mon foyer » : membres, nom affiché, code d'invitation (partage), rejoindre un foyer,
-// quitter le foyer ; le propriétaire peut retirer un membre
+// Écran « Mon foyer » : code d'invitation (partage du lien), membres, rejoindre un foyer, quitter le foyer ;
+// le propriétaire peut retirer un membre. Le nom affiché se modifie dans Réglages.
 export default function HouseholdScreen() {
   const { t, language } = useLanguage();
   const safe = useSafeSpacing();
@@ -43,10 +39,6 @@ export default function HouseholdScreen() {
   const [code, setCode] = useState(normalizeInviteCode(linkCode) ?? '');
   const [busy, setBusy] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const me = household?.members.find((m) => m.is_me);
-  const [name, setName] = useState('');
-
-  useEffect(() => setName(me?.name ?? ''), [me?.name]);
 
   // Lien reçu alors qu'on est déjà dans un foyer partagé : il faut d'abord le quitter
   const invitedCode = normalizeInviteCode(linkCode);
@@ -107,8 +99,6 @@ export default function HouseholdScreen() {
     await createInvite();
   });
 
-  const saveName = () => run('name', () => setDisplayName(name));
-
   // Rejoindre : aperçu (qui invite), puis transfert du garde-manger personnel s'il n'est pas vide
   const join = () => run('join', async () => {
     const trimmed = code.trim().toUpperCase();
@@ -156,11 +146,16 @@ export default function HouseholdScreen() {
     ]);
   };
 
+  const joinedLabel = (iso: string) =>
+    t('household.joinedOn', { date: new Date(iso).toLocaleDateString(language, { day: 'numeric', month: 'short' }) });
+
   if (!household) {
     return (
-      <View style={styles.loading}>
-        <Stack.Screen options={{ headerShown: true, title: t('household.title') }} />
-        <ActivityIndicator size="large" color="#10b981" />
+      <View style={styles.container}>
+        <ScreenHeader title={t('household.title')} back />
+        <View style={styles.content}>
+          {[0, 1, 2].map((row) => <SkeletonRow key={row} />)}
+        </View>
       </View>
     );
   }
@@ -169,136 +164,121 @@ export default function HouseholdScreen() {
   const isOwner = household.role === 'owner';
 
   return (
-    <>
-      <Stack.Screen options={{ headerShown: true, title: t('household.title') }} />
-      <KeyboardAvoider style={styles.container}>
+    <KeyboardAvoider style={styles.container}>
+      <ScreenHeader title={t('household.title')} back />
       <ScrollView
         ref={keyboardScroll.scrollRef}
         onScroll={keyboardScroll.onScroll}
         scrollEventThrottle={keyboardScroll.scrollEventThrottle}
-        contentContainerStyle={[styles.content, safe.bottom(40)]}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
+        contentContainerStyle={[styles.content, safe.bottom(spacing.xxxl)]}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} colors={[colors.primary]} tintColor={colors.primary} />}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.intro}>{household.shared ? t('household.sharedIntro') : t('household.personalIntro')}</Text>
-
-        {/* Membres */}
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Users size={18} color="#10b981" />
-            <Text style={styles.cardTitle}>
-              {t('household.members', { count: household.members.length, max: household.max_members })}
-            </Text>
-          </View>
-          {household.members.map((member) => (
-            <View key={member.user_id} style={styles.memberRow}>
-              <View style={styles.memberInfo}>
-                <Text style={styles.memberName}>
-                  {member.name ?? t('household.guest')}{member.is_me ? ` (${t('household.me')})` : ''}
-                </Text>
-                {member.role === 'owner' && (
-                  <View style={styles.ownerBadge}>
-                    <Crown size={12} color="#b45309" />
-                    <Text style={styles.ownerText}>{t('household.owner')}</Text>
-                  </View>
-                )}
-              </View>
-              {isOwner && household.shared && !member.is_me && (
-                <TouchableOpacity onPress={() => remove(member)} disabled={!!busy} hitSlop={8}>
-                  {busy === `remove-${member.user_id}` ? <ActivityIndicator size="small" color="#ef4444" /> : <UserMinus size={20} color="#ef4444" />}
-                </TouchableOpacity>
-              )}
-            </View>
-          ))}
-        </View>
-
-        {/* Nom affiché aux membres */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>{t('household.yourName')}</Text>
-          <Text style={styles.hint}>{t('household.yourNameHint')}</Text>
-          <View style={styles.inputRow}>
-            <Input
-              style={styles.input}
-              value={name}
-              onChangeText={setName}
-              maxLength={40}
-              placeholder={t('household.yourNamePlaceholder')}
-            />
-            <TouchableOpacity style={styles.smallButton} onPress={saveName} disabled={!!busy || name.trim() === (me?.name ?? '')}>
-              {busy === 'name' ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.smallButtonText}>{t('household.save')}</Text>}
-            </TouchableOpacity>
-          </View>
-        </View>
+        {!household.shared && <Text style={styles.intro}>{t('household.personalIntro')}</Text>}
 
         {/* Invitation */}
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <UserPlus size={18} color="#10b981" />
+        <Card variant="soft" style={styles.inviteCard}>
+          <View style={styles.inviteHeader}>
+            <Share2 size={sizes.icon} color={colors.primary} />
             <Text style={styles.cardTitle}>{t('household.inviteTitle')}</Text>
           </View>
           {full ? (
             <Text style={styles.hint}>{t('household.full', { max: household.max_members })}</Text>
           ) : (
             <>
-              <Text style={styles.hint}>{t('household.inviteHint')}</Text>
-              {household.invite && (
-                <View style={styles.codeBox}>
-                  <Text style={styles.code} selectable>{household.invite.code}</Text>
-                  <Text style={styles.codeExpiry}>{t('household.validUntil', { date: expiresLabel(household.invite.expires_at) })}</Text>
-                </View>
+              {household.invite ? (
+                <>
+                  <View style={styles.codeRow} accessible accessibilityLabel={household.invite.code}>
+                    {household.invite.code.split('').map((char, index) => (
+                      <View key={index} style={styles.codeBox}>
+                        <Text style={styles.codeChar}>{char}</Text>
+                      </View>
+                    ))}
+                  </View>
+                  <Text style={styles.hint}>{t('household.codeValidUntil', { date: expiresLabel(household.invite.expires_at) })}</Text>
+                </>
+              ) : (
+                <Text style={styles.hint}>{t('household.inviteHint')}</Text>
               )}
-              <TouchableOpacity style={styles.primaryButton} onPress={invite} disabled={!!busy}>
-                {busy === 'invite' ? <ActivityIndicator color="#fff" /> : (
-                  <>
-                    <Share2 size={18} color="#fff" />
-                    <Text style={styles.primaryButtonText}>{household.invite ? t('household.shareCode') : t('household.createCode')}</Text>
-                  </>
-                )}
-              </TouchableOpacity>
+              <Button
+                label={household.invite ? t('household.shareLink') : t('household.createCode')}
+                icon={Share2}
+                onPress={invite}
+                loading={busy === 'invite'}
+                disabled={!!busy && busy !== 'invite'}
+              />
               {household.invite && (
-                <TouchableOpacity onPress={newCode} disabled={!!busy} style={styles.linkButton}>
-                  <Text style={styles.linkText}>{t('household.newCode')}</Text>
-                </TouchableOpacity>
+                <Button label={t('household.newCode')} variant="ghost" size="small" onPress={newCode} loading={busy === 'newCode'} disabled={!!busy && busy !== 'newCode'} />
               )}
             </>
           )}
-        </View>
+        </Card>
+
+        {/* Membres */}
+        <Card style={styles.membersCard}>
+          <Text style={[styles.cardTitle, styles.membersTitle]}>
+            {t('household.membersTitle', { count: household.members.length, max: household.max_members })}
+          </Text>
+          {household.members.map((member) => {
+            const name = member.is_me ? t('household.you') : member.name ?? t('household.guest');
+            return (
+              <View key={member.user_id}>
+                <View style={cardStyles.divider} />
+                <View style={styles.member}>
+                  <View style={[styles.avatar, member.is_me && styles.avatarMe]}>
+                    <Text style={styles.avatarText}>{(member.is_me ? member.name ?? name : name).charAt(0).toUpperCase()}</Text>
+                  </View>
+                  <View style={styles.memberText}>
+                    <Text style={styles.memberName}>{name}</Text>
+                    <Text style={styles.memberDetail}>
+                      {member.is_me && member.role === 'owner' ? t('household.youManage') : joinedLabel(member.joined_at)}
+                    </Text>
+                  </View>
+                  {member.role === 'owner' && <Badge label={t('household.owner')} tone="soon" style={styles.centered} />}
+                  {isOwner && household.shared && !member.is_me && (
+                    <Touchable
+                      onPress={() => remove(member)}
+                      disabled={!!busy}
+                      style={styles.remove}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${t('household.remove')} ${name}`}
+                    >
+                      <UserMinus size={sizes.icon} color={colors.expired.text} />
+                    </Touchable>
+                  )}
+                </View>
+              </View>
+            );
+          })}
+        </Card>
 
         {/* Rejoindre un foyer (un seul foyer partagé à la fois) */}
         {!household.shared && (
-          <View style={styles.card}>
+          <Card style={styles.joinCard}>
             <Text style={styles.cardTitle}>{t('household.joinTitle')}</Text>
-            <Text style={styles.hint}>{t('household.joinHint')}</Text>
-            <View style={styles.inputRow}>
-              <Input
-                style={[styles.input, styles.codeInput]}
-                value={code}
-                onChangeText={(value) => setCode(value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
-                maxLength={6}
-                autoCapitalize="characters"
-                autoCorrect={false}
-                placeholder="ABC234"
-              />
-              <TouchableOpacity style={styles.smallButton} onPress={join} disabled={!!busy || code.length !== 6}>
-                {busy === 'join' ? <ActivityIndicator size="small" color="#fff" /> : <Text style={styles.smallButtonText}>{t('household.join')}</Text>}
-              </TouchableOpacity>
+            <View style={styles.joinRow}>
+              <View style={styles.codeField}>
+                <Input
+                  style={styles.codeInput}
+                  value={code}
+                  onChangeText={(value) => setCode(value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
+                  maxLength={6}
+                  autoCapitalize="characters"
+                  autoCorrect={false}
+                  placeholder={t('household.codePlaceholder')}
+                  accessibilityLabel={t('household.joinHint')}
+                />
+              </View>
+              <Button label={t('household.join')} variant="accent" size="medium" onPress={join} loading={busy === 'join'} disabled={(!!busy && busy !== 'join') || code.length !== 6} />
             </View>
-          </View>
+          </Card>
         )}
 
         {household.shared && (
-          <TouchableOpacity style={styles.leaveButton} onPress={leave} disabled={!!busy}>
-            {busy === 'leave' ? <ActivityIndicator color="#ef4444" /> : (
-              <>
-                <LogOut size={18} color="#ef4444" />
-                <Text style={styles.leaveText}>{t('household.leave')}</Text>
-              </>
-            )}
-          </TouchableOpacity>
+          <Button label={t('household.leave')} variant="danger" size="small" onPress={leave} loading={busy === 'leave'} disabled={!!busy && busy !== 'leave'} />
         )}
       </ScrollView>
-      </KeyboardAvoider>
-    </>
+    </KeyboardAvoider>
   );
 }
 
@@ -318,31 +298,122 @@ function ask(title: string, message: string, cancel: string, options: { label: s
 }
 
 const styles = StyleSheet.create({
-  loading: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f9fafb' },
-  container: { flex: 1, backgroundColor: '#f9fafb' },
-  content: { padding: 20, gap: 16, paddingBottom: 40 },
-  intro: { fontSize: 14, color: '#4b5563', lineHeight: 20 },
-  card: { backgroundColor: '#fff', borderRadius: 12, padding: 16, gap: 10, borderWidth: 1, borderColor: '#f3f4f6' },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  cardTitle: { fontSize: 16, fontWeight: '700', color: '#111827' },
-  hint: { fontSize: 13, color: '#6b7280', lineHeight: 18 },
-  memberRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 6 },
-  memberInfo: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
-  memberName: { fontSize: 15, color: '#111827' },
-  ownerBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#fef3c7', borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
-  ownerText: { fontSize: 11, color: '#b45309', fontWeight: '600' },
-  inputRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
-  input: { flex: 1, borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: '#111827' },
-  codeInput: { letterSpacing: 4, fontWeight: '700', fontSize: 18 },
-  smallButton: { backgroundColor: '#10b981', borderRadius: 8, paddingHorizontal: 14, paddingVertical: 11, minWidth: 90, alignItems: 'center' },
-  smallButtonText: { color: '#fff', fontWeight: '600' },
-  codeBox: { alignItems: 'center', backgroundColor: '#f0fdf4', borderRadius: 10, paddingVertical: 12 },
-  code: { fontSize: 30, fontWeight: '800', letterSpacing: 6, color: '#047857' },
-  codeExpiry: { fontSize: 12, color: '#6b7280', marginTop: 4 },
-  primaryButton: { flexDirection: 'row', gap: 8, justifyContent: 'center', alignItems: 'center', backgroundColor: '#10b981', borderRadius: 10, paddingVertical: 12 },
-  primaryButtonText: { color: '#fff', fontWeight: '600', fontSize: 15 },
-  linkButton: { alignItems: 'center', paddingVertical: 4 },
-  linkText: { color: '#10b981', fontWeight: '600' },
-  leaveButton: { flexDirection: 'row', gap: 8, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fef2f2', borderRadius: 10, paddingVertical: 12 },
-  leaveText: { color: '#ef4444', fontWeight: '600', fontSize: 15 },
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  content: {
+    paddingHorizontal: spacing.screen,
+    gap: spacing.lg,
+  },
+  intro: {
+    ...typography.body,
+    color: colors.textSecondary,
+  },
+  inviteCard: {
+    gap: spacing.md,
+    padding: spacing.xl,
+  },
+  inviteHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  cardTitle: {
+    ...typography.cardTitle,
+  },
+  hint: {
+    ...typography.secondary,
+    fontSize: typography.listTitle.fontSize,
+  },
+  codeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  codeBox: {
+    flex: 1,
+    height: sizes.codeBox,
+    maxWidth: sizes.codeBox,
+    borderRadius: radius.iconChip,
+    borderWidth: sizes.borderWidth,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  codeChar: {
+    ...typography.title2,
+    color: colors.primary,
+  },
+  membersCard: {
+    paddingVertical: spacing.xs,
+  },
+  membersTitle: {
+    paddingVertical: spacing.md,
+  },
+  member: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    minHeight: sizes.touch + spacing.xl,
+  },
+  avatar: {
+    width: sizes.avatar,
+    height: sizes.avatar,
+    borderRadius: radius.pill,
+    backgroundColor: colors.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarMe: {
+    backgroundColor: colors.accent,
+  },
+  avatarText: {
+    ...typography.button,
+    color: colors.onAccent,
+  },
+  memberText: {
+    flex: 1,
+    gap: spacing.xxs,
+  },
+  memberName: {
+    ...typography.cardTitle,
+  },
+  memberDetail: {
+    ...typography.secondary,
+    fontSize: typography.listTitle.fontSize,
+  },
+  centered: {
+    alignSelf: 'center',
+  },
+  remove: {
+    width: sizes.touch,
+    height: sizes.touch,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  joinCard: {
+    gap: spacing.md,
+  },
+  joinRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  codeField: {
+    flex: 1,
+    minHeight: sizes.button,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+    borderRadius: radius.control,
+    borderWidth: sizes.borderWidth,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  codeInput: {
+    ...typography.bodyStrong,
+    letterSpacing: spacing.xs,
+    minHeight: sizes.touch,
+  },
 });

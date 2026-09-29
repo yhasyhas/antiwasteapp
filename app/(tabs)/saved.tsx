@@ -1,85 +1,59 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  ActivityIndicator,
-} from 'react-native';
-import { Heart } from 'lucide-react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { useSavedRecipes } from '@/hooks/useSavedRecipes';
 import { RecipeListCard } from '@/components/recipe/RecipeListCard';
 import { RecipeSheet } from '@/components/recipe/RecipeSheet';
+import { EmptyState } from '@/components/ui/Illustrations';
+import { ListItemMotion } from '@/components/ui/ListItemMotion';
+import { ScreenHeader } from '@/components/ui/ScreenHeader';
+import { SkeletonRecipeCard } from '@/components/ui/Skeleton';
+import { colors, spacing, typography } from '@/constants/theme';
 
 export default function SavedScreen() {
   const { recipes, loading, selectedRecipe, setSelectedRecipe, isImageLoading, imageNotice, openRecipe, toggleFavorite } = useSavedRecipes();
   const { t } = useLanguage();
-  const safe = useSafeSpacing();
 
   const favoriteRecipes = recipes.filter((r) => r.is_favorite);
-
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#10b981" />
-      </View>
-    );
-  }
+  const otherRecipes = recipes.filter((r) => !r.is_favorite);
 
   return (
     <View style={styles.container}>
-      <View style={[styles.header, safe.top(20)]}>
-        <Text style={styles.headerTitle}>{t('saved.title')}</Text>
-        <Text style={styles.headerSubtitle}>
-          {t('saved.favoritesCount', { count: favoriteRecipes.length })}
-        </Text>
-      </View>
+      <ScreenHeader title={t('saved.title')} subtitle={loading ? undefined : t('saved.favoritesCount', { count: favoriteRecipes.length })} />
 
-      {favoriteRecipes.length === 0 ? (
-        <View style={styles.emptyState}>
-          <View style={styles.emptyIconContainer}>
-            <Heart size={64} color="#d1d5db" strokeWidth={1.5} />
-          </View>
-          <Text style={styles.emptyTitle}>{t('saved.emptyTitle')}</Text>
-          <Text style={styles.emptyText}>
-            {t('saved.emptyText')}
-          </Text>
+      {loading ? (
+        <View style={styles.content}>
+          <SkeletonRecipeCard />
         </View>
+      ) : favoriteRecipes.length === 0 ? (
+        <EmptyState kind="recipes" title={t('saved.emptyTitle')} text={t('saved.emptyText')} />
       ) : (
-        <ScrollView
-          style={styles.recipeList}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('saved.yourFavorites')}</Text>
-            {favoriteRecipes.map((recipe) => (
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <Text style={styles.sectionTitle}>{t('saved.yourFavorites')}</Text>
+          {favoriteRecipes.map((recipe, index) => (
+            <ListItemMotion key={recipe.id} index={index}>
               <RecipeListCard
-                key={recipe.id}
                 recipe={recipe}
                 imageLoading={isImageLoading(recipe.id)}
                 onPress={() => openRecipe(recipe)}
                 favorite={{ active: true, onToggle: () => toggleFavorite(recipe.id) }}
               />
-            ))}
-          </View>
+            </ListItemMotion>
+          ))}
 
-          {recipes.filter((r) => !r.is_favorite).length > 0 && (
-            <View style={styles.section}>
+          {otherRecipes.length > 0 && (
+            <>
               <Text style={styles.sectionTitle}>{t('saved.allRecipes')}</Text>
-              {recipes
-                .filter((r) => !r.is_favorite)
-                .map((recipe) => (
-                  <RecipeListCard
-                    key={recipe.id}
-                    recipe={recipe}
-                    imageLoading={isImageLoading(recipe.id)}
-                    onPress={() => openRecipe(recipe)}
-                    favorite={{ active: false, onToggle: () => toggleFavorite(recipe.id) }}
-                  />
-                ))}
-            </View>
+              {otherRecipes.map((recipe) => (
+                <RecipeListCard
+                  key={recipe.id}
+                  recipe={recipe}
+                  imageLoading={isImageLoading(recipe.id)}
+                  onPress={() => openRecipe(recipe)}
+                  favorite={{ active: false, onToggle: () => toggleFavorite(recipe.id) }}
+                />
+              ))}
+            </>
           )}
         </ScrollView>
       )}
@@ -101,68 +75,16 @@ export default function SavedScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: colors.background,
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f9fafb',
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginTop: 2,
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 40,
-  },
-  emptyIconContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#f3f4f6',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  emptyTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 8,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#6b7280',
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  recipeList: {
-    flex: 1,
-  },
-  section: {
-    padding: 20,
+  content: {
+    paddingHorizontal: spacing.screen,
+    paddingBottom: spacing.xxl,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 16,
+    ...typography.overline,
+    color: colors.textSecondary,
+    marginBottom: spacing.md,
+    marginTop: spacing.sm,
   },
 });

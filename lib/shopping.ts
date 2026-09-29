@@ -1,6 +1,7 @@
 import { supabase } from './supabase';
 import { activeHouseholdId } from './household';
 import { notifyPantryChanged, notifyShoppingChanged } from './pantryEvents';
+import { linkPantryFoodKeys } from './foodNames';
 
 export { onShoppingChanged } from './pantryEvents';
 
@@ -48,13 +49,16 @@ export const addShoppingItem = (name: string, quantity: string) =>
 export const setShoppingItemChecked = (id: string, checked: boolean) =>
   write(supabase.from('shopping_items').update({ checked }).eq('id', id));
 
+// Article retiré, annulable (undo_pantry_action) ; renvoie l'identifiant de l'action
 export const removeShoppingItem = (id: string) =>
-  write(supabase.from('shopping_items').delete().eq('id', id));
+  write(supabase.rpc('delete_shopping_item_with_undo', { p_id: id })) as Promise<string>;
 
-// Ingrédients manquants d'une recette, en un geste ; renvoie le nombre d'articles ajoutés (sans doublon)
-export const addMissingToShoppingList = (names: string[], recipeId?: string, recipeTitle?: string) =>
+// Ingrédients manquants d'une recette, en un geste, avec leurs quantités (même ordre que les noms) ;
+// renvoie le nombre d'articles ajoutés (sans doublon)
+export const addMissingToShoppingList = (names: string[], quantities: string[], recipeId?: string, recipeTitle?: string) =>
   write(supabase.rpc('add_to_shopping_list', {
     p_names: names,
+    p_quantities: quantities,
     p_recipe_id: recipeId ?? null,
     p_recipe_title: recipeTitle ?? null,
   })) as Promise<number>;
@@ -63,5 +67,7 @@ export const addMissingToShoppingList = (names: string[], recipeId?: string, rec
 export async function stockShoppingItems(items: { id: string; expires_at: string | null }[]): Promise<number> {
   const count = (await write(supabase.rpc('stock_shopping_items', { p_items: items }))) as number;
   notifyPantryChanged();
+  // Aliments rangés : reliés à leur fiche en arrière-plan
+  linkPantryFoodKeys();
   return count;
 }

@@ -1,5 +1,6 @@
 import { callEdgeFunction } from './callEdgeFunction';
 import { failureReasonOf, type FailureReason } from './quotaReason';
+import { rememberFoodNames } from './foodNames';
 import { supabase } from './supabase';
 
 // Fiches aliments (fonction food-fact) : générées une seule fois pour tous les utilisateurs, dans les trois
@@ -41,6 +42,7 @@ export async function fetchFoodFact(ingredient: { id: string; name: string; food
         const entry = { foodKey: data.food_key as string, fact: data.fact as FoodFact };
         cache.set(entry.foodKey, entry);
         cache.set(`name:${ingredient.name.toLowerCase()}`, entry);
+        rememberFoodNames(entry.foodKey, entry.fact);
         return { ok: true, ...entry };
       }
       if (response.status === 404 && data?.error === 'not_food') return { ok: false, reason: 'not_food' };

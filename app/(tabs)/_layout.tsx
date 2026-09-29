@@ -1,38 +1,28 @@
 import { Tabs } from 'expo-router';
-import { Home, Camera, List, Heart, Settings } from 'lucide-react-native';
+import { Camera, Heart, House, ListChecks, SlidersHorizontal } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { TabBar } from '@/components/ui/TabBar';
+import { colors } from '@/constants/theme';
 
 export default function TabsLayout() {
   const { t } = useTranslation();
-  // Boutons de navigation d'Android (trois boutons ou barre de gestes) : la barre d'onglets se place
-  // au-dessus, au lieu d'une hauteur fixe qu'ils recouvraient
-  const insets = useSafeAreaInsets();
   return (
     <Tabs
+      // Barre de l'app : pilule derrière l'onglet actif, au-dessus des boutons de navigation d'Android
+      tabBar={(props) => <TabBar {...props} />}
+      // Retour : onglet précédent (depuis la liste de courses, par exemple)
+      backBehavior="history"
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#10b981',
-        tabBarInactiveTintColor: '#9ca3af',
-        tabBarStyle: {
-          backgroundColor: '#fff',
-          borderTopWidth: 1,
-          borderTopColor: '#f3f4f6',
-          paddingTop: 8,
-          paddingBottom: 8 + insets.bottom,
-          height: 64 + insets.bottom,
-        },
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '600',
-        },
+        animation: 'fade',
+        sceneStyle: { backgroundColor: colors.background },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
           title: t('tabs.home'),
-          tabBarIcon: ({ size, color }) => <Home size={size} color={color} />,
+          tabBarIcon: ({ size, color }) => <House size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -46,7 +36,7 @@ export default function TabsLayout() {
         name="ingredients"
         options={{
           title: t('tabs.pantry'),
-          tabBarIcon: ({ size, color }) => <List size={size} color={color} />,
+          tabBarIcon: ({ size, color }) => <ListChecks size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -60,9 +50,11 @@ export default function TabsLayout() {
         name="settings"
         options={{
           title: t('tabs.settings'),
-          tabBarIcon: ({ size, color }) => <Settings size={size} color={color} />,
+          tabBarIcon: ({ size, color }) => <SlidersHorizontal size={size} color={color} />,
         }}
       />
+      {/* Liste de courses : ouverte depuis l'accueil et le garde-manger, barre d'onglets visible */}
+      <Tabs.Screen name="shopping" options={{ href: null, title: t('shopping.title') }} />
     </Tabs>
   );
 }

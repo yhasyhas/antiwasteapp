@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal } from 'react-native';
-import { Check, X } from 'lucide-react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { difficultyLabel } from '@/lib/labels';
+import { BottomSheet, SheetHeader } from '@/components/ui/BottomSheet';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { spacing, typography, colors } from '@/constants/theme';
 import { cuisineOptions, dietaryOptions, difficultyOptions, languages, mealTypes } from './options';
-import { modalStyles } from './modalStyles';
 import { CookTimeChoice, ServingsStepper } from './PreferenceControls';
 import type { Filters } from './types';
 
@@ -17,333 +18,129 @@ interface Props {
   onClose: () => void;
 }
 
-// Fenêtre des préférences de génération : type de repas, cuisine, langue, régimes, difficulté
+// Feuille des filtres de génération : type de repas, cuisine, temps, personnes, régimes, difficulté, langue
 export function FiltersModal({ visible, filters, onChange, onToggleDietary, onClose }: Props) {
   const { t } = useLanguage();
-  const safe = useSafeSpacing();
 
   return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      transparent={true}
-      onRequestClose={onClose}
-    >
-      <View style={modalStyles.modalOverlay}>
-        <View style={[modalStyles.modalContent, safe.bottom(24)]}>
-          <View style={modalStyles.modalHeader}>
-            <Text style={modalStyles.modalTitle}>{t('generate.filtersTitle')}</Text>
-            <TouchableOpacity onPress={onClose}>
-              <X size={24} color="#6b7280" />
-            </TouchableOpacity>
+    <BottomSheet visible={visible} onClose={onClose}>
+      <SheetHeader title={t('generate.filtersTitle')} onClose={onClose} />
+
+      <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent} showsVerticalScrollIndicator={false}>
+        <Group title={t('generate.mealType')}>
+          {mealTypes.map((meal) => (
+            <Chip
+              key={meal.value}
+              label={t(meal.labelKey)}
+              icon={meal.icon}
+              selected={filters.mealType === meal.value}
+              onPress={() => onChange({ ...filters, mealType: meal.value })}
+            />
+          ))}
+        </Group>
+
+        <Group title={t('cuisine.title')}>
+          {cuisineOptions.map((option) => (
+            <Chip
+              key={option.value}
+              label={t(option.labelKey)}
+              showCheck
+              selected={filters.cuisine === option.value}
+              onPress={() => onChange({ ...filters, cuisine: option.value })}
+            />
+          ))}
+        </Group>
+
+        <Group title={t('preferences.maxTime')}>
+          <CookTimeChoice value={filters.maxCookTime} onChange={(maxCookTime) => onChange({ ...filters, maxCookTime })} />
+        </Group>
+
+        <Group title={t('preferences.servings')}>
+          <ServingsStepper value={filters.servings} onChange={(servings) => onChange({ ...filters, servings })} />
+        </Group>
+
+        <Group title={t('generate.dietary')}>
+          {dietaryOptions.map((option) => (
+            <Chip
+              key={option.value}
+              label={t(option.labelKey)}
+              showCheck
+              selected={filters.dietary.includes(option.value)}
+              onPress={() => onToggleDietary(option.value)}
+            />
+          ))}
+        </Group>
+
+        {/* Aliments exclus : rappel (modifiables dans les préférences) */}
+        {filters.excluded.length > 0 && (
+          <View style={styles.group}>
+            <Text style={styles.groupTitle}>{t('preferences.excluded')}</Text>
+            <Text style={styles.note}>{t('preferences.excludedNote', { items: filters.excluded.join(', ') })}</Text>
           </View>
+        )}
 
-          <ScrollView showsVerticalScrollIndicator={false}>
-            {/* Type de repas */}
-            <View style={styles.filterGroup}>
-              <Text style={styles.filterGroupTitle}>{t('generate.mealType')}</Text>
-              <View style={styles.mealTypeGrid}>
-                {mealTypes.map((meal) => (
-                  <TouchableOpacity
-                    key={meal.value}
-                    style={[
-                      styles.mealTypeCard,
-                      filters.mealType === meal.value && styles.mealTypeCardSelected,
-                      { borderColor: meal.color }
-                    ]}
-                    onPress={() => onChange({ ...filters, mealType: meal.value })}
-                  >
-                    <View style={[styles.mealTypeIcon, { backgroundColor: meal.color + '20' }]}>
-                      <meal.icon size={24} color={meal.color} />
-                    </View>
-                    <Text style={[
-                      styles.mealTypeLabel,
-                      filters.mealType === meal.value && styles.mealTypeLabelSelected
-                    ]}>
-                      {t(meal.labelKey)}
-                    </Text>
-                    {filters.mealType === meal.value && (
-                      <View style={[styles.checkBadge, { backgroundColor: meal.color }]}>
-                        <Check size={12} color="#fff" />
-                      </View>
-                    )}
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
+        <Group title={t('generate.difficulty')}>
+          {difficultyOptions.map((option) => (
+            <Chip
+              key={option}
+              label={difficultyLabel(t, option)}
+              showCheck
+              selected={filters.difficulty === option}
+              onPress={() => onChange({ ...filters, difficulty: option })}
+            />
+          ))}
+        </Group>
 
-            {/* Cuisines du monde */}
-            <View style={styles.filterGroup}>
-              <Text style={styles.filterGroupTitle}>{t('cuisine.title')}</Text>
-              <View style={styles.optionGrid}>
-                {cuisineOptions.map((option) => (
-                  <TouchableOpacity
-                    key={option.value}
-                    style={[
-                      styles.optionChip,
-                      filters.cuisine === option.value && styles.optionChipSelected,
-                    ]}
-                    onPress={() => onChange({ ...filters, cuisine: option.value })}
-                  >
-                    {filters.cuisine === option.value && (
-                      <Check size={16} color="#fff" />
-                    )}
-                    <Text
-                      style={[
-                        styles.optionChipText,
-                        filters.cuisine === option.value && styles.optionChipTextSelected,
-                      ]}
-                    >
-                      {t(option.labelKey)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
+        <Group title={t('generate.recipeLanguage')}>
+          {languages.map((lang) => (
+            <Chip
+              key={lang.value}
+              label={lang.label}
+              selected={filters.language === lang.value}
+              onPress={() => onChange({ ...filters, language: lang.value })}
+            />
+          ))}
+        </Group>
+      </ScrollView>
 
-            {/* Langue des recettes */}
-            <View style={styles.filterGroup}>
-              <Text style={styles.filterGroupTitle}>{t('generate.recipeLanguage')}</Text>
-              <View style={styles.languageRow}>
-                {languages.map((lang) => (
-                  <TouchableOpacity
-                    key={lang.value}
-                    style={[
-                      styles.languageChip,
-                      filters.language === lang.value && styles.languageChipSelected,
-                    ]}
-                    onPress={() => onChange({ ...filters, language: lang.value })}
-                  >
-                    <Text style={styles.languageFlag}>{lang.flag}</Text>
-                    <Text style={[
-                      styles.languageText,
-                      filters.language === lang.value && styles.languageTextSelected
-                    ]}>
-                      {lang.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
+      <Button label={t('generate.apply')} onPress={onClose} style={styles.apply} />
+    </BottomSheet>
+  );
+}
 
-            {/* Préférences diététiques */}
-            <View style={styles.filterGroup}>
-              <Text style={styles.filterGroupTitle}>{t('generate.dietary')}</Text>
-              <View style={styles.optionGrid}>
-                {dietaryOptions.map((option) => (
-                  <TouchableOpacity
-                    key={option.value}
-                    style={[
-                      styles.optionChip,
-                      filters.dietary.includes(option.value) &&
-                        styles.optionChipSelected,
-                    ]}
-                    onPress={() => onToggleDietary(option.value)}
-                  >
-                    {filters.dietary.includes(option.value) && (
-                      <Check size={16} color="#fff" />
-                    )}
-                    <Text
-                      style={[
-                        styles.optionChipText,
-                        filters.dietary.includes(option.value) &&
-                          styles.optionChipTextSelected,
-                      ]}
-                    >
-                      {t(option.labelKey)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
-            {/* Temps maximum */}
-            <View style={styles.filterGroup}>
-              <Text style={styles.filterGroupTitle}>{t('preferences.maxTime')}</Text>
-              <CookTimeChoice value={filters.maxCookTime} onChange={(maxCookTime) => onChange({ ...filters, maxCookTime })} />
-            </View>
-
-            {/* Nombre de personnes */}
-            <View style={styles.filterGroup}>
-              <Text style={styles.filterGroupTitle}>{t('preferences.servings')}</Text>
-              <ServingsStepper value={filters.servings} onChange={(servings) => onChange({ ...filters, servings })} />
-            </View>
-
-            {/* Aliments exclus : rappel (modifiables dans les préférences) */}
-            {filters.excluded.length > 0 && (
-              <View style={styles.filterGroup}>
-                <Text style={styles.filterGroupTitle}>{t('preferences.excluded')}</Text>
-                <Text style={styles.excludedNote}>{t('preferences.excludedNote', { items: filters.excluded.join(', ') })}</Text>
-              </View>
-            )}
-
-            {/* Difficulté */}
-            <View style={styles.filterGroup}>
-              <Text style={styles.filterGroupTitle}>{t('generate.difficulty')}</Text>
-              <View style={styles.optionGrid}>
-                {difficultyOptions.map((option) => (
-                  <TouchableOpacity
-                    key={option}
-                    style={[
-                      styles.optionChip,
-                      filters.difficulty === option &&
-                        styles.optionChipSelected,
-                    ]}
-                    onPress={() =>
-                      onChange({ ...filters, difficulty: option })
-                    }
-                  >
-                    {filters.difficulty === option && (
-                      <Check size={16} color="#fff" />
-                    )}
-                    <Text
-                      style={[
-                        styles.optionChipText,
-                        filters.difficulty === option &&
-                          styles.optionChipTextSelected,
-                      ]}
-                    >
-                      {difficultyLabel(t, option)}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-          </ScrollView>
-
-          <TouchableOpacity
-            style={styles.applyButton}
-            onPress={onClose}
-          >
-            <Text style={styles.applyButtonText}>{t('generate.apply')}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
+function Group({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <View style={styles.group}>
+      <Text style={styles.groupTitle}>{title}</Text>
+      <View style={styles.chips}>{children}</View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  excludedNote: {
-    fontSize: 14,
-    color: '#6b7280',
-    lineHeight: 20,
+  body: {
+    flexGrow: 0,
   },
-  filterGroup: {
-    marginBottom: 24,
+  bodyContent: {
+    gap: spacing.xxl,
+    paddingBottom: spacing.lg,
   },
-  filterGroupTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 12,
+  group: {
+    gap: spacing.md,
   },
-  mealTypeGrid: {
+  groupTitle: {
+    ...typography.bodyStrong,
+  },
+  chips: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: spacing.sm,
   },
-  mealTypeCard: {
-    width: '47%',
-    backgroundColor: '#f9fafb',
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 2,
-    borderColor: '#e5e7eb',
-    alignItems: 'center',
-    gap: 8,
+  note: {
+    ...typography.secondary,
+    color: colors.textSecondary,
   },
-  mealTypeCardSelected: {
-    backgroundColor: '#fff',
-    borderWidth: 3,
-  },
-  mealTypeIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  mealTypeLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
-  },
-  mealTypeLabelSelected: {
-    color: '#111827',
-  },
-  checkBadge: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  languageRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  languageChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f3f4f6',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
-    gap: 8,
-  },
-  languageChipSelected: {
-    backgroundColor: '#10b981',
-  },
-  languageFlag: {
-    fontSize: 20,
-  },
-  languageText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
-  },
-  languageTextSelected: {
-    color: '#fff',
-  },
-  optionGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  optionChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f3f4f6',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    gap: 6,
-  },
-  optionChipSelected: {
-    backgroundColor: '#10b981',
-  },
-  optionChipText: {
-    fontSize: 14,
-    color: '#374151',
-    fontWeight: '500',
-  },
-  optionChipTextSelected: {
-    color: '#fff',
-  },
-  applyButton: {
-    backgroundColor: '#111827',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  applyButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
+  apply: {
+    marginTop: spacing.md,
   },
 });

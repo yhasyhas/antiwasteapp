@@ -1,58 +1,58 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { router, useFocusEffect } from 'expo-router';
+import { Camera, Plus, Search, ShoppingCart, Users } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useSafeSpacing } from '@/hooks/useSafeSpacing';
-import { Input } from '@/components/ui/Input';
+import { TextField } from '@/components/ui/Input';
 import { KeyboardAvoider } from '@/components/ui/KeyboardAvoider';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { EmptyState } from '@/components/ui/Illustrations';
+import { ScreenHeader, SquareButton } from '@/components/ui/ScreenHeader';
+import { SkeletonRow } from '@/components/ui/Skeleton';
+import { Touchable } from '@/components/ui/Touchable';
+import { ListItemMotion } from '@/components/ui/ListItemMotion';
+import { Toast } from '@/components/ui/Toast';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { supabase } from '@/lib/supabase';
-import { Search, Trash2, Plus, Package, Users, ShoppingCart } from 'lucide-react-native';
-import { router, useFocusEffect } from 'expo-router';
 import { IngredientCard, type PantryIngredient } from '@/components/pantry/IngredientCard';
 import { ExpiryEditModal } from '@/components/pantry/ExpiryEditModal';
 import { FoodFactSheet } from '@/components/pantry/FoodFactSheet';
-import { sortByUrgency } from '@/lib/expiry';
+import { expiryStatus, sortByUrgency } from '@/lib/expiry';
 import { maybeAskNotificationPermission } from '@/lib/notifications';
 import { notifyPantryChanged, onPantryChanged } from '@/lib/pantryEvents';
-import { activeHouseholdId } from '@/lib/household';
+import { activeHouseholdId, addedByLabel } from '@/lib/household';
 import { useHousehold } from '@/hooks/useHousehold';
+import { useUndoableAction } from '@/hooks/useUndoableAction';
+import { linkPantryFoodKeys, useFoodNames } from '@/lib/foodNames';
+import { colors, radius, shadows, sizes, spacing, typography } from '@/constants/theme';
+
+type Filter = 'all' | 'urgent' | 'leftovers';
+
+const isUrgent = (ingredient: PantryIngredient) => {
+  const status = expiryStatus(ingredient.expires_at);
+  return status === 'expired' || status === 'soon';
+};
 
 export default function IngredientsScreen() {
   const { user } = useAuth();
   const { t } = useLanguage();
-  const safe = useSafeSpacing();
   const [ingredients, setIngredients] = useState<PantryIngredient[]>([]);
-  const [filteredIngredients, setFilteredIngredients] = useState<PantryIngredient[]>(
-    []
-  );
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [deleting, setDeleting] = useState<string | null>(null);
+  const [filter, setFilter] = useState<Filter>('all');
   const [editingExpiry, setEditingExpiry] = useState<PantryIngredient | null>(null);
   const [savingExpiry, setSavingExpiry] = useState(false);
   const household = useHousehold();
+  const foodName = useFoodNames(ingredients);
   // Fiche de l'aliment touché
   const [factIngredient, setFactIngredient] = useState<PantryIngredient | null>(null);
 
   // Garde-manger partagé : rechargé quand un membre le modifie (temps réel) ou qu'on change de foyer
   useEffect(() => onPantryChanged(loadIngredients), [user]);
 
-  // « Ajouté par » (foyer partagé seulement) : moi, un membre, ou un ancien membre
-  const addedBy = (authorId: string | null): string | undefined => {
-    if (!household?.shared) return undefined;
-    const member = household.members.find((m) => m.user_id === authorId);
-    if (!member) return t('household.formerMember');
-    return member.is_me ? t('household.me') : member.name ?? t('household.guest');
-  };
+
 
   // Rechargé à chaque retour sur l'onglet (ingrédients ajoutés depuis la caméra, par exemple)
   useFocusEffect(
@@ -61,68 +61,44 @@ export default function IngredientsScreen() {
     }, [user])
   );
 
-  useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setFilteredIngredients(ingredients);
-    } else {
-      const filtered = ingredients.filter((ingredient) =>
-        ingredient.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredIngredients(filtered);
-    }
-  }, [searchQuery, ingredients]);
-
   const loadIngredients = async () => {
     if (!user) return;
 
     const householdId = await activeHouseholdId();
     if (!householdId) return;
 
-    // Pas de setLoading(true) : le spinner plein écran ne s'affiche qu'au premier chargement,
-    // les rechargements au retour sur l'onglet se font en arrière-plan
-    const { data, error } = await supabase
+    // Squelettes au premier chargement seulement ; les rechargements se font en arrière-plan
+    const { data } = await supabase
       .from('ingredients')
       .select('*')
       .eq('household_id', householdId)
       .order('created_at', { ascending: false });
 
-    if (data) {
-      // Par urgence : expirés et proches d'abord, sans date à la fin
-      const sorted = sortByUrgency(data as PantryIngredient[]);
-      setIngredients(sorted);
-      setFilteredIngredients(sorted);
-    }
+    // Par urgence : expirés et proches d'abord, sans date à la fin
+    if (data) setIngredients(sortByUrgency(data as PantryIngredient[]));
     setLoading(false);
+    // Aliments ajoutés sans identifiant (ajout manuel, code-barres, courses) : reliés à leur fiche
+    if (data?.some((row) => !row.food_key && row.kind !== 'dish')) linkPantryFoodKeys();
   };
 
-  const deleteIngredient = async (id: string) => {
-    Alert.alert(
-      t('pantry.deleteTitle'),
-      t('pantry.deleteText'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.delete'),
-          style: 'destructive',
-          onPress: async () => {
-            setDeleting(id);
-            const { error } = await supabase
-              .from('ingredients')
-              .delete()
-              .eq('id', id);
-
-            if (error) {
-              alertWriteError(t, 'deleting ingredient', error);
-            } else {
-              setIngredients(ingredients.filter((ing) => ing.id !== id));
-              notifyPantryChanged();
-            }
-            setDeleting(null);
-          },
-        },
-      ]
-    );
-  };
+  // Suppression enregistrée tout de suite, annulable (« Aliment retiré · Annuler ») : l'aliment revient tel
+  // quel et le compteur est rétabli
+  const removal = useUndoableAction<PantryIngredient>({
+    label: 'deleting ingredient',
+    perform: async (ingredient) => {
+      const { data, error } = await supabase.rpc('delete_ingredient_with_undo', { p_id: ingredient.id });
+      if (error) throw error;
+      return data as string;
+    },
+    onDone: (ingredient) => {
+      setIngredients((current) => current.filter((ing) => ing.id !== ingredient.id));
+      notifyPantryChanged();
+    },
+    onUndone: () => {
+      loadIngredients();
+      notifyPantryChanged();
+    },
+  });
 
   const saveExpiry = async (expiresAt: string | null) => {
     if (!editingExpiry) return;
@@ -138,7 +114,7 @@ export default function IngredientsScreen() {
       return;
     }
     const id = editingExpiry.id;
-    setIngredients(sortByUrgency(ingredients.map((ing) => ing.id === id ? { ...ing, expires_at: expiresAt } : ing)));
+    setIngredients((current) => sortByUrgency(current.map((ing) => ing.id === id ? { ...ing, expires_at: expiresAt } : ing)));
     setEditingExpiry(null);
     notifyPantryChanged();
     if (expiresAt) await maybeAskNotificationPermission();
@@ -167,7 +143,6 @@ export default function IngredientsScreen() {
               alertWriteError(t, 'clearing ingredients', error);
             } else {
               setIngredients([]);
-              setFilteredIngredients([]);
               notifyPantryChanged();
             }
             setLoading(false);
@@ -177,116 +152,128 @@ export default function IngredientsScreen() {
     );
   };
 
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#10b981" />
-      </View>
-    );
-  }
+  // Aliments en cours de suppression : déjà cachés (reviennent si l'enregistrement échoue)
+  const shown = ingredients.filter((ingredient) => !removal.hiddenIds.has(ingredient.id));
+  const query = searchQuery.trim().toLowerCase();
+  const searched = query
+    ? shown.filter((ingredient) => ingredient.name.toLowerCase().includes(query) || foodName(ingredient).toLowerCase().includes(query))
+    : shown;
+  const counts = {
+    all: searched.length,
+    urgent: searched.filter(isUrgent).length,
+    leftovers: searched.filter((ingredient) => ingredient.kind === 'dish').length,
+  };
+  const visible = searched.filter((ingredient) =>
+    filter === 'urgent' ? isUrgent(ingredient) : filter === 'leftovers' ? ingredient.kind === 'dish' : true,
+  );
+  const groups = [
+    { key: 'urgent', title: t('pantry.groupUrgent'), items: visible.filter(isUrgent), color: colors.expired.text },
+    { key: 'later', title: t('pantry.groupLater'), items: visible.filter((ingredient) => !isUrgent(ingredient)), color: colors.textSecondary },
+  ].filter((group) => group.items.length > 0);
+
+  const renderCard = (ingredient: PantryIngredient, index: number) => (
+    <ListItemMotion key={ingredient.id} index={index}>
+      <IngredientCard
+        ingredient={ingredient}
+        displayName={foodName(ingredient)}
+        onDelete={() => removal.run(ingredient)}
+        onEditExpiry={() => setEditingExpiry(ingredient)}
+        addedBy={addedByLabel(t, household, ingredient.user_id) ?? undefined}
+        onOpenFact={() => setFactIngredient(ingredient)}
+      />
+    </ListItemMotion>
+  );
 
   return (
     <KeyboardAvoider style={styles.container}>
-      <View style={[styles.header, safe.top(20)]}>
-        <View style={styles.headerText}>
-          <Text style={styles.headerTitle}>{t('pantry.title')}</Text>
-          <Text style={styles.headerSubtitle}>
-            {household?.shared
-              ? t('household.pantrySubtitle', { count: ingredients.length, members: household.members.length })
-              : t('ingredientCount', { count: ingredients.length })}
-          </Text>
-        </View>
-        <View style={styles.headerActions}>
-          <TouchableOpacity
-            style={styles.householdButton}
-            onPress={() => router.push('/shopping')}
-            accessibilityLabel={t('shopping.title')}
-          >
-            <ShoppingCart size={20} color="#10b981" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.householdButton}
-            onPress={() => router.push('/household')}
-            accessibilityLabel={t('household.title')}
-          >
-            <Users size={20} color="#10b981" />
-          </TouchableOpacity>
-          {ingredients.length > 0 && (
-            <TouchableOpacity
-              style={styles.clearButton}
-              onPress={clearAllIngredients}
-            >
-              <Trash2 size={20} color="#ef4444" />
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
+      <ScreenHeader
+        title={t('tabs.pantry')}
+        subtitle={
+          household?.shared
+            ? t('pantry.sharedSubtitle', { count: household.members.length })
+            : t('ingredientCount', { count: shown.length })
+        }
+        actions={
+          <>
+            <SquareButton icon={Users} label={t('household.title')} onPress={() => router.push('/household')} />
+            <SquareButton icon={ShoppingCart} label={t('shopping.title')} onPress={() => router.navigate('/shopping')} />
+          </>
+        }
+      />
 
-      <View style={styles.searchContainer}>
-        <Search size={20} color="#9ca3af" style={styles.searchIcon} />
-        <Input
-          style={styles.searchInput}
+      <ScrollView
+        style={styles.list}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <TextField
+          icon={Search}
           placeholder={t('pantry.searchPlaceholder')}
           value={searchQuery}
           onChangeText={setSearchQuery}
+          returnKeyType="search"
         />
-      </View>
 
-      {ingredients.length === 0 ? (
-        <View style={styles.emptyState}>
-          <View style={styles.emptyIconContainer}>
-            <Package size={64} color="#d1d5db" strokeWidth={1.5} />
+        {loading ? (
+          <View style={styles.section}>
+            {[0, 1, 2, 3].map((row) => <SkeletonRow key={row} />)}
           </View>
-          <Text style={styles.emptyTitle}>{t('pantry.emptyTitle')}</Text>
-          <Text style={styles.emptyText}>
-            {t('pantry.emptyText')}
-          </Text>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => router.push('/(tabs)/camera')}
-          >
-            <Plus size={20} color="#fff" />
-            <Text style={styles.addButtonText}>{t('pantry.addIngredients')}</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <>
-          <ScrollView
-            style={styles.ingredientList}
-            showsVerticalScrollIndicator={false}
-          >
-            {filteredIngredients.length === 0 ? (
-              <View style={styles.noResults}>
-                <Text style={styles.noResultsText}>{t('pantry.noResults')}</Text>
-              </View>
+        ) : shown.length === 0 ? (
+          <EmptyState
+            kind="pantry"
+            title={t('pantry.emptyTitle')}
+            text={t('pantry.emptyText')}
+            action={<Button label={t('pantry.addIngredients')} icon={Camera} onPress={() => router.navigate('/(tabs)/camera')} />}
+          />
+        ) : (
+          <>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filters}>
+              <Chip label={t('pantry.filterAll', { count: counts.all })} selected={filter === 'all'} onPress={() => setFilter('all')} />
+              <Chip label={t('pantry.filterUrgent', { count: counts.urgent })} selected={filter === 'urgent'} onPress={() => setFilter('urgent')} />
+              <Chip label={t('pantry.filterLeftovers', { count: counts.leftovers })} selected={filter === 'leftovers'} onPress={() => setFilter('leftovers')} />
+            </ScrollView>
+
+            {groups.length === 0 ? (
+              <Text style={styles.noResults}>{t('pantry.noResults')}</Text>
             ) : (
-              filteredIngredients.map((ingredient) => (
-                <IngredientCard
-                  key={ingredient.id}
-                  ingredient={ingredient}
-                  deleting={deleting === ingredient.id}
-                  onDelete={() => deleteIngredient(ingredient.id)}
-                  onEditExpiry={() => setEditingExpiry(ingredient)}
-                  addedBy={addedBy(ingredient.user_id)}
-                  onOpenFact={() => setFactIngredient(ingredient)}
-                />
+              groups.map((group) => (
+                <View key={group.key} style={styles.section}>
+                  <Text style={[styles.groupTitle, { color: group.color }]}>{group.title}</Text>
+                  {group.items.map(renderCard)}
+                </View>
               ))
             )}
-          </ScrollView>
 
-          <View style={styles.footer}>
-            <TouchableOpacity
-              style={styles.addMoreButton}
-              onPress={() => router.push('/(tabs)/camera')}
-            >
-              <Plus size={20} color="#10b981" />
-              <Text style={styles.addMoreButtonText}>{t('pantry.addMore')}</Text>
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
+            <Touchable onPress={clearAllIngredients} style={styles.clear} accessibilityRole="button">
+              <Text style={styles.clearText}>{t('pantry.clearTitle')}</Text>
+            </Touchable>
+          </>
+        )}
+      </ScrollView>
 
-      <FoodFactSheet ingredient={factIngredient} onClose={() => setFactIngredient(null)} />
+      {/* Ajouter : scan ou ajout à la main */}
+      <Touchable
+        onPress={() => router.navigate('/(tabs)/camera')}
+        style={styles.fab}
+        accessibilityRole="button"
+        accessibilityLabel={t('pantry.addIngredients')}
+      >
+        <Plus size={sizes.iconLarge + spacing.sm} color={colors.onPrimary} />
+      </Touchable>
+
+      <FoodFactSheet
+        ingredient={factIngredient}
+        onClose={() => setFactIngredient(null)}
+        onRemove={() => factIngredient && removal.run(factIngredient)}
+      />
+
+      <Toast
+        message={removal.pending ? t('pantry.removed') : null}
+        actionLabel={t('common.undo')}
+        onAction={removal.undo}
+        bottom={spacing.xl + sizes.fab + spacing.md}
+      />
 
       <ExpiryEditModal
         ingredient={editingExpiry}
@@ -301,144 +288,53 @@ export default function IngredientsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: colors.background,
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f9fafb',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginTop: 2,
-  },
-  clearButton: {
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: '#fef2f2',
-  },
-  headerText: {
+  list: {
     flex: 1,
   },
-  headerActions: {
-    flexDirection: 'row',
-    gap: 8,
+  listContent: {
+    paddingHorizontal: spacing.screen,
+    // Place pour le bouton « + » (sa hauteur et son écart au bord) sous le dernier élément, en fin de liste
+    paddingBottom: spacing.xl + sizes.fab + spacing.xxxl,
+    gap: spacing.lg,
   },
-  householdButton: {
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: '#f0fdf4',
+  filters: {
+    gap: spacing.sm,
   },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    margin: 20,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
+  section: {
+    gap: spacing.xs,
   },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    paddingVertical: 16,
-    fontSize: 16,
-    color: '#111827',
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 40,
-  },
-  emptyIconContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#f3f4f6',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  emptyTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 8,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#6b7280',
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 32,
-  },
-  addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#10b981',
-    paddingVertical: 14,
-    paddingHorizontal: 28,
-    borderRadius: 12,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  ingredientList: {
-    flex: 1,
-    paddingHorizontal: 20,
+  groupTitle: {
+    ...typography.overline,
+    marginBottom: spacing.sm,
   },
   noResults: {
-    padding: 40,
-    alignItems: 'center',
+    ...typography.body,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    paddingVertical: spacing.xxxl,
   },
-  noResultsText: {
-    fontSize: 16,
-    color: '#6b7280',
+  clear: {
+    alignSelf: 'center',
+    minHeight: sizes.touch,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
   },
-  footer: {
-    padding: 20,
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#f3f4f6',
+  clearText: {
+    ...typography.bodyStrong,
+    color: colors.expired.text,
   },
-  addMoreButton: {
-    flexDirection: 'row',
+  fab: {
+    position: 'absolute',
+    right: spacing.screen,
+    bottom: spacing.xl,
+    width: sizes.fab,
+    height: sizes.fab,
+    borderRadius: radius.card,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 14,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#10b981',
-    borderStyle: 'dashed',
-  },
-  addMoreButtonText: {
-    color: '#10b981',
-    fontSize: 16,
-    fontWeight: '600',
+    ...shadows.floating,
   },
 });

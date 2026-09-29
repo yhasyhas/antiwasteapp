@@ -1,8 +1,12 @@
 import { useEffect } from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
+import { Leaf } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
+import { IconChip } from '@/components/ui/IconChip';
+import { colors, sizes, spacing } from '@/constants/theme';
 
+// Démarrage : vers les onglets ou la connexion selon la session (logo pendant la lecture de la session)
 export default function Index() {
   const { user, loading } = useAuth();
 
@@ -18,7 +22,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#10b981" />
+      <IconChip icon={Leaf} tone="primary" size={sizes.iconChipLarge + spacing.xxl} />
     </View>
   );
 }
@@ -28,6 +32,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
   },
 });

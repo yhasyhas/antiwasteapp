@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Barcode } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 
 // Code-barres scanné, dans l'ajout manuel : produit trouvé (vérifier la date) ou inconnu (le nommer)
 export function BarcodeNotice({ barcode, found }: { barcode: string; found: boolean }) {
@@ -10,7 +11,7 @@ export function BarcodeNotice({ barcode, found }: { barcode: string; found: bool
   return (
     <View style={[styles.box, !found && styles.boxUnknown]}>
       <View style={styles.row}>
-        <Barcode size={18} color="#374151" />
+        <Barcode size={sizes.icon} color={colors.text} />
         <Text style={styles.code}>{barcode}</Text>
       </View>
       <Text style={styles.text}>{found ? t('barcode.foundHint') : t('barcode.unknownHint')}</Text>
@@ -20,29 +21,25 @@ export function BarcodeNotice({ barcode, found }: { barcode: string; found: bool
 
 const styles = StyleSheet.create({
   box: {
-    backgroundColor: '#ecfdf5',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 16,
+    backgroundColor: colors.primarySoft,
+    borderRadius: radius.control,
+    padding: spacing.md,
+    gap: spacing.sm,
   },
   boxUnknown: {
-    backgroundColor: '#fff7ed',
+    backgroundColor: colors.soon.background,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginBottom: 4,
+    gap: spacing.sm,
   },
   code: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#111827',
-    letterSpacing: 1,
+    ...typography.bodyStrong,
+    letterSpacing: spacing.xxs,
   },
   text: {
-    fontSize: 13,
-    color: '#4b5563',
-    lineHeight: 18,
+    ...typography.secondary,
+    color: colors.text,
   },
 });

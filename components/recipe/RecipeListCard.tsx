@@ -1,182 +1,197 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
-import { ChefHat, Clock, Heart, Lightbulb } from 'lucide-react-native';
+import { Clock, Heart, Sparkles } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { dietLabel, difficultyLabel } from '@/lib/labels';
+import { difficultyLabel } from '@/lib/labels';
+import { toSaveCount, usePantryUrgency } from '@/hooks/usePantryUrgency';
+import { Badge } from '@/components/ui/Badge';
+import { Card } from '@/components/ui/Card';
+import { RecipePlaceholder } from '@/components/ui/Illustrations';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Touchable } from '@/components/ui/Touchable';
+import { colors, motion, radius, sizes, spacing, typography } from '@/constants/theme';
 import type { Recipe } from './types';
 
 interface Props {
   recipe: Recipe;
-  // Image en cours de génération : indicateur dans la vignette jusqu'à son arrivée
+  // Image en cours de génération : squelette dans l'emplacement jusqu'à son arrivée
   imageLoading?: boolean;
   onPress: () => void;
-  // Cœur de favori sur la carte (écran Favoris)
+  // Cœur de favori sur la carte
   favorite?: { active: boolean; onToggle: () => void };
+  // large : image en haut (génération, favoris) ; compact : vignette à gauche (dernière recette)
+  variant?: 'large' | 'compact';
 }
 
-// Carte de recette unique, pour toutes les listes (accueil, favoris, toutes les recettes, génération).
-// Elle affiche l'image si elle existe, sans jamais la demander elle-même (voir useRecipeImages) ; la carte
-// se met à jour à son arrivée (état partagé des images).
-export function RecipeListCard({ recipe, imageLoading = false, onPress, favorite }: Props) {
+// Carte de recette unique pour toutes les listes. Elle affiche l'image si elle existe, sans jamais la
+// demander elle-même (voir useRecipeImages) ; sinon une illustration. Badge « X à sauver » : aliments du
+// garde-manger utilisés qui expirent bientôt.
+export function RecipeListCard({ recipe, imageLoading = false, onPress, favorite, variant = 'large' }: Props) {
   const { t } = useLanguage();
+  const pantry = usePantryUrgency();
+  const toSave = toSaveCount(recipe, pantry);
+  const compact = variant === 'compact';
+
+  const image = recipe.image_url ? (
+    // Cache sur disque : l'image n'est pas retéléchargée à chaque visite
+    <Image
+      source={{ uri: recipe.image_url }}
+      style={styles.fill}
+      contentFit="cover"
+      cachePolicy="memory-disk"
+      recyclingKey={recipe.id}
+      transition={motion.normal}
+    />
+  ) : imageLoading ? (
+    <Skeleton height={compact ? sizes.thumbnail : sizes.recipeImage} rounded={0} />
+  ) : (
+    <RecipePlaceholder style={styles.fill} compact={compact} label={compact ? t('recipe.photoShort') : t('recipe.photoPlaceholder')} />
+  );
+
+  const meta = (
+    <View style={styles.meta}>
+      <View style={styles.time}>
+        <Clock size={sizes.iconSmall} color={colors.textSecondary} />
+        <Text style={styles.timeText}>{t('common.minutes', { count: recipe.total_time })}</Text>
+      </View>
+      {recipe.difficulty ? <Badge label={difficultyLabel(t, recipe.difficulty)} tone="soft" /> : null}
+      {toSave > 0 ? <Badge label={t('recipe.toSave', { count: toSave })} tone="expired" /> : null}
+    </View>
+  );
+
+  const heart = favorite ? (
+    <Touchable
+      onPress={favorite.onToggle}
+      style={styles.heart}
+      accessibilityRole="button"
+      accessibilityState={{ selected: favorite.active }}
+      accessibilityLabel={favorite.active ? t('saved.removeFavorite') : t('recipe.saveToFavorites')}
+    >
+      <Heart size={sizes.iconLarge} color={favorite.active ? colors.expired.text : colors.text} fill={favorite.active ? colors.expired.text : colors.transparent} />
+    </Touchable>
+  ) : null;
+
+  if (compact) {
+    return (
+      <Card onPress={onPress} style={styles.compactCard} accessibilityLabel={recipe.title}>
+        <View style={styles.thumbnail}>{image}</View>
+        <View style={styles.compactBody}>
+          <Text style={styles.compactTitle} numberOfLines={2}>{recipe.title}</Text>
+          {meta}
+        </View>
+      </Card>
+    );
+  }
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress}>
-      <View style={styles.thumbnail}>
-        {recipe.image_url ? (
-          // Cache sur disque : l'image n'est pas retéléchargée à chaque visite
-          <Image
-            source={{ uri: recipe.image_url }}
-            style={styles.thumbnailImage}
-            contentFit="cover"
-            cachePolicy="memory-disk"
-            recyclingKey={recipe.id}
-            transition={150}
-          />
-        ) : imageLoading ? (
-          <ActivityIndicator color="#10b981" />
-        ) : (
-          <ChefHat size={28} color="#a7f3d0" />
-        )}
-      </View>
+    <Card onPress={onPress} style={styles.card} accessibilityLabel={recipe.title}>
+      <View style={styles.imageArea}>{image}</View>
       <View style={styles.body}>
         <View style={styles.header}>
-          <Text style={styles.title} numberOfLines={2}>{recipe.title}</Text>
-          {favorite && (
-            <TouchableOpacity onPress={favorite.onToggle} hitSlop={8} style={styles.favoriteButton}>
-              <Heart size={22} color={favorite.active ? '#ef4444' : '#d1d5db'} fill={favorite.active ? '#ef4444' : 'transparent'} />
-            </TouchableOpacity>
-          )}
+          <Text style={styles.title} numberOfLines={3}>{recipe.title}</Text>
+          {heart}
         </View>
-        {recipe.description ? (
-          <Text style={styles.description} numberOfLines={2}>{recipe.description}</Text>
-        ) : null}
+        {recipe.description ? <Text style={styles.description} numberOfLines={3}>{recipe.description}</Text> : null}
         {recipe.suggestion ? (
           <View style={styles.suggestion}>
-            <Lightbulb size={12} color="#b45309" />
-            <Text style={styles.suggestionText} numberOfLines={1}>{recipe.suggestion}</Text>
+            <Sparkles size={sizes.iconSmall} color={colors.onAccent} />
+            <Text style={styles.suggestionText} numberOfLines={2}>{recipe.suggestion}</Text>
           </View>
         ) : null}
-        <View style={styles.footer}>
-          <View style={styles.time}>
-            <Clock size={14} color="#6b7280" />
-            <Text style={styles.timeText}>{t('common.minutes', { count: recipe.total_time })}</Text>
-          </View>
-          {recipe.difficulty ? (
-            <View style={styles.difficultyBadge}>
-              <Text style={styles.difficultyText}>{difficultyLabel(t, recipe.difficulty)}</Text>
-            </View>
-          ) : null}
-          {recipe.dietary_tags.slice(0, 1).map((tag, index) => (
-            <View key={index} style={styles.tag}>
-              <Text style={styles.tagText}>{dietLabel(t, tag)}</Text>
-            </View>
-          ))}
-        </View>
+        {meta}
       </View>
-    </TouchableOpacity>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 12,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: '#f3f4f6',
-  },
-  thumbnail: {
-    width: 84,
-    height: 84,
-    borderRadius: 10,
-    overflow: 'hidden',
-    backgroundColor: '#ecfdf5',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  thumbnailImage: {
+  fill: {
     width: '100%',
     height: '100%',
   },
+  card: {
+    padding: 0,
+    overflow: 'hidden',
+    marginBottom: spacing.lg,
+  },
+  imageArea: {
+    height: sizes.recipeImage,
+    backgroundColor: colors.illustration.background,
+  },
   body: {
-    flex: 1,
+    padding: spacing.xl,
+    gap: spacing.md,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 4,
+    gap: spacing.md,
   },
   title: {
+    ...typography.title3,
     flex: 1,
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
   },
-  favoriteButton: {
-    marginLeft: 8,
+  heart: {
+    width: sizes.touch,
+    height: sizes.touch,
+    marginTop: -spacing.sm,
+    marginRight: -spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   description: {
-    fontSize: 13,
-    color: '#6b7280',
-    lineHeight: 18,
-    marginBottom: 6,
+    ...typography.body,
+    color: colors.textSecondary,
   },
   suggestion: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    backgroundColor: '#fef3c7',
-    borderRadius: 6,
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    marginBottom: 6,
+    gap: spacing.sm,
+    backgroundColor: colors.accentSoft,
+    borderRadius: radius.iconChip,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
   suggestionText: {
+    ...typography.body,
     flex: 1,
-    fontSize: 12,
-    color: '#92400e',
+    fontSize: typography.listTitle.fontSize,
   },
-  footer: {
+  meta: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
-    gap: 8,
-    marginTop: 'auto',
+    gap: spacing.sm,
   },
   time: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: spacing.xs,
+    marginRight: spacing.xs,
   },
   timeText: {
-    fontSize: 13,
-    color: '#6b7280',
+    ...typography.body,
+    color: colors.textSecondary,
   },
-  difficultyBadge: {
-    paddingVertical: 3,
-    paddingHorizontal: 8,
-    borderRadius: 6,
-    backgroundColor: '#f0fdf4',
+  compactCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.lg,
+    padding: spacing.md,
   },
-  difficultyText: {
-    fontSize: 12,
-    color: '#10b981',
-    fontWeight: '600',
-    textTransform: 'capitalize',
+  thumbnail: {
+    width: sizes.thumbnail,
+    height: sizes.thumbnail,
+    borderRadius: radius.iconChip + spacing.xs,
+    overflow: 'hidden',
+    backgroundColor: colors.illustration.background,
   },
-  tag: {
-    paddingVertical: 3,
-    paddingHorizontal: 8,
-    borderRadius: 6,
-    backgroundColor: '#f3f4f6',
+  compactBody: {
+    flex: 1,
+    gap: spacing.sm,
   },
-  tagText: {
-    fontSize: 12,
-    color: '#6b7280',
+  compactTitle: {
+    ...typography.cardTitle,
   },
 });

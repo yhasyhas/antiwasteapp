@@ -11,6 +11,7 @@ import { failureReasonOf, failureTitle } from '@/lib/quotaReason';
 import { expiryFromShelfLife, type FoodKind } from '@/lib/expiry';
 import { maybeAskNotificationPermission } from '@/lib/notifications';
 import { notifyPantryChanged } from '@/lib/pantryEvents';
+import { linkPantryFoodKeys } from '@/lib/foodNames';
 
 // Ingrédient renvoyé par l'Edge Function analyze-image
 interface ScannedIngredient {
@@ -173,13 +174,15 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
       setShowConfirmation(false);
       setDetectedIngredients([]);
       notifyPantryChanged();
+      // Aliments sans identifiant renvoyé par le scan : reliés à leur fiche en arrière-plan
+      linkPantryFoodKeys();
       // Premier ajout d'une date : proposition des rappels avant le message de confirmation
       await maybeAskNotificationPermission();
       Alert.alert(
         t('scan.ingredientsAdded'),
         t('scan.addedToPantry', { count: confirmed.length }),
         [
-          { text: t('scan.viewPantry'), onPress: () => router.push('/(tabs)/ingredients') },
+          { text: t('scan.viewPantry'), onPress: () => router.navigate('/(tabs)/ingredients') },
           { text: t('scan.scanMore'), style: 'cancel' }
         ]
       );

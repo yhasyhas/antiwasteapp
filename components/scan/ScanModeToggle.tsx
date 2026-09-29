@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Barcode, Camera } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Touchable } from '@/components/ui/Touchable';
+import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 
 export type ScanMode = 'photo' | 'barcode';
 
@@ -14,19 +16,21 @@ export function ScanModeToggle({ mode, onChange }: { mode: ScanMode; onChange: (
   ];
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} accessibilityRole="tablist">
       {options.map(({ value, label, Icon }) => {
         const active = mode === value;
+        const color = active ? colors.onPrimary : colors.text;
         return (
-          <TouchableOpacity
+          <Touchable
             key={value}
             style={[styles.option, active && styles.optionActive]}
             onPress={() => onChange(value)}
+            accessibilityRole="tab"
             accessibilityState={{ selected: active }}
           >
-            <Icon size={18} color={active ? '#fff' : '#374151'} />
-            <Text style={[styles.label, active && styles.labelActive]}>{label}</Text>
-          </TouchableOpacity>
+            <Icon size={sizes.icon} color={color} />
+            <Text style={[styles.label, { color }]}>{label}</Text>
+          </Touchable>
         );
       })}
     </View>
@@ -36,29 +40,23 @@ export function ScanModeToggle({ mode, onChange }: { mode: ScanMode; onChange: (
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#f3f4f6',
-    borderRadius: 12,
-    padding: 4,
-    marginBottom: 16,
+    backgroundColor: colors.primarySoft,
+    borderRadius: radius.control + spacing.xs,
+    padding: spacing.xs,
   },
   option: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 10,
-    borderRadius: 10,
+    gap: spacing.sm,
+    minHeight: sizes.touch,
+    borderRadius: radius.control,
   },
   optionActive: {
-    backgroundColor: '#10b981',
+    backgroundColor: colors.primary,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
-  },
-  labelActive: {
-    color: '#fff',
+    ...typography.button,
   },
 });

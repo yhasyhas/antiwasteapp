@@ -1,14 +1,8 @@
-import React, { useState, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-  Image,
-} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, AppState, Image, StyleSheet, Text, View } from 'react-native';
+import { useIsFocused } from 'expo-router';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
-import { FlipHorizontal, Plus } from 'lucide-react-native';
+import { Plus, RefreshCw } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { useScan } from '@/hooks/useScan';
@@ -17,6 +11,15 @@ import { ManualAddModal, type ManualPrefill } from '@/components/scan/ManualAddM
 import { ScanModeToggle, type ScanMode } from '@/components/scan/ScanModeToggle';
 import { ConfirmIngredientsModal } from '@/components/scan/ConfirmIngredientsModal';
 import { PermissionRequest } from '@/components/scan/PermissionRequest';
+import { Button } from '@/components/ui/Button';
+import { Touchable } from '@/components/ui/Touchable';
+import { reportCameraIssue } from '@/lib/sentry';
+import { colors, opacity, radius, sizes, spacing, typography } from '@/constants/theme';
+
+// Retour sur l'onglet : court délai avant de rouvrir la caméra (certains téléphones, Samsung notamment, ne
+// l'ont pas encore libérée) ; puis l'aperçu doit être prêt en quelques secondes
+const CAMERA_REOPEN_DELAY_MS = 500;
+const CAMERA_READY_TIMEOUT_MS = 5000;
 
 export default function CameraScreen() {
   const { t } = useLanguage();
@@ -44,6 +47,59 @@ export default function CameraScreen() {
     confirmDetected,
   } = useScan({ onManualAdd: () => setShowManualAdd(true) });
 
+  // Caméra montée seulement quand elle est visible : onglet Scanner affiché (les onglets restent montés en
+  // arrière-plan), app au premier plan, aucune feuille par-dessus. Sinon elle est libérée : sur Android, un
+  // aperçu resté ouvert pendant qu'on est ailleurs peut rester figé au retour.
+  const isFocused = useIsFocused();
+  const [appActive, setAppActive] = useState(AppState.currentState === 'active');
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => setAppActive(state === 'active'));
+    return () => subscription.remove();
+  }, []);
+  const cameraOn = isFocused && appActive && !showManualAdd && !showConfirmation;
+  // Caméra ouverte après le délai de réouverture
+  const [cameraMounted, setCameraMounted] = useState(false);
+  // Démarrage impossible (caméra occupée, erreur du système, aperçu jamais prêt) : message et « Réessayer »
+  const [cameraError, setCameraError] = useState(false);
+  const [cameraKey, setCameraKey] = useState(0);
+  const cameraReady = useRef(false);
+  const autoRestarted = useRef(false);
+  const retryCamera = () => {
+    autoRestarted.current = false;
+    setCameraError(false);
+    setCameraKey((key) => key + 1);
+  };
+  useEffect(() => {
+    if (!cameraOn) {
+      setCameraMounted(false);
+      return;
+    }
+    autoRestarted.current = false;
+    const timer = setTimeout(() => setCameraMounted(true), CAMERA_REOPEN_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [cameraOn]);
+  // Surveillance : aperçu pas prêt à temps (vide, sans erreur) → relancé une fois automatiquement, puis erreur
+  useEffect(() => {
+    if (!cameraMounted || cameraError) return;
+    cameraReady.current = false;
+    const timer = setTimeout(() => {
+      if (cameraReady.current) return;
+      if (!autoRestarted.current) {
+        autoRestarted.current = true;
+        reportCameraIssue('restart', 'ready_timeout');
+        setCameraKey((key) => key + 1);
+      } else {
+        reportCameraIssue('error', 'ready_timeout');
+        setCameraError(true);
+      }
+    }, CAMERA_READY_TIMEOUT_MS);
+    return () => clearTimeout(timer);
+  }, [cameraMounted, cameraKey, cameraError]);
+  // Caméra de retour : le scan de code-barres reprend (verrou laissé par un code lu juste avant de partir)
+  useEffect(() => {
+    if (cameraOn) resume();
+  }, [cameraOn]);
+
   const manualAddModal = (
     <ManualAddModal
       visible={showManualAdd}
@@ -57,11 +113,7 @@ export default function CameraScreen() {
   );
 
   if (!permission) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#10b981" />
-      </View>
-    );
+    return <View style={styles.container} />;
   }
 
   if (!permission.granted) {
@@ -78,7 +130,7 @@ export default function CameraScreen() {
   };
 
   const takePicture = async () => {
-    if (!cameraRef.current) return;
+    if (!cameraRef.current || !cameraMounted) return;
 
     try {
       const photo = await cameraRef.current.takePictureAsync();
@@ -88,35 +140,46 @@ export default function CameraScreen() {
     }
   };
 
+  const barcode = mode === 'barcode';
+
   return (
     <View style={styles.container}>
-      <View style={[styles.header, safe.top(20)]}>
-        <Text style={styles.headerTitle}>{t('scan.title')}</Text>
-        <TouchableOpacity
-          style={styles.manualButton}
-          onPress={() => setShowManualAdd(true)}
-        >
-          <Plus size={20} color="#10b981" />
-          <Text style={styles.manualButtonText}>{t('scan.addManually')}</Text>
-        </TouchableOpacity>
-      </View>
-
       <View style={styles.cameraContainer}>
-        <CameraView
-          style={styles.camera}
-          facing={facing}
-          ref={cameraRef}
-          barcodeScannerSettings={{ barcodeTypes: [...FOOD_BARCODE_TYPES] }}
-          onBarcodeScanned={mode === 'barcode' && !showManualAdd && !lookingUp ? onBarcodeScanned : undefined}
-        />
-        {/* CameraView n'accepte pas d'enfants : le cadre est superposé en position absolue */}
-        <View style={styles.cameraOverlay} pointerEvents="none">
-          <View style={[styles.scanFrame, mode === 'barcode' && styles.barcodeFrame]} />
-        </View>
-        {lookingUp && (
-          <View style={styles.analyzingOverlay}>
-            <ActivityIndicator size="large" color="#fff" />
-            <Text style={styles.analyzingText}>{t('barcode.lookingUp')}</Text>
+        {cameraOn && cameraMounted && !cameraError ? (
+          <CameraView
+            key={cameraKey}
+            style={styles.camera}
+            facing={facing}
+            ref={cameraRef}
+            barcodeScannerSettings={{ barcodeTypes: [...FOOD_BARCODE_TYPES] }}
+            onBarcodeScanned={barcode && !showManualAdd && !lookingUp ? onBarcodeScanned : undefined}
+            onCameraReady={() => {
+              cameraReady.current = true;
+            }}
+            onMountError={(event) => {
+              console.warn('[caméra] démarrage impossible :', event.message);
+              reportCameraIssue('error', 'mount_error');
+              setCameraError(true);
+            }}
+          />
+        ) : (
+          <View style={styles.camera} />
+        )}
+        {cameraError ? (
+          <View style={styles.cameraError}>
+            <Text style={styles.cameraErrorTitle}>{t('scan.cameraErrorTitle')}</Text>
+            <Text style={styles.cameraErrorText}>{t('scan.cameraErrorText')}</Text>
+            <Button label={t('common.retry')} icon={RefreshCw} variant="accent" size="medium" onPress={retryCamera} />
+          </View>
+        ) : (
+          // CameraView n'accepte pas d'enfants : le cadre de visée est superposé en position absolue
+          <View style={styles.overlay} pointerEvents="none">
+            <View style={[styles.frame, barcode && styles.barcodeFrame]}>
+              <View style={[styles.corner, styles.topLeft]} />
+              <View style={[styles.corner, styles.topRight]} />
+              <View style={[styles.corner, styles.bottomLeft]} />
+              <View style={[styles.corner, styles.bottomRight]} />
+            </View>
           </View>
         )}
 
@@ -124,43 +187,43 @@ export default function CameraScreen() {
           // La photo prise reste affichée pendant l'analyse, sous le message d'attente
           <Image source={{ uri: capturedImage }} style={styles.capturedImage} resizeMode="cover" />
         )}
-        {analyzing && (
-          <View style={styles.analyzingOverlay}>
-            <ActivityIndicator size="large" color="#fff" />
-            <Text style={styles.analyzingText}>{t('scan.analyzingPhoto')}</Text>
-            <Text style={styles.analyzingHint}>{t('scan.analyzingHint')}</Text>
+        {(analyzing || lookingUp) && (
+          <View style={styles.analyzing}>
+            <ActivityIndicator size="large" color={colors.accent} />
+            <Text style={styles.analyzingText}>{lookingUp ? t('barcode.lookingUp') : t('scan.analyzingPhoto')}</Text>
+            {analyzing ? <Text style={styles.analyzingHint}>{t('scan.analyzingHint')}</Text> : null}
           </View>
         )}
+
+        {/* En-tête posé sur l'aperçu */}
+        <View style={[styles.header, safe.top(spacing.xl)]}>
+          <Text style={styles.title}>{t('scan.shortTitle')}</Text>
+          <Touchable onPress={() => setShowManualAdd(true)} style={styles.manual} accessibilityRole="button">
+            <Plus size={sizes.icon} color={colors.onCamera} />
+            <Text style={styles.manualText}>{t('scan.byHand')}</Text>
+          </Touchable>
+        </View>
       </View>
 
       <View style={styles.controls}>
         <ScanModeToggle mode={mode} onChange={setMode} />
-        <Text style={styles.instructionText}>
-          {mode === 'barcode' ? t('barcode.pointCamera') : t('scan.pointCamera')}
-        </Text>
+        <Text style={styles.instruction}>{barcode ? t('barcode.pointCamera') : t('scan.pointCamera')}</Text>
 
         <View style={styles.buttonRow}>
-          <TouchableOpacity
-            style={styles.flipButton}
-            onPress={toggleCameraFacing}
-          >
-            <FlipHorizontal size={24} color="#6b7280" />
-          </TouchableOpacity>
+          <Touchable onPress={toggleCameraFacing} style={styles.flip} accessibilityRole="button" accessibilityLabel={t('scan.flipCamera')}>
+            <RefreshCw size={sizes.iconLarge} color={colors.primary} />
+          </Touchable>
 
-          {mode === 'photo' ? (
-            <TouchableOpacity
-              style={styles.captureButton}
-              onPress={takePicture}
-              disabled={analyzing}
-            >
-              <View style={styles.captureButtonInner} />
-            </TouchableOpacity>
-          ) : (
+          {barcode ? (
             // Le code est lu dès qu'il est dans le cadre
-            <View style={styles.captureButtonPlaceholder} />
+            <View style={styles.capturePlaceholder} />
+          ) : (
+            <Touchable onPress={takePicture} disabled={analyzing || cameraError} style={[styles.capture, cameraError && styles.captureDisabled]} accessibilityRole="button" accessibilityLabel={t('scan.takePhoto')}>
+              <View style={styles.captureInner} />
+            </Touchable>
           )}
 
-          <View style={styles.placeholder} />
+          <View style={styles.flipPlaceholder} />
         </View>
       </View>
 
@@ -169,6 +232,7 @@ export default function CameraScreen() {
       <ConfirmIngredientsModal
         visible={showConfirmation}
         ingredients={detectedIngredients}
+        photo={capturedImage}
         onToggle={toggleDetected}
         onExpiryChange={setDetectedExpiry}
         onConfirm={confirmDetected}
@@ -178,69 +242,124 @@ export default function CameraScreen() {
   );
 }
 
+const CORNER = sizes.scanCorner;
+const CORNER_WIDTH = sizes.scanCornerWidth;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: colors.camera,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    backgroundColor: '#fff',
-  },
-  headerTitle: {
-    flex: 1,
-    marginRight: 12,
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  manualButton: {
-    flexShrink: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    backgroundColor: '#f0fdf4',
-  },
-  manualButtonText: {
-    color: '#10b981',
-    fontSize: 14,
-    fontWeight: '600',
-  },
+  // Fond sombre même sans aperçu (caméra en cours d'ouverture ou vide) : le titre blanc reste lisible
   cameraContainer: {
     flex: 1,
-    position: 'relative',
+    backgroundColor: colors.camera,
   },
   camera: {
     flex: 1,
+    backgroundColor: colors.camera,
   },
-  cameraOverlay: {
+  header: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.screen,
+  },
+  title: {
+    ...typography.title1,
+    color: colors.onCamera,
+  },
+  manual: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    minHeight: sizes.touch,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radius.pill,
+    backgroundColor: colors.cameraControl,
+  },
+  manualText: {
+    ...typography.button,
+    color: colors.onCamera,
+  },
+  captureDisabled: {
+    opacity: opacity.disabled,
+  },
+  cameraError: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.md,
+    paddingHorizontal: spacing.xxxl,
   },
-  scanFrame: {
-    width: 280,
-    height: 280,
-    borderWidth: 3,
-    borderColor: '#10b981',
-    borderRadius: 24,
-    backgroundColor: 'transparent',
+  cameraErrorTitle: {
+    ...typography.title3,
+    color: colors.onCamera,
+    textAlign: 'center',
+  },
+  cameraErrorText: {
+    ...typography.body,
+    color: colors.onCameraMuted,
+    textAlign: 'center',
+    marginBottom: spacing.sm,
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  frame: {
+    width: sizes.scanFrame,
+    height: sizes.scanFrame,
   },
   barcodeFrame: {
-    width: 300,
-    height: 160,
-    borderRadius: 16,
+    height: sizes.scanFrame / 2,
+  },
+  corner: {
+    position: 'absolute',
+    width: CORNER,
+    height: CORNER,
+    borderColor: colors.accent,
+  },
+  topLeft: {
+    top: 0,
+    left: 0,
+    borderTopWidth: CORNER_WIDTH,
+    borderLeftWidth: CORNER_WIDTH,
+    borderTopLeftRadius: radius.card,
+  },
+  topRight: {
+    top: 0,
+    right: 0,
+    borderTopWidth: CORNER_WIDTH,
+    borderRightWidth: CORNER_WIDTH,
+    borderTopRightRadius: radius.card,
+  },
+  bottomLeft: {
+    bottom: 0,
+    left: 0,
+    borderBottomWidth: CORNER_WIDTH,
+    borderLeftWidth: CORNER_WIDTH,
+    borderBottomLeftRadius: radius.card,
+  },
+  bottomRight: {
+    bottom: 0,
+    right: 0,
+    borderBottomWidth: CORNER_WIDTH,
+    borderRightWidth: CORNER_WIDTH,
+    borderBottomRightRadius: radius.card,
   },
   capturedImage: {
     position: 'absolute',
@@ -249,79 +368,76 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
-  analyzingOverlay: {
+  analyzing: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     // Assez transparent pour voir la photo, assez sombre pour lire le message
-    backgroundColor: 'rgba(0, 0, 0, 0.45)',
-    justifyContent: 'center',
+    backgroundColor: colors.scrim,
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    padding: spacing.xxl,
   },
   analyzingText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    marginTop: 16,
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowRadius: 6,
+    ...typography.bodyStrong,
+    color: colors.onCamera,
+    textAlign: 'center',
   },
   analyzingHint: {
-    color: '#e5e7eb',
-    fontSize: 14,
-    marginTop: 6,
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowRadius: 6,
+    ...typography.secondary,
+    color: colors.onCameraMuted,
+    textAlign: 'center',
   },
   controls: {
-    backgroundColor: '#fff',
-    paddingTop: 16,
-    paddingBottom: 32,
-    paddingHorizontal: 20,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: radius.sheet,
+    borderTopRightRadius: radius.sheet,
+    marginTop: -radius.sheet,
+    paddingTop: spacing.xl,
+    paddingBottom: spacing.xl,
+    paddingHorizontal: spacing.screen,
+    gap: spacing.lg,
   },
-  instructionText: {
+  instruction: {
+    ...typography.body,
+    color: colors.textSecondary,
     textAlign: 'center',
-    fontSize: 16,
-    color: '#6b7280',
-    marginBottom: 20,
   },
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  flipButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#f3f4f6',
-    justifyContent: 'center',
+  flip: {
+    width: sizes.iconChipLarge,
+    height: sizes.iconChipLarge,
+    borderRadius: radius.pill,
+    backgroundColor: colors.primarySoft,
     alignItems: 'center',
-  },
-  captureButton: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: '#10b981',
     justifyContent: 'center',
+  },
+  flipPlaceholder: {
+    width: sizes.iconChipLarge,
+  },
+  capture: {
+    width: sizes.captureButton,
+    height: sizes.captureButton,
+    borderRadius: radius.pill,
+    backgroundColor: colors.primarySoft,
     alignItems: 'center',
-    padding: 4,
+    justifyContent: 'center',
   },
-  captureButtonInner: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#fff',
+  captureInner: {
+    width: sizes.captureButton - spacing.md,
+    height: sizes.captureButton - spacing.md,
+    borderRadius: radius.pill,
+    backgroundColor: colors.primary,
   },
-  placeholder: {
-    width: 56,
-  },
-  captureButtonPlaceholder: {
-    width: 72,
-    height: 72,
+  capturePlaceholder: {
+    width: sizes.captureButton,
+    height: sizes.captureButton,
   },
 });

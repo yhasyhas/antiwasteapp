@@ -206,6 +206,16 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Fiches aliments (fonction `food-fact`, `components/pantry/FoodFactSheet.tsx`, migration `food_facts`, scripts `scripts/food-facts/`), `food_key` renvoyé par le scan.
 - Tests : 59 tests Deno, 12 fichiers de tests SQL.
 
+### Phase 7 — design et ergonomie (branche `phase-7`, partie de `phase-6b`)
+- Système de design : `constants/theme.ts` (seule source des couleurs, typographies, arrondis, espacements, tailles), polices Bricolage Grotesque (titres) et Figtree (texte) chargées dans `app/_layout.tsx`.
+- Composants : `components/ui/` (Button, Card, Badge, Chip, IconChip, Checkbox, TextField, ListRow, Switch, BottomSheet et SheetHeader, ScreenHeader, TabBar, Skeleton, Illustrations et EmptyState, SwipeToDelete, ListItemMotion, Touchable).
+- Écrans refaits d'après `docs/design/` ; captures dans `docs/design/implemente/`. Sous-écran Langue (`app/language.tsx`), courses en onglet caché (`app/(tabs)/shopping.tsx`), vérification anti-robot intégrée au formulaire (`CaptchaField`).
+- Badge « X à sauver » : `hooks/usePantryUrgency.ts`.
+- Actions annulables (suppressions du garde-manger et des courses, « J'ai cuisiné ça ») : `hooks/useUndoableAction.ts` et `components/ui/Toast.tsx` (message temporaire avec une action, aussi pour « Voir » après l'ajout aux courses). Enregistrées tout de suite par `delete_ingredient_with_undo`, `delete_shopping_item_with_undo` et `cook_with_undo`, qui gardent l'état d'avant dans `pantry_actions` ; `undo_pantry_action` rétablit tout ou rien (compteur compris, grâce à `food_events.ingredient_id`) et renvoie 'conflict' si un autre membre a modifié un aliment entre-temps. Tests : `supabase/tests/undoable_actions.sql`.
+- « J'ai cuisiné ça » en quantité utilisée : `lib/quantity.ts` (lecture des quantités, quantité de la recette dans l'unité du garde-manger, pas des boutons + et −), `cook_with_undo(p_ids, p_leftovers)` (l'ancien `cook_ingredients` reste pour les versions précédentes de l'app).
+- Noms des aliments dans la langue de l'app : `lib/foodNames.ts` (`useFoodNames`, `linkPantryFoodKeys` qui appelle `food-fact` en mode `link_only`).
+- Traduction des recettes : fonction `translate-recipe`, `lib/recipeTranslation.ts`, colonne `recipes.translations`. Quotas `links` et `translations` dans `usage_counters`.
+
 ## 5. État actuel et problèmes connus
 
 ### Sécurité
@@ -217,7 +227,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`) : renommage en phase 8, nom pas encore choisi.
 - Sauvegardes de la base dans `backups/` : jamais commitées (`.gitignore`) ni exportées.
 - Rappels locaux (secours sans jeton push) calculés sur le téléphone ; avec le temps réel, un changement fait par un autre membre les recalcule dès que l'app est ouverte.
-- « J'ai cuisiné ça » retire les ingrédients entiers (pas de quantité restante).
+- « J'ai cuisiné ça » : quantité utilisée réglable seulement quand l'unité de la recette correspond à celle du garde-manger (sinon « Tout », « La moitié » ou « Un peu ») ; fermer la fiche pendant le message « Annuler » enregistre tout de suite.
 - Développement avec le build « Antigaspi (dev) » (`npx expo start --dev-client`) ; nouveau build seulement après un changement natif (bibliothèque native, `app.json`, `app.config.js`, `eas.json`). Expo Go reste utilisable, sans notifications push (rappels locaux).
 - Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 

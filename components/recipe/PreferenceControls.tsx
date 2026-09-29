@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Check, Minus, Plus, X } from 'lucide-react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Minus, Plus, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Input } from '@/components/ui/Input';
+import { TextField } from '@/components/ui/Input';
+import { Chip } from '@/components/ui/Chip';
+import { Touchable } from '@/components/ui/Touchable';
 import { COOK_TIME_OPTIONS, MAX_EXCLUDED, MAX_SERVINGS } from '@/lib/preferences';
+import { colors, opacity, radius, sizes, spacing, typography } from '@/constants/theme';
 
 // Commandes communes à l'écran « Préférences » et aux filtres de génération
 
@@ -12,15 +15,9 @@ export function CookTimeChoice({ value, onChange }: { value: number; onChange: (
   const { t } = useLanguage();
   return (
     <View style={styles.grid}>
-      {COOK_TIME_OPTIONS.map((minutes) => {
-        const selected = value === minutes;
-        return (
-          <TouchableOpacity key={minutes} style={[styles.chip, selected && styles.chipSelected]} onPress={() => onChange(minutes)}>
-            {selected && <Check size={16} color="#fff" />}
-            <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{t('common.minutes', { count: minutes })}</Text>
-          </TouchableOpacity>
-        );
-      })}
+      {COOK_TIME_OPTIONS.map((minutes) => (
+        <Chip key={minutes} label={t('common.minutes', { count: minutes })} selected={value === minutes} showCheck onPress={() => onChange(minutes)} />
+      ))}
     </View>
   );
 }
@@ -29,25 +26,25 @@ export function CookTimeChoice({ value, onChange }: { value: number; onChange: (
 export function ServingsStepper({ value, onChange }: { value: number | null; onChange: (servings: number | null) => void }) {
   const { t } = useLanguage();
   const current = value ?? 0;
+  const step = (icon: typeof Plus, disabled: boolean, next: number | null, label: string) => {
+    const Icon = icon;
+    return (
+      <Touchable
+        style={[styles.stepButton, disabled && styles.stepButtonDisabled]}
+        onPress={() => onChange(next)}
+        disabled={disabled}
+        accessibilityRole="button"
+        accessibilityLabel={label}
+      >
+        <Icon size={sizes.icon} color={colors.primary} />
+      </Touchable>
+    );
+  };
   return (
     <View style={styles.stepper}>
-      <TouchableOpacity
-        style={[styles.stepButton, current === 0 && styles.stepButtonDisabled]}
-        onPress={() => onChange(current <= 1 ? null : current - 1)}
-        disabled={current === 0}
-        accessibilityLabel="-"
-      >
-        <Minus size={18} color={current === 0 ? '#d1d5db' : '#10b981'} />
-      </TouchableOpacity>
+      {step(Minus, current === 0, current <= 1 ? null : current - 1, '-')}
       <Text style={styles.stepValue}>{value ? t('preferences.servingsValue', { count: value }) : t('preferences.servingsAny')}</Text>
-      <TouchableOpacity
-        style={[styles.stepButton, current >= MAX_SERVINGS && styles.stepButtonDisabled]}
-        onPress={() => onChange(Math.min(MAX_SERVINGS, current + 1))}
-        disabled={current >= MAX_SERVINGS}
-        accessibilityLabel="+"
-      >
-        <Plus size={18} color={current >= MAX_SERVINGS ? '#d1d5db' : '#10b981'} />
-      </TouchableOpacity>
+      {step(Plus, current >= MAX_SERVINGS, Math.min(MAX_SERVINGS, current + 1), '+')}
     </View>
   );
 }
@@ -67,48 +64,90 @@ export function ExcludedEditor({ value, onChange }: { value: string[]; onChange:
       {value.length > 0 && (
         <View style={styles.grid}>
           {value.map((item) => (
-            <TouchableOpacity key={item} style={styles.excludedChip} onPress={() => onChange(value.filter((other) => other !== item))} accessibilityLabel={t('preferences.removeExcluded', { name: item })}>
+            <Touchable
+              key={item}
+              style={styles.excludedChip}
+              onPress={() => onChange(value.filter((other) => other !== item))}
+              accessibilityRole="button"
+              accessibilityLabel={t('preferences.removeExcluded', { name: item })}
+            >
               <Text style={styles.excludedText}>{item}</Text>
-              <X size={14} color="#b91c1c" />
-            </TouchableOpacity>
+              <X size={sizes.iconSmall} color={colors.expired.text} />
+            </Touchable>
           ))}
         </View>
       )}
       {value.length < MAX_EXCLUDED && (
-        <View style={styles.addRow}>
-          <Input
-            style={styles.input}
-            value={draft}
-            onChangeText={setDraft}
-            placeholder={t('preferences.excludedPlaceholder')}
-            maxLength={40}
-            returnKeyType="done"
-            onSubmitEditing={add}
-            blurOnSubmit={false}
-          />
-          <TouchableOpacity style={styles.addButton} onPress={add} disabled={!draft.trim()} accessibilityLabel={t('shopping.add')}>
-            <Plus size={20} color="#fff" />
-          </TouchableOpacity>
-        </View>
+        <TextField
+          value={draft}
+          onChangeText={setDraft}
+          placeholder={t('preferences.excludedPlaceholder')}
+          maxLength={40}
+          returnKeyType="done"
+          onSubmitEditing={add}
+          blurOnSubmit={false}
+          trailing={
+            <Touchable style={[styles.addButton, !draft.trim() && styles.stepButtonDisabled]} onPress={add} disabled={!draft.trim()} accessibilityRole="button" accessibilityLabel={t('shopping.add')}>
+              <Plus size={sizes.iconLarge} color={colors.onPrimary} />
+            </Touchable>
+          }
+        />
       )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, backgroundColor: '#f3f4f6', borderWidth: 1, borderColor: '#e5e7eb' },
-  chipSelected: { backgroundColor: '#10b981', borderColor: '#10b981' },
-  chipText: { fontSize: 14, color: '#374151', fontWeight: '500' },
-  chipTextSelected: { color: '#fff' },
-  stepper: { flexDirection: 'row', alignItems: 'center', gap: 16 },
-  stepButton: { width: 40, height: 40, borderRadius: 20, borderWidth: 1, borderColor: '#10b981', alignItems: 'center', justifyContent: 'center' },
-  stepButtonDisabled: { borderColor: '#e5e7eb' },
-  stepValue: { fontSize: 16, fontWeight: '600', color: '#111827', minWidth: 110, textAlign: 'center' },
-  excluded: { gap: 10 },
-  excludedChip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, backgroundColor: '#fef2f2', borderWidth: 1, borderColor: '#fecaca' },
-  excludedText: { fontSize: 14, color: '#b91c1c', fontWeight: '500' },
-  addRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
-  input: { flex: 1, borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, backgroundColor: '#fff' },
-  addButton: { backgroundColor: '#10b981', borderRadius: 10, width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+  },
+  stepper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.lg,
+  },
+  stepButton: {
+    width: sizes.touch,
+    height: sizes.touch,
+    borderRadius: radius.pill,
+    borderWidth: sizes.borderWidth,
+    borderColor: colors.primary,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepButtonDisabled: {
+    opacity: opacity.disabled,
+  },
+  stepValue: {
+    ...typography.bodyStrong,
+    minWidth: sizes.illustration - spacing.xxl,
+    textAlign: 'center',
+  },
+  excluded: {
+    gap: spacing.md,
+  },
+  excludedChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm - 2,
+    minHeight: sizes.touch - spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.pill,
+    backgroundColor: colors.expired.background,
+  },
+  excludedText: {
+    ...typography.listTitle,
+    color: colors.expired.text,
+  },
+  addButton: {
+    width: sizes.touch,
+    height: sizes.touch,
+    borderRadius: radius.control - spacing.xs,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
