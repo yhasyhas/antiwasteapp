@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, type PressableProps, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, type PressableProps, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { motion } from '@/constants/theme';
 
@@ -14,10 +14,13 @@ type Props = Omit<PressableProps, 'style'> & {
 // Zone tactile de l'app : retour visuel au toucher (légère réduction et opacité), animé
 export function Touchable({ style, scale = true, disabled, onPressIn, onPressOut, children, ...props }: Props) {
   const pressed = useSharedValue(0);
+  // Opacité du style (bouton désactivé, estompé) gardée sous l'animation
+  const styleOpacity = StyleSheet.flatten(style)?.opacity;
+  const baseOpacity = typeof styleOpacity === 'number' ? styleOpacity : 1;
   const animated = useAnimatedStyle(() => ({
-    opacity: 1 - pressed.value * (1 - motion.pressedOpacity),
+    opacity: baseOpacity * (1 - pressed.value * (1 - motion.pressedOpacity)),
     transform: scale ? [{ scale: 1 - pressed.value * (1 - motion.pressedScale) }] : [],
-  }));
+  }), [baseOpacity, scale]);
 
   return (
     <AnimatedPressable
