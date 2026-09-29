@@ -160,6 +160,9 @@ const fr = {
     successTitle: "C'est fait !",
   },
   pantry: {
+    viewDetails: "Voir le détail",
+    removedLots_one: "{{name}} : {{count}} lot retiré",
+    removedLots_other: "{{name}} : {{count}} lots retirés",
     removed: "Aliment retiré",
     removeFromPantry: "Retirer du garde-manger",
     sharedSubtitle_one: "Foyer partagé · {{count}} membre",
@@ -596,6 +599,7 @@ const fr = {
     failedText: "L’annulation n’a pas pu être enregistrée. Vérifie ta connexion et réessaie.",
   },
   lots: {
+    inPantry: "Dans ton garde-manger",
     count_one: "{{count}} lot",
     count_other: "{{count}} lots",
     oldestFirst: "Pris d’abord dans le lot le plus ancien",

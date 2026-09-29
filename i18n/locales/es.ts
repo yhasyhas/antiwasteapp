@@ -159,6 +159,9 @@ const es: Translations = {
     successTitle: '¡Hecho!',
   },
   pantry: {
+    viewDetails: "Ver el detalle",
+    removedLots_one: "{{name}}: {{count}} lote quitado",
+    removedLots_other: "{{name}}: {{count}} lotes quitados",
     removed: "Alimento retirado",
     removeFromPantry: "Quitar de la despensa",
     sharedSubtitle_one: "Hogar compartido · {{count}} miembro",
@@ -595,6 +598,7 @@ const es: Translations = {
     failedText: "No se ha podido deshacer. Comprueba tu conexión e inténtalo de nuevo.",
   },
   lots: {
+    inPantry: "En tu despensa",
     count_one: "{{count}} lote",
     count_other: "{{count}} lotes",
     oldestFirst: "Se usa primero el lote más antiguo",

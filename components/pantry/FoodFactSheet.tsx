@@ -27,16 +27,22 @@ interface FactIngredient {
 interface Props {
   ingredient: FactIngredient | null;
   onClose: () => void;
-  // « Retirer du garde-manger » (suppression annulable, gérée par l'écran)
+  // « Retirer du garde-manger » (suppression annulable, gérée par l'écran), sans section du garde-manger
   onRemove?: () => void;
+  // « Dans ton garde-manger » (lots et actions), en haut de la feuille
+  pantry?: React.ReactNode;
+  // Fiche d'information (pas pour un reste de plat)
+  withFact?: boolean;
+  // Message « Annuler » affiché au-dessus de la feuille
+  toast?: React.ReactNode;
 }
 
 const CATEGORIES = ['fruit', 'vegetable', 'meat', 'fish', 'dairy', 'egg', 'grain', 'legume', 'bakery', 'condiment', 'spice', 'beverage', 'snack', 'frozen', 'other'] as const;
 
-// Fiche d'un aliment du garde-manger : description, origine, saison, atouts nutritionnels, astuces
-// anti-gaspi, « Cuisiner cet aliment ». Informations générales seulement (mention en bas), avec
-// « Signaler une erreur ».
-export function FoodFactSheet({ ingredient, onClose, onRemove }: Props) {
+// Feuille d'un aliment du garde-manger : en haut, « Dans ton garde-manger » (ses lots) ; en dessous, sa fiche :
+// description, origine, saison, atouts nutritionnels, astuces anti-gaspi, « Cuisiner cet aliment ».
+// Informations générales seulement (mention en bas), avec « Signaler une erreur ».
+export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact = true, toast }: Props) {
   const { t, language } = useLanguage();
   const [result, setResult] = useState<FoodFactResult | null>(null);
   const [reporting, setReporting] = useState(false);
@@ -45,9 +51,15 @@ export function FoodFactSheet({ ingredient, onClose, onRemove }: Props) {
   // Aliment gardé pendant l'animation de fermeture
   const [shown, setShown] = useState<FactIngredient | null>(null);
 
+  // Aliment affiché : suit les changements du garde-manger (lot retiré, date modifiée) pendant que la feuille
+  // est ouverte ; la fiche n'est rechargée qu'en changeant d'aliment
   useEffect(() => {
-    if (!ingredient) return;
-    setShown(ingredient);
+    if (ingredient) setShown(ingredient);
+  }, [ingredient]);
+
+  const factKey = ingredient ? ingredient.food_key ?? ingredient.name : null;
+  useEffect(() => {
+    if (!ingredient || !withFact) return;
     setResult(null);
     setReporting(false);
     setMessage('');
@@ -56,7 +68,7 @@ export function FoodFactSheet({ ingredient, onClose, onRemove }: Props) {
     return () => {
       active = false;
     };
-  }, [ingredient?.id]);
+  }, [factKey, withFact]);
 
   const lang = (['fr', 'en', 'es'].includes(language) ? language : 'fr') as 'fr' | 'en' | 'es';
   const section = result?.ok ? result.fact[lang] : null;
@@ -84,10 +96,11 @@ export function FoodFactSheet({ ingredient, onClose, onRemove }: Props) {
     onRemove?.();
   };
 
-  // Toujours proposé, même si la fiche ne se charge pas
-  const removeButton = onRemove
+  // Toujours proposé, même si la fiche ne se charge pas (avec la section du garde-manger, il y est)
+  const removeButton = onRemove && !pantry
     ? <Button label={t('pantry.removeFromPantry')} icon={Trash2} variant="danger" size="medium" onPress={remove} />
     : null;
+  const cookButton = <Button label={t('facts.cook')} icon={Sparkles} onPress={cook} />;
 
   const errorText = result && !result.ok
     ? result.reason === 'not_food' ? t('facts.notFood')
@@ -98,13 +111,14 @@ export function FoodFactSheet({ ingredient, onClose, onRemove }: Props) {
 
   return (
     <BottomSheet visible={ingredient !== null} onClose={onClose} background={colors.background} keyboard>
+      {toast}
       <View style={styles.header}>
         <IconChip icon={Leaf} tone="accent" size={sizes.iconChipLarge + spacing.sm} />
         <View style={styles.headerText}>
-          <Text style={styles.title}>{capitalize(section?.name ?? shown?.name ?? '')}</Text>
+          <Text style={styles.title}>{capitalize((withFact ? section?.name : null) ?? shown?.name ?? '')}</Text>
           <View style={styles.badges}>
             {category ? <Badge label={t(`category.${category}`)} tone="soft" /> : null}
-            {shown?.expires_at ? <ExpiryBadge expiresAt={shown.expires_at} /> : null}
+            {shown?.expires_at && !pantry ? <ExpiryBadge expiresAt={shown.expires_at} /> : null}
           </View>
         </View>
         <Touchable onPress={onClose} style={styles.close} accessibilityRole="button" accessibilityLabel={t('common.close')}>
@@ -112,83 +126,91 @@ export function FoodFactSheet({ ingredient, onClose, onRemove }: Props) {
         </Touchable>
       </View>
 
-      {!result ? (
-        <View style={styles.loading}>
-          <Skeleton height={typography.body.fontSize!} />
-          <Skeleton width="85%" height={typography.body.fontSize!} />
-          <Skeleton width="60%" height={typography.body.fontSize!} />
-          <Text style={styles.loadingText}>{t('facts.loading')}</Text>
-        </View>
-      ) : errorText ? (
-        <Text style={styles.error}>{errorText}</Text>
-      ) : section ? (
-        <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.body}>
-          <Text style={styles.description}>{section.description}</Text>
-
-          <View style={styles.facts}>
-            <Card style={styles.fact}>
-              <Text style={styles.factLabel}>{t('facts.origin')}</Text>
-              <Text style={styles.factValue}>{section.origin}</Text>
-            </Card>
-            <Card style={styles.fact}>
-              <Text style={styles.factLabel}>{t('facts.season')}</Text>
-              <Text style={styles.factValue}>{section.season}</Text>
-            </Card>
+      <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.body}>
+        {pantry}
+        {!withFact ? cookButton : null}
+        {!withFact ? null : !result ? (
+          <View style={styles.loading}>
+            <Skeleton height={typography.body.fontSize!} />
+            <Skeleton width="85%" height={typography.body.fontSize!} />
+            <Skeleton width="60%" height={typography.body.fontSize!} />
+            <Text style={styles.loadingText}>{t('facts.loading')}</Text>
           </View>
+        ) : errorText ? (
+          <>
+            <Text style={styles.error}>{errorText}</Text>
+            {/* Aliment du garde-manger : « Cuisiner cet aliment » reste possible sans sa fiche */}
+            {pantry ? cookButton : null}
+          </>
+        ) : section ? (
+          <>
+            <Text style={styles.description}>{section.description}</Text>
 
-          {section.nutrition.length > 0 && (
-            <View style={styles.group}>
-              <Text style={styles.groupTitle}>{t('facts.highlights')}</Text>
-              <View style={styles.chips}>
-                {section.nutrition.map((item, index) => <Chip key={index} label={item} />)}
-              </View>
+            <View style={styles.facts}>
+              <Card style={styles.fact}>
+                <Text style={styles.factLabel}>{t('facts.origin')}</Text>
+                <Text style={styles.factValue}>{section.origin}</Text>
+              </Card>
+              <Card style={styles.fact}>
+                <Text style={styles.factLabel}>{t('facts.season')}</Text>
+                <Text style={styles.factValue}>{section.season}</Text>
+              </Card>
             </View>
-          )}
 
-          {section.tips.length > 0 && (
-            <Card style={styles.tipsCard}>
-              <Text style={[styles.groupTitle, styles.tipsTitle]}>{t('facts.tips')}</Text>
-              {section.tips.map((tip, index) => (
-                <View key={index}>
-                  <View style={cardStyles.divider} />
-                  <View style={styles.tip}>
-                    <IconChip icon={Leaf} tone="accent" size={sizes.iconChip - spacing.sm} />
-                    <Text style={styles.tipText}>{tip}</Text>
-                  </View>
+            {section.nutrition.length > 0 && (
+              <View style={styles.group}>
+                <Text style={styles.groupTitle}>{t('facts.highlights')}</Text>
+                <View style={styles.chips}>
+                  {section.nutrition.map((item, index) => <Chip key={index} label={item} />)}
                 </View>
-              ))}
-            </Card>
-          )}
-
-          <Button label={t('facts.cook')} icon={Sparkles} onPress={cook} />
-          {removeButton}
-
-          {reporting ? (
-            <View style={styles.report}>
-              <TextField
-                value={message}
-                onChangeText={setMessage}
-                placeholder={t('facts.reportPlaceholder')}
-                maxLength={500}
-                multiline
-                style={styles.reportInput}
-              />
-              <View style={styles.reportActions}>
-                <Button label={t('common.cancel')} variant="ghost" size="small" onPress={() => setReporting(false)} />
-                <Button label={t('facts.reportSend')} size="small" onPress={sendReport} loading={sending} />
               </View>
-            </View>
-          ) : (
-            <View style={styles.footer}>
-              <Text style={styles.disclaimer}>{t('facts.disclaimer')}</Text>
-              <Touchable onPress={() => setReporting(true)} style={styles.reportLink} accessibilityRole="button">
-                <Text style={styles.reportLinkText}>{t('facts.report')}</Text>
-              </Touchable>
-            </View>
-          )}
-        </ScrollView>
-      ) : null}
-      {section ? null : removeButton}
+            )}
+
+            {section.tips.length > 0 && (
+              <Card style={styles.tipsCard}>
+                <Text style={[styles.groupTitle, styles.tipsTitle]}>{t('facts.tips')}</Text>
+                {section.tips.map((tip, index) => (
+                  <View key={index}>
+                    <View style={cardStyles.divider} />
+                    <View style={styles.tip}>
+                      <IconChip icon={Leaf} tone="accent" size={sizes.iconChip - spacing.sm} />
+                      <Text style={styles.tipText}>{tip}</Text>
+                    </View>
+                  </View>
+                ))}
+              </Card>
+            )}
+
+            {cookButton}
+            {removeButton}
+
+            {reporting ? (
+              <View style={styles.report}>
+                <TextField
+                  value={message}
+                  onChangeText={setMessage}
+                  placeholder={t('facts.reportPlaceholder')}
+                  maxLength={500}
+                  multiline
+                  style={styles.reportInput}
+                />
+                <View style={styles.reportActions}>
+                  <Button label={t('common.cancel')} variant="ghost" size="small" onPress={() => setReporting(false)} />
+                  <Button label={t('facts.reportSend')} size="small" onPress={sendReport} loading={sending} />
+                </View>
+              </View>
+            ) : (
+              <View style={styles.footer}>
+                <Text style={styles.disclaimer}>{t('facts.disclaimer')}</Text>
+                <Touchable onPress={() => setReporting(true)} style={styles.reportLink} accessibilityRole="button">
+                  <Text style={styles.reportLinkText}>{t('facts.report')}</Text>
+                </Touchable>
+              </View>
+            )}
+          </>
+        ) : null}
+        {withFact && section ? null : removeButton}
+      </ScrollView>
     </BottomSheet>
   );
 }

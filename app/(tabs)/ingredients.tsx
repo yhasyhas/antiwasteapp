@@ -19,7 +19,7 @@ import { supabase } from '@/lib/supabase';
 import { IngredientCard, type PantryIngredient } from '@/components/pantry/IngredientCard';
 import { ExpiryEditModal } from '@/components/pantry/ExpiryEditModal';
 import { FoodFactSheet } from '@/components/pantry/FoodFactSheet';
-import { LotsSheet } from '@/components/pantry/LotsSheet';
+import { PantryLotsSection } from '@/components/pantry/PantryLotsSection';
 import { expiryStatus, sortByUrgency } from '@/lib/expiry';
 import { maybeAskNotificationPermission } from '@/lib/notifications';
 import { notifyPantryChanged, onPantryChanged } from '@/lib/pantryEvents';
@@ -30,7 +30,7 @@ import { activeHouseholdId, addedByLabel } from '@/lib/household';
 import { useHousehold } from '@/hooks/useHousehold';
 import { useUndoableAction } from '@/hooks/useUndoableAction';
 import { linkPantryFoodKeys, useFoodNames } from '@/lib/foodNames';
-import { colors, motion, radius, shadows, sizes, spacing, typography } from '@/constants/theme';
+import { colors, radius, shadows, sizes, spacing, typography } from '@/constants/theme';
 
 type Filter = 'all' | 'urgent' | 'leftovers';
 type Group = LotGroup<PantryIngredient> & { total?: string };
@@ -47,6 +47,8 @@ interface Removal {
   id: string;
   ids: string[];
   lot: boolean;
+  // Aliment entier : nom affiché (message « Œufs : 3 lots retirés »)
+  name: string;
 }
 
 interface Merge {
@@ -67,9 +69,8 @@ export default function IngredientsScreen() {
   const [savingExpiry, setSavingExpiry] = useState(false);
   const household = useHousehold();
   const foodName = useFoodNames(ingredients);
-  // Fiche de l'aliment touché ; détail des lots (clé de la ligne)
-  const [factIngredient, setFactIngredient] = useState<PantryIngredient | null>(null);
-  const [lotsKey, setLotsKey] = useState<string | null>(null);
+  // Feuille de l'aliment touché (sa ligne, et un de ses lots pour la retrouver si la ligne change de clé)
+  const [sheet, setSheet] = useState<{ key: string; lotId: string } | null>(null);
 
   // Garde-manger partagé : rechargé quand un membre le modifie (temps réel) ou qu'on change de foyer
   useEffect(() => onPantryChanged(loadIngredients), [user]);
@@ -211,14 +212,12 @@ export default function IngredientsScreen() {
     { key: 'later', title: t('pantry.groupLater'), items: visible.filter((group) => !isUrgent(group)), color: colors.textSecondary },
   ].filter((section) => section.items.length > 0);
 
-  const lotsGroup = lotsKey ? allGroups.find((group) => group.key === lotsKey) ?? null : null;
-  const removeGroup = (group: Group) => removal.run({ id: group.key, ids: group.lots.map((lot) => lot.id), lot: false });
-
-  // Fiche de l'aliment depuis le détail des lots : la feuille des lots se ferme d'abord
-  const openFactFromLots = (group: Group) => {
-    setLotsKey(null);
-    setTimeout(() => setFactIngredient(group.first), motion.normal);
-  };
+  const sheetGroup = sheet
+    ? allGroups.find((group) => group.key === sheet.key) ?? allGroups.find((group) => group.lots.some((lot) => lot.id === sheet.lotId)) ?? null
+    : null;
+  const openSheet = (group: Group) => setSheet({ key: group.key, lotId: group.first.id });
+  const removeGroup = (group: Group) =>
+    removal.run({ id: group.key, ids: group.lots.map((lot) => lot.id), lot: false, name: foodName(group.first) });
 
   const mergeLots = (same: PantryIngredient[]) => {
     const stock = lotsStock(same);
@@ -237,15 +236,17 @@ export default function IngredientsScreen() {
           quantityLabel={group.total}
           lotCount={group.lots.length}
           onDelete={() => removeGroup(group)}
-          onEditExpiry={() => (multiple ? setLotsKey(group.key) : setEditingExpiry(group.first))}
+          onEditExpiry={() => (multiple ? openSheet(group) : setEditingExpiry(group.first))}
           addedBy={multiple ? undefined : addedByLabel(t, household, group.first.user_id) ?? undefined}
-          onOpenFact={() => (multiple ? setLotsKey(group.key) : setFactIngredient(group.first))}
+          onOpenFact={() => openSheet(group)}
         />
       </ListItemMotion>
     );
   };
 
-  const toastMessage = merging.pending ? t('lots.merged') : removal.pending ? t(removal.pending.lot ? 'lots.removed' : 'pantry.removed') : null;
+  const removedMessage = (item: Removal) =>
+    item.lot ? t('lots.removed') : item.ids.length > 1 ? t('pantry.removedLots', { name: item.name, count: item.ids.length }) : t('pantry.removed');
+  const toastMessage = merging.pending ? t('lots.merged') : removal.pending ? removedMessage(removal.pending) : null;
   const toastAction = merging.pending ? merging.undo : removal.undo;
 
   return (
@@ -326,30 +327,24 @@ export default function IngredientsScreen() {
         <Plus size={sizes.iconLarge + spacing.sm} color={colors.onPrimary} />
       </Touchable>
 
+      {/* Feuille de l'aliment : ses lots (« Dans ton garde-manger »), puis sa fiche */}
       <FoodFactSheet
-        ingredient={factIngredient}
-        onClose={() => setFactIngredient(null)}
-        onRemove={() => {
-          if (!factIngredient) return;
-          const group = allGroups.find((candidate) => candidate.lots.some((lot) => lot.id === factIngredient.id));
-          if (group) removeGroup(group);
-        }}
-      />
-
-      <LotsSheet
-        group={lotsGroup}
-        displayName={lotsGroup ? foodName(lotsGroup.first) : ''}
-        addedBy={(lot) => addedByLabel(t, household, lot.user_id)}
-        onClose={() => setLotsKey(null)}
-        onRemoveLot={(lot) => removal.run({ id: lot.id, ids: [lot.id], lot: true })}
-        onRemoveAll={() => {
-          if (!lotsGroup) return;
-          setLotsKey(null);
-          removeGroup(lotsGroup);
-        }}
-        onSaveExpiry={saveLotExpiry}
-        onMerge={mergeLots}
-        onOpenFact={lotsGroup && lotsGroup.first.kind !== 'dish' ? () => openFactFromLots(lotsGroup) : undefined}
+        ingredient={sheetGroup?.first ?? null}
+        onClose={() => setSheet(null)}
+        withFact={sheetGroup?.first.kind !== 'dish'}
+        pantry={sheetGroup ? (
+          <PantryLotsSection
+            group={sheetGroup}
+            addedBy={(lot) => addedByLabel(t, household, lot.user_id)}
+            onRemoveLot={(lot) => removal.run({ id: lot.id, ids: [lot.id], lot: true, name: foodName(lot) })}
+            onRemoveAll={() => {
+              setSheet(null);
+              removeGroup(sheetGroup);
+            }}
+            onSaveExpiry={saveLotExpiry}
+            onMerge={mergeLots}
+          />
+        ) : null}
         toast={<Toast message={toastMessage} actionLabel={t('common.undo')} onAction={toastAction} bottom="100%" />}
       />
 

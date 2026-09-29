@@ -159,6 +159,9 @@ const en: Translations = {
     successTitle: 'Done!',
   },
   pantry: {
+    viewDetails: "See details",
+    removedLots_one: "{{name}}: {{count}} batch removed",
+    removedLots_other: "{{name}}: {{count}} batches removed",
     removed: "Item removed",
     removeFromPantry: "Remove from pantry",
     sharedSubtitle_one: "Shared household · {{count}} member",
@@ -595,6 +598,7 @@ const en: Translations = {
     failedText: "The undo couldn’t be saved. Check your connection and try again.",
   },
   lots: {
+    inPantry: "In your pantry",
     count_one: "{{count}} batch",
     count_other: "{{count}} batches",
     oldestFirst: "Taken from the oldest batch first",
