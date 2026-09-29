@@ -17,3 +17,7 @@ verify_jwt = false
 # Appelée par pg_cron avec le secret CRON_SECRET (en-tête x-cron-secret), jamais par l'app
 [functions.daily-digest]
 verify_jwt = false
+
+# Fiche aliment : chaque fonction vérifie l'utilisateur elle-même (ou la clé secrète pour le pré-remplissage)
+[functions.food-fact]
+verify_jwt = false

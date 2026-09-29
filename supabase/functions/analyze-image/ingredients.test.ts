@@ -12,12 +12,13 @@ const item = (overrides: Record<string, unknown> = {}) => ({
   kind: 'ingredient',
   storage_tip: 'Au frigo, 5 jours.',
   shelf_life_days: 5,
+  food_key: 'tomato',
   ...overrides,
 });
 
 Deno.test('schéma : tous les champs requis, aucun champ en plus (mode strict de Groq)', () => {
   const items = (RESPONSE_SCHEMA.properties.ingredients as any).items;
-  assertEquals(items.required, ['name', 'quantity', 'category', 'confidence', 'kind', 'storage_tip', 'shelf_life_days']);
+  assertEquals(items.required, ['name', 'quantity', 'category', 'confidence', 'kind', 'storage_tip', 'shelf_life_days', 'food_key']);
   assertEquals(items.additionalProperties, false);
   assertEquals(items.properties.kind.enum, ['ingredient', 'dish']);
 });
@@ -91,4 +92,13 @@ Deno.test('plat cuisiné : toujours 2 à 3 jours', () => {
   assertEquals(cleanShelfLife(1, 'other', 'dish'), 2);
   assertEquals(cleanShelfLife(2, 'grain', 'dish'), 2);
   assertEquals(cleanShelfLife(undefined, 'other', 'dish'), 3);
+});
+
+Deno.test('food_key : identifiant normalisé pour un aliment, null pour un plat ou une valeur invalide', () => {
+  const cleaned = cleanIngredients([
+    item({ food_key: 'Cherry Tomato' }),
+    item({ name: 'gratin', kind: 'dish', food_key: 'gratin' }),
+    item({ name: 'lait', food_key: '' }),
+  ]);
+  assertEquals(cleaned.map((i) => i.food_key), ['cherry_tomato', null, null]);
 });

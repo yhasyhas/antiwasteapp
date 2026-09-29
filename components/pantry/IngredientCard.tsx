@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { Lightbulb, Trash2 } from 'lucide-react-native';
+import { BookOpen, Lightbulb, Trash2 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
 import type { FoodKind } from '@/lib/expiry';
@@ -18,6 +18,8 @@ export interface PantryIngredient {
   barcode: string | null;
   // Auteur (null : compte supprimé)
   user_id: string | null;
+  // Identifiant standard (fiche aliment) ; null avant la première ouverture de la fiche
+  food_key?: string | null;
 }
 
 interface Props {
@@ -27,24 +29,34 @@ interface Props {
   onEditExpiry: () => void;
   // Foyer partagé : nom de celui qui l'a ajouté (sinon non affiché)
   addedBy?: string;
+  // Fiche de l'aliment (pas pour un plat cuisiné)
+  onOpenFact?: () => void;
 }
 
-const ORIGIN_STYLES: Record<string, { background: string; text: string; labelKey: 'pantry.scanned' | 'pantry.manual' | 'pantry.barcode' }> = {
+const ORIGIN_STYLES: Record<string, { background: string; text: string; labelKey: 'pantry.scanned' | 'pantry.manual' | 'pantry.barcode' | 'pantry.shopping' }> = {
   camera: { background: '#ede9fe', text: '#7c3aed', labelKey: 'pantry.scanned' },
   barcode: { background: '#e0e7ff', text: '#4338ca', labelKey: 'pantry.barcode' },
   manual: { background: '#dbeafe', text: '#2563eb', labelKey: 'pantry.manual' },
+  shopping: { background: '#fce7f3', text: '#be185d', labelKey: 'pantry.shopping' },
 };
 
 // Ingrédient du garde-manger : nom, quantité, date de péremption (badge de couleur, modifiable),
 // reste de plat, origine, conseil de conservation, suppression
-export function IngredientCard({ ingredient, deleting, onDelete, onEditExpiry, addedBy }: Props) {
+export function IngredientCard({ ingredient, deleting, onDelete, onEditExpiry, addedBy, onOpenFact }: Props) {
   const { t } = useLanguage();
   const origin = ORIGIN_STYLES[ingredient.added_via] ?? ORIGIN_STYLES.manual;
 
   return (
     <View style={styles.ingredientCard}>
       <View style={styles.ingredientInfo}>
-        <Text style={styles.ingredientName}>{ingredient.name}</Text>
+        {onOpenFact && ingredient.kind !== 'dish' ? (
+          <TouchableOpacity onPress={onOpenFact} style={styles.nameButton} accessibilityHint={t('facts.open')}>
+            <Text style={styles.ingredientName}>{ingredient.name}</Text>
+            <BookOpen size={15} color="#10b981" />
+          </TouchableOpacity>
+        ) : (
+          <Text style={styles.ingredientName}>{ingredient.name}</Text>
+        )}
         {ingredient.quantity ? (
           <Text style={styles.ingredientQuantity}>
             {ingredient.quantity}
@@ -101,6 +113,12 @@ const styles = StyleSheet.create({
   },
   ingredientInfo: {
     flex: 1,
+  },
+  nameButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    alignSelf: 'flex-start',
   },
   ingredientName: {
     fontSize: 16,

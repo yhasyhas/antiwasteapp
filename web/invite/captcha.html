@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Vérification</title>
+  <!-- Cloudflare Turnstile : vérification anti-robot avant une connexion (dans l'app, affichée dans une
+       WebView). Le jeton obtenu est renvoyé à l'app, qui le transmet à Supabase (captchaToken).
+       Messages envoyés : ready (widget affiché), token, error (code Turnstile ou erreur de la page). -->
+  <style>
+    body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #fff; font-family: system-ui, sans-serif; }
+    #widget { min-height: 70px; }
+  </style>
+  <script>
+    var params = new URLSearchParams(location.search);
+    function send(message) {
+      if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(JSON.stringify(message));
+      else window.parent.postMessage(message, '*');
+    }
+    window.onerror = function (message) { send({ type: 'error', code: 'page: ' + String(message).slice(0, 120) }); };
+    function start() {
+      try {
+        turnstile.render('#widget', {
+          sitekey: params.get('sitekey') || '',
+          language: params.get('lang') || 'auto',
+          // compact sur les écrans étroits (choisi par l'app)
+          size: params.get('size') === 'compact' ? 'compact' : 'normal',
+          callback: function (token) { send({ type: 'token', token: token }); },
+          'error-callback': function (code) { send({ type: 'error', code: String(code) }); return true; },
+          'unsupported-callback': function () { send({ type: 'error', code: 'unsupported' }); },
+          // Jeton expiré ou délai dépassé : nouvelle vérification dans la même fenêtre
+          'expired-callback': function () { turnstile.reset('#widget'); },
+          'timeout-callback': function () { turnstile.reset('#widget'); },
+          // Suivi (affiché dans l'app en développement) : défi interactif, taille visible de la page
+          'before-interactive-callback': function () { send({ type: 'state', code: 'interactive' }); },
+          'after-interactive-callback': function () { send({ type: 'state', code: 'interactive-done' }); },
+        });
+        send({ type: 'ready' });
+        setTimeout(function () {
+          var box = document.querySelector('#widget').getBoundingClientRect();
+          send({ type: 'state', code: 'page ' + window.innerWidth + 'x' + window.innerHeight + ', widget ' + Math.round(box.width) + 'x' + Math.round(box.height) });
+        }, 3000);
+      } catch (error) {
+        send({ type: 'error', code: 'render: ' + String(error && error.message || error).slice(0, 120) });
+      }
+    }
+  </script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=start&render=explicit" async defer
+          onerror="send({ type: 'error', code: 'script' })"></script>
+</head>
+<body>
+  <div id="widget"></div>
+</body>
+</html>

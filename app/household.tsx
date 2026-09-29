@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import { Stack, useFocusEffect } from 'expo-router';
+import { Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Crown, LogOut, Share2, UserMinus, UserPlus, Users } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
@@ -29,6 +29,7 @@ import {
   setDisplayName,
   type HouseholdMember,
 } from '@/lib/household';
+import { inviteLink, normalizeInviteCode } from '@/lib/invite';
 
 // Écran « Mon foyer » : membres, nom affiché, code d'invitation (partage), rejoindre un foyer,
 // quitter le foyer ; le propriétaire peut retirer un membre
@@ -37,13 +38,25 @@ export default function HouseholdScreen() {
   const safe = useSafeSpacing();
   const keyboardScroll = useKeyboardScroll();
   const household = useHousehold();
-  const [code, setCode] = useState('');
+  // Lien d'invitation : code prérempli
+  const { code: linkCode } = useLocalSearchParams<{ code?: string }>();
+  const [code, setCode] = useState(normalizeInviteCode(linkCode) ?? '');
   const [busy, setBusy] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const me = household?.members.find((m) => m.is_me);
   const [name, setName] = useState('');
 
   useEffect(() => setName(me?.name ?? ''), [me?.name]);
+
+  // Lien reçu alors qu'on est déjà dans un foyer partagé : il faut d'abord le quitter
+  const invitedCode = normalizeInviteCode(linkCode);
+  useEffect(() => {
+    if (!invitedCode) return;
+    setCode(invitedCode);
+    if (household?.shared && household.invite?.code !== invitedCode) {
+      Alert.alert(t('household.title'), t('household.errors.already_in_household'));
+    }
+  }, [invitedCode, household?.shared]);
 
   useFocusEffect(useCallback(() => {
     loadHousehold();
@@ -76,7 +89,13 @@ export default function HouseholdScreen() {
     new Date(iso).toLocaleString(language, { weekday: 'long', hour: '2-digit', minute: '2-digit' });
 
   const shareInvite = async (invite: { code: string; expires_at: string }) => {
-    await Share.share({ message: t('household.shareMessage', { code: invite.code, expires: expiresLabel(invite.expires_at) }) });
+    const link = inviteLink(invite.code);
+    const expires = expiresLabel(invite.expires_at);
+    await Share.share({
+      message: link
+        ? t('household.shareLinkMessage', { link, code: invite.code, expires })
+        : t('household.shareMessage', { code: invite.code, expires }),
+    });
   };
 
   const invite = () => run('invite', async () => {
@@ -131,7 +150,7 @@ export default function HouseholdScreen() {
   };
 
   const remove = (member: HouseholdMember) => {
-    Alert.alert(t('household.removeTitle'), t('household.removeText', { name: member.name }), [
+    Alert.alert(t('household.removeTitle'), t('household.removeText', { name: member.name ?? t('household.guest') }), [
       { text: t('common.cancel'), style: 'cancel' },
       { text: t('household.remove'), style: 'destructive', onPress: () => run(`remove-${member.user_id}`, () => removeMember(member.user_id)) },
     ]);
@@ -175,7 +194,7 @@ export default function HouseholdScreen() {
             <View key={member.user_id} style={styles.memberRow}>
               <View style={styles.memberInfo}>
                 <Text style={styles.memberName}>
-                  {member.name}{member.is_me ? ` (${t('household.me')})` : ''}
+                  {member.name ?? t('household.guest')}{member.is_me ? ` (${t('household.me')})` : ''}
                 </Text>
                 {member.role === 'owner' && (
                   <View style={styles.ownerBadge}>

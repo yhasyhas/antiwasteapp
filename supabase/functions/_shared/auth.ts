@@ -14,6 +14,8 @@ import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from './keys.ts';
 export interface AuthenticatedUser {
   id: string;
   email?: string;
+  // Essai sans compte (connexion anonyme Supabase) : quotas réduits
+  isAnonymous: boolean;
 }
 
 const ISSUER = `${SUPABASE_URL}/auth/v1`;
@@ -39,7 +41,7 @@ async function fetchUser(authorization: string): Promise<AuthenticatedUser | nul
   if (!response.ok) return null;
 
   const user = await response.json();
-  return typeof user?.id === 'string' ? { id: user.id, email: user.email } : null;
+  return typeof user?.id === 'string' ? { id: user.id, email: user.email, isAnonymous: user.is_anonymous === true } : null;
 }
 
 export async function getAuthenticatedUser(req: Request): Promise<AuthenticatedUser | null> {
@@ -50,7 +52,7 @@ export async function getAuthenticatedUser(req: Request): Promise<AuthenticatedU
   try {
     const { payload } = await jwtVerify(token, PUBLIC_KEYS, { issuer: ISSUER, audience: 'authenticated' });
     if (typeof payload.sub !== 'string' || payload.role !== 'authenticated') return null;
-    return { id: payload.sub, email: typeof payload.email === 'string' ? payload.email : undefined };
+    return { id: payload.sub, email: typeof payload.email === 'string' ? payload.email : undefined, isAnonymous: payload.is_anonymous === true };
   } catch (error) {
     // Aucune clé publique ne correspond, ou algorithme non pris en charge : le serveur tranche
     if (error instanceof errors.JWKSNoMatchingKey || error instanceof errors.JOSENotSupported) {

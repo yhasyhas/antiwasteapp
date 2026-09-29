@@ -15,10 +15,11 @@ import { Input } from '@/components/ui/Input';
 import { KeyboardAvoider } from '@/components/ui/KeyboardAvoider';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { supabase } from '@/lib/supabase';
-import { Search, Trash2, Plus, Package, Users } from 'lucide-react-native';
+import { Search, Trash2, Plus, Package, Users, ShoppingCart } from 'lucide-react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { IngredientCard, type PantryIngredient } from '@/components/pantry/IngredientCard';
 import { ExpiryEditModal } from '@/components/pantry/ExpiryEditModal';
+import { FoodFactSheet } from '@/components/pantry/FoodFactSheet';
 import { sortByUrgency } from '@/lib/expiry';
 import { maybeAskNotificationPermission } from '@/lib/notifications';
 import { notifyPantryChanged, onPantryChanged } from '@/lib/pantryEvents';
@@ -39,6 +40,8 @@ export default function IngredientsScreen() {
   const [editingExpiry, setEditingExpiry] = useState<PantryIngredient | null>(null);
   const [savingExpiry, setSavingExpiry] = useState(false);
   const household = useHousehold();
+  // Fiche de l'aliment touché
+  const [factIngredient, setFactIngredient] = useState<PantryIngredient | null>(null);
 
   // Garde-manger partagé : rechargé quand un membre le modifie (temps réel) ou qu'on change de foyer
   useEffect(() => onPantryChanged(loadIngredients), [user]);
@@ -48,7 +51,7 @@ export default function IngredientsScreen() {
     if (!household?.shared) return undefined;
     const member = household.members.find((m) => m.user_id === authorId);
     if (!member) return t('household.formerMember');
-    return member.is_me ? t('household.me') : member.name;
+    return member.is_me ? t('household.me') : member.name ?? t('household.guest');
   };
 
   // Rechargé à chaque retour sur l'onglet (ingrédients ajoutés depuis la caméra, par exemple)
@@ -196,6 +199,13 @@ export default function IngredientsScreen() {
         <View style={styles.headerActions}>
           <TouchableOpacity
             style={styles.householdButton}
+            onPress={() => router.push('/shopping')}
+            accessibilityLabel={t('shopping.title')}
+          >
+            <ShoppingCart size={20} color="#10b981" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.householdButton}
             onPress={() => router.push('/household')}
             accessibilityLabel={t('household.title')}
           >
@@ -258,6 +268,7 @@ export default function IngredientsScreen() {
                   onDelete={() => deleteIngredient(ingredient.id)}
                   onEditExpiry={() => setEditingExpiry(ingredient)}
                   addedBy={addedBy(ingredient.user_id)}
+                  onOpenFact={() => setFactIngredient(ingredient)}
                 />
               ))
             )}
@@ -274,6 +285,8 @@ export default function IngredientsScreen() {
           </View>
         </>
       )}
+
+      <FoodFactSheet ingredient={factIngredient} onClose={() => setFactIngredient(null)} />
 
       <ExpiryEditModal
         ingredient={editingExpiry}

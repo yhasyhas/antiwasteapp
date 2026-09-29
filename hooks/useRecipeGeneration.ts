@@ -12,6 +12,7 @@ import { useRecipeImages } from '@/hooks/useRecipeImages';
 import { daysUntil, sortByUrgency } from '@/lib/expiry';
 import { onPantryChanged } from '@/lib/pantryEvents';
 import { activeHouseholdId } from '@/lib/household';
+import { loadPreferences } from '@/lib/preferences';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import type { Filters, Recipe } from '@/components/recipe/types';
 
@@ -43,6 +44,8 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
     cuisine: 'any',
     // Recettes dans la langue de l'app, sauf préférence enregistrée
     language,
+    servings: null,
+    excluded: [],
   });
 
   useEffect(() => {
@@ -86,20 +89,19 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
   const loadUserPreferences = async () => {
     if (!user) return;
 
-    const { data } = await supabase
-      .from('user_preferences')
-      .select('*')
-      .eq('user_id', user.id)
-      .single();
-
-    if (data) {
+    // Préférences enregistrées (écran « Préférences ») : valeurs par défaut des filtres
+    const preferences = await loadPreferences(user.id);
+    if (preferences) {
       setFilters((current) => ({
         ...current,
-        dietary: data.dietary_preferences || [],
-        difficulty: data.default_difficulty || 'easy',
-        maxCookTime: data.max_cook_time || 60,
-        mealType: data.default_meal_type || 'lunch',
-        language: data.default_language || language,
+        dietary: preferences.dietary,
+        excluded: preferences.excluded,
+        maxCookTime: preferences.maxCookTime,
+        cuisine: preferences.cuisine,
+        servings: preferences.servings,
+        difficulty: (preferences.difficulty as Filters['difficulty']) || current.difficulty,
+        mealType: (preferences.mealType as Filters['mealType']) || current.mealType,
+        language: preferences.language || current.language,
       }));
     }
   };
@@ -137,6 +139,8 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
           mealType: filters.mealType,
           cuisine: filters.cuisine,
           language: filters.language,
+          excluded: filters.excluded,
+          ...(filters.servings && { servings: filters.servings }),
         },
       });
 

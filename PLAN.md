@@ -198,13 +198,14 @@ Regroupe ce qui dépend du build de développement.
 
 **Terminé quand** : l'app tourne dans le build de développement, deux comptes partagent un garde-manger mis à jour en temps réel, et le résumé de 9 h arrive par notification push.
 
-### Phase 6b — Liste de courses, compteur anti-gaspi, préférences, essai sans compte, fiches aliments
+### Phase 6b — Invitation par lien, liste de courses, compteur anti-gaspi, préférences, essai sans compte, fiches aliments
 
-- [ ] Liste de courses construite à partir de `missing_ingredients`
-- [ ] Compteur de gaspillage évité (kg, et éventuellement argent économisé) sur l'accueil
-- [ ] Écran de préférences : régimes, ingrédients exclus, temps max ; utilisé par la génération
+- [ ] Invitation par lien : route `join` de l'app (code prérempli), page web d'invitation sur Cloudflare Pages (trois langues, ouvre l'app ou propose le téléchargement), message de partage avec le lien
+- [ ] Liste de courses partagée par le foyer, en temps réel : ingrédients manquants d'une recette en un geste (`missing_ingredients`), ajout manuel, article acheté envoyé au garde-manger avec une date proposée
+- [ ] Compteur anti-gaspi sur l'accueil, en nombre d'aliments (ce mois-ci, pour le foyer et pour moi) : « sauvé » avec « J'ai cuisiné ça », « gaspillé » quand un aliment est supprimé après sa date
+- [ ] Écran de préférences : régimes, aliments exclus (allergies et goûts), temps maximum, nombre de personnes ; appliquées par défaut à la génération, modifiables dans les filtres
 - [ ] Cuisines du monde : préférence de cuisine enregistrée et utilisée par défaut
-- [ ] Connexion anonyme Supabase pour tester sans compte, avec conversion en compte plus tard
+- [ ] Essai sans compte : connexion anonyme Supabase protégée par Cloudflare Turnstile, quotas réduits, conversion en vrai compte sans perte de données (garde-manger et foyer compris), invité par lien accepté
 
 #### Fiches aliments
 
@@ -244,6 +245,9 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 - [ ] Rédiger la politique de confidentialité (photos, données du garde-manger)
 - [ ] Bêta fermée : TestFlight (iOS) et tests internes Google Play, avec quelques proches
 - [ ] Fiches des stores : captures d'écran, description
+- [ ] Remplacer le schéma de liens `myapp` (hérité de bolt) par un schéma propre à l'app, avec le nom définitif ; nouveau build nécessaire
+- [ ] Relire les 100 fiches aliments avant la bêta avec `scripts/food-facts/review.mjs` (exemple d'astuce douteuse : « vinaigre de banane »)
+- [ ] Renommer ou supprimer le sous-domaine inutile `bolt-expo-starter.workers.dev`
 
 **Terminé quand** : au moins 5 testeurs utilisent l'app pendant une semaine sans plantage bloquant.
 
@@ -355,4 +359,12 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 | 26/09/2026 | Champs de saisie : couleur du texte et du texte indicatif explicites partout (`components/ui/Input.tsx`) ; Android en mode sombre écrivait en blanc sur les champs blancs. Œil pour afficher ou masquer le mot de passe (connexion, inscription). `userInterfaceStyle` passé à `light` (l'app n'a pas de thème sombre) : pris en compte au prochain build | Le thème sombre éventuel relève de la phase 7 |
 | 26/09/2026 | Noms Open Food Facts nettoyés (`cleanProductName`) : symboles de mise en forme, composition et allergènes collés au nom, précisions entre parenthèses retirés ; 40 caractères au plus, coupés au dernier mot | |
 | 26/09/2026 | Phase 6a validée sur deux téléphones (build de développement) : foyer partagé et temps réel, notification push reçue (reçu Firebase confirmé) et ouverture de la génération, barre d'onglets, clavier, mot de passe, caméra, code-barres, étiquettes | Fusion de `phase-6a` dans master |
+| 27/09/2026 | Invitation par lien : page unique `web/invite/` (trois langues selon le navigateur) sur Cloudflare Pages, lien `…pages.dev/?code=ABC234` ; sur Android, lien « intent » qui ouvre l'app installée, sinon le téléchargement (build de test, configurable) ; route `join` de l'app sur le schéma existant `myapp` | Aucun nouveau build : le schéma `myapp` est déjà dans le build. Le schéma définitif sera choisi en phase 8 avec le nom |
+| 27/09/2026 | Liste de courses : écran dédié ouvert depuis une carte « Courses » de l'accueil (à côté de « Scanner » et « Mon garde-manger », avec le nombre d'articles à acheter) et une icône du garde-manger, plutôt qu'un sixième onglet | Six onglets sont trop serrés sur un téléphone (libellés coupés) ; la liste reste à un geste depuis l'accueil et le garde-manger. À revoir avec la navigation en phase 7 |
+| 27/09/2026 | Liste de courses partagée par le foyer (`shopping_items`), temps réel sur le canal du foyer (événement « shopping ») ; ajout des manquants d'une recette sans doublon ; article acheté rangé au garde-manger avec une date proposée à une semaine, modifiable | Origine « Courses » sur les ingrédients rangés |
+| 27/09/2026 | Compteur anti-gaspi : table `food_events` ; « sauvé » avec « J'ai cuisiné ça » (fonction `cook_ingredients`), « gaspillé » quand un aliment est supprimé après sa date (déclencheur) ; une suppression avant la date ne compte pas. Affichage sur l'accueil en nombre d'aliments, mois en cours (UTC), foyer et moi | Pas de kilos ni d'euros |
+| 27/09/2026 | Préférences de recettes : régimes, aliments exclus (20 au plus), temps maximum, cuisine, nombre de personnes ; valeurs par défaut des filtres, modifiables pour une génération (temps et personnes ajoutés aux filtres). Une recette qui contient un aliment exclu est écartée par le serveur | |
+| 27/09/2026 | Essai sans compte : connexion anonyme Supabase, Cloudflare Turnstile affiché dans une WebView (page `captcha.html` du site d'invitation), quotas réduits (5 scans, 3 générations, 9 images, 5 fiches par jour) ; conversion en vrai compte sur le même identifiant (adresse puis mot de passe) ; se déconnecter d'un compte d'essai est précédé d'un avertissement | Le bouton n'apparaît qu'avec la clé Turnstile configurée ; la protection captcha de Supabase s'applique aussi à la connexion et à l'inscription. Comptes anonymes abandonnés : nettoyage à prévoir en phase 8 |
+| 27/09/2026 | Fiches aliments : fonction `food-fact`, fiche générée une seule fois (trois langues en un appel, réservation comme les images), validation stricte (longueurs, trois langues, liste étroite de mots de promesse de santé refusés) ; identifiant renvoyé par le scan, sinon retrouvé par les alias ou par un appel IA léger à la première ouverture (ajout manuel, code-barres, anciens ingrédients), puis enregistré sur l'ingrédient ; quota de 15 nouvelles fiches par jour (lire une fiche existante est gratuit) | Pré-remplissage de 100 aliments courants (`scripts/food-facts/prefill.mjs`) ; relecture par export Markdown et marquage « relue » (`scripts/food-facts/review.mjs`). Premières fiches correctes, quelques astuces discutables : relecture nécessaire avant la bêta |
+| 28/09/2026 | Page d'invitation déployée sur Cloudflare Pages : `https://antigaspi-invite.pages.dev` (projet `antigaspi-invite`, `npx wrangler pages deploy web/invite --project-name antigaspi-invite --branch main`) ; la page Turnstile est servie à `/captcha`. Widget Turnstile « Antigaspi » (mode Managed) limité à ce domaine | Wrangler 4 propose désormais Workers à la place de Pages : la création du projet Pages demande `--force` une seule fois ; ne pas lancer `wrangler deploy` à la racine (il publierait l'app web). Sous-domaine workers.dev du compte créé au passage (`bolt-expo-starter`), inutilisé |
 | | *(résultat du test Gemini vs Clarifai)* | |

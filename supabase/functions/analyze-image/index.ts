@@ -1,11 +1,12 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { getAuthenticatedUser } from '../_shared/auth.ts';
-import { consumeQuota, DAILY_LIMITS, refundQuota } from '../_shared/quota.ts';
+import { consumeQuota, dailyLimit, refundQuota } from '../_shared/quota.ts';
 import { logUserQuota, reportInBackground, reportProviderQuota } from '../_shared/quotaAlerts.ts';
 import { readSimulation } from '../_shared/simulate.ts';
 import { withCors } from '../_shared/cors.ts';
 import { type AiProvider, type AttemptLog, geminiProvider, groqProvider, runWithFallback } from '../_shared/ai.ts';
 import { parseIngredients, RESPONSE_SCHEMA } from './ingredients.ts';
+import { FOOD_KEY_GUIDE } from '../_shared/foodKey.ts';
 
 // Modèles configurables par secret : les fournisseurs retirent régulièrement des modèles
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || '';
@@ -118,6 +119,7 @@ Liste uniquement les produits alimentaires achetés.
 - "kind" : "ingredient".
 - "storage_tip" : ${STORAGE_TIP_GUIDE(languageName)}
 - "shelf_life_days" : ${SHELF_LIFE_GUIDE} Produit neuf, non ouvert.
+- "food_key" : ${FOOD_KEY_GUIDE}.
 - Un même produit n'apparaît qu'une fois : additionne les quantités.
 - Ignore les produits non alimentaires (hygiène, entretien…), les totaux, remises, moyens de paiement et TVA.
 - Si l'image n'est pas un ticket lisible, renvoie une liste vide.`;
@@ -133,6 +135,7 @@ Liste les aliments et ingrédients de cuisine visibles.
 - "kind" : "dish" pour un plat cuisiné ou un reste de repas (ex. "gratin de pâtes", "reste de poulet rôti", "soupe"), dont "name" est alors le nom du plat ; "ingredient" pour tout le reste.
 - "storage_tip" : ${STORAGE_TIP_GUIDE(languageName)}
 - "shelf_life_days" : ${SHELF_LIFE_GUIDE}
+- "food_key" : ${FOOD_KEY_GUIDE}.
 - Un même aliment n'apparaît qu'une fois : additionne les quantités.
 - 20 aliments au plus, les plus visibles d'abord.
 - Ignore ce qui n'est pas comestible (ustensiles, meubles, emballages vides).
@@ -182,10 +185,11 @@ Deno.serve(withCors(async (req: Request) => {
       return errorResponse('not_configured', language, 500, 'GEMINI_API_KEY and GROQ_API_KEY missing');
     }
 
-    if (simulation?.user_quota || !await consumeQuota(user.id, 'scans')) {
-      logUserQuota('analyze-image', 'scans', DAILY_LIMITS.scans, user.id);
-      const message = (MESSAGES[language] || MESSAGES['en']).quota_exceeded.replace('{limit}', String(DAILY_LIMITS.scans));
-      return jsonResponse({ error: 'quota_exceeded', reason: 'user_quota', message, limit: DAILY_LIMITS.scans }, 429);
+    if (simulation?.user_quota || !await consumeQuota(user, 'scans')) {
+      const limit = dailyLimit(user, 'scans');
+      logUserQuota('analyze-image', 'scans', limit, user.id);
+      const message = (MESSAGES[language] || MESSAGES['en']).quota_exceeded.replace('{limit}', String(limit));
+      return jsonResponse({ error: 'quota_exceeded', reason: 'user_quota', message, limit }, 429);
     }
     quotaUserId = user.id;
 

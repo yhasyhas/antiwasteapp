@@ -2,6 +2,7 @@
 // (testée par ingredients.test.ts).
 
 import type { ParseResult } from '../_shared/ai.ts';
+import { FOOD_KEY_GUIDE, normalizeFoodKey } from '../_shared/foodKey.ts';
 
 // En dessous de ce niveau de confiance, l'ingrédient n'est pas proposé à l'utilisateur
 export const MIN_CONFIDENCE = 0.5;
@@ -54,8 +55,9 @@ export const RESPONSE_SCHEMA = {
           kind: { type: 'string', enum: KINDS },
           storage_tip: { type: 'string', description: 'Conseil de conservation court, dans la langue demandée' },
           shelf_life_days: { type: 'integer', description: "Nombre de jours avant que l'aliment ne soit plus bon, à partir d'aujourd'hui" },
+          food_key: { type: 'string', description: FOOD_KEY_GUIDE },
         },
-        required: ['name', 'quantity', 'category', 'confidence', 'kind', 'storage_tip', 'shelf_life_days'],
+        required: ['name', 'quantity', 'category', 'confidence', 'kind', 'storage_tip', 'shelf_life_days', 'food_key'],
         additionalProperties: false,
       },
     },
@@ -72,6 +74,8 @@ export interface DetectedIngredient {
   kind: FoodKind;
   storage_tip: string;
   shelf_life_days: number;
+  // Identifiant standard (fiche aliment) ; null pour un plat cuisiné ou s'il est mal formé
+  food_key: string | null;
 }
 
 // Raison pour laquelle un aliment ne respecte pas RESPONSE_SCHEMA, ou null s'il est utilisable.
@@ -128,6 +132,7 @@ export function cleanIngredients(raw: unknown): DetectedIngredient[] {
         kind,
         storage_tip: typeof item.storage_tip === 'string' ? item.storage_tip.trim().slice(0, MAX_STORAGE_TIP_LENGTH) : '',
         shelf_life_days: cleanShelfLife(item.shelf_life_days, category, kind),
+        food_key: kind === 'dish' ? null : normalizeFoodKey(item.food_key),
       };
     })
     .filter((item) => item.confidence >= MIN_CONFIDENCE)

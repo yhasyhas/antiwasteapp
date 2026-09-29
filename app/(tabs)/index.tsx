@@ -14,12 +14,14 @@ import { alertWriteError } from '@/lib/alertWriteError';
 import { loadFavoriteIds, setFavorite } from '@/lib/favorites';
 import { activeHouseholdId } from '@/lib/household';
 import { onPantryChanged } from '@/lib/pantryEvents';
+import { loadShoppingList, onShoppingChanged } from '@/lib/shopping';
 import { useRecipeImages } from '@/hooks/useRecipeImages';
 import { recipeFromRow, type Recipe } from '@/components/recipe/types';
 import { RecipeSheet } from '@/components/recipe/RecipeSheet';
-import { ChefHat, Sparkles, TrendingUp } from 'lucide-react-native';
+import { ChefHat, ShoppingCart, Sparkles, TrendingUp } from 'lucide-react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { RecipeListCard } from '@/components/recipe/RecipeListCard';
+import { WasteCounter } from '@/components/home/WasteCounter';
 
 type RecentRecipe = Recipe & { id: string };
 
@@ -44,6 +46,14 @@ export default function HomeScreen() {
 
   // Garde-manger du foyer actif ; rechargé quand un membre le modifie (temps réel)
   useEffect(() => onPantryChanged(loadIngredients), [user]);
+
+  // Articles à acheter (carte « Courses »)
+  const [toBuy, setToBuy] = useState(0);
+  const loadToBuy = useCallback(() => {
+    loadShoppingList().then((items) => items && setToBuy(items.filter((item) => !item.checked).length));
+  }, []);
+  useFocusEffect(loadToBuy);
+  useEffect(() => onShoppingChanged(loadToBuy), [loadToBuy]);
 
   const loadIngredients = async () => {
     if (!user) return;
@@ -110,7 +120,7 @@ export default function HomeScreen() {
       <View style={[styles.header, safe.top(20)]}>
         <View>
           <Text style={styles.greeting}>{t('home.welcomeBack')}</Text>
-          <Text style={styles.email}>{user?.email}</Text>
+          <Text style={styles.email}>{user?.email || t('auth.guestName')}</Text>
         </View>
         <TouchableOpacity onPress={signOut} style={styles.logoutButton}>
           <Text style={styles.logoutText}>{t('home.signOut')}</Text>
@@ -166,7 +176,20 @@ export default function HomeScreen() {
             <Text style={styles.actionTitle}>{t('home.myPantry')}</Text>
             <Text style={styles.actionSubtitle}>{t('ingredientCount', { count: ingredients.length })}</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.actionCard}
+            onPress={() => router.push('/shopping')}
+          >
+            <View style={styles.actionIconContainer}>
+              <ShoppingCart size={24} color="#10b981" />
+            </View>
+            <Text style={styles.actionTitle}>{t('shopping.short')}</Text>
+            <Text style={styles.actionSubtitle}>{t('shopping.toBuyCount', { count: toBuy })}</Text>
+          </TouchableOpacity>
         </View>
+
+        <WasteCounter />
 
         {recipes.length > 0 && (
           <View style={styles.section}>

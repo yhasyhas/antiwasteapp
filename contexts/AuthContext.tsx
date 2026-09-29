@@ -16,8 +16,13 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string) => Promise<{ error: any; needsEmailConfirmation: boolean }>;
+  signIn: (email: string, password: string, captchaToken?: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, captchaToken?: string) => Promise<{ error: any; needsEmailConfirmation: boolean }>;
+  // Essai sans compte (connexion anonyme Supabase)
+  signInAnonymously: (captchaToken?: string) => Promise<{ error: any }>;
+  // Compte anonyme → vrai compte : même identifiant, toutes les données sont gardées
+  upgradeAccount: (email: string, password: string) => Promise<{ error: any }>;
+  isAnonymous: boolean;
   signOut: () => Promise<void>;
 }
 
@@ -83,19 +88,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) throw error;
 
       if (!profile) {
-        const { error: insertError } = await supabase.from('profiles').insert({ id, email: email! });
+        // Compte anonyme : pas d'adresse e-mail
+        const { error: insertError } = await supabase.from('profiles').insert({ id, email: email ?? null });
         if (insertError) throw insertError;
+      } else if (email) {
+        // Après la conversion d'un compte anonyme : l'adresse rejoint le profil
+        await supabase.from('profiles').update({ email }).eq('id', id).is('email', null);
       }
     } catch (e) {
       console.error('Error creating profile:', e);
     }
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, captchaToken?: string) => {
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
+        options: { captchaToken },
       });
       return { error };
     } catch (e) {
@@ -103,13 +113,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, captchaToken?: string) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: { captchaToken },
     });
     // Confirmation d'email active : le compte est créé mais sans session tant que le lien n'est pas ouvert
     return { error, needsEmailConfirmation: !error && !data.session };
+  };
+
+  const signInAnonymously = async (captchaToken?: string) => {
+    const { error } = await supabase.auth.signInAnonymously({ options: { captchaToken } });
+    return { error };
+  };
+
+  // L'adresse d'abord (le compte devient permanent), puis le mot de passe ; nouveau jeton sans is_anonymous
+  const upgradeAccount = async (email: string, password: string) => {
+    const { error: emailError } = await supabase.auth.updateUser({ email });
+    if (emailError) return { error: emailError };
+    const { error: passwordError } = await supabase.auth.updateUser({ password });
+    if (passwordError) return { error: passwordError };
+    const { data, error } = await supabase.auth.refreshSession();
+    if (!error && data.user) await ensureProfile(data.user.id, data.user.email);
+    return { error };
   };
 
   const signOut = async () => {
@@ -120,7 +147,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, session, loading, signIn, signUp, signOut }}
+      value={{ user, session, loading, signIn, signUp, signInAnonymously, upgradeAccount, isAnonymous: user?.is_anonymous === true, signOut }}
     >
       {children}
     </AuthContext.Provider>

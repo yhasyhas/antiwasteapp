@@ -33,6 +33,9 @@ export interface Filters {
   mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
   cuisine: Cuisine;
   language: string;
+  // Préférences : nombre de personnes (null : non précisé) et aliments exclus (allergies, goûts)
+  servings: number | null;
+  excluded: string[];
 }
 
 // Réservation pendant la génération de l'image (voir generate-recipe-image) : pas encore une image

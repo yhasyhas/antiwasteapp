@@ -1,6 +1,6 @@
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { supabase } from './supabase';
-import { notifyPantryChanged } from './pantryEvents';
+import { notifyPantryChanged, notifyShoppingChanged } from './pantryEvents';
 
 // Foyer actif de l'utilisateur connecté (son foyer partagé s'il en a un, sinon son foyer personnel) :
 // un seul état partagé par toute l'app, lu par useHousehold. Toutes les écritures passent par les
@@ -9,7 +9,8 @@ import { notifyPantryChanged } from './pantryEvents';
 
 export interface HouseholdMember {
   user_id: string;
-  name: string;
+  // null : compte sans nom ni adresse (essai sans compte) ; l'app affiche « Invité »
+  name: string | null;
   role: 'owner' | 'member';
   joined_at: string;
   is_me: boolean;
@@ -117,6 +118,7 @@ function subscribeRealtime(householdId: string | null) {
     next
       .on('broadcast', { event: 'pantry' }, () => notifyPantryChanged())
       .on('broadcast', { event: 'members' }, () => loadHousehold())
+      .on('broadcast', { event: 'shopping' }, () => notifyShoppingChanged())
       .subscribe((status, error) => {
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') console.warn('[foyer] temps réel :', status, error?.message ?? '');
       });

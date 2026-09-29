@@ -31,9 +31,14 @@ function RootNavigator() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="recipe/generate" />
         <Stack.Screen name="household" />
+        <Stack.Screen name="shopping" />
+        <Stack.Screen name="preferences" />
+        <Stack.Screen name="auth/upgrade" />
         {/* Développement seulement (l'écran redirige ailleurs hors développement) */}
         <Stack.Screen name="dev/status" />
       </Stack.Protected>
+      {/* Lien d'invitation : accessible sans session (le code est gardé le temps de se connecter) */}
+      <Stack.Screen name="join" />
       <Stack.Screen name="+not-found" />
     </Stack>
   );

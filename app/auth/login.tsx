@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -13,11 +13,43 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { Input, PasswordInput } from '@/components/ui/Input';
 import { KeyboardAvoider, useKeyboardScroll } from '@/components/ui/KeyboardAvoider';
+import { CaptchaCancelled, captchaEnabled, useCaptcha } from '@/components/auth/Captcha';
+import { hasPendingInvite } from '@/lib/invite';
 import { authErrorMessage } from '@/lib/authErrors';
 import { ChefHat } from 'lucide-react-native';
 
 export default function LoginScreen() {
-  const { signIn } = useAuth();
+  const { signIn, signInAnonymously } = useAuth();
+  const { getToken, captcha } = useCaptcha();
+  // Lien d'invitation ouvert sans session : message d'accueil
+  const [invited, setInvited] = useState(false);
+  useEffect(() => {
+    hasPendingInvite().then(setInvited);
+  }, []);
+
+  // Jeton anti-robot (Turnstile) ; null si l'utilisateur a fermé la vérification
+  const captchaToken = async (): Promise<string | undefined | null> => {
+    try {
+      return await getToken();
+    } catch (error) {
+      if (!(error instanceof CaptchaCancelled)) setError(t('auth.captchaFailed'));
+      return null;
+    }
+  };
+
+  const tryWithoutAccount = async () => {
+    setError('');
+    const token = await captchaToken();
+    if (token === null) return;
+    setLoading(true);
+    const { error: anonymousError } = await signInAnonymously(token);
+    setLoading(false);
+    if (anonymousError) {
+      setError(authErrorMessage(t, anonymousError));
+      return;
+    }
+    router.replace('/(tabs)');
+  };
   const { t } = useLanguage();
   const safe = useSafeSpacing();
   const keyboardScroll = useKeyboardScroll();
@@ -32,10 +64,12 @@ export default function LoginScreen() {
       return;
     }
 
-    setLoading(true);
     setError('');
+    const token = await captchaToken();
+    if (token === null) return;
+    setLoading(true);
 
-    const { error: signInError } = await signIn(email, password);
+    const { error: signInError } = await signIn(email, password, token);
     setLoading(false);
 
     if (signInError) {
@@ -66,6 +100,8 @@ export default function LoginScreen() {
             {t('auth.tagline')}
           </Text>
         </View>
+
+        {invited && <Text style={styles.invited}>{t('auth.invitedBanner')}</Text>}
 
         <View style={styles.form}>
           <View style={styles.inputGroup}>
@@ -114,8 +150,17 @@ export default function LoginScreen() {
               {t('auth.noAccount')}<Text style={styles.linkBold}>{t('auth.signUp')}</Text>
             </Text>
           </TouchableOpacity>
+
+          {/* Essai sans compte : seulement avec la protection anti-robot configurée */}
+          {captchaEnabled && (
+            <TouchableOpacity style={styles.guestButton} onPress={tryWithoutAccount} disabled={loading}>
+              <Text style={styles.guestText}>{t('auth.tryWithoutAccount')}</Text>
+              <Text style={styles.guestHint}>{t('auth.tryWithoutAccountHint')}</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
+      {captcha}
     </KeyboardAvoider>
   );
 }
@@ -198,6 +243,35 @@ const styles = StyleSheet.create({
   linkBold: {
     color: '#10b981',
     fontWeight: '600',
+  },
+  invited: {
+    backgroundColor: '#f0fdf4',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 16,
+    color: '#047857',
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'center',
+  },
+  guestButton: {
+    marginTop: 8,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#d1fae5',
+    backgroundColor: '#fff',
+    alignItems: 'center',
+  },
+  guestText: {
+    color: '#047857',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  guestHint: {
+    color: '#6b7280',
+    fontSize: 12,
+    marginTop: 2,
   },
   errorText: {
     color: '#ef4444',
