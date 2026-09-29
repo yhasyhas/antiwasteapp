@@ -5,15 +5,18 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { notifyPantryChanged } from '@/lib/pantryEvents';
 import { useFoodNames } from '@/lib/foodNames';
+import { loadPantry } from '@/lib/pantry';
+import { consumeOldestFirst, findExisting, groupLots, lotsStock, totalLabel, type LotGroup } from '@/lib/pantryLots';
 import { formatQuantity, parseQuantity, stepOf, usedFromRecipe, type Quantity } from '@/lib/quantity';
+import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import { useUndoableAction } from '@/hooks/useUndoableAction';
 import { BottomSheet, SheetHeader } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/Button';
 import { cardStyles } from '@/components/ui/Card';
 import { Chip } from '@/components/ui/Chip';
 import { Toast } from '@/components/ui/Toast';
-import { Touchable } from '@/components/ui/Touchable';
-import { colors, opacity, radius, sizes, spacing, typography } from '@/constants/theme';
+import { StepButton } from '@/components/ui/StepButton';
+import { colors, sizes, spacing, typography } from '@/constants/theme';
 
 interface UsedIngredient {
   name: string;
@@ -30,41 +33,40 @@ interface Props {
 }
 
 // Quantité utilisée : un nombre dans l'unité du garde-manger (réglé avec + et −), ou, sans unité commune avec
-// la recette, « Tout », « La moitié » ou « Un peu »
+// la recette ou entre les lots, « Tout », « La moitié » ou « Un peu »
 type Used = { kind: 'amount'; value: number } | { kind: 'all' } | { kind: 'half' } | { kind: 'little' };
 
-interface PantryRow {
-  id: string;
-  name: string;
-  quantity: string | null;
-  food_key: string | null;
-  kind: string | null;
-  // Quantité du garde-manger lue (null : pas de nombre)
+// Un aliment du garde-manger (tous ses lots) utilisé par la recette
+interface CookRow {
+  key: string;
+  group: LotGroup<PantryIngredient>;
+  // Quantité totale des lots (null : pas calculable)
   stock: Quantity | null;
   used: Used;
 }
 
-// Changements de la validation : aliments retirés et restes
+// Changements de la validation : lots finis et lots entamés
 interface Cooking {
   id: string;
   usedUp: string[];
   leftovers: { id: string; quantity: string }[];
 }
 
-// « J'ai cuisiné ça » : pour chaque ingrédient du garde-manger utilisé par la recette, la quantité utilisée,
-// préremplie avec celle de la recette ; en dessous, ce qu'il en restera. Les aliments finis sont retirés et
-// comptés « sauvés », les autres gardent leur date et prennent la quantité restante. Enregistré tout de suite,
-// puis « Retiré du garde-manger · Annuler » pendant 5 secondes (état d'avant rétabli par le serveur).
+// « J'ai cuisiné ça » : pour chaque aliment du garde-manger utilisé par la recette, la quantité utilisée,
+// préremplie avec celle de la recette ; en dessous, ce qu'il en restera. La quantité est prise du lot le plus
+// ancien au plus récent : les lots finis sont retirés et comptés « sauvés », un lot entamé garde sa date et
+// prend la quantité restante. Enregistré tout de suite, puis « Retiré du garde-manger · Annuler » pendant
+// 5 secondes (état d'avant rétabli par le serveur, tous les lots compris).
 export function CookedButton({ ingredientsUsed, style }: Props) {
   const { t, language } = useLanguage();
-  const [rows, setRows] = useState<PantryRow[] | null>(null);
+  const [rows, setRows] = useState<CookRow[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const foodName = useFoodNames(rows);
+  const foodName = useFoodNames(rows?.map((row) => row.group.first));
 
   const cooking = useUndoableAction<Cooking>({
     label: 'removing cooked ingredients',
-    // Retirés et comptés « sauvés » ; restes mis à jour sans être comptés
+    // Retirés et comptés « sauvés » ; lots entamés mis à jour sans être comptés
     perform: async ({ usedUp, leftovers }) => {
       const { data, error } = await supabase.rpc('cook_with_undo', { p_ids: usedUp, p_leftovers: leftovers });
       if (error) throw error;
@@ -75,47 +77,66 @@ export function CookedButton({ ingredientsUsed, style }: Props) {
   });
 
   const used = (ingredientsUsed ?? []).filter((item) => !!item?.pantry_id);
-  const pantryIds = [...new Set(used.map((item) => item.pantry_id as string))];
   // Recettes d'avant la phase 3 : pas d'identifiants, rien à retirer
-  if (pantryIds.length === 0) return null;
+  if (used.length === 0) return null;
 
   const open = async () => {
     setLoading(true);
-    // Seulement ceux encore présents (d'autres ont pu être retirés entre-temps)
-    const { data, error } = await supabase
-      .from('ingredients')
-      .select('id, name, quantity, food_key, kind')
-      .in('id', pantryIds);
+    const pantry = await loadPantry();
     setLoading(false);
-    if (error) {
+    if (!pantry) {
       Alert.alert(t('common.error'), t('errors.writeText'));
       return;
     }
-    if (!data || data.length === 0) {
+    // Aliment de chaque ingrédient de la recette : celui du lot choisi à la génération, ou, s'il n'est plus
+    // là, le même aliment ajouté depuis
+    const groups = groupLots(pantry);
+    const found = new Map<string, CookRow>();
+    for (const item of used) {
+      const group = groups.find((candidate) => candidate.lots.some((lot) => lot.id === item.pantry_id))
+        ?? findExisting(groups, { name: item.name, quantity: '', kind: 'ingredient', expires_at: null });
+      if (!group || found.has(group.key)) continue;
+      const stock = lotsStock(group.lots);
+      const needed = parseQuantity([item.quantity, item.unit].filter(Boolean).join(' '), group.first.name);
+      const amount = usedFromRecipe(stock, needed);
+      found.set(group.key, { key: group.key, group, stock, used: amount !== null ? { kind: 'amount', value: amount } : { kind: 'all' } });
+    }
+    if (found.size === 0) {
       Alert.alert(t('cooked.button'), t('cooked.nothingLeft'));
       return;
     }
-    setRows(data.map((row) => {
-      const stock = parseQuantity(row.quantity, row.name);
-      const recipe = used.find((item) => item.pantry_id === row.id);
-      const needed = recipe ? parseQuantity([recipe.quantity, recipe.unit].filter(Boolean).join(' '), row.name) : null;
-      const amount = usedFromRecipe(stock, needed);
-      return { ...row, stock, used: amount !== null ? { kind: 'amount', value: amount } : { kind: 'all' } };
-    }));
+    setRows([...found.values()]);
   };
 
-  const setUsed = (id: string, next: Used) =>
-    setRows((current) => current?.map((row) => (row.id === id ? { ...row, used: next } : row)) ?? null);
+  const setUsed = (key: string, next: Used) =>
+    setRows((current) => current?.map((row) => (row.key === key ? { ...row, used: next } : row)) ?? null);
 
-  const step = (row: PantryRow, direction: 1 | -1) => {
+  const step = (row: CookRow, direction: 1 | -1) => {
     if (row.used.kind !== 'amount' || !row.stock) return;
     const size = stepOf(row.stock);
     const next = Math.round((row.used.value + direction * size) / size) * size;
-    setUsed(row.id, { kind: 'amount', value: Number(Math.min(Math.max(next, 0), row.stock.value).toFixed(3)) });
+    setUsed(row.key, { kind: 'amount', value: Number(Math.min(Math.max(next, 0), row.stock.value).toFixed(3)) });
+  };
+
+  // Lots finis et lots entamés pour la quantité choisie
+  const changesOf = (row: CookRow): { usedUp: string[]; leftovers: { id: string; quantity: string }[] } => {
+    const { used: value, stock, group } = row;
+    if (value.kind === 'all') return { usedUp: group.lots.map((lot) => lot.id), leftovers: [] };
+    if (value.kind === 'little') return { usedUp: [], leftovers: [] };
+    if (value.kind === 'amount') return consumeOldestFirst(group.lots, value.value, language);
+    // La moitié : du plus ancien au plus récent si le total se calcule, sinon chaque lot de moitié
+    if (stock) return consumeOldestFirst(group.lots, stock.value / 2, language);
+    return {
+      usedUp: [],
+      leftovers: group.lots.map((lot) => {
+        const quantity = parseQuantity(lot.quantity, lot.name);
+        return { id: lot.id, quantity: quantity ? formatQuantity(Number((quantity.value / 2).toFixed(2)), quantity.unit, language) : t('cooked.halfValue') };
+      }),
+    };
   };
 
   // Ce qu'il restera : null si l'aliment est fini (retiré), '' si rien ne change, sinon la quantité restante
-  const remaining = (row: PantryRow): string | null => {
+  const remaining = (row: CookRow): string | null => {
     const { used: value, stock } = row;
     if (value.kind === 'all') return null;
     if (value.kind === 'little') return '';
@@ -126,19 +147,20 @@ export function CookedButton({ ingredientsUsed, style }: Props) {
     return value.value === 0 ? '' : formatQuantity(left, stock.unit, language);
   };
 
-  const remainingLine = (row: PantryRow): string => {
+  const remainingLine = (row: CookRow): string => {
     const left = remaining(row);
     if (left === null) return t('cooked.noneLeft');
-    if (left === '') return row.used.kind === 'little' ? t('cooked.mostRemains') : t('cooked.willRemain', { quantity: row.quantity ?? '' });
+    if (left === '') return row.used.kind === 'little' ? t('cooked.mostRemains') : t('cooked.willRemain', { quantity: totalLabel(row.group.lots, language) });
     return t('cooked.willRemain', { quantity: left });
   };
 
-  const changes = (rows ?? []).map((row) => ({ row, left: remaining(row) })).filter(({ left }) => left !== '');
+  const changes = (rows ?? []).filter((row) => remaining(row) !== '');
 
   // Enregistré avant de fermer la fiche : en cas d'échec (hors connexion), erreur et fiche gardée ouverte
   const confirm = async () => {
-    const usedUp = changes.filter(({ left }) => left === null).map(({ row }) => row.id);
-    const leftovers = changes.filter(({ left }) => left !== null).map(({ row, left }) => ({ id: row.id, quantity: left as string }));
+    const all = changes.map(changesOf);
+    const usedUp = all.flatMap((change) => change.usedUp);
+    const leftovers = all.flatMap((change) => change.leftovers);
     if (usedUp.length + leftovers.length === 0) return setRows(null);
     setSaving(true);
     const saved = await cooking.run({ id: `cooking-${Date.now()}`, usedUp, leftovers });
@@ -155,11 +177,13 @@ export function CookedButton({ ingredientsUsed, style }: Props) {
         <SheetHeader title={t('cooked.title')} subtitle={t('cooked.subtitle')} onClose={() => setRows(null)} />
         <ScrollView style={styles.list} keyboardShouldPersistTaps="handled">
           {(rows ?? []).map((row, index) => (
-            <View key={row.id} style={styles.item}>
+            <View key={row.key} style={styles.item}>
               {index > 0 ? <View style={cardStyles.divider} /> : null}
               <View style={styles.itemHeader}>
-                <Text style={styles.name} numberOfLines={2}>{foodName(row)}</Text>
-                {row.quantity ? <Text style={styles.quantity}>{row.quantity}</Text> : null}
+                <Text style={styles.name} numberOfLines={2}>{foodName(row.group.first)}</Text>
+                <Text style={styles.quantity}>
+                  {[totalLabel(row.group.lots, language), row.group.lots.length > 1 ? t('lots.count', { count: row.group.lots.length }) : null].filter(Boolean).join(' · ')}
+                </Text>
               </View>
 
               <View style={styles.usedRow}>
@@ -172,13 +196,16 @@ export function CookedButton({ ingredientsUsed, style }: Props) {
                   </View>
                 ) : (
                   <View style={styles.choices}>
-                    <Chip label={t('cooked.all')} selected={row.used.kind === 'all'} onPress={() => setUsed(row.id, { kind: 'all' })} />
-                    <Chip label={t('cooked.half')} selected={row.used.kind === 'half'} onPress={() => setUsed(row.id, { kind: 'half' })} />
-                    <Chip label={t('cooked.aLittle')} selected={row.used.kind === 'little'} onPress={() => setUsed(row.id, { kind: 'little' })} />
+                    <Chip label={t('cooked.all')} selected={row.used.kind === 'all'} onPress={() => setUsed(row.key, { kind: 'all' })} />
+                    <Chip label={t('cooked.half')} selected={row.used.kind === 'half'} onPress={() => setUsed(row.key, { kind: 'half' })} />
+                    <Chip label={t('cooked.aLittle')} selected={row.used.kind === 'little'} onPress={() => setUsed(row.key, { kind: 'little' })} />
                   </View>
                 )}
               </View>
               <Text style={[styles.remaining, remaining(row) === null && styles.removed]}>{remainingLine(row)}</Text>
+              {row.group.lots.length > 1 && remaining(row) !== '' && remaining(row) !== null ? (
+                <Text style={styles.remaining}>{t('lots.oldestFirst')}</Text>
+              ) : null}
             </View>
           ))}
         </ScrollView>
@@ -191,20 +218,6 @@ export function CookedButton({ ingredientsUsed, style }: Props) {
         />
       </BottomSheet>
     </View>
-  );
-}
-
-function StepButton({ icon: Icon, label, disabled, onPress }: { icon: typeof Plus; label: string; disabled: boolean; onPress: () => void }) {
-  return (
-    <Touchable
-      onPress={onPress}
-      disabled={disabled}
-      style={[styles.stepButton, disabled && styles.stepButtonDisabled]}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-    >
-      <Icon size={sizes.icon} color={colors.primary} />
-    </Touchable>
   );
 }
 
@@ -247,19 +260,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-  },
-  stepButton: {
-    width: sizes.touch,
-    height: sizes.touch,
-    borderRadius: radius.pill,
-    borderWidth: sizes.borderWidth,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stepButtonDisabled: {
-    opacity: opacity.disabled,
   },
   amount: {
     ...typography.cardTitle,

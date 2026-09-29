@@ -36,26 +36,29 @@ interface Props {
   onEditExpiry: () => void;
   // Foyer partagé : nom de celui qui l'a ajouté (sinon non affiché)
   addedBy?: string;
-  // Fiche de l'aliment (pas pour un plat cuisiné)
+  // Fiche de l'aliment (pas pour un plat cuisiné), ou détail des lots
   onOpenFact?: () => void;
+  // Aliment en plusieurs lots : quantité totale et nombre de lots (date : la plus proche)
+  quantityLabel?: string;
+  lotCount?: number;
 }
 
 // Aliment du garde-manger : nom, quantité, auteur, conseil de conservation, badges de date (touchable
 // pour la modifier) et de reste. Toucher la carte ouvre la fiche de l'aliment ; glisser vers la gauche
 // ou appui long : supprimer (ou les autres actions).
-export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry, addedBy, onOpenFact }: Props) {
+export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry, addedBy, onOpenFact, quantityLabel, lotCount = 1 }: Props) {
   const { t } = useLanguage();
   const swipeable = useRef<SwipeableMethods>(null);
   const isDish = ingredient.kind === 'dish';
   const name = displayName ?? ingredient.name;
-  const openFact = onOpenFact && !isDish ? onOpenFact : undefined;
+  const openFact = onOpenFact && (!isDish || lotCount > 1) ? onOpenFact : undefined;
   // « ajouté par Awa » : seule la première lettre de la phrase passe en minuscule, le prénom garde sa majuscule
-  const details = [ingredient.quantity, addedBy ? addedBy.charAt(0).toLowerCase() + addedBy.slice(1) : null].filter(Boolean).join(' · ');
+  const details = [quantityLabel ?? ingredient.quantity, lotCount > 1 ? t('lots.count', { count: lotCount }) : null, addedBy ? addedBy.charAt(0).toLowerCase() + addedBy.slice(1) : null].filter(Boolean).join(' · ');
 
   // Appui long : toutes les actions de l'aliment
   const showActions = () => {
     Alert.alert(name, undefined, [
-      ...(openFact ? [{ text: t('pantry.viewFact'), onPress: openFact }] : []),
+      ...(openFact ? [{ text: lotCount > 1 ? t('lots.count', { count: lotCount }) : t('pantry.viewFact'), onPress: openFact }] : []),
       { text: t('expiry.edit'), onPress: onEditExpiry },
       { text: t('common.delete'), style: 'destructive' as const, onPress: onDelete },
       { text: t('common.cancel'), style: 'cancel' as const },
@@ -89,7 +92,7 @@ export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry
         onPress={openFact ?? showActions}
         onLongPress={showActions}
         style={styles.card}
-        accessibilityLabel={openFact ? `${name}, ${t('facts.open')}` : name}
+        accessibilityLabel={openFact ? `${name}, ${lotCount > 1 ? t('lots.count', { count: lotCount }) : t('facts.open')}` : name}
       >
         <IconChip icon={Leaf} />
         <View style={styles.body}>
