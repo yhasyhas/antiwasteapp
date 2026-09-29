@@ -22,7 +22,7 @@ Langues : français (par défaut), anglais, espagnol.
 | App | Expo SDK 57, React Native 0.86, React 19.2, expo-router 57 (routes par fichiers), TypeScript 6 |
 | Traductions | i18next + react-i18next + expo-localization, clés typées, fr / en / es |
 | Notifications | `expo-notifications`, notifications locales (fonctionnent dans Expo Go) |
-| Codes-barres | `expo-camera` + Open Food Facts (appel direct, User-Agent de l'app) |
+| Caméra et codes-barres | `react-native-vision-camera` 5 (Nitro, nouvelle architecture) et `react-native-vision-camera-barcode-scanner` (ML Kit) sur le téléphone, `expo-camera` sur le web seulement ; Open Food Facts (appel direct, User-Agent de l'app) |
 | Suivi des erreurs | Sentry (`@sentry/react-native`), région UE ; erreurs JavaScript seulement dans Expo Go |
 | UI | StyleSheet natif, icônes `lucide-react-native`, couleur principale `#10b981` (vert) |
 | Backend | Supabase (projet `iqzjonmjlscuckdmiehk`) : Auth, Postgres avec RLS, Edge Functions (Deno) ; nouvelles clés d'API (publishable / secrète) |
@@ -216,6 +216,11 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Noms des aliments dans la langue de l'app : `lib/foodNames.ts` (`useFoodNames`, `linkPantryFoodKeys` qui appelle `food-fact` en mode `link_only`).
 - Traduction des recettes : fonction `translate-recipe`, `lib/recipeTranslation.ts`, colonne `recipes.translations`. Quotas `links` et `translations` dans `usage_counters`.
 
+### Phase 7c — caméra sur react-native-vision-camera (branche `phase-7c`)
+- `components/scan/ScannerCamera.tsx` (téléphone, vision-camera : aperçu, photo dans un fichier temporaire, code-barres EAN-13 / EAN-8 / UPC-A / UPC-E par le lecteur ML Kit, sans frame processors) et `ScannerCamera.web.tsx` (web, expo-camera), même interface (`scannerCameraTypes.ts`).
+- `app/(tabs)/camera.tsx` : caméra montée seulement quand elle est visible, réouverte après 500 ms, surveillance sur la première image reçue (`onPreviewStarted`) avec une relance automatique puis « Réessayer », événements Sentry avec le modèle du téléphone (`reportCameraIssue`).
+- expo-camera exclu de l'autolinking mobile (`expo.autolinking.exclude` dans `package.json`) ; permission caméra déclarée dans `app.json`. Nouveau build de développement nécessaire.
+
 ## 5. État actuel et problèmes connus
 
 ### Sécurité
@@ -232,7 +237,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 
 ## 6. Prochaine étape
-Phase 6b : liste de courses, compteur anti-gaspi, préférences, essai sans compte, fiches aliments. Phase 7 : design et ergonomie ; phase 8 : lancement. Détails dans `PLAN.md`.
+Phase 7c : caméra sur react-native-vision-camera (tests sur les deux téléphones), puis phase 7b et phase 8 (lancement). Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash

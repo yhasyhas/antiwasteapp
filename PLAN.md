@@ -238,13 +238,13 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 
 À faire avant la phase 7b. Sur un Samsung, l'aperçu du Scanner reste vide au retour sur l'onglet malgré la réouverture différée et la relance automatique (expo-camera) ; le Redmi fonctionne.
 
-- [ ] Relever les événements Sentry « Caméra du Scanner » (modèle, version d'Android, relance ou erreur) et les noter au journal
-- [ ] Ajouter react-native-vision-camera (plugin de configuration, permission caméra) et créer un nouveau build de développement EAS
-- [ ] Réécrire l'aperçu du Scanner : caméra active seulement quand l'onglet est affiché, l'app au premier plan et aucune feuille par-dessus ; photo, retournement avant / arrière
-- [ ] Code-barres avec le lecteur de vision-camera (EAN-13, EAN-8, UPC-A, UPC-E) : un code à la fois, reprise à la fermeture de l'ajout manuel et au retour sur l'onglet
-- [ ] Erreurs de démarrage : message et « Réessayer », événement Sentry avec le modèle du téléphone et la version du système
-- [ ] Version web de l'app (captures, essais) : vision-camera n'existe pas sur le web, garder expo-camera sur le web ou afficher l'ajout à la main
-- [ ] Retirer expo-camera s'il ne sert plus
+- [x] Événements Sentry « Caméra du Scanner » : aucun reçu (voir le journal) ; pas de diagnostic supplémentaire, passage direct à vision-camera (décision du 29/09/2026)
+- [x] Ajouter react-native-vision-camera (permission caméra dans `app.json`, pas de plugin fourni) et créer un nouveau build de développement EAS
+- [x] Réécrire l'aperçu du Scanner : caméra active seulement quand l'onglet est affiché, l'app au premier plan et aucune feuille par-dessus ; photo, retournement avant / arrière
+- [x] Code-barres avec le lecteur de vision-camera (EAN-13, EAN-8, UPC-A, UPC-E) : un code à la fois, reprise à la fermeture de l'ajout manuel et au retour sur l'onglet
+- [x] Erreurs de démarrage : message et « Réessayer », événement Sentry avec le modèle du téléphone et la version du système
+- [x] Version web de l'app (captures, essais) : vision-camera n'existe pas sur le web, expo-camera gardé sur le web seulement
+- [x] Retirer expo-camera du mobile (exclu de l'autolinking, gardé pour le web)
 - [ ] Tests sur les deux téléphones : cinq allers-retours Scanner → Garde-manger → Scanner en photo et en code-barres, arrière-plan puis retour, « À la main » ouvert puis fermé
 
 **Terminé quand** : l'aperçu du Scanner revient à chaque retour sur l'onglet, sur le Samsung comme sur le Redmi, en photo et en code-barres.
@@ -410,4 +410,5 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 | 29/09/2026 | Cartes du garde-manger empilées sur Android après « Voir le garde-manger » depuis le Scanner : animations de liste seulement quand l'écran est affiché, réarrangement animé désactivé sur Android ; liens vers les onglets par `router.navigate` (plus de second écran empilé) | Liste mise à jour pendant que l'onglet était caché : les animations de réarrangement calculaient des positions fausses |
 | 29/09/2026 | Phases 6b et 7 validées et fusionnées dans master. Caméra : le Redmi fonctionne, l'aperçu reste vide sur le Samsung malgré la réouverture différée et la relance automatique | Nouvelle phase 7c (passage à react-native-vision-camera), avant la phase 7b. Événements Sentry de la caméra pas encore relevés : l'accès en lecture à Sentry manque (seul le DSN, qui ne permet que d'envoyer, est configuré) |
 | 29/09/2026 | Sentry : aucun événement « Caméra du Scanner » après les allers-retours sur le Samsung | Sentry démarre avec l'app et expo-device est dans le build : un événement aurait pu partir. Explication la plus probable : `onCameraReady` arrive sur le Samsung alors que l'aperçu reste vide, donc la surveillance ne se déclenche pas (ni relance automatique, ni erreur, ni événement). La surveillance ne peut pas détecter ce cas : raison de plus pour la phase 7c |
+| 29/09/2026 | Phase 7c : react-native-vision-camera 5.2.3 avec react-native-nitro-modules 0.37.1 et react-native-nitro-image 0.15.2 ; codes-barres par react-native-vision-camera-barcode-scanner 5.2.3 (ML Kit, modèle inclus, sortie de caméra sans frame processors) | Version 5 : Nitro, nouvelle architecture obligatoire (celle du projet) ; publiée en août 2026, après React Native 0.86 ; testée par ses auteurs avec React Native 0.85, compilée ici avec 0.86.3 (build EAS réussi). La v4 n'est plus maintenue. Surveillance basée sur `onPreviewStarted` (première image reçue), signal qu'expo-camera n'offrait pas |
 | | *(résultat du test Gemini vs Clarifai)* | |
