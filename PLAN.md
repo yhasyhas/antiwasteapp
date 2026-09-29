@@ -200,39 +200,39 @@ Regroupe ce qui dépend du build de développement.
 
 ### Phase 6b — Invitation par lien, liste de courses, compteur anti-gaspi, préférences, essai sans compte, fiches aliments
 
-- [ ] Invitation par lien : route `join` de l'app (code prérempli), page web d'invitation sur Cloudflare Pages (trois langues, ouvre l'app ou propose le téléchargement), message de partage avec le lien
-- [ ] Liste de courses partagée par le foyer, en temps réel : ingrédients manquants d'une recette en un geste (`missing_ingredients`), ajout manuel, article acheté envoyé au garde-manger avec une date proposée
-- [ ] Compteur anti-gaspi sur l'accueil, en nombre d'aliments (ce mois-ci, pour le foyer et pour moi) : « sauvé » avec « J'ai cuisiné ça », « gaspillé » quand un aliment est supprimé après sa date
-- [ ] Écran de préférences : régimes, aliments exclus (allergies et goûts), temps maximum, nombre de personnes ; appliquées par défaut à la génération, modifiables dans les filtres
-- [ ] Cuisines du monde : préférence de cuisine enregistrée et utilisée par défaut
-- [ ] Essai sans compte : connexion anonyme Supabase protégée par Cloudflare Turnstile, quotas réduits, conversion en vrai compte sans perte de données (garde-manger et foyer compris), invité par lien accepté
+- [x] Invitation par lien : route `join` de l'app (code prérempli), page web d'invitation sur Cloudflare Pages (trois langues, ouvre l'app ou propose le téléchargement), message de partage avec le lien
+- [x] Liste de courses partagée par le foyer, en temps réel : ingrédients manquants d'une recette en un geste (`missing_ingredients`), ajout manuel, article acheté envoyé au garde-manger avec une date proposée
+- [x] Compteur anti-gaspi sur l'accueil, en nombre d'aliments (ce mois-ci, pour le foyer et pour moi) : « sauvé » avec « J'ai cuisiné ça », « gaspillé » quand un aliment est supprimé après sa date
+- [x] Écran de préférences : régimes, aliments exclus (allergies et goûts), temps maximum, nombre de personnes ; appliquées par défaut à la génération, modifiables dans les filtres
+- [x] Cuisines du monde : préférence de cuisine enregistrée et utilisée par défaut
+- [x] Essai sans compte : connexion anonyme Supabase protégée par Cloudflare Turnstile, quotas réduits, conversion en vrai compte sans perte de données (garde-manger et foyer compris), invité par lien accepté
 
 #### Fiches aliments
 
 En touchant un aliment du garde-manger, on voit sa fiche : description courte, origine, saison, principaux atouts nutritionnels et astuces anti-gaspi. Informations générales uniquement, sans promesse de santé.
 
-- [ ] Identifiant standard de l'aliment `food_key` (anglais, minuscules, singulier : `banana`, `plantain`, `cherry_tomato`) qui regroupe les variantes (« bananes mûres », « banane » → `banana`) : renvoyé par `analyze-image` pour chaque aliment (`null` pour un plat cuisiné), colonne `food_key` sur `ingredients` (migration d'ajout, sans toucher aux données existantes)
-- [ ] `food_key` à l'ajout manuel et au code-barres : correspondance avec les noms connus des fiches (noms dans les trois langues et variantes enregistrées), sinon un appel IA léger qui renvoie l'identifiant ; pour le code-barres, à partir du nom et des catégories Open Food Facts. Anciens ingrédients sans `food_key` : même correspondance à l'ouverture de la fiche
-- [ ] Table partagée `food_facts` (clé `food_key`) : contenu dans les trois langues (fr, en, es) généré **en un seul appel**, noms et variantes par langue, modèle utilisé, date, état de relecture (`reviewed`) ; lecture pour les utilisateurs connectés, écriture réservée aux fonctions (clé secrète) ; tests SQL
-- [ ] Table `food_fact_reports` (signalements) : aliment, langue, message facultatif, auteur ; chaque utilisateur ne crée et ne lit que ses signalements ; tests SQL
-- [ ] Fonction `food-fact` : renvoie la fiche existante sans rien générer ; sinon la génère une seule fois pour tous les utilisateurs (réservation contre les appels simultanés, comme les images), consigne « informations générales, aucune promesse de santé ni conseil médical », validation du JSON renvoyé (champs, longueurs, trois langues) ; secours entre fournisseurs, noms de modèles dans les secrets
-- [ ] Quota : seules les nouvelles fiches générées comptent (quota personnel par jour dans `usage_counters`, lire une fiche existante est gratuit) ; raisons `user_quota` / `provider_quota` / `provider_error` et alerte Sentry en cas de quota de fournisseur épuisé, comme les autres fonctions ; tests Deno
-- [ ] Écran de fiche depuis le garde-manger (toucher un aliment) : sections traduites, mention « Informations générales, pas un avis médical », bouton « Signaler une erreur » ; message clair si la fiche ne peut pas être générée (quota, panne)
-- [ ] Pré-remplir la centaine d'aliments les plus courants (liste versionnée dans le dépôt, script lancé une fois avec la clé secrète, reprise possible sans régénérer les fiches existantes)
-- [ ] Relecture des fiches : script d'export en Markdown (une fiche par aliment, trois langues, signalements en regard) et marquage `reviewed` des fiches relues ; les fiches signalées remontent en tête
+- [x] Identifiant standard de l'aliment `food_key` (anglais, minuscules, singulier : `banana`, `plantain`, `cherry_tomato`) qui regroupe les variantes (« bananes mûres », « banane » → `banana`) : renvoyé par `analyze-image` pour chaque aliment (`null` pour un plat cuisiné), colonne `food_key` sur `ingredients` (migration d'ajout, sans toucher aux données existantes)
+- [x] `food_key` à l'ajout manuel et au code-barres : correspondance avec les noms connus des fiches (noms dans les trois langues et variantes enregistrées), sinon un appel IA léger qui renvoie l'identifiant ; pour le code-barres, à partir du nom et des catégories Open Food Facts. Anciens ingrédients sans `food_key` : même correspondance à l'ouverture de la fiche
+- [x] Table partagée `food_facts` (clé `food_key`) : contenu dans les trois langues (fr, en, es) généré **en un seul appel**, noms et variantes par langue, modèle utilisé, date, état de relecture (`reviewed`) ; lecture pour les utilisateurs connectés, écriture réservée aux fonctions (clé secrète) ; tests SQL
+- [x] Table `food_fact_reports` (signalements) : aliment, langue, message facultatif, auteur ; chaque utilisateur ne crée et ne lit que ses signalements ; tests SQL
+- [x] Fonction `food-fact` : renvoie la fiche existante sans rien générer ; sinon la génère une seule fois pour tous les utilisateurs (réservation contre les appels simultanés, comme les images), consigne « informations générales, aucune promesse de santé ni conseil médical », validation du JSON renvoyé (champs, longueurs, trois langues) ; secours entre fournisseurs, noms de modèles dans les secrets
+- [x] Quota : seules les nouvelles fiches générées comptent (quota personnel par jour dans `usage_counters`, lire une fiche existante est gratuit) ; raisons `user_quota` / `provider_quota` / `provider_error` et alerte Sentry en cas de quota de fournisseur épuisé, comme les autres fonctions ; tests Deno
+- [x] Écran de fiche depuis le garde-manger (toucher un aliment) : sections traduites, mention « Informations générales, pas un avis médical », bouton « Signaler une erreur » ; message clair si la fiche ne peut pas être générée (quota, panne)
+- [x] Pré-remplir la centaine d'aliments les plus courants (liste versionnée dans le dépôt, script lancé une fois avec la clé secrète, reprise possible sans régénérer les fiches existantes)
+- [x] Relecture des fiches : script d'export en Markdown (une fiche par aliment, trois langues, signalements en regard) et marquage `reviewed` des fiches relues ; les fiches signalées remontent en tête
 
-**Terminé quand** : un nouvel utilisateur peut scanner et générer une recette sans créer de compte, puis garder ses données en créant son compte ; toucher un aliment du garde-manger (scanné, ajouté à la main ou par code-barres) ouvre sa fiche dans la langue de l'app, sans nouvelle génération pour les aliments pré-remplis ; les fiches peuvent être relues et signalées.
+**Terminé quand** : un nouvel utilisateur peut scanner et générer une recette sans créer de compte, puis garder ses données en créant son compte ; toucher un aliment du garde-manger (scanné, ajouté à la main ou par code-barres) ouvre sa fiche dans la langue de l'app, sans nouvelle génération pour les aliments pré-remplis ; les fiches peuvent être relues et signalées. *(Validée le 29/09/2026 dans l'app, tests à deux téléphones compris ; fusionnée avec la phase 7.)*
 
 ## Phase 7 — Design et ergonomie
 
-- [ ] Identité visuelle : couleurs, typographie, composants (boutons, cartes, badges, fenêtres)
-- [ ] Maquettes des écrans principaux (accueil, scan, garde-manger, génération, fiche recette), **validées avant de coder**
-- [ ] Refonte des écrans d'après les maquettes validées
-- [ ] Boutons, transitions et fluidité (animations, retours visuels, temps de chargement ressentis)
-- [ ] Accueil : retirer l'e-mail et le bouton « Se déconnecter », qui ont leur place dans les Réglages
-- [ ] Icônes des cartes de l'accueil à revoir : « Scanner » (un appareil photo) et « Mon garde-manger » (la courbe montante ne convient pas)
+- [x] Identité visuelle : couleurs, typographie, composants (boutons, cartes, badges, fenêtres)
+- [x] Maquettes des écrans principaux (accueil, scan, garde-manger, génération, fiche recette), **validées avant de coder**
+- [x] Refonte des écrans d'après les maquettes validées
+- [x] Boutons, transitions et fluidité (animations, retours visuels, temps de chargement ressentis)
+- [x] Accueil : retirer l'e-mail et le bouton « Se déconnecter », qui ont leur place dans les Réglages
+- [x] Icônes des cartes de l'accueil à revoir : « Scanner » (un appareil photo) et « Mon garde-manger » (la courbe montante ne convient pas)
 
-**Terminé quand** : les écrans principaux suivent les maquettes validées et l'app paraît fluide sur un téléphone Android d'entrée de gamme.
+**Terminé quand** : les écrans principaux suivent les maquettes validées et l'app paraît fluide sur un téléphone Android d'entrée de gamme. *(Validée le 29/09/2026 sur deux téléphones Android ; reste l'aperçu vide de la caméra sur le Samsung, repris en phase 7c.)*
 
 ## Phase 8 — Préparer le lancement
 
