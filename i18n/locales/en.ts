@@ -296,6 +296,9 @@ const en: Translations = {
     french: 'French',
   },
   generate: {
+    rejectedNote_one: "One recipe didn't match your criteria and was left out.",
+    rejectedNote_other: "{{count}} recipes didn't match your criteria and were left out.",
+    fewIngredientsNote: "Few foods chosen, so fewer recipes. Add more for more ideas.",
     canEditSelection: "You can change this selection.",
     withYourFoods: "With your foods",
     useAll: "Use everything",

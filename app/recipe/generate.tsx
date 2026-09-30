@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { Soup, Sparkles } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -15,7 +15,7 @@ import { EmptyState } from '@/components/ui/Illustrations';
 import { ListItemMotion } from '@/components/ui/ListItemMotion';
 import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { Skeleton, SkeletonRecipeCard } from '@/components/ui/Skeleton';
-import { colors, radius, sizes, spacing } from '@/constants/theme';
+import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 
 export default function GenerateRecipeScreen() {
   // priority : identifiants séparés par des virgules (accueil, fiche aliment, notification), présélectionnés
@@ -26,6 +26,7 @@ export default function GenerateRecipeScreen() {
     toggleSelected,
     clearSelection,
     hasLeftovers,
+    resultNote,
     recipes,
     loading,
     generating,
@@ -52,7 +53,7 @@ export default function GenerateRecipeScreen() {
     <View style={styles.container}>
       <ScreenHeader title={title} back />
 
-      <ScrollView style={styles.content} contentContainerStyle={styles.contentInner} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.content} contentContainerStyle={[styles.contentInner, safe.bottom(spacing.xxl)]} showsVerticalScrollIndicator={false}>
         {loading ? (
           <View style={styles.chipsSkeleton}>
             {[0, 1, 2, 3].map((chip) => (
@@ -84,30 +85,34 @@ export default function GenerateRecipeScreen() {
                 />
               </ListItemMotion>
             ))}
+            {resultNote ? <Text style={styles.note}>{resultNote}</Text> : null}
           </View>
         )}
-      </ScrollView>
 
-      <View style={[styles.footer, safe.bottom(spacing.lg)]}>
-        {hasLeftovers && (
+        {/* Actions à la fin de la liste : « D'autres recettes » (ou « Générer »), « Transformer mes restes »
+            seulement avec des restes parmi les aliments choisis */}
+        <View style={styles.actions}>
           <Button
-            label={t('generate.transformLeftovers')}
-            icon={Soup}
-            variant="accent"
-            size="medium"
-            onPress={() => generateRecipes('leftovers')}
-            loading={generatingMode === 'leftovers'}
-            disabled={generating}
+            label={recipes.length > 0 ? t('generate.generateMore') : t('generate.generate')}
+            icon={Sparkles}
+            onPress={() => generateRecipes('standard')}
+            loading={generatingMode === 'standard'}
+            disabled={generating || ingredients.length === 0}
           />
-        )}
-        <Button
-          label={recipes.length > 0 ? t('generate.generateMore') : t('generate.generate')}
-          icon={Sparkles}
-          onPress={() => generateRecipes('standard')}
-          loading={generatingMode === 'standard'}
-          disabled={generating || ingredients.length === 0}
-        />
-      </View>
+          {hasLeftovers && (
+            <Button
+              label={t('generate.transformLeftovers')}
+              icon={Soup}
+              variant="soft"
+              size="small"
+              onPress={() => generateRecipes('leftovers')}
+              loading={generatingMode === 'leftovers'}
+              disabled={generating}
+              style={styles.leftovers}
+            />
+          )}
+        </View>
+      </ScrollView>
 
       <FiltersModal
         visible={showFilters}
@@ -149,12 +154,15 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.sm,
   },
-  footer: {
-    paddingHorizontal: spacing.screen,
-    paddingTop: spacing.md,
-    gap: spacing.sm,
-    backgroundColor: colors.surface,
-    borderTopWidth: sizes.borderWidth,
-    borderTopColor: colors.border,
+  note: {
+    ...typography.secondary,
+    textAlign: 'center',
+    marginTop: spacing.xs,
+  },
+  actions: {
+    gap: spacing.md,
+  },
+  leftovers: {
+    alignSelf: 'center',
   },
 });

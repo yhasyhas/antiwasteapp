@@ -297,6 +297,9 @@ const fr = {
     french: 'Française',
   },
   generate: {
+    rejectedNote_one: "Une recette ne respectait pas tes critères : elle a été écartée.",
+    rejectedNote_other: "{{count}} recettes ne respectaient pas tes critères : elles ont été écartées.",
+    fewIngredientsNote: "Peu d'aliments choisis, donc moins de recettes. Ajoutes-en pour plus d'idées.",
     canEditSelection: "Tu peux modifier cette sélection.",
     withYourFoods: "Avec tes aliments",
     useAll: "Tout utiliser",

@@ -296,6 +296,9 @@ const es: Translations = {
     french: 'Francesa',
   },
   generate: {
+    rejectedNote_one: "Una receta no cumplía tus criterios y se descartó.",
+    rejectedNote_other: "{{count}} recetas no cumplían tus criterios y se descartaron.",
+    fewIngredientsNote: "Pocos alimentos elegidos, así que menos recetas. Añade más para tener más ideas.",
     canEditSelection: "Puedes cambiar esta selección.",
     withYourFoods: "Con tus alimentos",
     useAll: "Usar todo",

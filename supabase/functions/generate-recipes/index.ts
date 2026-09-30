@@ -198,6 +198,8 @@ function buildPrompts(options: {
   otherPantry: string[];
   excluded: string[];
   servings: number | null;
+  // Nouvelle demande après une recette écartée : titres déjà proposés, à ne pas refaire
+  avoidTitles?: string[];
 }): { system: string; prompt: string } {
   const languageName = LANGUAGE_NAMES[options.language] || LANGUAGE_NAMES['en'];
   const dietaryRules = options.dietary.map((diet) => DIETARY_RULES[diet.toLowerCase()]).filter(Boolean);
@@ -254,7 +256,8 @@ ${options.pantryText}
 
 Crée exactement ${options.count} recette${options.count > 1 ? 's' : ''}${options.count > 1 ? ' vraiment différentes les unes des autres (plat, technique de cuisson, texture)' : ''}.
 - Difficulté : ${options.difficulty}
-- Temps total maximum : ${options.maxCookTime} minutes${options.servings ? `
+- Temps total maximum : ${options.maxCookTime} minutes${options.avoidTitles && options.avoidTitles.length > 0 ? `
+- Déjà proposées, à ne pas refaire (autre plat, autre technique) : ${options.avoidTitles.map((title) => `« ${title} »`).join(', ')}` : ''}${options.servings ? `
 - Pour ${options.servings} personne${options.servings > 1 ? 's' : ''} : quantités adaptées, "servings" = ${options.servings}` : ''}
 
 ${refusal}`;
@@ -317,7 +320,7 @@ Deno.serve(withCors(async (req: Request) => {
     const servings = cleanServings(preferences.servings);
     const context = { mealType: preferences.mealType, cuisine, difficulty, dietary, maxRecipes: count, mode, otherPantry, excluded, servings };
 
-    const { system, prompt } = buildPrompts({
+    const promptOptions = {
       pantryText: pantryForPrompt(pantry),
       count,
       language,
@@ -334,7 +337,8 @@ Deno.serve(withCors(async (req: Request) => {
       otherPantry,
       excluded,
       servings,
-    });
+    };
+    const { system, prompt } = buildPrompts(promptOptions);
 
     const providers = debug === true && requestedOrder
       ? orderProviders(PROVIDERS, requestedOrder).filter((p) => requestedOrder.split(',').includes(p.name))
@@ -362,9 +366,33 @@ Deno.serve(withCors(async (req: Request) => {
       return failureResponse(failure, language, debugInfo);
     }
 
-    const { recipes, dietaryRejections, refusal, invalid } = result.value;
+    const { dietaryRejections, refusal, invalid } = result.value;
+    let recipes = result.value.recipes;
     if (invalid.length > 0) console.warn(`[generate-recipes] recettes mal formées écartées : ${invalid.join(' ; ')}`);
     if (dietaryRejections.length > 0) console.warn(`[generate-recipes] recettes écartées (régime) : ${dietaryRejections.join(' ; ')}`);
+
+    // Recettes écartées (mal formées ou hors régime) : une nouvelle demande pour celles qui manquent, un seul
+    // essai, sans compter une autre génération dans le quota
+    const missing = count - recipes.length;
+    if (recipes.length > 0 && missing > 0 && invalid.length + dietaryRejections.length > 0) {
+      const again = buildPrompts({ ...promptOptions, count: missing, avoidTitles: recipes.map((recipe) => recipe.title) });
+      const second = await runWithFallback(providers, {
+        system: again.system,
+        prompt: again.prompt,
+        schema: buildRecipeSchema(pantry, diets),
+        schemaName: 'recipes',
+        temperature: 0.8,
+        maxOutputTokens: MAX_OUTPUT_TOKENS,
+      }, (text) => parseRecipes(text, pantry, diets, { ...context, maxRecipes: missing }), { label: 'generate-recipes', log, t0, simulate: simulation?.providers });
+      for (const hit of second.quotaHits) {
+        reportInBackground(reportProviderQuota(hit.provider, 'generate-recipes', hit.details, simulation !== null));
+      }
+      if (second.ok) {
+        const titles = new Set(recipes.map((recipe) => recipe.title.toLowerCase()));
+        recipes = [...recipes, ...second.value.recipes.filter((recipe) => !titles.has(recipe.title.toLowerCase()))].slice(0, count);
+      }
+      console.log(`[generate-recipes] nouvelle demande après ${missing} recette(s) écartée(s) : ${recipes.length}/${count}`);
+    }
 
     if (recipes.length === 0) {
       // Seul cas sans recette accepté : les régimes. Un refus reste compté dans le quota.
@@ -377,6 +405,9 @@ Deno.serve(withCors(async (req: Request) => {
       recipes,
       totalGenerated: recipes.length,
       requested: count,
+      // Recettes écartées et non remplacées (l'app l'explique) ; moins de 3 demandées avec peu d'aliments
+      rejected: Math.max(0, count - recipes.length),
+      fewIngredients: count < 3,
       provider: result.provider.name,
       ...(debug === true && { debug: { ...debugInfo.debug, dietary_rejections: dietaryRejections, invalid } }),
     }, 200);
