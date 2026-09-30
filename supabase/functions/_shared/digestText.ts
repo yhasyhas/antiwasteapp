@@ -77,8 +77,8 @@ function listNames(items: DigestItem[], texts: (typeof TEXTS)[DigestLanguage]): 
   return `${names.slice(0, -1).join(', ')} ${texts.and} ${names[names.length - 1]}`;
 }
 
-// Même règle que generate-recipes : 1 recette pour 1 ou 2 ingrédients, 2 jusqu'à 5, sinon 3
-const recipeCount = (pantrySize: number) => (pantrySize <= 2 ? 1 : pantrySize <= 5 ? 2 : 3);
+// Même règle que generate-recipes : 2 recettes pour 1 ou 2 aliments, 3 à partir de 3
+const recipeCount = (pantrySize: number): number => (pantrySize <= 2 ? 2 : 3);
 
 export function digestContent(today: DigestItem[], tomorrow: DigestItem[], pantrySize: number, language: string) {
   const texts = TEXTS[(language in TEXTS ? language : 'fr') as DigestLanguage];
