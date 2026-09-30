@@ -14,7 +14,6 @@ import { Button } from '@/components/ui/Button';
 import { Card, cardStyles } from '@/components/ui/Card';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { RecipePlaceholder } from '@/components/ui/Illustrations';
-import { Skeleton } from '@/components/ui/Skeleton';
 import { Toast } from '@/components/ui/Toast';
 import { Touchable } from '@/components/ui/Touchable';
 import { colors, motion, radius, sizes, spacing, typography } from '@/constants/theme';
@@ -104,12 +103,10 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
     <Modal visible animationType="slide" statusBarTranslucent navigationBarTranslucent onRequestClose={onClose}>
       <View style={styles.container}>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-          {/* Image, ou illustration tant qu'il n'y en a pas */}
+          {/* Image, ou illustration tant qu'il n'y en a pas (génération en cours comprise) */}
           <View style={styles.hero}>
             {recipe.image_url ? (
               <Image source={{ uri: recipe.image_url }} style={styles.fill} contentFit="cover" cachePolicy="memory-disk" transition={motion.normal} />
-            ) : imageLoading ? (
-              <Skeleton height={sizes.recipeHero} rounded={0} />
             ) : (
               <RecipePlaceholder style={styles.fill} label={t('recipe.photoPlaceholder')} />
             )}
