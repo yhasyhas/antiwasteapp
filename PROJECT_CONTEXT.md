@@ -243,6 +243,14 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Documentation : `CLAUDE.md` (règles, lu à chaque session), `docs/ENVIRONMENT.md` (comptes, variables, secrets, sans valeurs), `docs/REPRISE-PROJET.md` (contexte et raisons des choix).
 - Quantités : litre « L », « pièce » par défaut sans unité (`formatQuantity`) ; « X à sauver » recalculé sur le garde-manger actuel (`hooks/usePantryUrgency.ts`) ; 2 recettes pour 1 ou 2 aliments, 3 au-delà (`recipeCount`).
 
+### Phase 8 — anti-gaspi avancé (branche `phase-8`)
+- Rangement des lots (`lib/storage.ts`, migration `20261001100000_phase8_pantry.sql`) : `location`, `date_kind`, `opened_at`, `frozen_at`, `thawed_at` ; valeurs par défaut identiques dans l'app et la base (`default_location`, `default_date_kind`, déclencheur `fill_storage_defaults`) ; urgence par lot (`lotUrgency`, `isUrgentLot`).
+- Feuille de l'aliment (`components/pantry/PantryLotsSection.tsx`) : emplacement, type de date, « Je l'ai ouvert », « Congeler » / « Décongeler » ; emplacement proposé au scan et à la saisie (`LocationChoice`) ; filtres et section « Au congélateur » dans le garde-manger.
+- « J'ai cuisiné ça » (`components/recipe/CookedButton.tsx`) : relié à la recette, « ✓ Cuisiné aujourd'hui », récapitulatif, « Modifier » (`modify_cook_action`, `last_cook_action`), « Je l'ai cuisinée à nouveau » ; « Cuisinée le » dans « Mes recettes ».
+- Résumé quotidien réglable (`lib/digestSettings.ts`, Réglages → Notifications), respecté par `claim_daily_digests` et les rappels locaux.
+- Fiches aliments : « Est-ce encore bon ? » (`signs`, `discard`) et `seasonal` (saison affichée pour les produits frais seulement).
+- Tests : `supabase/tests/phase8_pantry.sql`.
+
 ## 5. État actuel et problèmes connus
 
 ### Sécurité
@@ -259,7 +267,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 
 ## 6. Prochaine étape
-Phase 8 : anti-gaspi avancé (emplacement, congélation, dates « de préférence avant », date d'ouverture, « Est-ce encore bon ? », heure du résumé), puis 9 Recettes, 10 Premier contact, 11 Point de décision, 12 Natif (un seul build), 13 Services et abonnements, 14 Audit, 15 Lancement. Détails dans `PLAN.md`.
+Tests de la phase 8 sur téléphone (dont la fluidité sur le Galaxy A30), puis 9 Recettes, 10 Premier contact, 11 Point de décision, 12 Natif (un seul build), 13 Services et abonnements, 14 Audit, 15 Lancement. Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash
