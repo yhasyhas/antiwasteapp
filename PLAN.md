@@ -16,6 +16,7 @@ Dernière mise à jour : 30/09/2026
 - **Un commit par tâche**, avec un message clair en français.
 - **`npm run typecheck` doit passer avant chaque commit** (à partir de la fin de la phase 0).
 - **Tous les tests passent avant chaque fusion, sans exception connue** : tests SQL (`supabase/tests/`), tests des fonctions (Deno) et typecheck.
+- **Tout nouveau compte, variable ou secret est ajouté à `docs/ENVIRONMENT.md` dans le même commit.**
 - **Aucune clé secrète dans le code ni dans les réponses envoyées à l'app.** Les secrets vont dans `supabase secrets set`.
 - **Noms de modèles IA toujours dans des secrets** (`GROQ_MODEL`, `GEMINI_MODEL`…), jamais en dur : les fournisseurs retirent des modèles régulièrement.
 - **Rapports et messages en français.**
@@ -349,7 +350,7 @@ Suite de la phase 7, sur la branche `phase-7-finalisation`.
 
 Ancienne phase 8a.
 
-- [ ] Créer un jeton Sentry en lecture seule (`event:read`, `project:read`) pour analyser les erreurs après le lancement
+- [x] Créer un jeton Sentry en lecture seule (`event:read`, `project:read`) pour analyser les erreurs après le lancement (variable Windows `SENTRY_ACCESS_TOKEN` ; lecture vérifiée le 30/09/2026 ; une requête d'écriture vide a été acceptée : droits à revoir, voir le journal)
 - [ ] Test de performance et de mémoire sur un téléphone modeste de référence (Galaxy A30, 4 Go) : scan, génération, listes, transitions
 - [ ] Build de test optimisé (profil preview, paquet provisoire .preview) pour mesurer les performances réelles sur le Galaxy A30 ; le build de développement est plus lent par nature
 - [ ] Relire toutes les règles de sécurité de la base (RLS, fonctions SECURITY DEFINER, droits)
@@ -566,4 +567,7 @@ Ancienne phase 8.
 | 30/09/2026 | Produits laitiers, œufs et miel acceptés automatiquement pour le seul régime végétarien, jamais en vegan ni sans lactose (tests pour chaque cas) | |
 | 30/09/2026 | Saison des fiches en quelques mots (« Juillet à octobre », « Toute l'année » seul) : 95 fiches réécrites (`scripts/food-facts/fix-seasons.mjs`, après sauvegarde), 0 échec | Saisons selon la région de l'utilisateur : v1.1 |
 | 30/09/2026 | « X à sauver » : garde-manger actuel, lot disparu remplacé par le même aliment retrouvé par son nom, badge masqué à 0 ; 2 recettes pour 1 ou 2 aliments, 3 à partir de 3 ; litre « L », « pièce » par défaut pour une quantité sans unité | Outils de développement des Réglages et page /dev/status : masqués hors développement (`__DEV__`), vérification ajoutée en phase 14 |
+| 30/09/2026 | Sel, poivre, huile et eau jamais « à acheter » ni ajoutés aux courses, avec ou sans sélection (serveur, et filtre à l'affichage pour les recettes déjà enregistrées) | « Mes basiques » modifiables : phase 10 |
+| 30/09/2026 | Jeton Sentry en lecture dans la variable Windows `SENTRY_ACCESS_TOKEN` (et non `SENTRY_AUTH_TOKEN`, réservé aux source maps du build de production) : lecture vérifiée (projet `yhasral/react-native`, région UE, 14 événements, 12 problèmes sur 14 jours) | Une requête d'écriture vide (PUT sur le projet, sans changement) a été acceptée (HTTP 200) : le jeton a peut-être plus que la lecture, à recréer avec les seuls droits de lecture |
+| 30/09/2026 | `CLAUDE.md` (lu au début de chaque session) et `docs/ENVIRONMENT.md` (inventaire des comptes, variables et secrets, sans valeurs) ; règle : tout nouveau compte, variable ou secret y est ajouté dans le même commit | `docs/REPRISE-PROJET.md`, cité par `CLAUDE.md`, n'existe pas encore |
 | | *(résultat du test Gemini vs Clarifai)* | |
