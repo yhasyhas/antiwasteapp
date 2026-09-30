@@ -237,7 +237,9 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Icônes des aliments : `components/pantry/FoodIcon.tsx` (catégorie → icône lucide, famille → `colors.foodFamilies`).
 - Dates : relatives jusqu'à 7 jours (`RELATIVE_DAYS`), date réelle au-delà (`shortDate`, `lib/expiry.ts`).
 - Génération : recette écartée redemandée une fois ; `rejected` et `fewIngredients` dans la réponse, expliqués sous les résultats ; végétarien : produits laitiers, œufs et miel toujours permis (`isDietException`).
-- Fiches aliments : atouts de trois mots au plus (`isShortNutrition`), réécriture des fiches existantes par `scripts/food-facts/fix-nutrition.mjs`.
+- Fiches aliments : atouts de trois mots au plus (`isShortNutrition`), saison en quelques mots (`SEASON_MAX`) ; réécriture des fiches existantes par `scripts/food-facts/fix-nutrition.mjs` et `fix-seasons.mjs`.
+- « Vider le garde-manger » dans les Réglages (retrait annulable par `delete_ingredients_with_undo`) ; plus de « Tout effacer » dans le garde-manger.
+- Quantités : litre « L », « pièce » par défaut sans unité (`formatQuantity`) ; « X à sauver » recalculé sur le garde-manger actuel (`hooks/usePantryUrgency.ts`) ; 2 recettes pour 1 ou 2 aliments, 3 au-delà (`recipeCount`).
 
 ## 5. État actuel et problèmes connus
 
