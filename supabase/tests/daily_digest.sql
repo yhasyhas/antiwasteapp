@@ -26,14 +26,19 @@ EXCEPTION WHEN OTHERS THEN
   RETURN SQLERRM;
 END;
 $$;
+-- Fuseau de test : heure locale entre 6 h et 16 h (l'heure du résumé se règle de 5 h à 22 h)
+CREATE FUNCTION pg_temp.tz() RETURNS text LANGUAGE sql STABLE AS $$
+  SELECT tz FROM (VALUES ('Europe/Paris'), ('America/New_York'), ('Asia/Tokyo'), ('Asia/Kolkata'), ('Pacific/Honolulu'), ('Australia/Sydney'), ('America/Los_Angeles')) AS z(tz)
+  WHERE extract(hour FROM now() AT TIME ZONE tz) BETWEEN 6 AND 16 LIMIT 1
+$$;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA pg_temp TO authenticated, anon, service_role;
 
 -- Garde-manger de 1 : deux aliments qui expirent aujourd'hui (heure de Paris), un demain, un plus tard
 INSERT INTO public.ingredients (user_id, name, expires_at) VALUES
-  (pg_temp.u(1), 'crème', (now() AT TIME ZONE 'Europe/Paris')::date),
-  (pg_temp.u(1), 'tomates', (now() AT TIME ZONE 'Europe/Paris')::date),
-  (pg_temp.u(1), 'reste de riz', (now() AT TIME ZONE 'Europe/Paris')::date + 1),
-  (pg_temp.u(1), 'pâtes', (now() AT TIME ZONE 'Europe/Paris')::date + 30);
+  (pg_temp.u(1), 'crème', (now() AT TIME ZONE pg_temp.tz())::date),
+  (pg_temp.u(1), 'tomates', (now() AT TIME ZONE pg_temp.tz())::date),
+  (pg_temp.u(1), 'reste de riz', (now() AT TIME ZONE pg_temp.tz())::date + 1),
+  (pg_temp.u(1), 'pâtes', (now() AT TIME ZONE pg_temp.tz())::date + 30);
 -- 2 : rien qui expire bientôt
 INSERT INTO public.ingredients (user_id, name, expires_at) VALUES (pg_temp.u(2), 'riz', NULL);
 
@@ -42,7 +47,7 @@ SET LOCAL ROLE authenticated;
 DO $$
 BEGIN
   PERFORM pg_temp.login(1);
-  PERFORM public.register_push_token('ExponentPushToken[digest-test-token-1]', 'android', 'Europe/Paris', 'fr');
+  PERFORM public.register_push_token('ExponentPushToken[digest-test-token-1]', 'android', pg_temp.tz(), 'fr');
   PERFORM public.register_push_token('ExponentPushToken[digest-test-token-2]', 'android', 'Mars/Olympus', 'de');
   IF (SELECT timezone || '/' || language FROM public.push_tokens WHERE token = 'ExponentPushToken[digest-test-token-2]') <> 'UTC/fr' THEN
     RAISE EXCEPTION 'ÉCHEC : fuseau ou langue inconnus non remplacés par UTC et fr';
@@ -56,7 +61,7 @@ BEGIN
 
   -- Même téléphone, autre compte : le jeton 2 passe à l'utilisateur 3
   PERFORM pg_temp.login(3);
-  PERFORM public.register_push_token('ExponentPushToken[digest-test-token-2]', 'android', 'Europe/Paris', 'en');
+  PERFORM public.register_push_token('ExponentPushToken[digest-test-token-2]', 'android', pg_temp.tz(), 'en');
   IF (SELECT count(*) FROM public.push_tokens) <> 1 THEN
     RAISE EXCEPTION 'ÉCHEC : 3 voit d''autres jetons que le sien';
   END IF;
@@ -66,7 +71,7 @@ BEGIN
     RAISE EXCEPTION 'ÉCHEC : jeton de 1 supprimé par un autre utilisateur, ou jeton 2 pas transféré';
   END IF;
   PERFORM pg_temp.login(2);
-  PERFORM public.register_push_token('ExponentPushToken[digest-test-token-3]', 'android', 'Europe/Paris', 'fr');
+  PERFORM public.register_push_token('ExponentPushToken[digest-test-token-3]', 'android', pg_temp.tz(), 'fr');
   IF pg_temp.error_of('SELECT * FROM public.claim_daily_digests(9, NULL, true)') !~ 'permission denied' THEN
     RAISE EXCEPTION 'ÉCHEC : claim_daily_digests appelable depuis l''app';
   END IF;
@@ -85,17 +90,19 @@ SET LOCAL ROLE service_role;
 DO $$
 DECLARE
   v_row record;
-  v_hour integer := extract(hour FROM now() AT TIME ZONE 'Europe/Paris');
+  v_hour integer := extract(hour FROM now() AT TIME ZONE pg_temp.tz());
 BEGIN
-  -- Hors de la plage de 9 h (heure locale) : rien
-  IF EXISTS (SELECT 1 FROM public.claim_daily_digests((v_hour + 12) % 24, pg_temp.u(1))) THEN
+  -- Heure choisie par l'utilisateur (phase 8) : pas encore venue, rien
+  UPDATE public.profiles SET digest_hour = v_hour + 5 WHERE id IN (pg_temp.u(1), pg_temp.u(2));
+  IF EXISTS (SELECT 1 FROM public.claim_daily_digests(9, pg_temp.u(1))) THEN
     RAISE EXCEPTION 'ÉCHEC : résumé envoyé hors de l''heure locale prévue';
   END IF;
-  -- À l'heure locale prévue : le résumé de 1 (2 aujourd'hui, 1 demain, 4 aliments)
-  SELECT * INTO v_row FROM public.claim_daily_digests(v_hour, pg_temp.u(1));
+  -- À l'heure locale choisie : le résumé de 1 (2 aujourd'hui, 1 demain, 4 aliments)
+  UPDATE public.profiles SET digest_hour = v_hour WHERE id IN (pg_temp.u(1), pg_temp.u(2));
+  SELECT * INTO v_row FROM public.claim_daily_digests(9, pg_temp.u(1));
   IF v_row.user_id IS NULL OR jsonb_array_length(v_row.today) <> 2 OR jsonb_array_length(v_row.tomorrow) <> 1
      OR v_row.pantry_size <> 4 OR v_row.tokens <> ARRAY['ExponentPushToken[digest-test-token-1]'] OR v_row.language <> 'fr'
-     OR v_row.local_date <> (now() AT TIME ZONE 'Europe/Paris')::date THEN
+     OR v_row.local_date <> (now() AT TIME ZONE pg_temp.tz())::date THEN
     RAISE EXCEPTION 'ÉCHEC : contenu du résumé : %', row_to_json(v_row);
   END IF;
   -- Aucun doublon, même forcé
