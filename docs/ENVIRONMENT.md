@@ -54,8 +54,9 @@ En bash, dans une session démarrée après la modification : `[ -n "$NOM" ] && 
   - API : en-tête `Authorization: Bearer <jeton>`, lu depuis la variable.
   - `sentry-cli`, qui attend `SENTRY_AUTH_TOKEN` : pour une seule commande seulement, en PowerShell `$env:SENTRY_AUTH_TOKEN = $env:SENTRY_ACCESS_TOKEN; sentry-cli … ; Remove-Item Env:SENTRY_AUTH_TOKEN`.
 - **Vérifier** : `GET https://de.sentry.io/api/0/projects/` renvoie 200 et le projet `yhasral/react-native`. Vérifié le 30/09/2026 : 14 événements et 12 problèmes lus.
+- **Vérifier la lecture seule** : une vraie écriture sans effet, par exemple `PUT` sur le projet avec son nom actuel, doit renvoyer 403. Un `PUT` vide ne prouve rien : Sentry l'accepte (200) même sans droit d'écriture.
 - **Renouveler** : sentry.io (région UE) → Settings → Account → Auth Tokens (ou Organization → Auth Tokens), avec les droits `event:read`, `project:read` et `org:read` si besoin.
-- **Droits prévus** : lecture seule. **À vérifier** : le 30/09/2026, une requête d'écriture sur le projet (vide, sans aucun changement) a été acceptée. Si le jeton a plus que la lecture, il faut le recréer avec les seuls droits de lecture.
+- **Droits** : `event:read`, `project:read`, `org:read`. Jeton recréé le 30/09/2026 : lecture seule vérifiée, une écriture sur le projet est refusée (403).
 
 ---
 
@@ -193,7 +194,7 @@ Ces éléments seront ajoutés à cet inventaire au moment de leur création.
   - offre Pro de Supabase et offres payantes de Gemini et Cloudflare : moyens de paiement sur les comptes (hors dépôt).
 - **Phase 14 (audit)** :
   - sauvegardes automatiques de la base : secrets GitHub Actions (adresse et mot de passe de la base, ou jeton d'accès) et emplacement des sauvegardes ;
-  - relecture des droits de chaque jeton (Expo, Cloudflare, Sentry).
+  - relecture des droits des jetons Expo et Cloudflare (Sentry vérifié le 30/09/2026).
 - **Phase 15 (lancement)** :
   - `SENTRY_AUTH_TOKEN` : envoi des source maps au build de production ;
   - comptes Google Play Console et App Store Connect ;

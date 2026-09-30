@@ -350,7 +350,7 @@ Suite de la phase 7, sur la branche `phase-7-finalisation`.
 
 Ancienne phase 8a.
 
-- [x] Créer un jeton Sentry en lecture seule (`event:read`, `project:read`) pour analyser les erreurs après le lancement (variable Windows `SENTRY_ACCESS_TOKEN` ; lecture vérifiée le 30/09/2026 ; une requête d'écriture vide a été acceptée : droits à revoir, voir le journal)
+- [x] Créer un jeton Sentry en lecture seule (`event:read`, `project:read`) pour analyser les erreurs après le lancement (variable Windows `SENTRY_ACCESS_TOKEN`, droits `event:read`, `project:read`, `org:read` ; lecture et refus de l'écriture vérifiés le 30/09/2026)
 - [ ] Test de performance et de mémoire sur un téléphone modeste de référence (Galaxy A30, 4 Go) : scan, génération, listes, transitions
 - [ ] Build de test optimisé (profil preview, paquet provisoire .preview) pour mesurer les performances réelles sur le Galaxy A30 ; le build de développement est plus lent par nature
 - [ ] Relire toutes les règles de sécurité de la base (RLS, fonctions SECURITY DEFINER, droits)
@@ -570,4 +570,6 @@ Ancienne phase 8.
 | 30/09/2026 | Sel, poivre, huile et eau jamais « à acheter » ni ajoutés aux courses, avec ou sans sélection (serveur, et filtre à l'affichage pour les recettes déjà enregistrées) | « Mes basiques » modifiables : phase 10 |
 | 30/09/2026 | Jeton Sentry en lecture dans la variable Windows `SENTRY_ACCESS_TOKEN` (et non `SENTRY_AUTH_TOKEN`, réservé aux source maps du build de production) : lecture vérifiée (projet `yhasral/react-native`, région UE, 14 événements, 12 problèmes sur 14 jours) | Une requête d'écriture vide (PUT sur le projet, sans changement) a été acceptée (HTTP 200) : le jeton a peut-être plus que la lecture, à recréer avec les seuls droits de lecture |
 | 30/09/2026 | `CLAUDE.md` (lu au début de chaque session) et `docs/ENVIRONMENT.md` (inventaire des comptes, variables et secrets, sans valeurs) ; règle : tout nouveau compte, variable ou secret y est ajouté dans le même commit | `docs/REPRISE-PROJET.md`, cité par `CLAUDE.md`, n'existe pas encore |
+| 30/09/2026 | Jeton Sentry recréé avec `event:read`, `project:read` et `org:read` : lecture vérifiée (événements, problèmes, organisation) ; une vraie écriture (`PUT` du projet avec son nom actuel) est refusée (403) | Le `PUT` vide reste accepté (200) : Sentry ne contrôle pas les droits quand rien ne change ; le premier test n'était donc pas probant. Méthode notée dans `docs/ENVIRONMENT.md` |
+| 30/09/2026 | Finalisation de la phase 7 validée sur les deux téléphones et fusionnée dans master ; `docs/REPRISE-PROJET.md` ajouté (contexte des conversations de conseil) | Prochaine étape : phase 8, anti-gaspi avancé |
 | | *(résultat du test Gemini vs Clarifai)* | |

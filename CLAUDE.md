@@ -7,7 +7,7 @@ Application mobile anti-gaspi (Expo / React Native, Supabase) : on remplit son g
 - `PLAN.md` : feuille de route, phase en cours, règles de travail complètes, journal des décisions. **Source de vérité, à lire en premier.**
 - `PROJECT_CONTEXT.md` : architecture et état actuel du code.
 - `README.md` : installation et lancement.
-- `docs/REPRISE-PROJET.md` : reprise du projet (pas encore créé).
+- `docs/REPRISE-PROJET.md` : reprise du projet (contexte des conversations de conseil, raisons des choix, pièges à éviter).
 - `docs/ENVIRONMENT.md` : comptes, variables, secrets, fichiers sensibles. **À lire avant toute action qui touche un compte ou un secret.**
 
 ## Règles essentielles
