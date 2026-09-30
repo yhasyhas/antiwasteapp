@@ -29,7 +29,16 @@ export const ORIGIN_MAX = 48;
 // Atouts : pastilles courtes, trois mots au plus (« Source de potassium », « Riche en fibres »)
 export const NUTRITION_MAX_WORDS = 3;
 const wordCount = (value: string) => value.trim().split(/\s+/).length;
-export const isShortNutrition = (value: string) => wordCount(value) <= NUTRITION_MAX_WORDS;
+// Style télégraphique refusé : liaison manquante (« Source protéines », « Riche antioxydants ») ou deux
+// vitamines collées (« Vitamines C K »)
+const MISSING_LINK: Record<string, RegExp> = {
+  fr: /^(source|riche|pauvre|faible|apport|apporte|contient)\s+(?!(de|d'|d’|du|des|en)\b)/i,
+  en: /^(source|rich|high|low)\s+(?!(of|in)\b)/i,
+  es: /^(fuente|rico|rica|bajo|baja|aporte|aporta)\s+(?!(de|del|en)\b)/i,
+};
+export const isShortNutrition = (value: string, language?: string) => wordCount(value) <= NUTRITION_MAX_WORDS
+  && !(language && MISSING_LINK[language]?.test(value.trim()))
+  && !/\b[A-Z]\d*\s+[A-Z]\d*$/.test(value.trim());
 const LIMITS = { name: 60, description: 320, origin: ORIGIN_MAX, season: 220, item: 160, minItems: 2, maxItems: 4 };
 
 // Promesses de santé ou conseils médicaux : la fiche est refusée (les trois langues). Liste volontairement
@@ -84,7 +93,7 @@ export function resolvePrompt(name: string): string {
 export const FACT_SYSTEM = `Tu rédiges des fiches aliments courtes pour une application anti-gaspi, en français, en anglais et en espagnol (mêmes informations dans les trois langues, chacune rédigée naturellement dans sa langue).
 RÈGLES STRICTES :
 - Informations générales et factuelles uniquement. Aucune promesse de santé, aucun conseil médical : ne dis jamais qu'un aliment guérit, soigne, prévient ou traite quoi que ce soit, ne cite aucune maladie ni médicament.
-- "nutrition" : atouts nutritionnels généraux et prudents, trois mots au plus chacun, sans phrase ni point final (ex. « Source de fibres », « Riche en potassium », « Vitamine C »), sans chiffres précis ni superlatifs.
+- "nutrition" : atouts nutritionnels généraux et prudents, trois mots au plus chacun, sans phrase ni point final (ex. « Source de fibres », « Riche en potassium », « Vitamine C »), sans chiffres précis ni superlatifs. Chaque atout est une expression correcte avec ses liaisons (« Source de protéines », jamais « Source protéines ») ; un seul nutriment par atout (« Vitamine C » et « Vitamine K » plutôt que « Vitamines C K »).
 - "tips" : astuces anti-gaspi concrètes (bien le conserver, utiliser les restes ou les parties souvent jetées, reconnaître quand il est encore bon).
 - "season" : pour l'hémisphère nord ; « toute l'année » pour un produit d'épicerie ou transformé.
 - "origin" : quelques mots seulement (2 à 5), sans phrase ni point final, ex. « Asie du Sud-Est », « Amérique centrale », « Bassin méditerranéen ».
@@ -99,7 +108,7 @@ Rédige sa fiche.${foodKey ? ` "food_key" : "${foodKey}".` : ` "food_key" : ${FO
 const text = (value: unknown, max: number): string | null =>
   typeof value === 'string' && value.trim() !== '' && value.trim().length <= max ? value.trim() : null;
 
-function cleanSection(raw: any): FactSection | string {
+function cleanSection(raw: any, language: FactLanguage): FactSection | string {
   if (!raw || typeof raw !== 'object') return 'section absente';
   const name = text(raw.name, LIMITS.name);
   const description = text(raw.description, LIMITS.description);
@@ -111,7 +120,7 @@ function cleanSection(raw: any): FactSection | string {
     : [];
   // Atouts de plus de trois mots écartés (pastilles de la fiche)
   const received = list(raw.nutrition);
-  const nutrition = received.map((item) => item.replace(/\.$/, '')).filter(isShortNutrition).slice(0, LIMITS.maxItems);
+  const nutrition = received.map((item) => item.replace(/\.$/, '')).filter((item) => isShortNutrition(item, language)).slice(0, LIMITS.maxItems);
   const tips = list(raw.tips).slice(0, LIMITS.maxItems);
   // Promesse de santé cherchée dans tout ce que le modèle a écrit, atouts écartés compris
   const all = [name, description, origin, season, ...received, ...tips].join(' ');
@@ -138,7 +147,7 @@ export function parseFact(textResponse: string, requestedName: string, expectedK
 
   const content = {} as FactContent;
   for (const language of LANGUAGES) {
-    const cleaned = cleanSection(raw?.[language]);
+    const cleaned = cleanSection(raw?.[language], language);
     if (typeof cleaned === 'string') return { ok: false, failure: `${language} : ${cleaned}`, code: 'invalid_response' };
     content[language] = cleaned;
   }
@@ -208,7 +217,7 @@ export function nutritionPrompt(content: FactContent): string {
   const lines = LANGUAGES.map((language) => `- ${language} (${content[language].name}) : ${content[language].nutrition.map((item) => `« ${item} »`).join(', ')}`).join('\n');
   return `Voici les atouts nutritionnels d'un aliment dans trois langues :
 ${lines}
-Réécris-les en 2 à 4 pastilles courtes par langue, trois mots au plus chacune, sans phrase ni point final, avec une majuscule au début, mêmes informations dans les trois langues (ex. « Source de potassium », « Riche en fibres », « Vitamine C » ; « Source of potassium », « High in fiber », « Vitamin C » ; « Fuente de potasio », « Rico en fibra », « Vitamina C »). Informations générales et prudentes : aucun chiffre, aucun superlatif, aucune promesse de santé.`;
+Réécris-les en 2 à 4 pastilles courtes par langue, trois mots au plus chacune, sans phrase ni point final, avec une majuscule au début. Chaque pastille est une expression correcte avec ses liaisons (« Source de protéines », « Riche en fer », jamais « Source protéines » ni « Riche fer ») et un seul nutriment (« Vitamine C » et « Vitamine K » en deux pastilles, jamais « Vitamines C K » ni « Fer calcium ») ; garde les atouts les plus utiles si tout ne tient pas. Mêmes informations dans les trois langues (ex. « Source de potassium », « Riche en fibres », « Vitamine C » ; « Source of potassium », « High in fiber », « Vitamin C » ; « Fuente de potasio », « Rico en fibra », « Vitamina C »). Informations générales et prudentes : aucun chiffre, aucun superlatif, aucune promesse de santé.`;
 }
 
 export function parseNutrition(textResponse: string): ParseResult<Record<FactLanguage, string[]>> {
@@ -222,7 +231,7 @@ export function parseNutrition(textResponse: string): ParseResult<Record<FactLan
   for (const language of LANGUAGES) {
     const items = Array.isArray(raw?.[language])
       ? raw[language].filter((item: unknown): item is string => typeof item === 'string')
-        .map((item: string) => item.trim().replace(/\.$/, '')).filter((item: string) => item !== '' && isShortNutrition(item))
+        .map((item: string) => item.trim().replace(/\.$/, '')).filter((item: string) => item !== '' && isShortNutrition(item, language))
       : [];
     if (items.length < 2) return { ok: false, failure: `${language} : moins de 2 atouts courts`, code: 'invalid_response' };
     const claim = items.join(' ').match(HEALTH_CLAIMS);

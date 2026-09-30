@@ -9,7 +9,7 @@ const section = (name: string, overrides: Record<string, unknown> = {}) => ({
   description: 'Fruit doux et pratique, qui mûrit après la récolte.',
   origin: "Originaire d'Asie du Sud-Est.",
   season: "Toute l'année (importée).",
-  nutrition: ['Source de potassium', 'Apporte des fibres'],
+  nutrition: ['Potassium', 'Vitamine C'],
   tips: ['Trop mûre, elle se congèle pour les smoothies', 'Séparez-la des autres fruits pour ralentir leur mûrissement'],
   ...overrides,
 });
@@ -89,4 +89,16 @@ Deno.test('atouts réécrits : trois langues, majuscule, trois mots au plus', ()
   assertEquals(ok.value.en, ['Source of potassium', 'High in fiber']);
   assertEquals(ok.value.es, ['Fuente de potasio', 'Rico en fibra']);
   assertEquals(parseNutrition(JSON.stringify({ fr: ['Source de potassium'], en: ['A', 'B'], es: ['A', 'B'] })).ok, false);
+});
+
+Deno.test('atouts télégraphiques refusés : liaison manquante, vitamines collées', () => {
+  const result = parseNutrition(JSON.stringify({
+    fr: ['Source protéines', 'Riche antioxydants', 'Vitamines C K', 'Source de fibres', 'Riche en fer'],
+    en: ['Source of protein', 'High fiber', 'Rich in iron'],
+    es: ['Fuente proteínas', 'Fuente de fibra', 'Rica en hierro'],
+  }));
+  assert(result.ok);
+  assertEquals(result.value.fr, ['Source de fibres', 'Riche en fer']);
+  assertEquals(result.value.en, ['Source of protein', 'Rich in iron']);
+  assertEquals(result.value.es, ['Fuente de fibra', 'Rica en hierro']);
 });

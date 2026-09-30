@@ -5,6 +5,7 @@
 // Lancement, depuis la racine du projet (CLI Supabase lié) :
 //   node scripts/food-facts/fix-nutrition.mjs --list   # affiche seulement les fiches concernées
 //   node scripts/food-facts/fix-nutrition.mjs          # les réécrit
+//   node scripts/food-facts/fix-nutrition.mjs --all    # réécrit toutes les fiches (nouvelles consignes)
 // Avant la réécriture : sauvegarde avec npx supabase db dump --data-only.
 //
 // Une fiche à la fois, avec une pause : les offres gratuites de Groq et Gemini limitent les tokens par minute.
@@ -21,11 +22,12 @@ const keys = JSON.parse(execSync(`npx supabase projects api-keys --project-ref $
 const SECRET = keys.find((key) => key.type === 'secret' && key.name === 'default')?.api_key;
 if (!SECRET) throw new Error('Clé secrète introuvable (CLI Supabase lié ?)');
 
-// Atout « long » : plus de trois mots, ou point final
-const tooLong = (item) => item.trim().split(/\s+/).length > 3 || /\.$/.test(item.trim());
+// Atout à réécrire : plus de trois mots, point final, ou style télégraphique (« Source protéines », « Vitamines C K »)
+const tooLong = (item) => item.trim().split(/\s+/).length > 3 || /\.$/.test(item.trim())
+  || /^(source|riche|apport|faible|contient)\s+(?!(de|d'|d’|du|des|en)\b)/i.test(item.trim()) || /\b[A-Z]\d*\s+[A-Z]\d*$/.test(item.trim());
 
 const rows = await (await fetch(`${SUPABASE_URL}/rest/v1/food_facts?select=food_key,content&status=eq.ready&order=food_key`, { headers: { apikey: SECRET } })).json();
-const todo = rows.filter((row) => ['fr', 'en', 'es'].some((language) => (row.content?.[language]?.nutrition ?? []).some(tooLong)));
+const todo = process.argv.includes('--all') ? rows : rows.filter((row) => ['fr', 'en', 'es'].some((language) => (row.content?.[language]?.nutrition ?? []).some(tooLong)));
 console.log(`${rows.length} fiches, ${todo.length} avec des atouts à raccourcir`);
 
 if (process.argv.includes('--list')) {
