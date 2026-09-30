@@ -14,6 +14,11 @@ export interface FactSection {
   season: string;
   nutrition: string[];
   tips: string[];
+  // Produit frais de saison (fruits, légumes, poissons, fruits de mer) : la saison n'est affichée que pour eux
+  seasonal: boolean;
+  // « Est-ce encore bon ? » : signes à vérifier, et quand jeter sans hésiter
+  signs: string[];
+  discard: string[];
 }
 
 export type FactContent = Record<FactLanguage, FactSection>;
@@ -56,8 +61,10 @@ const section = {
     season: { type: 'string', description: 'Saison dans l\'hémisphère nord en quelques mots (2 à 5), sans phrase ni point final (ex. « Juillet à octobre », « Toute l\'année », « Automne et hiver »)' },
     nutrition: { type: 'array', items: { type: 'string' }, description: '2 à 4 atouts nutritionnels généraux, factuels, en trois mots au plus chacun (ex. « Source de potassium », « Riche en fibres », « Vitamine C »)' },
     tips: { type: 'array', items: { type: 'string' }, description: '2 à 4 astuces anti-gaspi (conservation, restes, parties souvent jetées)' },
+    signs: { type: 'array', items: { type: 'string' }, description: '2 à 4 signes à vérifier pour savoir s\'il est encore bon (aspect, odeur, texture), phrases courtes' },
+    discard: { type: 'array', items: { type: 'string' }, description: '1 à 3 cas où le jeter sans hésiter (moisissure, odeur aigre, emballage bombé…), phrases courtes' },
   },
-  required: ['name', 'description', 'origin', 'season', 'nutrition', 'tips'],
+  required: ['name', 'description', 'origin', 'season', 'nutrition', 'tips', 'signs', 'discard'],
   additionalProperties: false,
 };
 
@@ -67,12 +74,13 @@ export const FACT_SCHEMA = {
   properties: {
     is_food: { type: 'boolean' },
     food_key: { type: 'string', description: FOOD_KEY_GUIDE },
+    seasonal: { type: 'boolean', description: "true pour tout produit frais : fruit, légume (herbes fraîches comprises), poisson, fruit de mer, même trouvé toute l'année ; false pour le reste" },
     variants: { type: 'array', items: { type: 'string' }, description: 'Autres noms courants de cet aliment, dans les trois langues (pluriels, variantes)' },
     fr: section,
     en: section,
     es: section,
   },
-  required: ['is_food', 'food_key', 'variants', 'fr', 'en', 'es'],
+  required: ['is_food', 'food_key', 'seasonal', 'variants', 'fr', 'en', 'es'],
   additionalProperties: false,
 };
 
@@ -92,6 +100,10 @@ export function resolvePrompt(name: string): string {
 - "food_key" : ${FOOD_KEY_GUIDE}. Regroupe les variantes : « bananes mûres » → "banana", « tomates cerises bio » → "cherry_tomato", « lait demi-écrémé » → "milk".`;
 }
 
+// « Est-ce encore bon ? » : prudent et général, jamais de promesse ni de conseil médical
+const STILL_GOOD_RULES = `- "signs" : 2 à 4 signes simples à vérifier pour savoir si l'aliment est encore bon (aspect, odeur, texture, emballage), phrases courtes à l'impératif, en tutoyant, sans point final (fr : « Vérifie… », « Sens… », « Regarde… », « Touche… » ; en : « Check… », « Smell… » ; es : « Comprueba… », « Huele… »). Un aliment seulement trop mûr, taché, flétri ou ramolli reste bon à cuisiner : dis-le plutôt que d'en faire un signe de fin (ex. « Taches brunes : parfaite pour un gâteau ou un smoothie »).
+- "discard" : 1 à 3 signes d'aliment réellement gâté, à jeter sans hésiter : moisissure (sur un aliment mou), odeur aigre, rance ou de pourri, texture visqueuse ou gluante, emballage bombé ou qui fuit. Jamais pour un aliment seulement trop mûr, taché ou flétri. Phrases courtes sans point final, qui commencent par le signe (fr : « Moisissure visible », « Odeur aigre » ; en : « Visible mould » ; es : « Moho visible »). Reste prudent et général : jamais de conseil médical ni de nom de maladie.`;
+
 export const FACT_SYSTEM = `Tu rédiges des fiches aliments courtes pour une application anti-gaspi, en français, en anglais et en espagnol (mêmes informations dans les trois langues, chacune rédigée naturellement dans sa langue).
 RÈGLES STRICTES :
 - Informations générales et factuelles uniquement. Aucune promesse de santé, aucun conseil médical : ne dis jamais qu'un aliment guérit, soigne, prévient ou traite quoi que ce soit, ne cite aucune maladie ni médicament.
@@ -99,6 +111,8 @@ RÈGLES STRICTES :
 - "tips" : astuces anti-gaspi concrètes (bien le conserver, utiliser les restes ou les parties souvent jetées, reconnaître quand il est encore bon).
 - "season" : pour l'hémisphère nord, sans le préciser, en quelques mots (2 à 5), sans phrase ni point final, ex. « Juillet à octobre », « Automne et hiver » ; « Toute l'année » (seul, sans pic ni mois) pour un produit disponible toute l'année, d'épicerie ou transformé.
 - "origin" : quelques mots seulement (2 à 5), sans phrase ni point final, ex. « Asie du Sud-Est », « Amérique centrale », « Bassin méditerranéen ».
+- "seasonal" : true pour tout produit frais : fruit, légume (herbes fraîches, ail, oignon, pomme de terre compris), poisson, fruit de mer, même trouvé toute l'année ; false pour la viande, les produits laitiers, les œufs, l'épicerie (céréales, légumineuses sèches, fruits secs, noix), les produits transformés.
+${STILL_GOOD_RULES}
 - Phrases courtes : description 1 à 2 phrases, saison 1 phrase, 2 à 4 éléments par liste.
 - Si ce n'est pas un aliment, "is_food" : false et des textes vides.`;
 
@@ -106,6 +120,9 @@ export function factPrompt(name: string, foodKey: string | null): string {
   return `Aliment : « ${name} »${foodKey ? ` (identifiant : ${foodKey})` : ''}.
 Rédige sa fiche.${foodKey ? ` "food_key" : "${foodKey}".` : ` "food_key" : ${FOOD_KEY_GUIDE}.`}`;
 }
+
+// Signes et cas à jeter : courts, 2 à 4 et 1 à 3
+const STILL_GOOD = { item: 140, minSigns: 2, maxSigns: 4, minDiscard: 1, maxDiscard: 3 };
 
 const text = (value: unknown, max: number): string | null =>
   typeof value === 'string' && value.trim() !== '' && value.trim().length <= max ? value.trim() : null;
@@ -124,12 +141,27 @@ function cleanSection(raw: any, language: FactLanguage): FactSection | string {
   const received = list(raw.nutrition);
   const nutrition = received.map((item) => item.replace(/\.$/, '')).filter((item) => isShortNutrition(item, language)).slice(0, LIMITS.maxItems);
   const tips = list(raw.tips).slice(0, LIMITS.maxItems);
+  const stillGood = cleanStillGood(raw);
+  if (typeof stillGood === 'string') return stillGood;
   // Promesse de santé cherchée dans tout ce que le modèle a écrit, atouts écartés compris
   const all = [name, description, origin, season, ...received, ...tips].join(' ');
   const claim = all.match(HEALTH_CLAIMS);
   if (claim) return `promesse de santé (« ${claim[0]} »)`;
   if (nutrition.length < LIMITS.minItems || tips.length < LIMITS.minItems) return 'moins de 2 atouts ou astuces';
-  return { name, description, origin, season, nutrition, tips };
+  return { name, description, origin, season, nutrition, tips, seasonal: false, ...stillGood };
+}
+
+// « Est-ce encore bon ? » d'une langue : signes (2 à 4) et cas à jeter (1 à 3), courts, sans promesse de santé
+function cleanStillGood(raw: any): { signs: string[]; discard: string[] } | string {
+  const list = (value: unknown, max: number) => Array.isArray(value)
+    ? value.map((item) => text(typeof item === 'string' ? item.replace(/\s+/g, ' ') : item, STILL_GOOD.item)).filter((item): item is string => item !== null).slice(0, max)
+    : [];
+  const signs = list(raw?.signs, STILL_GOOD.maxSigns);
+  const discard = list(raw?.discard, STILL_GOOD.maxDiscard);
+  if (signs.length < STILL_GOOD.minSigns || discard.length < STILL_GOOD.minDiscard) return 'signes ou cas à jeter manquants';
+  const claim = [...signs, ...discard].join(' ').match(HEALTH_CLAIMS);
+  if (claim) return `promesse de santé (« ${claim[0]} »)`;
+  return { signs, discard };
 }
 
 export type FactParse = ParseResult<GeneratedFact | { not_food: true }>;
@@ -151,7 +183,7 @@ export function parseFact(textResponse: string, requestedName: string, expectedK
   for (const language of LANGUAGES) {
     const cleaned = cleanSection(raw?.[language], language);
     if (typeof cleaned === 'string') return { ok: false, failure: `${language} : ${cleaned}`, code: 'invalid_response' };
-    content[language] = cleaned;
+    content[language] = { ...cleaned, seasonal: raw?.seasonal === true };
   }
 
   const variants = Array.isArray(raw.variants) ? raw.variants.filter((v: unknown): v is string => typeof v === 'string') : [];
@@ -272,4 +304,51 @@ export function parseSeasons(textResponse: string): ParseResult<Record<FactLangu
     seasons[language] = season.charAt(0).toUpperCase() + season.slice(1);
   }
   return { ok: true, value: seasons };
+}
+
+// Fiches existantes (phase 8) : « Est-ce encore bon ? » et produit frais de saison, sans toucher au reste
+export const PHASE8_SCHEMA = {
+  type: 'object',
+  properties: {
+    seasonal: { type: 'boolean', description: "true pour tout produit frais : fruit, légume (herbes fraîches comprises), poisson, fruit de mer, même trouvé toute l'année ; false pour le reste" },
+    ...Object.fromEntries(LANGUAGES.map((language) => [language, {
+      type: 'object',
+      properties: {
+        signs: { type: 'array', items: { type: 'string' }, description: '2 à 4 signes à vérifier' },
+        discard: { type: 'array', items: { type: 'string' }, description: '1 à 3 cas où le jeter sans hésiter' },
+      },
+      required: ['signs', 'discard'],
+      additionalProperties: false,
+    }])),
+  },
+  required: ['seasonal', ...LANGUAGES],
+  additionalProperties: false,
+};
+
+export function phase8Prompt(content: FactContent): string {
+  const lines = LANGUAGES.map((language) => `- ${language} : ${content[language].name} — ${content[language].description}`).join('\n');
+  return `Aliment d'une fiche anti-gaspi, dans trois langues :
+${lines}
+Pour cet aliment, donne :
+- "seasonal" : true pour tout produit frais : fruit, légume (herbes fraîches, ail, oignon, pomme de terre compris), poisson, fruit de mer, même trouvé toute l'année ; false pour la viande, les produits laitiers, les œufs, l'épicerie (céréales, légumineuses sèches, fruits secs, noix), les produits transformés.
+${STILL_GOOD_RULES}
+Mêmes informations dans les trois langues, chacune rédigée naturellement dans sa langue (fr, en, es), avec une majuscule au début de chaque phrase.`;
+}
+
+export function parsePhase8(textResponse: string): ParseResult<{ seasonal: boolean } & Record<FactLanguage, { signs: string[]; discard: string[] }>> {
+  let raw: any;
+  try {
+    raw = JSON.parse(textResponse);
+  } catch {
+    return { ok: false, failure: `JSON invalide (${textResponse.slice(0, 120)})`, code: 'invalid_response' };
+  }
+  if (typeof raw?.seasonal !== 'boolean') return { ok: false, failure: 'seasonal absent', code: 'invalid_response' };
+  const value = { seasonal: raw.seasonal } as { seasonal: boolean } & Record<FactLanguage, { signs: string[]; discard: string[] }>;
+  for (const language of LANGUAGES) {
+    const cleaned = cleanStillGood(raw?.[language]);
+    if (typeof cleaned === 'string') return { ok: false, failure: `${language} : ${cleaned}`, code: 'invalid_response' };
+    const upper = (item: string) => item.charAt(0).toUpperCase() + item.slice(1);
+    value[language] = { signs: cleaned.signs.map(upper), discard: cleaned.discard.map(upper) };
+  }
+  return { ok: true, value };
 }

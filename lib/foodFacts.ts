@@ -13,6 +13,10 @@ export interface FoodFactSection {
   season: string;
   nutrition: string[];
   tips: string[];
+  // Phase 8 (fiches complétées) : produit frais de saison ; « Est-ce encore bon ? »
+  seasonal?: boolean;
+  signs?: string[];
+  discard?: string[];
 }
 
 export type FoodFact = Record<'fr' | 'en' | 'es', FoodFactSection>;

@@ -69,6 +69,8 @@ export default function IngredientsScreen() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
+  // « Est-ce encore bon ? » demandé depuis un lot (la fiche défile jusqu'à la section)
+  const [stillGoodRequest, setStillGoodRequest] = useState(0);
   const [editingExpiry, setEditingExpiry] = useState<PantryIngredient | null>(null);
   const [savingExpiry, setSavingExpiry] = useState(false);
   const household = useHousehold();
@@ -348,6 +350,7 @@ export default function IngredientsScreen() {
         title={sheetGroup ? foodName(sheetGroup.first) : undefined}
         subtitle={sheetGroup ? naming.generic(sheetGroup.first) : null}
         product={sheetGroup?.first.barcode ? <ProductCard ingredient={sheetGroup.first} /> : null}
+        stillGoodRequest={stillGoodRequest}
         onClose={() => setSheet(null)}
         // Fiche générique : aliments bruts, et produits peu transformés (NOVA 1 ou 2)
         withFact={!!sheetGroup && sheetGroup.first.kind !== 'dish' && (!sheetGroup.first.barcode || hasGenericFact(sheetGroup.first))}
@@ -365,6 +368,7 @@ export default function IngredientsScreen() {
             onThaw={thawLot}
             onOpen={openLot}
             onMerge={mergeLots}
+            onShowStillGood={() => setStillGoodRequest((request) => request + 1)}
           />
         ) : null}
         toast={<Toast message={toastMessage} actionLabel={t('common.undo')} onAction={toastAction} inset={false} />}

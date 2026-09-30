@@ -2,7 +2,7 @@
 // Lancement : deno test --no-config --allow-env supabase/functions/
 
 import { assert, assertEquals } from 'jsr:@std/assert@1';
-import { FACT_SCHEMA, ORIGIN_MAX, parseFact, parseNutrition, parseOrigins, parseResolution, parseSeasons, SEASON_MAX } from './facts.ts';
+import { FACT_SCHEMA, ORIGIN_MAX, parseFact, parseNutrition, parseOrigins, parsePhase8, parseResolution, parseSeasons, SEASON_MAX } from './facts.ts';
 
 const section = (name: string, overrides: Record<string, unknown> = {}) => ({
   name,
@@ -11,6 +11,8 @@ const section = (name: string, overrides: Record<string, unknown> = {}) => ({
   season: "Toute l'année.",
   nutrition: ['Potassium', 'Vitamine C'],
   tips: ['Trop mûre, elle se congèle pour les smoothies', 'Séparez-la des autres fruits pour ralentir leur mûrissement'],
+  signs: ['Vérifie que la peau est jaune, avec quelques taches', 'La chair doit rester ferme'],
+  discard: ['Moisissure ou odeur de fermenté'],
   ...overrides,
 });
 const fact = (overrides: Record<string, unknown> = {}) => JSON.stringify({
@@ -24,7 +26,7 @@ const fact = (overrides: Record<string, unknown> = {}) => JSON.stringify({
 });
 
 Deno.test('schéma strict : tous les champs requis, trois langues', () => {
-  assertEquals(FACT_SCHEMA.required, ['is_food', 'food_key', 'variants', 'fr', 'en', 'es']);
+  assertEquals(FACT_SCHEMA.required, ['is_food', 'food_key', 'seasonal', 'variants', 'fr', 'en', 'es']);
   assertEquals(FACT_SCHEMA.additionalProperties, false);
 });
 
@@ -111,4 +113,28 @@ Deno.test('saison en quelques mots : point final retiré, majuscule, saison trop
   assertEquals(long.ok, false);
   const fiche = parseFact(fact({ fr: section('Banane', { season: "Toute l'année dans les pays producteurs, sinon de juin à septembre en Europe." }) }), 'banane', null);
   assertEquals(fiche.ok, false);
+});
+
+Deno.test('« Est-ce encore bon ? » et saison : signes et cas à jeter exigés, produit frais recopié dans chaque langue', () => {
+  const frais = parseFact(fact({ seasonal: true }), 'banane', null);
+  assert(frais.ok && !('not_food' in frais.value));
+  assertEquals(frais.value.content.fr.seasonal, true);
+  assertEquals(frais.value.content.es.discard, ['Moisissure ou odeur de fermenté']);
+  const sansSaison = parseFact(fact(), 'banane', null);
+  assert(sansSaison.ok && !('not_food' in sansSaison.value));
+  assertEquals(sansSaison.value.content.en.seasonal, false);
+  assertEquals(parseFact(fact({ fr: section('Banane', { signs: ['Une seule'] }) }), 'banane', null).ok, false);
+  assertEquals(parseFact(fact({ fr: section('Banane', { discard: [] }) }), 'banane', null).ok, false);
+  const claim = parseFact(fact({ fr: section('Banane', { discard: ['Jette-la : elle donne des maladies'] }) }), 'banane', null);
+  assert(!claim.ok && claim.failure.includes('promesse de santé'));
+});
+
+Deno.test('réécriture des fiches existantes : produit frais, signes et cas à jeter dans les trois langues', () => {
+  const lang = { signs: ['vérifie la couleur', 'Sens-la'], discard: ['Moisissure visible'] };
+  const ok = parsePhase8(JSON.stringify({ seasonal: false, fr: lang, en: lang, es: lang }));
+  assert(ok.ok);
+  assertEquals(ok.value.seasonal, false);
+  assertEquals(ok.value.fr.signs, ['Vérifie la couleur', 'Sens-la']);
+  assertEquals(parsePhase8(JSON.stringify({ fr: lang, en: lang, es: lang })).ok, false);
+  assertEquals(parsePhase8(JSON.stringify({ seasonal: true, fr: lang, en: lang })).ok, false);
 });

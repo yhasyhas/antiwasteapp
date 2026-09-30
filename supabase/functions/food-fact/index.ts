@@ -7,7 +7,7 @@ import { withCors } from '../_shared/cors.ts';
 import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_SECRET_KEY, SUPABASE_URL } from '../_shared/keys.ts';
 import { type AiProvider, type AttemptLog, geminiProvider, groqProvider, orderProviders, runWithFallback } from '../_shared/ai.ts';
 import { normalizeAlias, normalizeFoodKey } from '../_shared/foodKey.ts';
-import { FACT_SCHEMA, FACT_SYSTEM, type FactContent, factPrompt, NUTRITION_SCHEMA, nutritionPrompt, ORIGIN_SCHEMA, originPrompt, parseFact, parseNutrition, parseOrigins, parseResolution, parseSeasons, RESOLVE_SCHEMA, resolvePrompt, SEASON_SCHEMA, seasonPrompt } from './facts.ts';
+import { FACT_SCHEMA, FACT_SYSTEM, type FactContent, factPrompt, NUTRITION_SCHEMA, nutritionPrompt, ORIGIN_SCHEMA, originPrompt, parseFact, parseNutrition, parseOrigins, parsePhase8, PHASE8_SCHEMA, phase8Prompt, parseResolution, parseSeasons, RESOLVE_SCHEMA, resolvePrompt, SEASON_SCHEMA, seasonPrompt } from './facts.ts';
 
 // Fiche d'un aliment (touché dans le garde-manger). Une fiche est générée une seule fois pour tous les
 // utilisateurs, avec les trois langues dans le même appel, puis relue dans la table food_facts.
@@ -129,6 +129,28 @@ async function fixSeason(foodKey: string, t0: number): Promise<Response> {
   return json({ food_key: foodKey, seasons: rewritten.value });
 }
 
+// Pré-remplissage (clé secrète) : « Est-ce encore bon ? » et produit frais de saison ajoutés à une fiche prête ;
+// le reste de la fiche ne change pas
+async function fixPhase8(foodKey: string, t0: number): Promise<Response> {
+  const rows = await db(`food_facts?select=content,aliases,model&status=eq.ready&food_key=eq.${encodeURIComponent(foodKey)}`);
+  const fact = rows?.[0] as { content: FactContent; aliases: string[]; model: string } | undefined;
+  if (!fact) return json({ error: 'not_found' }, 404);
+  const rewritten = await runWithFallback(PROVIDERS, {
+    prompt: phase8Prompt(fact.content),
+    schema: PHASE8_SCHEMA,
+    schemaName: 'still_good',
+    temperature: 0,
+    maxOutputTokens: 2500,
+  }, parsePhase8, { label: FUNCTION_NAME, log: [], t0 });
+  if (!rewritten.ok) return failure(rewritten.reason === 'provider_quota' ? 'provider_quota' : 'provider_error', rewritten.reason === 'provider_quota' ? 503 : 502);
+  const content = Object.fromEntries(Object.entries(fact.content).map(([language, section]) => {
+    const added = rewritten.value[language as keyof typeof rewritten.value] as { signs: string[]; discard: string[] } | undefined;
+    return [language, { ...section, seasonal: rewritten.value.seasonal, ...(added ?? {}) }];
+  }));
+  await rpc('save_food_fact', { p_food_key: foodKey, p_content: content, p_aliases: fact.aliases, p_model: fact.model });
+  return json({ food_key: foodKey, phase8: rewritten.value });
+}
+
 const ready = (foodKey: string, fact: { content: unknown; reviewed: boolean }) =>
   json({ food_key: foodKey, fact: fact.content, reviewed: fact.reviewed });
 
@@ -154,6 +176,8 @@ Deno.serve(withCors(async (req: Request) => {
   if (admin && body?.fix_nutrition === true && foodKey) return await fixNutrition(foodKey, t0);
   // Pré-remplissage : saison d'une fiche existante réécrite en quelques mots
   if (admin && body?.fix_season === true && foodKey) return await fixSeason(foodKey, t0);
+  // Pré-remplissage : « Est-ce encore bon ? » et produit frais de saison ajoutés à une fiche existante
+  if (admin && body?.fix_phase8 === true && foodKey) return await fixPhase8(foodKey, t0);
 
   // Quota compté une fois par requête, rendu si rien n'a été généré
   let quotaCounted = false;
