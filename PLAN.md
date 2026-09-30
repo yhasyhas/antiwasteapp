@@ -286,14 +286,18 @@ Suite de la phase 7, sur la branche `phase-7-finalisation`.
 
 ## Phase 8 — Anti-gaspi avancé
 
-- [ ] Emplacement de chaque aliment : frigo, congélateur, placard
-- [ ] Action « Congeler » : range l'aliment au congélateur et prolonge sa date, avec un conseil adapté
-- [ ] Distinction « À consommer jusqu'au » / « À consommer de préférence avant » : un aliment « de préférence avant » dépassé n'est jamais affiché comme à jeter, ni compté comme gaspillé
-- [ ] Date « Ouvert le… » qui raccourcit la conservation
-- [ ] « Est-ce encore bon ? » dans la fiche aliment : signes à vérifier
-- [ ] Heure du résumé quotidien réglable
+- [ ] « J'ai cuisiné ça » confirmé : après la validation, bouton « ✓ Cuisiné aujourd'hui » grisé avec un lien « Modifier » ; récapitulatif sur la fiche (avant et après de chaque aliment : « Tomates : 4 → 1 », « Riz au poulet : fini ») ; « Modifier » rouvre la feuille avec les quantités saisies, et la correction remplace l'action précédente en une seule opération côté serveur (mêmes règles que l'annulation, conflit compris) ; annulation actuelle inchangée ; lien discret « Je l'ai cuisinée à nouveau » pour un vrai deuxième repas ; « Cuisinée le [date] » dans « Mes recettes » ; tests SQL de la modification, conflit compris
+- [ ] Emplacement de chaque lot : frigo, congélateur, placard, proposé automatiquement au scan selon l'aliment, modifiable partout ; filtre par emplacement dans le garde-manger
+- [ ] Action « Congeler » par lot dans la feuille de l'aliment : lot au congélateur, nouvelle date estimée selon l'aliment, conseil de congélation ; « Décongeler » : date courte (1 à 2 jours) et rappel de ne pas recongeler ; les aliments congelés ne sont pas « à utiliser vite »
+- [ ] Deux types de dates, proposés automatiquement et modifiables : « À consommer jusqu'au » (stricte) et « À consommer de préférence avant » (indicative) ; un aliment « de préférence avant » dépassé n'est jamais affiché en rouge ni compté comme gaspillé (badge neutre « Date indicative dépassée », lien vers « Est-ce encore bon ? ») et le résumé quotidien ne le signale pas comme urgent
+- [ ] « Je l'ai ouvert » par lot : la date devient la plus proche entre la date d'origine et la conservation après ouverture
+- [ ] « Est-ce encore bon ? » : nouvelle section des fiches aliments (signes à vérifier, quand jeter sans hésiter), prudente et générale, dans les trois langues
+- [ ] Résumé quotidien : heure réglable et interrupteur dans les Réglages (section Notifications), respectés par `daily-digest` et par les rappels locaux
+- [ ] Saison affichée seulement pour les produits frais (fruits, légumes, poissons, fruits de mer), jamais pour le reste
+- [ ] Fiches aliments régénérées une seule fois pour « Est-ce encore bon ? » et la saison, après sauvegarde, avec un contrôle de qualité
+- [ ] Compteur anti-gaspi et notifications cohérents avec les nouvelles règles (congelés, dates indicatives) ; fluidité vérifiée sur le Galaxy A30
 
-**Terminé quand** : un aliment peut être rangé, congelé et marqué ouvert, sa date et ses rappels suivent, et un produit « de préférence avant » dépassé n'est jamais présenté ni compté comme gaspillé.
+**Terminé quand** : un aliment peut être rangé, congelé et marqué ouvert, sa date et ses rappels suivent, un produit « de préférence avant » dépassé n'est jamais présenté ni compté comme gaspillé, et « J'ai cuisiné ça » peut être confirmé et corrigé.
 
 ## Phase 9 — Recettes
 
@@ -381,7 +385,7 @@ Ancienne phase 8.
 
 ### Obligatoire avant la bêta
 
-- [ ] Interrupteur « Résumé quotidien » dans les Réglages, respecté par la fonction `daily-digest` et par les rappels locaux
+- [ ] Interrupteur « Résumé quotidien » dans les Réglages, respecté par la fonction `daily-digest` et par les rappels locaux (prévu en phase 8)
 - [ ] « Aide et contact » dans les Réglages, avec l'adresse de contact du projet
 
 **Terminé quand** : au moins 5 testeurs utilisent l'app pendant une semaine sans plantage bloquant.
