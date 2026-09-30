@@ -258,3 +258,20 @@ Deno.test('végétarien : produits laitiers, œufs et miel toujours permis, sauf
   const flagged = recipe([ing('crème fraîche', 'p1', ['vegetarian']), ing('beurre', 'missing', ['vegetarian'])]);
   assertEquals(dietViolations(flagged, ['vegetarian']), []);
 });
+
+Deno.test('produits laitiers, œufs et miel : acceptés seulement pour le régime végétarien', () => {
+  const animal = ['Crème fraîche', 'Beurre doux', 'Lait entier', 'Œufs', 'Yaourt nature', 'Miel', 'Heavy cream', 'Huevos'];
+  for (const name of animal) {
+    assert(isDietException(name, 'vegetarian'), `végétarien : ${name}`);
+    assert(!isDietException(name, 'vegan'), `vegan : ${name}`);
+  }
+  for (const name of ['Crème fraîche', 'Beurre doux', 'Lait entier', 'Yaourt nature', 'Heavy cream']) {
+    assert(!isDietException(name, 'dairy-free'), `sans lactose : ${name}`);
+  }
+  // Mêmes ingrédients signalés par le modèle : écartés en vegan et sans lactose, gardés en végétarien
+  const flagged = recipe([ing('crème fraîche', 'p1', ['vegetarian', 'vegan', 'dairy-free']), ing('miel', 'missing', ['vegetarian', 'vegan'])]);
+  assertEquals(dietViolations(flagged, ['vegetarian']), []);
+  assertEquals(dietViolations(flagged, ['vegan']), ['crème fraîche (vegan)', 'miel (vegan)']);
+  assertEquals(dietViolations(flagged, ['dairy-free']), ['crème fraîche (dairy-free)']);
+  assertEquals(dietViolations(flagged, ['vegetarian', 'vegan']), ['crème fraîche (vegan)', 'miel (vegan)']);
+});
