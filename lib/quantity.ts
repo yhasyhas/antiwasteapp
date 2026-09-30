@@ -128,17 +128,33 @@ export function displayQuantity(text: string | null | undefined, language: strin
   if (!Number.isFinite(value)) return text;
   const unit = match[2];
   const measure = normalize(unit) in MASS || normalize(unit) in VOLUME;
-  // Mot quelconque sans décimale : texte d'origine (pas d'accord imposé à « 3 tomate »)
-  if (!measure && !/[.,]/.test(match[1])) return text;
+  // Mot quelconque sans décimale : texte d'origine (pas d'accord imposé à « 3 tomate ») ; nombre seul : unité
+  // par défaut (« 6 » → « 6 pièces »)
+  if (!measure && unit !== '' && !/[.,]/.test(match[1])) return text;
   return formatQuantity(value, unit, language);
 }
 
-// Nombre → texte (virgule décimale en français et en espagnol), suivi de l'unité du garde-manger, convertie
-// dans l'unité la plus naturelle quand c'est simple (0,25 kg → 250 g)
-export function formatQuantity(rawValue: number, rawUnit: string, language: string): string {
-  const { value, unit } = naturalQuantity(rawValue, rawUnit);
+// Nombre dans le format de la langue (virgule décimale en français et en espagnol)
+function formatNumber(value: number, language: string): string {
   const number = Number(value.toFixed(2)).toString();
-  const text = language === 'en' ? number : number.replace('.', ',');
+  return language === 'en' ? number : number.replace('.', ',');
+}
+
+// Unité par défaut d'une quantité sans unité (« 1 pièce », « 6 pièces »)
+const PIECE: Record<string, [string, string]> = { fr: ['pièce', 'pièces'], en: ['piece', 'pieces'], es: ['pieza', 'piezas'] };
+
+// Nombre → texte (virgule décimale en français et en espagnol), suivi de l'unité du garde-manger, convertie
+// dans l'unité la plus naturelle quand c'est simple (0,25 kg → 250 g) ; litre écrit « L » (« 1 L », « 1,5 L ») ;
+// sans unité, « pièce » (« 1 pièce », « 6 pièces »)
+export function formatQuantity(rawValue: number, rawUnit: string, language: string): string {
+  const natural = naturalQuantity(rawValue, rawUnit);
+  const value = natural.value;
+  if (natural.unit.trim() === '') {
+    const [one, many] = PIECE[language] ?? PIECE.fr;
+    return `${formatNumber(value, language)} ${value > 1 ? many : one}`;
+  }
+  const unit = normalize(natural.unit) === 'l' ? 'L' : natural.unit;
+  const text = formatNumber(value, language);
   // « 1 œuf », « 1 tranche » : unité au singulier (sauf les unités de mesure : « 1 l », « 1 kg ») ; au-delà de 1,
   // un mot simple prend un « s » en français et en espagnol (« 3 paquets », « 2 paquetes »)
   const measure = normalize(unit) in MASS || normalize(unit) in VOLUME;
