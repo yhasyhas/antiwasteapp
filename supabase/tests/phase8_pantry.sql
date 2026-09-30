@@ -323,6 +323,24 @@ BEGIN
 END $$;
 RESET ROLE;
 
+-- Ajout direct (liste de courses, versions précédentes) : emplacement et type de date par défaut
+INSERT INTO public.ingredients (id, user_id, household_id, name, quantity, category, kind, food_key) VALUES
+  ('00000000-0000-4000-b000-000000000e41', '00000000-0000-4000-a000-000000000e0a', (SELECT value::uuid FROM ctx WHERE key = 'household'), 'Lentilles', '500 g', 'legume', 'ingredient', 'lentil'),
+  ('00000000-0000-4000-b000-000000000e42', '00000000-0000-4000-a000-000000000e0a', (SELECT value::uuid FROM ctx WHERE key = 'household'), 'Petits pois', '1', 'frozen', 'ingredient', NULL),
+  ('00000000-0000-4000-b000-000000000e43', '00000000-0000-4000-a000-000000000e0a', (SELECT value::uuid FROM ctx WHERE key = 'household'), 'Jambon', '4', 'meat', 'ingredient', NULL);
+INSERT INTO public.ingredients (id, user_id, household_id, name, quantity, location, date_kind) VALUES
+  ('00000000-0000-4000-b000-000000000e44', '00000000-0000-4000-a000-000000000e0a', (SELECT value::uuid FROM ctx WHERE key = 'household'), 'Soupe', '1', 'pantry', 'best_before');
+DO $$
+BEGIN
+  IF (SELECT location || '/' || date_kind FROM public.ingredients WHERE id = '00000000-0000-4000-b000-000000000e41') <> 'pantry/best_before'
+     OR (SELECT location || '/' || date_kind || '/' || (frozen_at = current_date)::text FROM public.ingredients WHERE id = '00000000-0000-4000-b000-000000000e42') <> 'freezer/best_before/true'
+     OR (SELECT location || '/' || date_kind FROM public.ingredients WHERE id = '00000000-0000-4000-b000-000000000e43') <> 'fridge/use_by'
+     OR (SELECT location || '/' || date_kind FROM public.ingredients WHERE id = '00000000-0000-4000-b000-000000000e44') <> 'pantry/best_before' THEN
+    RAISE EXCEPTION 'ÉCHEC : valeurs par défaut à l''ajout direct';
+  END IF;
+  RAISE NOTICE 'OK 14 : ajout direct : emplacement et type de date par défaut (valeurs données gardées), date de congélation';
+END $$;
+
 -- Appel à deux paramètres (versions précédentes de l'app) toujours accepté
 SET LOCAL ROLE authenticated;
 SELECT pg_temp.login('00000000-0000-4000-a000-000000000e0a');
