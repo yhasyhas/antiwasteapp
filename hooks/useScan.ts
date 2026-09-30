@@ -241,6 +241,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
     setShowConfirmation,
     closeConfirmation,
     notice,
+    showNotice,
     analyzeImage,
     toggleDetected,
     setDetectedExpiry,

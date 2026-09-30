@@ -53,6 +53,7 @@ export default function CameraScreen() {
     saving,
     closeConfirmation,
     notice,
+    showNotice,
   } = useScan({ onManualAdd: () => setShowManualAdd(true) });
 
   // Caméra montée seulement quand elle est visible : onglet Scanner affiché (les onglets restent montés en
@@ -113,6 +114,7 @@ export default function CameraScreen() {
     <ManualAddModal
       visible={showManualAdd}
       prefill={prefill}
+      onNothingAdded={() => showNotice(t('scan.nothingAdded'))}
       onClose={() => {
         setShowManualAdd(false);
         // Scan du code-barres suivant

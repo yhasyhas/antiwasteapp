@@ -26,6 +26,7 @@ import { QuantityField } from '@/components/pantry/QuantityField';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import { addPantryItems, defaultChoice, existingFor, loadPantry, PantryConflictError, pantryGroups } from '@/lib/pantry';
 import { capitalizeFirst } from '@/lib/foodNames';
+import { displayQuantity } from '@/lib/quantity';
 import type { LotGroup } from '@/lib/pantryLots';
 
 interface ManualIngredient {
@@ -68,10 +69,12 @@ interface Props {
   visible: boolean;
   onClose: () => void;
   prefill?: ManualPrefill | null;
+  // « Terminer » sans rien enregistrer : message « Aucun aliment ajouté » sur le Scanner
+  onNothingAdded?: () => void;
 }
 
 // Ajout manuel d'ingrédients. La saisie est conservée quand la fenêtre est fermée sans enregistrer.
-export function ManualAddModal({ visible, onClose, prefill }: Props) {
+export function ManualAddModal({ visible, onClose, prefill, onNothingAdded }: Props) {
   const { user } = useAuth();
   const { t, language } = useLanguage();
   // Garde-manger du foyer, relu à chaque ouverture : aliments déjà présents
@@ -141,6 +144,15 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
 
   // Aliments à enregistrer (« Ne pas ajouter » exclus)
   const toSave = manualIngredients.filter((ingredient) => ingredient.choice !== 'skip');
+
+  // Rien à enregistrer (tout en « Ne pas ajouter » ou retiré, aucune saisie en cours) : « Terminer »
+  const nothingToSave = toSave.length === 0 && !newIngredientName.trim();
+  const finish = () => {
+    setManualIngredients([]);
+    setPending(null);
+    onClose();
+    onNothingAdded?.();
+  };
 
   const saveManualIngredients = async () => {
     if (!user || toSave.length === 0) return;
@@ -238,7 +250,7 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
                   <View style={styles.item}>
                     <View style={styles.itemText}>
                       <Text style={[styles.itemName, ingredient.choice === 'skip' && styles.skipped]}>{capitalizeFirst(ingredient.name)}</Text>
-                      {ingredient.quantity ? <Text style={styles.itemQuantity}>{ingredient.quantity}</Text> : null}
+                      {ingredient.quantity ? <Text style={styles.itemQuantity}>{displayQuantity(ingredient.quantity, language)}</Text> : null}
                     </View>
                     {ingredient.kind === 'dish' && <Badge label={t('pantry.leftover')} tone="leftover" />}
                     <ExpiryBadge expiresAt={ingredient.expires_at} />
@@ -261,14 +273,18 @@ export function ManualAddModal({ visible, onClose, prefill }: Props) {
         )}
       </ScrollView>
 
-      <Button
-        label={t('manual.saveCount', { count: toSave.length })}
-        icon={Check}
-        onPress={saveManualIngredients}
-        loading={saving}
-        disabled={toSave.length === 0}
-        style={styles.save}
-      />
+      {nothingToSave ? (
+        <Button label={t('scan.finish')} variant="outline" onPress={finish} style={styles.save} />
+      ) : (
+        <Button
+          label={t('manual.saveCount', { count: toSave.length })}
+          icon={Check}
+          onPress={saveManualIngredients}
+          loading={saving}
+          disabled={toSave.length === 0}
+          style={styles.save}
+        />
+      )}
     </BottomSheet>
   );
 }
