@@ -232,6 +232,13 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Produits scannés par code-barres : colonnes `product_name`, `generic_name`, `brand`, `nova_group`, `nutriscore_grade`, `off_categories` (`lib/openFoodFacts.ts`) ; nom du produit gardé, nom générique en sous-titre (`useFoodNaming`), fiche générique pour NOVA 1 ou 2, sinon `components/pantry/ProductCard.tsx`. Relecture des produits existants : `scripts/products/refresh-products.ts`. Nom générique gardé en entier, sous-titre coupé à la fin d'un mot (`components/ui/WordClampText.tsx`).
 - Quantités affichées avec `displayQuantity` (`lib/quantity.ts`) : format de la langue, unité la plus naturelle (`naturalQuantity`, aussi dans `formatQuantity`).
 
+### Phase 7 — finalisation du design (branche `phase-7-finalisation`)
+- Navigation (`app/(tabs)/_layout.tsx`, `components/ui/TabBar.tsx`) : Accueil · Garde-manger · Scanner (bouton rond au centre) · Courses · Réglages ; « Mes recettes » (`app/(tabs)/saved.tsx`) en onglet caché, ouvert depuis la section « Mes recettes » de l'accueil.
+- Icônes des aliments : `components/pantry/FoodIcon.tsx` (catégorie → icône lucide, famille → `colors.foodFamilies`).
+- Dates : relatives jusqu'à 7 jours (`RELATIVE_DAYS`), date réelle au-delà (`shortDate`, `lib/expiry.ts`).
+- Génération : recette écartée redemandée une fois ; `rejected` et `fewIngredients` dans la réponse, expliqués sous les résultats ; végétarien : produits laitiers, œufs et miel toujours permis (`isDietException`).
+- Fiches aliments : atouts de trois mots au plus (`isShortNutrition`), réécriture des fiches existantes par `scripts/food-facts/fix-nutrition.mjs`.
+
 ## 5. État actuel et problèmes connus
 
 ### Sécurité
@@ -248,7 +255,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 
 ## 6. Prochaine étape
-Phase 7 (finalisation du design, branche `phase-7-finalisation`), puis 8 Anti-gaspi avancé, 9 Recettes, 10 Premier contact, 11 Point de décision, 12 Natif (un seul build), 13 Services et abonnements, 14 Audit, 15 Lancement. Détails dans `PLAN.md`.
+Tests de la phase 7 (finalisation du design) sur téléphone, puis 8 Anti-gaspi avancé, 9 Recettes, 10 Premier contact, 11 Point de décision, 12 Natif (un seul build), 13 Services et abonnements, 14 Audit, 15 Lancement. Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash

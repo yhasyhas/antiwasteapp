@@ -271,15 +271,15 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 Suite de la phase 7, sur la branche `phase-7-finalisation`.
 
 - [x] Bilan des cases non cochées et des points reportés des phases 7, 7b et 7c
-- [ ] Navigation : onglets Accueil · Garde-manger · Scanner (au centre, mis en valeur) · Courses · Réglages ; favoris dans l'Accueil, section « Mes recettes » avec « Tout voir » (l'écran Favoris devient cette page)
-- [ ] Garde-manger : dates relatives jusqu'à 7 jours, date réelle au-delà (« 12 oct. »), dans le format de la langue
-- [ ] Fiche aliment : majuscule au début de chaque valeur, badge de date avec les couleurs du garde-manger, atouts en pastilles courtes (trois mots au plus : consignes des fiches et champ régénéré pour les fiches existantes)
-- [ ] Résultats de génération : « D'autres recettes » à la fin de la liste, « Transformer mes restes » seulement avec des restes et plus compact, illustration « Photo du plat » pendant le chargement de l'image ; recette écartée par le serveur : une nouvelle demande (un essai), sinon explication à l'utilisateur
-- [ ] Vérifier l'étiquette de régime sur une recette végétarienne et les quantités des courses venues d'une recette
-- [ ] Écarts avec les maquettes de `docs/design/`
-- [ ] Icônes par catégorie d'aliment dans le garde-manger, à la place de la feuille unique (déplacé depuis les finitions du lancement)
-- [ ] Captures à jour dans `docs/design/implemente/`
-- [ ] Suppression des branches fusionnées (locales et sur GitHub)
+- [x] Navigation : onglets Accueil · Garde-manger · Scanner (au centre, mis en valeur) · Courses · Réglages ; favoris dans l'Accueil, section « Mes recettes » avec « Tout voir » (l'écran Favoris devient cette page)
+- [x] Garde-manger : dates relatives jusqu'à 7 jours, date réelle au-delà (« 12 oct. »), dans le format de la langue
+- [x] Fiche aliment : majuscule au début de chaque valeur, badge de date avec les couleurs du garde-manger, atouts en pastilles courtes (trois mots au plus : consignes des fiches et champ régénéré pour les fiches existantes)
+- [x] Résultats de génération : « D'autres recettes » à la fin de la liste, « Transformer mes restes » seulement avec des restes et plus compact, illustration « Photo du plat » pendant le chargement de l'image ; recette écartée par le serveur : une nouvelle demande (un essai), sinon explication à l'utilisateur
+- [x] Vérifier l'étiquette de régime sur une recette végétarienne et les quantités des courses venues d'une recette
+- [x] Écarts avec les maquettes de `docs/design/`
+- [x] Icônes par catégorie d'aliment dans le garde-manger, à la place de la feuille unique (déplacé depuis les finitions du lancement)
+- [x] Captures à jour dans `docs/design/implemente/`
+- [x] Suppression des branches fusionnées (locales et sur GitHub)
 
 **Terminé quand** : chaque point du bilan est traité ou reporté dans une phase, les écrans suivent les maquettes (écarts restants décidés et notés au journal), et les captures de `docs/design/implemente/` correspondent à l'app.
 
@@ -552,4 +552,10 @@ Ancienne phase 8.
 | 30/09/2026 | Nom générique Open Food Facts gardé en entier (120 caractères au plus ; il était coupé à 40 comme le nom du produit : « Tartines croustillantes à la farine de ») ; sous-titre du garde-manger sur deux lignes au maximum, coupé à la fin d'un mot avec « … » | Produits existants relus après sauvegarde : 4 lots, 3 produits, NOVA connu pour tous |
 | 30/09/2026 | Quantités affichées dans le format de la langue (« 0,25 kg ») et dans l'unité la plus naturelle quand la conversion est simple (0,25 kg → 250 g, 1500 g → 1,5 kg, 0,5 l → 50 cl) ; les quantités enregistrées ne sont pas réécrites | Fractions, « 2 x 125 g » et textes libres restent tels quels |
 | 30/09/2026 | Fin du projet réorganisée : 7 Finalisation du design, 8 Anti-gaspi avancé, 9 Recettes, 10 Premier contact, 11 Point de décision, 12 Natif (un seul build), 13 Services et abonnements, 14 Audit qualité et sécurité (ancienne 8a), 15 Lancement (ancienne 8), puis v1.1. Règle : simple rechargement d'abord, changements natifs regroupés dans un seul build, services payants ensuite, audit de l'app complète juste avant le lancement | Déplacés sans doublon : icônes par catégorie → 7 ; « Mot de passe oublié » → 10 ; confirmation d'email → 13 ; offres payantes de Gemini et limites de Groq → 13 ; nom de l'app décidé en 11, renommage gardé au lancement. Les mentions « phase 8 » et « phase 8a » plus haut dans ce journal désignent désormais les phases 15 et 14 |
+| 30/09/2026 | Phase 7 (finalisation) : navigation Accueil · Garde-manger · Scanner (bouton rond au centre) · Courses · Réglages ; favoris dans l'accueil (« Mes recettes », favoris d'abord, « Tout voir » vers l'ancien écran Favoris, devenu « Mes recettes ») | Liens vérifiés : carte « Courses » de l'accueil, panier du garde-manger, « Voir » après un ajout aux courses, « Voir mes recettes » après un favori |
+| 30/09/2026 | Dates relatives jusqu'à 7 jours, date réelle au-delà (« 12 oct. », avec l'année si elle diffère) ; le badge de la fiche aliment utilisait déjà les couleurs du garde-manger (même composant) | 4 jours reste vert comme dans le garde-manger (la maquette de la fiche le montrait en orange) |
+| 30/09/2026 | Atouts des fiches aliments : trois mots au plus, expressions correctes avec leurs liaisons, un nutriment par pastille ; style télégraphique refusé par la validation (« Source protéines », « Vitamines C K ») ; les 103 fiches réécrites (`scripts/food-facts/fix-nutrition.mjs --all`, après sauvegarde), 0 échec | Premier passage abandonné : sans consigne sur les liaisons, le modèle écrivait « Eau fibres » |
+| 30/09/2026 | 2 recettes au lieu de 3 : pas une recette écartée, mais la règle du nombre de recettes (1 recette pour 1 ou 2 aliments choisis, 2 pour 3 à 5, 3 au-delà) ; la capture avait 3 aliments choisis. Désormais, une explication s'affiche sous les résultats ; une recette écartée par le serveur est redemandée une fois (titres déjà proposés exclus), sinon expliquée | Essai réel en régime végétarien : Groq signalait la crème fraîche et le beurre comme non végétariens, toutes les recettes étaient écartées (« aucune recette compatible »). Produits laitiers, œufs et miel toujours permis quand le nom entier en est un ; ensuite 3 recettes sur 3, étiquette « Végétarien » affichée |
+| 30/09/2026 | Quantités des courses venues d'une recette vérifiées dans l'app (« Oignon 1 pièce », « Coriandre 1 bouquet ») ; bouton « Tout ajouter aux courses » (l'ancien libellé était coupé sur un écran étroit) | |
+| 30/09/2026 | Icônes par catégorie d'aliment (lucide) dans la même pastille, teinte douce par grande famille (végétal, protéines, frais, épicerie, assaisonnement, restes) dans les jetons de `theme.ts` ; marmite pour les restes, feuille pour une catégorie inconnue | Captures de `docs/design/implemente/` refaites, écrans sans maquette compris (aliment en plusieurs lots, fiche produit, ajout d'ingrédients, confirmation du scan, « Mes recettes ») |
 | | *(résultat du test Gemini vs Clarifai)* | |
