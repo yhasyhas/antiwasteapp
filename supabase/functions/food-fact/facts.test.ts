@@ -2,7 +2,7 @@
 // Lancement : deno test --no-config --allow-env supabase/functions/
 
 import { assert, assertEquals } from 'jsr:@std/assert@1';
-import { FACT_SCHEMA, ORIGIN_MAX, parseFact, parseOrigins, parseResolution } from './facts.ts';
+import { FACT_SCHEMA, ORIGIN_MAX, parseFact, parseNutrition, parseOrigins, parseResolution } from './facts.ts';
 
 const section = (name: string, overrides: Record<string, unknown> = {}) => ({
   name,
@@ -72,4 +72,21 @@ Deno.test('origine en quelques mots : point final retiré, origine trop longue r
   assert(!long.ok);
   const fiche = parseFact(fact({ fr: section('Banane', { origin: "Originaire d'Asie du Sud-Est, cultivée depuis des millénaires en Inde et en Afrique." }) }), 'banane', null);
   assert(!fiche.ok);
+});
+
+Deno.test('atouts courts : plus de trois mots écartés, fiche refusée sans deux atouts courts', () => {
+  const result = parseFact(fact({ fr: section('Banane', { nutrition: ['Source de potassium', 'Apporte des fibres alimentaires', 'Vitamine C.'] }) }), 'banane', null);
+  assert(result.ok && !('not_food' in result.value));
+  assertEquals(result.value.content.fr.nutrition, ['Source de potassium', 'Vitamine C']);
+  const tooLong = parseFact(fact({ fr: section('Banane', { nutrition: ['Apporte des fibres alimentaires', 'Contient de la vitamine C'] }) }), 'banane', null);
+  assertEquals(tooLong.ok, false);
+});
+
+Deno.test('atouts réécrits : trois langues, majuscule, trois mots au plus', () => {
+  const ok = parseNutrition(JSON.stringify({ fr: ['source de potassium', 'Riche en fibres'], en: ['Source of potassium', 'High in fiber.'], es: ['Fuente de potasio', 'Rico en fibra', 'Aporta mucha fibra dietética'] }));
+  assert(ok.ok);
+  assertEquals(ok.value.fr, ['Source de potassium', 'Riche en fibres']);
+  assertEquals(ok.value.en, ['Source of potassium', 'High in fiber']);
+  assertEquals(ok.value.es, ['Fuente de potasio', 'Rico en fibra']);
+  assertEquals(parseNutrition(JSON.stringify({ fr: ['Source de potassium'], en: ['A', 'B'], es: ['A', 'B'] })).ok, false);
 });
