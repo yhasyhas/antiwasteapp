@@ -241,6 +241,7 @@ export default function HomeScreen() {
                 imageLoading={images.isLoading(recipe.id)}
                 onPress={() => openRecipe(recipe)}
                 favorite={{ active: favoriteIds.has(recipe.id), onToggle: () => toggleFavorite(recipe) }}
+                showCooked
               />
             ))}
           </View>

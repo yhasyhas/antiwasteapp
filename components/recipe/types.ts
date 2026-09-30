@@ -24,6 +24,8 @@ export interface Recipe {
   // Langue de la recette (celle choisie à la génération) et traductions déjà faites (« Traduire en … »)
   language?: string;
   translations?: Partial<Record<string, RecipeText>>;
+  // Dernier repas (« J'ai cuisiné ça » relié à la recette)
+  last_cooked_at?: string | null;
 }
 
 // Textes traduits d'une recette (fonction translate-recipe) : même ordre et même nombre d'éléments que
@@ -115,5 +117,6 @@ export function recipeFromRow(row: any): Recipe & { id: string } {
     image_url: imageOf(row?.image_url),
     language: typeof row?.language === 'string' ? row.language : undefined,
     translations: row?.translations && typeof row.translations === 'object' ? row.translations : {},
+    last_cooked_at: typeof row?.last_cooked_at === 'string' ? row.last_cooked_at : null,
   };
 }

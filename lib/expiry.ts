@@ -29,6 +29,10 @@ export function todayISO(): string {
   return toISODate(new Date());
 }
 
+// Horodatage ("2026-10-01T18:20:00Z") → date locale 'AAAA-MM-JJ'
+export const localDateOf = (timestamp: string) => toISODate(new Date(timestamp));
+export const isToday = (timestamp: string) => localDateOf(timestamp) === todayISO();
+
 export function addDays(iso: string, days: number): string {
   const date = fromISODate(iso);
   date.setDate(date.getDate() + days);

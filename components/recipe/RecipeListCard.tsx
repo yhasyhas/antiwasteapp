@@ -11,6 +11,7 @@ import { RecipePlaceholder } from '@/components/ui/Illustrations';
 import { Touchable } from '@/components/ui/Touchable';
 import { colors, motion, radius, sizes, spacing, typography } from '@/constants/theme';
 import type { Recipe } from './types';
+import { localDateOf, shortDate } from '@/lib/expiry';
 
 interface Props {
   recipe: Recipe;
@@ -21,13 +22,18 @@ interface Props {
   favorite?: { active: boolean; onToggle: () => void };
   // large : image en haut (génération, favoris) ; compact : vignette à gauche (« Mes recettes » de l'accueil)
   variant?: 'large' | 'compact';
+  // « Cuisinée le [date] » (Mes recettes)
+  showCooked?: boolean;
 }
 
 // Carte de recette unique pour toutes les listes. Elle affiche l'image si elle existe, sans jamais la
 // demander elle-même (voir useRecipeImages) ; sinon une illustration. Badge « X à sauver » : aliments du
 // garde-manger utilisés qui expirent bientôt.
-export function RecipeListCard({ recipe, onPress, favorite, variant = 'large' }: Props) {
-  const { t } = useLanguage();
+export function RecipeListCard({ recipe, onPress, favorite, variant = 'large', showCooked = false }: Props) {
+  const { t, language } = useLanguage();
+  const cooked = showCooked && recipe.last_cooked_at
+    ? <Text style={styles.cooked}>{t('cookedMore.cookedOn', { date: shortDate(localDateOf(recipe.last_cooked_at), language) })}</Text>
+    : null;
   const pantry = usePantryUrgency();
   const toSave = toSaveCount(recipe, pantry);
   const compact = variant === 'compact';
@@ -77,6 +83,7 @@ export function RecipeListCard({ recipe, onPress, favorite, variant = 'large' }:
         <View style={styles.compactBody}>
           <Text style={styles.compactTitle} numberOfLines={2}>{recipe.title}</Text>
           {meta}
+          {cooked}
         </View>
         {heart}
       </Card>
@@ -99,6 +106,7 @@ export function RecipeListCard({ recipe, onPress, favorite, variant = 'large' }:
           </View>
         ) : null}
         {meta}
+        {cooked}
       </View>
     </Card>
   );
@@ -168,6 +176,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.xs,
     marginRight: spacing.xs,
+  },
+  cooked: {
+    ...typography.secondary,
   },
   timeText: {
     ...typography.body,

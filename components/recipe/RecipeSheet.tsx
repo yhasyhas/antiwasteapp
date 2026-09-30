@@ -234,7 +234,7 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
         {toast || recipe.ingredients_used.some((item) => item.pantry_id) ? (
           <View style={[styles.bottomBar, safe.bottom(spacing.md)]}>
             <Toast message={toast} actionLabel={t('common.view')} onAction={openShoppingList} inset={false} />
-            <CookedButton ingredientsUsed={recipe.ingredients_used} />
+            <CookedButton ingredientsUsed={recipe.ingredients_used} recipeId={recipe.id} />
           </View>
         ) : null}
       </View>
