@@ -472,7 +472,7 @@ export function parseRecipes(
   return { ok: true, value: { recipes: recipes.slice(0, context.maxRecipes), dietaryRejections, refusal, invalid } };
 }
 
-// 1 recette pour 1 ou 2 ingrédients, 2 jusqu'à 5, sinon 3
+// 2 recettes pour 1 ou 2 aliments, 3 à partir de 3
 export function recipeCount(pantrySize: number): number {
-  return pantrySize <= 2 ? 1 : pantrySize <= 5 ? 2 : 3;
+  return pantrySize <= 2 ? 2 : 3;
 }

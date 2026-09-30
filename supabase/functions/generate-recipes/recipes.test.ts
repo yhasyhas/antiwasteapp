@@ -144,7 +144,7 @@ Deno.test('lecture : valeurs par défaut, suggestion vide retirée, nombre de re
 });
 
 Deno.test('nombre de recettes selon le garde-manger', () => {
-  assertEquals([1, 2, 3, 5, 6, 20].map(recipeCount), [1, 1, 2, 2, 3, 3]);
+  assertEquals([1, 2, 3, 5, 6, 20].map(recipeCount), [2, 2, 3, 3, 3, 3]);
 });
 
 // ---------- Anti-gaspi (phase 5) ----------
