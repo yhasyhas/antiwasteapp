@@ -19,7 +19,7 @@ export default function SavedScreen() {
 
   return (
     <View style={styles.container}>
-      <ScreenHeader title={t('saved.title')} subtitle={loading ? undefined : t('saved.favoritesCount', { count: favoriteRecipes.length })} />
+      <ScreenHeader back title={t('saved.title')} subtitle={loading ? undefined : t('saved.favoritesCount', { count: favoriteRecipes.length })} />
 
       {loading ? (
         <View style={styles.content}>

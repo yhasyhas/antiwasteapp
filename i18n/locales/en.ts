@@ -25,7 +25,7 @@ const en: Translations = {
     home: 'Home',
     scan: 'Scan',
     pantry: 'Pantry',
-    saved: 'Saved',
+    shopping: 'Shopping',
     settings: 'Settings',
   },
   auth: {
@@ -216,7 +216,7 @@ const en: Translations = {
     removeDate: 'Remove date',
   },
   saved: {
-    title: 'Saved recipes',
+    title: 'My recipes',
     favoritesCount_one: '{{count}} favorite',
     favoritesCount_other: '{{count}} favorites',
     emptyTitle: 'No saved recipes',

@@ -35,6 +35,10 @@ type RecentRecipe = Recipe & { id: string };
 
 // Nombre d'aliments « à utiliser vite » affichés sur l'accueil
 const URGENT_COUNT = 3;
+// « Mes recettes » : favoris d'abord, puis les plus récentes
+const MY_RECIPES_COUNT = 3;
+// Recettes lues pour la section (les favoris peuvent être plus anciens que les dernières générées)
+const RECIPES_LOADED = 30;
 
 export default function HomeScreen() {
   const { user } = useAuth();
@@ -42,7 +46,7 @@ export default function HomeScreen() {
   const safe = useSafeSpacing();
   // null : pas encore chargé (squelettes)
   const [ingredients, setIngredients] = useState<PantryIngredient[] | null>(null);
-  const [lastRecipe, setLastRecipe] = useState<RecentRecipe | null>(null);
+  const [recipes, setRecipes] = useState<RecentRecipe[]>([]);
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [selectedRecipe, setSelectedRecipe] = useState<RecentRecipe | null>(null);
   // Images lues dans l'état partagé : une image générée sur un autre écran apparaît ici aussi
@@ -90,9 +94,9 @@ export default function HomeScreen() {
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
-      .limit(1);
+      .limit(RECIPES_LOADED);
 
-    if (data) setLastRecipe(data.length > 0 ? recipeFromRow(data[0]) : null);
+    if (data) setRecipes(data.map((row) => recipeFromRow(row) as RecentRecipe));
     setFavoriteIds(await loadFavoriteIds(user.id));
   };
 
@@ -122,6 +126,8 @@ export default function HomeScreen() {
   const urgent = groupLots(ingredients ?? []).map((group) => ({ ...group.first, quantity: lotLabel(group.first, group.lots, language) }))
     .filter((ingredient) => ['expired', 'soon'].includes(expiryStatus(ingredient.expires_at)))
     .slice(0, URGENT_COUNT);
+  const myRecipes = [...recipes.filter((recipe) => favoriteIds.has(recipe.id)), ...recipes.filter((recipe) => !favoriteIds.has(recipe.id))]
+    .slice(0, MY_RECIPES_COUNT);
   const cookUrgent = () => router.push({ pathname: '/recipe/generate', params: { priority: urgent.map((i) => i.id).join(',') } });
 
   return (
@@ -215,13 +221,25 @@ export default function HomeScreen() {
           </Card>
         </View>
 
-        {lastRecipe ? (
-          <RecipeListCard
-            variant="compact"
-            recipe={images.withImage(lastRecipe)}
-            imageLoading={images.isLoading(lastRecipe.id)}
-            onPress={() => openRecipe(lastRecipe)}
-          />
+        {myRecipes.length > 0 ? (
+          <View style={styles.section}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>{t('saved.title')}</Text>
+              <Touchable onPress={() => router.navigate('/saved')} style={styles.link} accessibilityRole="link">
+                <Text style={styles.linkText}>{t('home.seeAll')}</Text>
+              </Touchable>
+            </View>
+            {myRecipes.map((recipe) => (
+              <RecipeListCard
+                key={recipe.id}
+                variant="compact"
+                recipe={images.withImage(recipe)}
+                imageLoading={images.isLoading(recipe.id)}
+                onPress={() => openRecipe(recipe)}
+                favorite={{ active: favoriteIds.has(recipe.id), onToggle: () => toggleFavorite(recipe) }}
+              />
+            ))}
+          </View>
         ) : null}
       </ScrollView>
 
@@ -316,6 +334,9 @@ const styles = StyleSheet.create({
   cookUrgent: {
     marginTop: spacing.sm,
     marginBottom: spacing.md,
+  },
+  section: {
+    gap: spacing.md,
   },
   shortcuts: {
     flexDirection: 'row',

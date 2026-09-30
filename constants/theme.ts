@@ -166,6 +166,8 @@ export const sizes = {
   sheetHandle: { width: 44, height: 5 },
   tabBar: 64,
   tabPill: { width: 56, height: 30 },
+  // Bouton rond du Scanner au centre de la barre d'onglets
+  tabFeatured: 58,
   recipeImage: 170,
   recipeHero: 260,
   thumbnail: 72,

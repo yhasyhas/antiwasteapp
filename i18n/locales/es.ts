@@ -25,7 +25,7 @@ const es: Translations = {
     home: 'Inicio',
     scan: 'Escanear',
     pantry: 'Despensa',
-    saved: 'Favoritos',
+    shopping: 'Compras',
     settings: 'Ajustes',
   },
   auth: {
@@ -216,7 +216,7 @@ const es: Translations = {
     removeDate: 'Quitar la fecha',
   },
   saved: {
-    title: 'Recetas guardadas',
+    title: 'Mis recetas',
     favoritesCount_one: '{{count}} favorito',
     favoritesCount_other: '{{count}} favoritos',
     emptyTitle: 'No hay recetas guardadas',

@@ -26,7 +26,7 @@ const fr = {
     home: 'Accueil',
     scan: 'Scanner',
     pantry: 'Garde-manger',
-    saved: 'Favoris',
+    shopping: 'Courses',
     settings: 'Réglages',
   },
   auth: {
@@ -217,7 +217,7 @@ const fr = {
     removeDate: 'Retirer la date',
   },
   saved: {
-    title: 'Recettes sauvegardées',
+    title: 'Mes recettes',
     favoritesCount_one: '{{count}} favori',
     favoritesCount_other: '{{count}} favoris',
     emptyTitle: 'Aucune recette sauvegardée',
