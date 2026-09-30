@@ -159,8 +159,8 @@ export function isDietException(name: string, diet: StrictDiet): boolean {
 
 // ---------- Sélection d'ingrédients ----------
 
-// Avec une sélection, les recettes n'utilisent que les ingrédients choisis, plus ces basiques
-// (disponibles partout, jamais considérés comme « un autre ingrédient du garde-manger »)
+// Basiques (sel, poivre, huile, eau) : disponibles partout, jamais « à acheter » ; avec une sélection, jamais
+// considérés comme « un autre ingrédient du garde-manger » (même liste dans l'app : lib/basics.ts)
 export const BASICS = ['sel', 'poivre', 'huile', 'eau', 'salt', 'pepper', 'oil', 'water', 'sal', 'pimienta', 'aceite', 'agua'];
 export const MAX_OTHER_PANTRY = 100;
 
@@ -394,7 +394,8 @@ export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; 
     dietary_tags: isStringArray(raw.dietary_tags) ? raw.dietary_tags : context.dietary,
     ingredients_used: ingredients,
     ingredients_from_list: unique(ingredients.filter((i) => i.pantry_id).map((i) => i.name)),
-    missing_ingredients: unique(ingredients.filter((i) => !i.pantry_id).map((i) => i.name)),
+    // À acheter : sans les basiques (sel, poivre, huile, eau), toujours disponibles
+    missing_ingredients: unique(ingredients.filter((i) => !i.pantry_id && !isBasic(i.name)).map((i) => i.name)),
     instructions: raw.instructions,
     tips: isStringArray(raw.tips) ? raw.tips : [],
     ...(suggestion && { suggestion }),

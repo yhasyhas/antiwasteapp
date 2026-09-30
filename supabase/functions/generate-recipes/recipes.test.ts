@@ -20,6 +20,7 @@ import {
   parseRecipes,
   recipeCount,
   strictDietsOf,
+  toRecipe,
   urgentItems,
 } from './recipes.ts';
 
@@ -274,4 +275,11 @@ Deno.test('produits laitiers, œufs et miel : acceptés seulement pour le régim
   assertEquals(dietViolations(flagged, ['vegan']), ['crème fraîche (vegan)', 'miel (vegan)']);
   assertEquals(dietViolations(flagged, ['dairy-free']), ['crème fraîche (dairy-free)']);
   assertEquals(dietViolations(flagged, ['vegetarian', 'vegan']), ['crème fraîche (vegan)', 'miel (vegan)']);
+});
+
+Deno.test('à acheter : sans sel, poivre, huile ni eau, avec ou sans sélection', () => {
+  const pantry = buildPantry([{ id: 'a', name: 'tomates', quantity: '', days_left: 3, kind: 'ingredient' }]);
+  const raw = recipe([ing('tomates', 'p1'), ing('sel', 'missing'), ing("huile d'olive", 'missing'), ing('eau', 'missing'), ing('poivre noir', 'missing'), ing('oignon', 'missing')]);
+  const result = toRecipe(raw, pantry, { mealType: 'dinner', cuisine: 'any', difficulty: 'easy', dietary: [] });
+  assertEquals(result.missing_ingredients, ['oignon']);
 });

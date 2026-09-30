@@ -6,6 +6,7 @@ import { ChevronLeft, Clock, Flame, Heart, Languages, Sparkles, Users } from 'lu
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { toSaveCount, usePantryUrgency } from '@/hooks/usePantryUrgency';
+import { isBasic } from '@/lib/basics';
 import { dietLabel, difficultyLabel } from '@/lib/labels';
 import { failureTitle } from '@/lib/quotaReason';
 import { cachedTranslation, translateRecipe } from '@/lib/recipeTranslation';
@@ -87,7 +88,8 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
   };
   const pantry = usePantryUrgency();
   const toSave = toSaveCount(recipe, pantry);
-  const missing = recipe.missing_ingredients ?? [];
+  // À acheter, sans les basiques (recettes enregistrées avant leur retrait côté serveur)
+  const missing = (recipe.missing_ingredients ?? []).filter((name) => !isBasic(name));
 
   // Quantité d'un ingrédient (recherchée dans ingredients_used par son nom)
   const amountOf = (name: string) => {

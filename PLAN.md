@@ -313,6 +313,7 @@ Suite de la phase 7, sur la branche `phase-7-finalisation`.
 - [ ] « Donner mon avis »
 - [ ] Accessibilité : grandes tailles de texte, lecteurs d'écran, contrastes
 - [ ] Option « Pas d'images en données mobiles »
+- [ ] « Mes basiques » : liste modifiable dans les Préférences (préremplie avec sel, poivre, huile, eau), considérée comme toujours disponible par la génération, jamais ajoutée à « À acheter » ni aux courses
 
 **Terminé quand** : un nouvel utilisateur est guidé jusqu'à son premier scan, voit son impact du mois, et l'app reste utilisable avec les plus grandes tailles de texte et un lecteur d'écran.
 
