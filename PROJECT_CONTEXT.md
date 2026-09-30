@@ -243,7 +243,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`) : nom choisi en phase 11, renommage au lancement (phase 15).
 - Sauvegardes de la base dans `backups/` : jamais commitées (`.gitignore`) ni exportées.
 - Rappels locaux (secours sans jeton push) calculés sur le téléphone ; avec le temps réel, un changement fait par un autre membre les recalcule dès que l'app est ouverte.
-- « J'ai cuisiné ça » : quantité utilisée réglable seulement quand l'unité de la recette correspond à celle du garde-manger (sinon « Tout », « La moitié » ou « Un peu ») ; fermer la fiche pendant le message « Annuler » enregistre tout de suite.
+- « J'ai cuisiné ça » : quantité utilisée réglable seulement quand l'unité de la recette correspond à celle du garde-manger (sinon « Tout », « La moitié » ou « Un peu ») ; l'action est enregistrée tout de suite, « Annuler » (10 secondes) ou « Récemment retirés » (24 heures) la rétablissent.
 - Développement avec le build « Antigaspi (dev) » (`npx expo start --dev-client`) ; nouveau build seulement après un changement natif (bibliothèque native, `app.json`, `app.config.js`, `eas.json`). Expo Go reste utilisable, sans notifications push (rappels locaux).
 - Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 

@@ -12,6 +12,7 @@ Dernière mise à jour : 30/09/2026
 ## Règles de travail
 
 - **Une branche par phase** : `phase-0`, `phase-1`, etc. Fusion dans `master` quand la phase est terminée.
+- **Une branche est supprimée juste après sa fusion** (localement et sur GitHub).
 - **Un commit par tâche**, avec un message clair en français.
 - **`npm run typecheck` doit passer avant chaque commit** (à partir de la fin de la phase 0).
 - **Tous les tests passent avant chaque fusion, sans exception connue** : tests SQL (`supabase/tests/`), tests des fonctions (Deno) et typecheck.
@@ -77,7 +78,7 @@ Cinq fonctionnalités qui la différencient d'un simple générateur de recettes
 - [x] `npx expo-doctor` passe sans erreur (21/21)
 - [x] Corriger ce qui casse (expo-router, expo-camera, expo-image-manipulator, reanimated…) ; `npm run typecheck` passe ; le bundle Android se construit (`npx expo export --platform android`)
 - [x] Tester sur Android avec Expo Go du Play Store (SDK 57) : connexion, scan, garde-manger, génération, favoris, paramètres — validé le 24/09/2026 avec l'ajout manuel : l'app envoie bien la photo, seul Clarifai (fermé) bloque le scan, repris en phase 0.6
-- [ ] Désinstaller l'Expo Go SDK 54 installé temporairement
+- [x] Désinstaller l'Expo Go SDK 54 installé temporairement
 
 **Terminé quand** : l'app tourne dans Expo Go SDK 57 sur Android, un scan et une génération fonctionnent, et `npx expo-doctor` et `npm run typecheck` passent. *(Validée le 24/09/2026 avec l'ajout manuel à la place du scan, voir journal.)*
 
@@ -269,7 +270,12 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 
 Suite de la phase 7, sur la branche `phase-7-finalisation`.
 
-- [ ] Bilan des cases non cochées et des points reportés des phases 7, 7b et 7c
+- [x] Bilan des cases non cochées et des points reportés des phases 7, 7b et 7c
+- [ ] Navigation : onglets Accueil · Garde-manger · Scanner (au centre, mis en valeur) · Courses · Réglages ; favoris dans l'Accueil, section « Mes recettes » avec « Tout voir » (l'écran Favoris devient cette page)
+- [ ] Garde-manger : dates relatives jusqu'à 7 jours, date réelle au-delà (« 12 oct. »), dans le format de la langue
+- [ ] Fiche aliment : majuscule au début de chaque valeur, badge de date avec les couleurs du garde-manger, atouts en pastilles courtes (trois mots au plus : consignes des fiches et champ régénéré pour les fiches existantes)
+- [ ] Résultats de génération : « D'autres recettes » à la fin de la liste, « Transformer mes restes » seulement avec des restes et plus compact, illustration « Photo du plat » pendant le chargement de l'image ; recette écartée par le serveur : une nouvelle demande (un essai), sinon explication à l'utilisateur
+- [ ] Vérifier l'étiquette de régime sur une recette végétarienne et les quantités des courses venues d'une recette
 - [ ] Écarts avec les maquettes de `docs/design/`
 - [ ] Icônes par catégorie d'aliment dans le garde-manger, à la place de la feuille unique (déplacé depuis les finitions du lancement)
 - [ ] Captures à jour dans `docs/design/implemente/`
@@ -350,6 +356,7 @@ Ancienne phase 8a.
 - [ ] `npm audit` et mise à jour des dépendances
 - [ ] Vérifier qu'aucun secret n'est exposé (code, historique git, build, fonctions)
 - [ ] Suppression de compte depuis l'app et depuis une page web (obligatoire pour le Play Store)
+- [ ] Nettoyage automatique des comptes d'essai (anonymes) inactifs depuis 30 jours, avec leur foyer personnel s'il n'est partagé avec personne
 - [ ] Sauvegardes automatiques de la base et test de restauration
 - [ ] Tests automatisés des parcours critiques sur téléphone : connexion, scan, génération, « J'ai cuisiné ça », foyer
 
