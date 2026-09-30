@@ -141,8 +141,17 @@ export function normalizeName(name: string): string {
 }
 
 // Vrai si le nom contient une exception entière (« lait de coco bio » contient « lait de coco »)
+// Végétarien : produits laitiers, œufs et miel toujours permis (les modèles signalent parfois à tort la crème
+// ou le beurre). Le nom entier doit être l'un d'eux, avec ses précisions courantes (« beurre doux », « lait
+// entier ») : « beurre d'anchois » ou « fond de veau au beurre » restent contrôlés.
+const VEGETARIAN_BASE = '(beurre|creme|creme fraiche|lait|oeufs?|jaunes? d oeufs?|blancs? d oeufs?|yaourts?|yogourts?|fromage blanc|miel|butter|cream|sour cream|milk|eggs?|egg yolks?|egg whites?|yogh?urts?|honey|mantequilla|nata|crema|leche|huevos?|yemas?|claras?|yogures?|miel)';
+const VEGETARIAN_DETAIL = '(doux|demi sel|sale|entier|entiere|demi ecreme|ecreme|fraiche|epaisse|liquide|frais|nature|grec|grecque|bio|de vache|whole|skimmed|semi skimmed|heavy|double|single|unsalted|salted|plain|greek|fresh|entera|desnatada|semidesnatada|natural|griego|sin sal|con sal|para montar|de cocina|a fouetter|battus?|beaten)';
+const VEGETARIAN_ALWAYS = new RegExp(`^(${VEGETARIAN_DETAIL} )*${VEGETARIAN_BASE}( ${VEGETARIAN_DETAIL})*$`);
+
 export function isDietException(name: string, diet: StrictDiet): boolean {
-  const padded = ` ${normalizeName(name)} `;
+  const normalized = normalizeName(name);
+  if (diet === 'vegetarian' && VEGETARIAN_ALWAYS.test(normalized)) return true;
+  const padded = ` ${normalized} `;
   return DIET_EXCEPTIONS[diet].some((exception) => padded.includes(` ${exception} `));
 }
 

@@ -10,6 +10,7 @@ import {
   cleanServings,
   excludedUsed,
   isBasic,
+  dietViolations,
   isDietException,
   otherPantryUsed,
   leftoverItems,
@@ -244,4 +245,16 @@ Deno.test('préférences : aliments exclus nettoyés, nombre de personnes impos�
   const outcome = parseRecipes(JSON.stringify({ recipes: [recipe([ing('banane', 'p1')])], refusal: '' }), PANTRY, [], { ...CONTEXT, servings: 6 });
   assert(outcome.ok);
   assertEquals(outcome.value.recipes[0].servings, 6);
+});
+
+Deno.test('végétarien : produits laitiers, œufs et miel toujours permis, sauf dans un nom qui contient autre chose', () => {
+  for (const name of ['Crème fraîche', 'Beurre', 'beurre doux', 'Lait entier', 'Œufs', "Jaunes d'œufs", 'Yaourt grec', 'Miel', 'Heavy cream', 'Nata para montar', 'Huevos']) {
+    assert(isDietException(name, 'vegetarian'), name);
+  }
+  for (const name of ["Beurre d'anchois", 'Fond de veau au beurre', 'Crème de crabe', 'Lardons', 'Bouillon de poulet']) {
+    assert(!isDietException(name, 'vegetarian'), name);
+  }
+  assert(!isDietException('Beurre', 'vegan'));
+  const flagged = recipe([ing('crème fraîche', 'p1', ['vegetarian']), ing('beurre', 'missing', ['vegetarian'])]);
+  assertEquals(dietViolations(flagged, ['vegetarian']), []);
 });

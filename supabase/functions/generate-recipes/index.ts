@@ -397,7 +397,7 @@ Deno.serve(withCors(async (req: Request) => {
     if (recipes.length === 0) {
       // Seul cas sans recette accepté : les régimes. Un refus reste compté dans le quota.
       console.warn(`[generate-recipes] aucune recette compatible avec ${diets.join(', ')}${refusal ? ` : ${refusal}` : ''}`);
-      return failureResponse('dietary_refusal', language, debugInfo);
+      return failureResponse('dietary_refusal', language, debug === true ? { debug: { ...debugInfo.debug, dietary_rejections: dietaryRejections, invalid, refusal } } : debugInfo);
     }
 
     console.log(`[generate-recipes] ${result.provider.name} (${result.provider.model}) : ${recipes.length}/${count} recette(s) en ${Date.now() - t0} ms, cuisine ${cuisine}, langue ${language}`);
