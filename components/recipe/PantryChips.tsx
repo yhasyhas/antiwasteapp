@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Chip } from '@/components/ui/Chip';
 import { Touchable } from '@/components/ui/Touchable';
 import { EXPIRY_COLORS, expiryStatus, type FoodKind } from '@/lib/expiry';
+import { isUrgentLot } from '@/lib/storage';
 import { useFoodNames } from '@/lib/foodNames';
 import { colors, sizes, spacing, typography } from '@/constants/theme';
 
@@ -54,7 +55,7 @@ export function PantryChips({ ingredients, selectedIds, onToggle, onClear }: Pro
       <View style={styles.grid}>
         {visible.map((ingredient) => {
           const status = expiryStatus(ingredient.expires_at);
-          const urgent = status === 'expired' || status === 'soon';
+          const urgent = isUrgentLot(ingredient);
           return (
             <Chip
               key={ingredient.id}

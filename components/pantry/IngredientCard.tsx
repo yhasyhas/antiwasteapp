@@ -35,6 +35,12 @@ export interface PantryIngredient {
   nova_group?: number | null;
   nutriscore_grade?: string | null;
   off_categories?: string[] | null;
+  // Rangement (phase 8) : vides pour un lot rétabli d'avant la phase 8 (valeurs par défaut de lib/storage.ts)
+  location?: string | null;
+  date_kind?: string | null;
+  opened_at?: string | null;
+  frozen_at?: string | null;
+  thawed_at?: string | null;
 }
 
 interface Props {
@@ -118,7 +124,7 @@ export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry
           ) : null}
         </View>
         <View style={styles.badges}>
-          <ExpiryBadge expiresAt={ingredient.expires_at} onPress={onEditExpiry} />
+          <ExpiryBadge expiresAt={ingredient.expires_at} dateKind={ingredient.date_kind} location={ingredient.location} onPress={onEditExpiry} />
           {isDish ? <Badge label={t('pantry.leftover')} tone="leftover" /> : null}
         </View>
       </Card>

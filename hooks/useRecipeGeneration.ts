@@ -10,6 +10,7 @@ import { failureReasonOf, failureTitle } from '@/lib/quotaReason';
 import { supabase } from '@/lib/supabase';
 import { useRecipeImages } from '@/hooks/useRecipeImages';
 import { daysUntil, sortByUrgency } from '@/lib/expiry';
+import { daysLeftForRecipes } from '@/lib/storage';
 import { onPantryChanged } from '@/lib/pantryEvents';
 import { activeHouseholdId } from '@/lib/household';
 import { loadPreferences } from '@/lib/preferences';
@@ -142,7 +143,8 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
           id: i.id,
           name: modelName(i),
           quantity: i.quantity || '',
-          days_left: i.expires_at ? daysUntil(i.expires_at) : null,
+          // Date stricte hors congélateur seulement : un aliment congelé ou à date indicative n'est pas urgent
+          days_left: daysLeftForRecipes(i),
           kind: i.kind,
         })),
         // Avec une sélection : le reste du garde-manger, que les recettes ne doivent pas utiliser

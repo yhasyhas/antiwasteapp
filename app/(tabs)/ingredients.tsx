@@ -21,7 +21,8 @@ import { ExpiryEditModal } from '@/components/pantry/ExpiryEditModal';
 import { FoodFactSheet } from '@/components/pantry/FoodFactSheet';
 import { PantryLotsSection } from '@/components/pantry/PantryLotsSection';
 import { RecentlyRemoved } from '@/components/pantry/RecentlyRemoved';
-import { expiryStatus, sortByUrgency } from '@/lib/expiry';
+import { sortByUrgency } from '@/lib/expiry';
+import { defaultLocation, isUrgentLot, LOCATIONS, type StorageLocation } from '@/lib/storage';
 import { maybeAskNotificationPermission } from '@/lib/notifications';
 import { notifyPantryChanged, onPantryChanged } from '@/lib/pantryEvents';
 import { loadPantry } from '@/lib/pantry';
@@ -34,14 +35,15 @@ import { hasGenericFact, linkPantryFoodKeys, useFoodNaming } from '@/lib/foodNam
 import { ProductCard } from '@/components/pantry/ProductCard';
 import { colors, radius, shadows, sizes, spacing, typography } from '@/constants/theme';
 
-type Filter = 'all' | 'urgent' | 'leftovers';
+type Filter = 'all' | 'urgent' | 'leftovers' | StorageLocation;
 type Group = LotGroup<PantryIngredient> & { total?: string };
 
-// Ligne urgente : son lot le plus ancien est périmé ou proche de sa date
-const isUrgent = (group: Group) => {
-  const status = expiryStatus(group.first.expires_at);
-  return status === 'expired' || status === 'soon';
-};
+// Ligne urgente : un de ses lots a une date stricte passée ou proche, hors congélateur
+const isUrgent = (group: Group) => group.lots.some(isUrgentLot);
+// Ligne entièrement au congélateur
+const isFrozen = (group: Group) => group.lots.every((lot) => lot.location === 'freezer');
+// Emplacement d'un lot (lot d'avant la phase 8 : emplacement par défaut)
+const locationOf = (lot: PantryIngredient) => (lot.location as StorageLocation | null) ?? defaultLocation(lot.category, lot.kind, lot.food_key);
 
 // Suppression annulable : un aliment entier (tous ses lots) ou un seul lot
 interface Removal {
@@ -175,13 +177,18 @@ export default function IngredientsScreen() {
     all: searched.length,
     urgent: searched.filter(isUrgent).length,
     leftovers: searched.filter((group) => group.first.kind === 'dish').length,
-  };
+    ...Object.fromEntries(LOCATIONS.map((location) => [location, searched.filter((group) => group.lots.some((lot) => locationOf(lot) === location)).length])),
+  } as Record<Filter, number>;
   const visible = searched.filter((group) =>
-    filter === 'urgent' ? isUrgent(group) : filter === 'leftovers' ? group.first.kind === 'dish' : true,
+    filter === 'urgent' ? isUrgent(group)
+      : filter === 'leftovers' ? group.first.kind === 'dish'
+        : filter === 'all' ? true
+          : group.lots.some((lot) => locationOf(lot) === filter),
   );
   const sections = [
     { key: 'urgent', title: t('pantry.groupUrgent'), items: visible.filter(isUrgent), color: colors.expired.text },
-    { key: 'later', title: t('pantry.groupLater'), items: visible.filter((group) => !isUrgent(group)), color: colors.textSecondary },
+    { key: 'later', title: t('pantry.groupLater'), items: visible.filter((group) => !isUrgent(group) && !isFrozen(group)), color: colors.textSecondary },
+    { key: 'freezer', title: t('storage.groupFreezer'), items: visible.filter((group) => !isUrgent(group) && isFrozen(group)), color: colors.foodFamilies.cold.icon },
   ].filter((section) => section.items.length > 0);
 
   const sheetGroup = sheet
@@ -271,6 +278,9 @@ export default function IngredientsScreen() {
               <Chip label={t('pantry.filterAll', { count: counts.all })} selected={filter === 'all'} onPress={() => setFilter('all')} />
               <Chip label={t('pantry.filterUrgent', { count: counts.urgent })} selected={filter === 'urgent'} onPress={() => setFilter('urgent')} />
               <Chip label={t('pantry.filterLeftovers', { count: counts.leftovers })} selected={filter === 'leftovers'} onPress={() => setFilter('leftovers')} />
+              {LOCATIONS.filter((location) => counts[location] > 0).map((location) => (
+                <Chip key={location} label={`${t(`storage.${location}`)} · ${counts[location]}`} selected={filter === location} onPress={() => setFilter(location)} />
+              ))}
             </ScrollView>
 
             {sections.length === 0 ? (

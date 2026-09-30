@@ -11,7 +11,8 @@ import { loadFavoriteIds, setFavorite } from '@/lib/favorites';
 import { activeHouseholdId } from '@/lib/household';
 import { onPantryChanged } from '@/lib/pantryEvents';
 import { loadShoppingList, onShoppingChanged } from '@/lib/shopping';
-import { expiryStatus, sortByUrgency } from '@/lib/expiry';
+import { sortByUrgency } from '@/lib/expiry';
+import { isUrgentLot } from '@/lib/storage';
 import { groupLots, lotLabel } from '@/lib/pantryLots';
 import { useRecipeImages } from '@/hooks/useRecipeImages';
 import { useFoodNames } from '@/lib/foodNames';
@@ -124,8 +125,10 @@ export default function HomeScreen() {
 
   // Les plus urgents (périmés ou bientôt, triés par date), un par aliment : son lot le plus ancien ;
   // « Cuisiner ces aliments » les présélectionne
-  const urgent = groupLots(ingredients ?? []).map((group) => ({ ...group.first, quantity: lotLabel(group.first, group.lots, language) }))
-    .filter((ingredient) => ['expired', 'soon'].includes(expiryStatus(ingredient.expires_at)))
+  const urgent = groupLots(ingredients ?? [])
+    .map((group) => ({ group, lot: group.lots.find(isUrgentLot) }))
+    .filter((entry) => entry.lot)
+    .map(({ group, lot }) => ({ ...lot!, quantity: lotLabel(lot!, group.lots, language) }))
     .slice(0, URGENT_COUNT);
   const myRecipes = [...recipes.filter((recipe) => favoriteIds.has(recipe.id)), ...recipes.filter((recipe) => !favoriteIds.has(recipe.id))]
     .slice(0, MY_RECIPES_COUNT);
@@ -184,7 +187,7 @@ export default function HomeScreen() {
                       </View>
                       <View style={styles.badges}>
                         {ingredient.kind === 'dish' ? <Badge label={t('pantry.leftover')} tone="leftover" /> : null}
-                        <ExpiryBadge expiresAt={ingredient.expires_at} />
+                        <ExpiryBadge expiresAt={ingredient.expires_at} dateKind={ingredient.date_kind} location={ingredient.location} />
                       </View>
                     </View>
                   </View>

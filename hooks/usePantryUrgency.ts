@@ -3,10 +3,11 @@ import { supabase } from '@/lib/supabase';
 import { activeHouseholdId } from '@/lib/household';
 import { onPantryChanged } from '@/lib/pantryEvents';
 import { expiryStatus } from '@/lib/expiry';
+import { isUrgentLot } from '@/lib/storage';
 import { foodIdentity } from '@/lib/pantryLots';
 import type { Recipe } from '@/components/recipe/types';
 
-// Dates du garde-manger actuel du foyer, partagées par les cartes et fiches de recette pour le badge
+// Dates du garde-manger actuel du foyer (seulement celles des lots à utiliser vite), partagées par les cartes et fiches de recette pour le badge
 // « X à sauver » (recettes nouvelles comme enregistrées) ; rechargées quand le garde-manger change (temps
 // réel, ajout, « J'ai cuisiné ça »)
 
@@ -29,7 +30,7 @@ const earliest = (a: string | null | undefined, b: string | null) => (a === unde
 async function reload() {
   const householdId = await activeHouseholdId();
   if (!householdId) return;
-  const { data, error } = await supabase.from('ingredients').select('id, name, expires_at').eq('household_id', householdId);
+  const { data, error } = await supabase.from('ingredients').select('id, name, expires_at, date_kind, location').eq('household_id', householdId);
   if (error) {
     console.warn('[urgence]', error.message);
     return;
@@ -37,7 +38,9 @@ async function reload() {
   const byId = new Map<string, string | null>();
   const byFood = new Map<string, string | null>();
   for (const row of data ?? []) {
-    const date = (row.expires_at as string | null) ?? null;
+    // Seules les dates des lots à utiliser vite comptent (congelé, date indicative ou lointaine : sans date)
+    const date = isUrgentLot(row as { expires_at: string | null; date_kind: string | null; location: string | null })
+      ? (row.expires_at as string) : null;
     byId.set(row.id as string, date);
     const food = foodIdentity(row.name as string);
     byFood.set(food, earliest(byFood.get(food), date));
