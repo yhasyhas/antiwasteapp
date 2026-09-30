@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { Globe, LogOut, UserRound, Users, Utensils } from 'lucide-react-native';
+import { Globe, LogOut, Trash2, UserRound, Users, Utensils } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHousehold } from '@/hooks/useHousehold';
 import { setDisplayName } from '@/lib/household';
+import { alertWriteError } from '@/lib/alertWriteError';
+import { loadPantry, pantryGroups } from '@/lib/pantry';
+import { notifyPantryChanged } from '@/lib/pantryEvents';
+import { supabase } from '@/lib/supabase';
 import { sendSentryTestError, sentryEnabled } from '@/lib/sentry';
 import { notificationsSupported, sendTestReminder } from '@/lib/notifications';
 import { BottomSheet, SheetHeader } from '@/components/ui/BottomSheet';
@@ -62,6 +66,39 @@ export default function SettingsScreen() {
     else Alert.alert(t('notifications.testButton'), t('notifications.testSent'));
   };
 
+  // « Vider le garde-manger » : tous les lots du foyer retirés en une action, rétablissable pendant 24 heures
+  // dans « Récemment retirés » ; la confirmation dit combien d'aliments et pour qui
+  const clearPantry = async () => {
+    const rows = await loadPantry();
+    if (!rows) return;
+    const foods = pantryGroups(rows).length;
+    if (foods === 0) {
+      Alert.alert(t('settings.clearPantry'), t('settings.clearPantryEmpty'));
+      return;
+    }
+    const shared = household?.shared ?? false;
+    Alert.alert(
+      t('settings.clearPantryTitle'),
+      `${t(shared ? 'settings.clearPantryShared' : 'settings.clearPantryPersonal', { count: foods })} ${t('settings.clearPantryLots', { count: rows.length })} ${t('settings.clearPantryUndo')}`,
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('settings.clearPantryConfirm', { count: foods }),
+          style: 'destructive',
+          onPress: async () => {
+            const { error } = await supabase.rpc('delete_ingredients_with_undo', { p_ids: rows.map((row) => row.id) });
+            if (error) {
+              alertWriteError(t, 'clearing pantry', error);
+              return;
+            }
+            notifyPantryChanged();
+            Alert.alert(t('settings.clearPantry'), t('settings.clearPantryDone', { count: foods }));
+          },
+        },
+      ],
+    );
+  };
+
   const displayName = me?.name || (isAnonymous ? t('auth.guestName') : t('settings.noName'));
   const currentLanguage = APP_LANGUAGES.find((lang) => lang.code === language)?.label ?? language;
 
@@ -110,7 +147,8 @@ export default function SettingsScreen() {
         </Card>
 
         <Card style={styles.list}>
-          <ListRow icon={LogOut} title={t('settings.signOut')} danger onPress={confirmSignOut} />
+          <ListRow icon={Trash2} title={t('settings.clearPantry')} danger onPress={clearPantry} />
+          <ListRow divider icon={LogOut} title={t('settings.signOut')} danger onPress={confirmSignOut} />
         </Card>
 
         {/* Développement seulement : vérifie que les erreurs remontent dans Sentry */}
