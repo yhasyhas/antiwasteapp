@@ -259,7 +259,8 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 - [x] Annulation (enregistrement immédiat, rétablissement tout ou rien, conflits) quand « J'ai cuisiné ça » consomme plusieurs lots, avec tests SQL
 - [x] Historique des ajouts, utilisations (totales ou partielles) et suppressions : aliment, quantité, membre du foyer. Aucun écran pour l'instant
 - [x] Retours des tests : confirmation du scan (« Terminer », vraie photo, libellés), message « Annuler » adapté aux téléphones lents, « Récemment retirés » (24 heures), produits scannés par code-barres (Open Food Facts)
-- [ ] Fluidité vérifiée sur le Galaxy A30 : listes regroupées, détail des lots
+- [x] Seconds retours des tests : « Terminer » dans la feuille « Ajouter des ingrédients », nom générique en entier (deux lignes au maximum, coupé à la fin d'un mot), quantités dans le format de la langue et dans l'unité la plus naturelle
+- [x] Fluidité vérifiée sur le Galaxy A30 : listes regroupées, détail des lots
 
 **Terminé quand** : un aliment scanné deux fois n'apparaît qu'une fois dans le garde-manger avec ses lots, et « J'ai cuisiné ça » consomme les lots du plus ancien au plus récent, annulation comprise.
 
@@ -277,11 +278,13 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 - [ ] Remplacer le schéma de liens `myapp` (hérité de bolt) par un schéma propre à l'app, avec le nom définitif ; nouveau build nécessaire
 - [ ] Relire les 100 fiches aliments avant la bêta avec `scripts/food-facts/review.mjs` (exemple d'astuce douteuse : « vinaigre de banane »)
 - [ ] Renommer ou supprimer le sous-domaine inutile `bolt-expo-starter.workers.dev`
+- [ ] Icônes par catégorie d'aliment dans le garde-manger, à la place de la feuille unique
 
 ### Phase 8a — Audit qualité et sécurité
 
 - [ ] Créer un jeton Sentry en lecture seule (`event:read`, `project:read`) pour analyser les erreurs après le lancement
 - [ ] Test de performance et de mémoire sur un téléphone modeste de référence (Galaxy A30, 4 Go) : scan, génération, listes, transitions
+- [ ] Build de test optimisé (profil preview, paquet provisoire .preview) pour mesurer les performances réelles sur le Galaxy A30 ; le build de développement est plus lent par nature
 - [ ] Relire toutes les règles de sécurité de la base (RLS, fonctions SECURITY DEFINER, droits)
 - [ ] Traiter les avertissements de sécurité et de performance de Supabase
 - [ ] `npm audit` et mise à jour des dépendances
@@ -458,4 +461,7 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 | 30/09/2026 | « Récemment retirés » en bas du garde-manger : retraits (lots, aliments, articles de courses) et « J'ai cuisiné ça » des dernières 24 heures faits par l'utilisateur, avec « Rétablir ». Annulation possible 24 heures côté serveur, mêmes règles ; la fusion de lots reste à 2 minutes. Rétablir un article de courses rajouté entre-temps : conflit (pas de doublon). Auteur ou recette supprimés entre-temps : rétabli sans eux | Tests SQL : `supabase/tests/recent_actions.sql` |
 | 30/09/2026 | « Palmito L'original » est un biscuit LU (palmier feuilleté, NOVA 4, Nutri-Score E, nom générique Open Food Facts « Biscuits feuilletés ») : la catégorie « Boulangerie » venait bien d'Open Food Facts (biscuits) ; l'erreur était « Cœur de palmier », fiche devinée à partir du nom du produit | Produit par code-barres : garde son nom, nom générique d'Open Food Facts en sous-titre ; fiche générique seulement pour NOVA 1 ou 2 (reliée par le nom générique), sinon fiche produit (marque, catégorie, Nutri-Score, NOVA, lien Open Food Facts) ; lots et doublons regroupés par code-barres ; biscuits et gâteaux rangés en « En-cas » ; catégorie tirée de la catégorie Open Food Facts la plus précise, vide si le produit n'en a pas |
 | 30/09/2026 | Produits existants relus dans Open Food Facts (`scripts/products/refresh-products.ts`, après sauvegarde) : 1 seul produit scanné en base (compote Auchan, NOVA 4, catégorie corrigée en « Fruit », nom nettoyé) ; NOVA connu pour 1 sur 1 | Règle de catégorie des fruits corrigée (`en:fruit-based-foods`, compotes) |
+| 30/09/2026 | Tests de la phase 7b validés sur le Galaxy A30 et le Redmi : confirmation du scan photo, produits de marque, annulation (lente sur le A30 mais utilisable à temps), « Récemment retirés », conflit, recette avec un produit de marque, fluidité nettement meilleure. NOVA connu pour 2 produits sur 2 scannés (tartines Auchan, biscuits Gerblé) | Mesure des performances réelles reportée à un build de test optimisé (phase 8a) |
+| 30/09/2026 | Nom générique Open Food Facts gardé en entier (120 caractères au plus ; il était coupé à 40 comme le nom du produit : « Tartines croustillantes à la farine de ») ; sous-titre du garde-manger sur deux lignes au maximum, coupé à la fin d'un mot avec « … » | Produits existants relus après sauvegarde : 4 lots, 3 produits, NOVA connu pour tous |
+| 30/09/2026 | Quantités affichées dans le format de la langue (« 0,25 kg ») et dans l'unité la plus naturelle quand la conversion est simple (0,25 kg → 250 g, 1500 g → 1,5 kg, 0,5 l → 50 cl) ; les quantités enregistrées ne sont pas réécrites | Fractions, « 2 x 125 g » et textes libres restent tels quels |
 | | *(résultat du test Gemini vs Clarifai)* | |

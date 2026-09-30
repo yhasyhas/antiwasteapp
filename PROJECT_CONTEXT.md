@@ -222,14 +222,15 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - expo-camera exclu de l'autolinking mobile (`expo.autolinking.exclude` dans `package.json`) ; permission caméra déclarée dans `app.json`.
 - Aperçu Android en TextureView (`implementationMode="compatible"`) et photo demandée en 960 × 1280 (1,2 Mpx, réduite à 800 px pour l'analyse) : sans ces réglages, l'aperçu restait vide sur le Galaxy A30, téléphone de référence pour les appareils modestes.
 
-### Phase 7b — fiabilité du garde-manger (branche `phase-7b`)
+### Phase 7b — fiabilité du garde-manger (validée le 30/09/2026)
 - Lots : chaque ligne de `ingredients` est un lot ; `lib/pantryLots.ts` les regroupe par aliment (`food_key` ou nom normalisé), calcule la quantité totale, consomme du plus ancien au plus récent, repère un aliment déjà présent. `lib/pantry.ts` : lecture du garde-manger et ajout en une opération (`add_pantry_items`).
 - Garde-manger : une ligne par aliment ; une seule feuille par aliment (`FoodFactSheet`) avec, en haut, « Dans ton garde-manger » (`components/pantry/PantryLotsSection.tsx`) : lots, date, auteur, date d'ajout, retrait d'un lot, fusion (`merge_lots`), suppression de l'aliment entier (`delete_ingredients_with_undo`) ; la fiche d'information en dessous.
 - Scan et ajout manuel : quantité avec + et − (`QuantityField`), aliment déjà présent (`ExistingFoodChoice`).
 - Historique : table `pantry_history` (déclencheur `log_pantry_history`), sans écran.
 - Génération, accueil, « J'ai cuisiné ça » : par aliment. Tests : `supabase/tests/pantry_lots.sql`.
 - Message « Annuler » (`components/ui/Toast.tsx`, `hooks/useUndoableAction.ts`) : 10 secondes, dans la mise en page, réaffiché au retour dans l'app pendant 2 minutes. « Récemment retirés » (`components/pantry/RecentlyRemoved.tsx`, `recent_pantry_actions`) : actions rétablissables 24 heures. Tests : `supabase/tests/recent_actions.sql`.
-- Produits scannés par code-barres : colonnes `product_name`, `generic_name`, `brand`, `nova_group`, `nutriscore_grade`, `off_categories` (`lib/openFoodFacts.ts`) ; nom du produit gardé, nom générique en sous-titre (`useFoodNaming`), fiche générique pour NOVA 1 ou 2, sinon `components/pantry/ProductCard.tsx`. Relecture des produits existants : `scripts/products/refresh-products.ts`.
+- Produits scannés par code-barres : colonnes `product_name`, `generic_name`, `brand`, `nova_group`, `nutriscore_grade`, `off_categories` (`lib/openFoodFacts.ts`) ; nom du produit gardé, nom générique en sous-titre (`useFoodNaming`), fiche générique pour NOVA 1 ou 2, sinon `components/pantry/ProductCard.tsx`. Relecture des produits existants : `scripts/products/refresh-products.ts`. Nom générique gardé en entier, sous-titre coupé à la fin d'un mot (`components/ui/WordClampText.tsx`).
+- Quantités affichées avec `displayQuantity` (`lib/quantity.ts`) : format de la langue, unité la plus naturelle (`naturalQuantity`, aussi dans `formatQuantity`).
 
 ## 5. État actuel et problèmes connus
 
@@ -247,7 +248,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 
 ## 6. Prochaine étape
-Tests de la phase 7b sur téléphone (dont la fluidité sur le Galaxy A30), puis phase 8 (lancement, avec la phase 8a). Détails dans `PLAN.md`.
+Phase 8 : préparer le lancement, avec la phase 8a (audit qualité et sécurité, dont un build de test optimisé pour mesurer les performances sur le Galaxy A30). Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash
