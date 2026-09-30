@@ -8,8 +8,10 @@ import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { IconChip } from '@/components/ui/IconChip';
 import { Touchable } from '@/components/ui/Touchable';
+import { WordClampText } from '@/components/ui/WordClampText';
 import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 import type { FoodKind } from '@/lib/expiry';
+import { displayQuantity } from '@/lib/quantity';
 
 export interface PantryIngredient {
   id: string;
@@ -56,13 +58,13 @@ interface Props {
 // pour la modifier) et de reste. Toucher la carte ouvre la feuille de l'aliment (lots, fiche) ; glisser vers la gauche
 // ou appui long : supprimer (ou les autres actions).
 export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry, addedBy, onOpenFact, subtitle, quantityLabel, lotCount = 1 }: Props) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const swipeable = useRef<SwipeableMethods>(null);
   const isDish = ingredient.kind === 'dish';
   const name = displayName ?? ingredient.name;
   const openFact = onOpenFact;
   // « ajouté par Awa » : seule la première lettre de la phrase passe en minuscule, le prénom garde sa majuscule
-  const details = [quantityLabel ?? ingredient.quantity, lotCount > 1 ? t('lots.count', { count: lotCount }) : null, addedBy ? addedBy.charAt(0).toLowerCase() + addedBy.slice(1) : null].filter(Boolean).join(' · ');
+  const details = [quantityLabel ?? displayQuantity(ingredient.quantity, language), lotCount > 1 ? t('lots.count', { count: lotCount }) : null, addedBy ? addedBy.charAt(0).toLowerCase() + addedBy.slice(1) : null].filter(Boolean).join(' · ');
 
   // Appui long : toutes les actions de l'aliment
   const showActions = () => {
@@ -106,7 +108,7 @@ export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry
         <IconChip icon={Leaf} />
         <View style={styles.body}>
           <Text style={styles.name}>{name}</Text>
-          {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+          {subtitle ? <WordClampText style={styles.subtitle}>{subtitle}</WordClampText> : null}
           {details ? <Text style={styles.details}>{details}</Text> : null}
           {ingredient.storage_tip ? (
             <View style={styles.tip}>

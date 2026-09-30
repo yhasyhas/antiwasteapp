@@ -7,6 +7,8 @@ const USER_AGENT = 'AntiGaspiRecettes/1.0 (https://github.com/yhasyhas/antiwaste
 const TIMEOUT_MS = 8000;
 // Nom court, lisible dans le garde-manger et dans les notifications
 const MAX_NAME_LENGTH = 40;
+// Nom générique gardé en entier (limite de la colonne), raccourci seulement à l'affichage
+const MAX_GENERIC_LENGTH = 120;
 
 export interface OffProduct {
   name: string;
@@ -57,7 +59,7 @@ export function categoryFromTags(tags: unknown): string | null {
 // Nettoie un nom saisi par les contributeurs d'Open Food Facts : symboles de mise en forme (**, _, #),
 // composition ou allergènes collés au nom (« Ingrédients : … », « Contient : … », « peut contenir … »),
 // précisions entre parenthèses ou crochets, séparateurs de fin. Coupé au dernier mot entier.
-export function cleanProductName(raw: string): string {
+export function cleanProductName(raw: string, maxLength = MAX_NAME_LENGTH): string {
   let name = raw
     .replace(/[*_#~`|<>{}]+/g, ' ')
     .replace(/\s+/g, ' ')
@@ -68,10 +70,10 @@ export function cleanProductName(raw: string): string {
   name = name.replace(/\s*[([][^)\]]*[)\]]/g, '').replace(/\s*[([].*$/, '');
   // Séparateurs et ponctuation en bout de nom
   name = name.replace(/^[\s\-–—:,.;/]+|[\s\-–—:,.;/]+$/g, '').replace(/\s+/g, ' ');
-  if (name.length > MAX_NAME_LENGTH) {
-    const cut = name.slice(0, MAX_NAME_LENGTH + 1);
+  if (name.length > maxLength) {
+    const cut = name.slice(0, maxLength + 1);
     const lastSpace = cut.lastIndexOf(' ');
-    name = (lastSpace > 12 ? cut.slice(0, lastSpace) : name.slice(0, MAX_NAME_LENGTH)).replace(/[\s\-–—:,.;/]+$/, '');
+    name = (lastSpace > 12 ? cut.slice(0, lastSpace) : name.slice(0, maxLength)).replace(/[\s\-–—:,.;/]+$/, '');
   }
   // Première lettre en majuscule (« LAIT DEMI-ÉCRÉMÉ » reste tel quel)
   return name.charAt(0).toUpperCase() + name.slice(1);
@@ -81,7 +83,7 @@ export function cleanProductName(raw: string): string {
 function genericName(product: any, language: string): string | null {
   for (const value of [product[`generic_name_${language}`], product.generic_name]) {
     if (typeof value !== 'string') continue;
-    const name = cleanProductName(value);
+    const name = cleanProductName(value, MAX_GENERIC_LENGTH);
     if (name.length >= 2) return name;
   }
   return null;
