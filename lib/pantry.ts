@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase';
 import { activeHouseholdId } from '@/lib/household';
 import { findExisting, groupLots, mergeTarget, type LotGroup, type NewFood } from '@/lib/pantryLots';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
+import type { DateKind, StorageLocation } from '@/lib/storage';
 
 // Garde-manger du foyer actif (lots), ou null s'il n'a pas pu être lu
 export async function loadPantry(): Promise<PantryIngredient[] | null> {
@@ -33,6 +34,9 @@ export interface FoodToAdd extends NewFood {
   off_categories?: string[] | null;
   added_via: 'camera' | 'barcode' | 'manual';
   choice?: ExistingChoice;
+  // Emplacement et type de date choisis (sinon valeurs par défaut du serveur)
+  location?: StorageLocation | null;
+  date_kind?: DateKind | null;
 }
 
 // Le garde-manger a changé entre-temps (autre membre) : rien n'a été enregistré
@@ -59,6 +63,8 @@ export async function addPantryItems(foods: FoodToAdd[], groups: LotGroup<Pantry
       nova_group: food.nova_group ?? null,
       nutriscore_grade: food.nutriscore_grade ?? null,
       off_categories: food.off_categories ?? null,
+      location: food.location ?? null,
+      date_kind: food.date_kind ?? null,
     };
     const group = food.choice === 'merge' ? findExisting(groups, food) : null;
     if (!group) return base;

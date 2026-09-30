@@ -47,6 +47,7 @@ export default function CameraScreen() {
     toggleDetected,
     setDetectedExpiry,
     setDetectedQuantity,
+    setDetectedLocation,
     setDetectedChoice,
     confirmDetected,
     groups,
@@ -253,6 +254,7 @@ export default function CameraScreen() {
         onToggle={toggleDetected}
         onExpiryChange={setDetectedExpiry}
         onQuantityChange={setDetectedQuantity}
+        onLocationChange={setDetectedLocation}
         onChoiceChange={setDetectedChoice}
         groups={groups}
         saving={saving}

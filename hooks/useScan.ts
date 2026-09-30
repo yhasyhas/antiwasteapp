@@ -8,6 +8,7 @@ import { alertWriteError } from '@/lib/alertWriteError';
 import { callEdgeFunction, SessionExpiredError } from '@/lib/callEdgeFunction';
 import { failureReasonOf, failureTitle } from '@/lib/quotaReason';
 import { expiryFromShelfLife, type FoodKind } from '@/lib/expiry';
+import { defaultDateKind, defaultLocation, frozenExpiry, type DateKind, type StorageLocation } from '@/lib/storage';
 import { maybeAskNotificationPermission } from '@/lib/notifications';
 import { notifyPantryChanged } from '@/lib/pantryEvents';
 import { linkPantryFoodKeys } from '@/lib/foodNames';
@@ -45,6 +46,11 @@ export interface DetectedIngredient {
   confirmed: boolean;
   // Déjà dans le garde-manger : ajouté au lot existant ou en lot séparé
   choice: ExistingChoice;
+  // Emplacement proposé selon l'aliment, modifiable ; type de date qui en découle
+  location: StorageLocation;
+  date_kind: DateKind;
+  // Date proposée hors congélateur (rétablie si l'aliment quitte le congélateur avant l'ajout)
+  fresh_expires_at: string;
 }
 
 // Analyse d'une photo (analyze-image) et enregistrement des ingrédients confirmés
@@ -132,6 +138,8 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
         setGroups(current);
         setDetectedIngredients(data.ingredients.map((ingredient: ScannedIngredient) => {
           const kind: FoodKind = ingredient.kind === 'dish' ? 'dish' : 'ingredient';
+          const location = defaultLocation(ingredient.category, kind, ingredient.food_key);
+          const freshExpiry = expiryFromShelfLife(ingredient.shelf_life_days, kind);
           const detected = {
             name: ingredient.name,
             quantity: ingredient.quantity ?? '',
@@ -139,7 +147,10 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
             kind,
             storage_tip: ingredient.storage_tip ?? '',
             food_key: ingredient.food_key ?? null,
-            expires_at: expiryFromShelfLife(ingredient.shelf_life_days, kind),
+            expires_at: location === 'freezer' ? frozenExpiry(ingredient.category, kind) : freshExpiry,
+            fresh_expires_at: freshExpiry,
+            location,
+            date_kind: location === 'freezer' ? 'best_before' as const : defaultDateKind(ingredient.category, kind),
             confirmed: true,
           };
           return { ...detected, choice: defaultChoice(current, detected, language) };
@@ -177,6 +188,15 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
     setDetectedIngredients((current) => current.map((item, i) => i === index ? { ...item, quantity } : item));
   };
 
+  // Emplacement : au congélateur, date de congélation estimée (indicative) ; ailleurs, date proposée au scan
+  const setDetectedLocation = (index: number, location: StorageLocation) => {
+    setDetectedIngredients((current) => current.map((item, i) => {
+      if (i !== index || item.location === location) return item;
+      if (location === 'freezer') return { ...item, location, expires_at: frozenExpiry(item.category, item.kind), date_kind: 'best_before' };
+      return { ...item, location, date_kind: defaultDateKind(item.category, item.kind), ...(item.location === 'freezer' && { expires_at: item.fresh_expires_at }) };
+    }));
+  };
+
   // Aliment déjà présent : ajouter aux existants, séparément, ou ne pas l'ajouter (décoché)
   const setDetectedChoice = (index: number, choice: AddChoice) => {
     setDetectedIngredients((current) => current.map((item, i) => {
@@ -190,7 +210,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
   const saveIngredients = async (ingredients: DetectedIngredient[]) => {
     if (!user) return false;
     try {
-      await addPantryItems(ingredients.map((item) => ({ ...item, quantity: item.quantity.trim(), added_via: 'camera' as const })), groups, language);
+      await addPantryItems(ingredients.map(({ fresh_expires_at: _fresh, ...item }) => ({ ...item, quantity: item.quantity.trim(), added_via: 'camera' as const })), groups, language);
       return true;
     } catch (error) {
       if (error instanceof PantryConflictError) {
@@ -246,6 +266,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
     toggleDetected,
     setDetectedExpiry,
     setDetectedQuantity,
+    setDetectedLocation,
     setDetectedChoice,
     confirmDetected,
     groups,

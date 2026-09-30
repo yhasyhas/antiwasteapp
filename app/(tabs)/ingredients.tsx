@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { Camera, Plus, Search, ShoppingCart, Users } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
@@ -19,10 +19,10 @@ import { supabase } from '@/lib/supabase';
 import { IngredientCard, type PantryIngredient } from '@/components/pantry/IngredientCard';
 import { ExpiryEditModal } from '@/components/pantry/ExpiryEditModal';
 import { FoodFactSheet } from '@/components/pantry/FoodFactSheet';
-import { PantryLotsSection } from '@/components/pantry/PantryLotsSection';
+import { PantryLotsSection, type LotPatch } from '@/components/pantry/PantryLotsSection';
 import { RecentlyRemoved } from '@/components/pantry/RecentlyRemoved';
-import { sortByUrgency } from '@/lib/expiry';
-import { defaultLocation, isUrgentLot, LOCATIONS, type StorageLocation } from '@/lib/storage';
+import { formatDate, sortByUrgency, todayISO } from '@/lib/expiry';
+import { defaultLocation, freezeFamily, frozenExpiry, isUrgentLot, LOCATIONS, openedExpiry, thawedExpiry, type StorageLocation } from '@/lib/storage';
 import { maybeAskNotificationPermission } from '@/lib/notifications';
 import { notifyPantryChanged, onPantryChanged } from '@/lib/pantryEvents';
 import { loadPantry } from '@/lib/pantry';
@@ -136,20 +136,46 @@ export default function IngredientsScreen() {
     },
   });
 
-  // Renvoie vrai si la date est enregistrée
-  const saveLotExpiry = async (lot: PantryIngredient, expiresAt: string | null): Promise<boolean> => {
+  // Changement d'un lot (date, type de date, emplacement, ouverture, congélation) ; renvoie vrai s'il est
+  // enregistré
+  const updateLot = async (lot: PantryIngredient, patch: Partial<PantryIngredient>): Promise<boolean> => {
     const { error } = await supabase
       .from('ingredients')
-      .update({ expires_at: expiresAt })
+      .update(patch)
       .eq('id', lot.id);
     if (error) {
-      alertWriteError(t, 'updating expiry date', error);
+      alertWriteError(t, 'updating pantry lot', error);
       return false;
     }
-    setIngredients((current) => sortByUrgency(current.map((ing) => ing.id === lot.id ? { ...ing, expires_at: expiresAt } : ing)));
+    setIngredients((current) => sortByUrgency(current.map((ing) => ing.id === lot.id ? { ...ing, ...patch } : ing)));
     notifyPantryChanged();
-    if (expiresAt) await maybeAskNotificationPermission();
+    if (patch.expires_at) await maybeAskNotificationPermission();
     return true;
+  };
+  const saveLotExpiry = (lot: PantryIngredient, expiresAt: string | null) => updateLot(lot, { expires_at: expiresAt });
+  const saveLotPatch = (lot: PantryIngredient, patch: LotPatch) => updateLot(lot, patch);
+
+  // « Congeler » : au congélateur, nouvelle date estimée selon l'aliment (qualité, indicative), conseil
+  const freezeLot = async (lot: PantryIngredient) => {
+    const expiresAt = frozenExpiry(lot.category, lot.kind);
+    if (!await updateLot(lot, { location: 'freezer', frozen_at: todayISO(), thawed_at: null, expires_at: expiresAt, date_kind: 'best_before' })) return;
+    Alert.alert(
+      t('storage.freezeTipTitle'),
+      `${t('storage.frozenDone', { date: formatDate(expiresAt, language) })}\n\n${t(`storage.freezeTip_${freezeFamily(lot.category, lot.kind)}`)}`,
+    );
+  };
+  // « Décongeler » : au frigo, date courte (1 à 2 jours, stricte), rappel de ne pas recongeler
+  const thawLot = async (lot: PantryIngredient) => {
+    const expiresAt = thawedExpiry(lot.category, lot.kind);
+    if (!await updateLot(lot, { location: 'fridge', thawed_at: todayISO(), expires_at: expiresAt, date_kind: 'use_by' })) return;
+    Alert.alert(t('storage.thaw'), t('storage.thawDone', { date: formatDate(expiresAt, language) }));
+  };
+  // « Je l'ai ouvert » : date la plus proche entre celle d'origine et la conservation après ouverture ; si
+  // c'est celle d'après ouverture, elle devient stricte
+  const openLot = async (lot: PantryIngredient) => {
+    const expiresAt = openedExpiry(lot.expires_at, lot.category, lot.kind);
+    const shortened = expiresAt !== lot.expires_at;
+    await updateLot(lot, { opened_at: todayISO(), expires_at: expiresAt, ...(shortened && { date_kind: 'use_by' }) });
   };
 
   const saveExpiry = async (expiresAt: string | null) => {
@@ -334,7 +360,10 @@ export default function IngredientsScreen() {
               setSheet(null);
               removeGroup(sheetGroup);
             }}
-            onSaveExpiry={saveLotExpiry}
+            onUpdateLot={saveLotPatch}
+            onFreeze={freezeLot}
+            onThaw={thawLot}
+            onOpen={openLot}
             onMerge={mergeLots}
           />
         ) : null}
