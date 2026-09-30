@@ -16,13 +16,15 @@ const TONES: Record<IconChipTone, { background: string; icon: string }> = {
 interface Props {
   icon: LucideIcon;
   tone?: IconChipTone;
+  // Couleurs précises (jetons du thème), à la place du ton : pastilles des aliments par famille
+  palette?: { background: string; icon: string };
   size?: number;
   style?: StyleProp<ViewStyle>;
 }
 
 // Pastille d'icône (carré arrondi 12) devant une ligne ou dans une carte
-export function IconChip({ icon: Icon, tone = 'soft', size = sizes.iconChip, style }: Props) {
-  const colorsOf = TONES[tone];
+export function IconChip({ icon: Icon, tone = 'soft', palette, size = sizes.iconChip, style }: Props) {
+  const colorsOf = palette ?? TONES[tone];
   return (
     <View style={[styles.chip, { width: size, height: size, backgroundColor: colorsOf.background }, style]}>
       <Icon size={Math.round(size * 0.5)} color={colorsOf.icon} />

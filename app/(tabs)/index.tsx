@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
-import { Camera, ChefHat, Leaf, ShoppingCart, Sparkles } from 'lucide-react-native';
+import { Camera, ChefHat, ShoppingCart, Sparkles } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
@@ -22,6 +22,7 @@ import { RecipeListCard } from '@/components/recipe/RecipeListCard';
 import { WasteCounter } from '@/components/home/WasteCounter';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
+import { FoodIcon } from '@/components/pantry/FoodIcon';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -176,7 +177,7 @@ export default function HomeScreen() {
                   <View key={ingredient.id}>
                     <View style={styles.divider} />
                     <View style={styles.row}>
-                      <IconChip icon={Leaf} />
+                      <FoodIcon category={ingredient.category} kind={ingredient.kind} />
                       <View style={styles.rowText}>
                         <Text style={styles.rowTitle} numberOfLines={1}>{foodName(ingredient)}</Text>
                         {ingredient.quantity ? <Text style={styles.rowSubtitle} numberOfLines={1}>{displayQuantity(ingredient.quantity, language)}</Text> : null}

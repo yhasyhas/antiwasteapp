@@ -1,14 +1,14 @@
 import React, { useRef } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import ReanimatedSwipeable, { type SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
-import { Info, Leaf, Trash2 } from 'lucide-react-native';
+import { Info, Trash2 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
-import { IconChip } from '@/components/ui/IconChip';
 import { Touchable } from '@/components/ui/Touchable';
 import { WordClampText } from '@/components/ui/WordClampText';
+import { FoodIcon } from './FoodIcon';
 import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 import type { FoodKind } from '@/lib/expiry';
 import { displayQuantity } from '@/lib/quantity';
@@ -105,7 +105,7 @@ export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry
         style={styles.card}
         accessibilityLabel={openFact ? `${name}, ${isDish ? t('pantry.viewDetails') : t('facts.open')}` : name}
       >
-        <IconChip icon={Leaf} />
+        <FoodIcon category={ingredient.category} kind={ingredient.kind} />
         <View style={styles.body}>
           <Text style={styles.name}>{name}</Text>
           {subtitle ? <WordClampText style={styles.subtitle}>{subtitle}</WordClampText> : null}

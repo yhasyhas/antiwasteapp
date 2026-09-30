@@ -5,6 +5,7 @@ import { Leaf, Sparkles, Trash2, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fetchFoodFact, reportFoodFact, type FoodFactResult } from '@/lib/foodFacts';
 import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
+import { FoodIcon } from './FoodIcon';
 import { Badge } from '@/components/ui/Badge';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/Button';
@@ -22,6 +23,7 @@ interface FactIngredient {
   food_key?: string | null;
   expires_at?: string | null;
   category?: string | null;
+  kind?: string | null;
 }
 
 interface Props {
@@ -117,7 +119,7 @@ export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact 
   return (
     <BottomSheet visible={ingredient !== null} onClose={onClose} background={colors.background} keyboard>
       <View style={styles.header}>
-        <IconChip icon={Leaf} tone="accent" size={sizes.iconChipLarge + spacing.sm} />
+        <FoodIcon category={category} kind={shown?.kind} size={sizes.iconChipLarge + spacing.sm} />
         <View style={styles.headerText}>
           <Text style={styles.title}>{title ?? capitalize((withFact ? section?.name : null) ?? shown?.name ?? '')}</Text>
           {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}

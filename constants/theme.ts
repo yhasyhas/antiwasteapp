@@ -6,6 +6,9 @@ import type { TextStyle } from 'react-native';
 
 // ── Couleurs ──────────────────────────────────────────────────────────────────────────────────────
 
+// Grandes familles d'aliments : teinte douce de la pastille d'icône du garde-manger
+export type FoodFamily = 'plant' | 'protein' | 'cold' | 'grocery' | 'seasoning' | 'dish' | 'other';
+
 export interface ThemeColors {
   background: string;
   surface: string;
@@ -36,6 +39,8 @@ export interface ThemeColors {
   skeleton: string;
   // Message temporaire en bas de l'écran (« Aliment retiré · Annuler ») : fond sombre, action en citron vert
   toast: { background: string; text: string; action: string };
+  // Pastilles des aliments par famille : fond doux, icône foncée (contraste suffisant sur le fond)
+  foodFamilies: Record<FoodFamily, { background: string; icon: string }>;
   transparent: string;
 }
 
@@ -62,6 +67,22 @@ export const lightColors: ThemeColors = {
   illustration: { background: '#D2E4CC', shape: '#E1EEDF', line: '#2E6A4A', leaf: '#B9D45A' },
   skeleton: '#E1EEDF',
   toast: { background: '#15241B', text: '#FFFFFF', action: '#B9D45A' },
+  foodFamilies: {
+    // Fruits, légumes, légumineuses : le vert de l'app
+    plant: { background: '#E1EEDF', icon: '#2E6A4A' },
+    // Viandes, poissons, œufs : terre cuite
+    protein: { background: '#F7E3DA', icon: '#94452A' },
+    // Produits laitiers, surgelés, boissons : bleu frais
+    cold: { background: '#E0ECF3', icon: '#2D5C7C' },
+    // Céréales, boulangerie, en-cas : blé
+    grocery: { background: '#F5EBD2', icon: '#7A5712' },
+    // Condiments, épices : citron vert
+    seasoning: { background: '#EEF5D3', icon: '#4D6814' },
+    // Restes de plats : citron vert, comme le badge « Reste »
+    dish: { background: '#EEF5D3', icon: '#2E6A4A' },
+    // Catégorie inconnue : la feuille d'avant
+    other: { background: '#E1EEDF', icon: '#2E6A4A' },
+  },
   transparent: 'transparent',
 };
 
