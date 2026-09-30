@@ -27,7 +27,8 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         // Onglets cachés (href: null) : pas de bouton dans la barre
         if (route.name in PARENT_TAB) return null;
         const focused = route.name === highlighted;
-        const featured = route.name === FEATURED_TAB;
+        // Sur l'écran Scanner, onglet simple : seul le déclencheur de l'appareil photo reste en rond
+        const featured = route.name === FEATURED_TAB && activeName !== FEATURED_TAB;
         const label = typeof options.title === 'string' ? options.title : route.name;
         const onPress = () => {
           const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
