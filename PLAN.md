@@ -355,6 +355,7 @@ Ancienne phase 8a.
 - [ ] Traiter les avertissements de sécurité et de performance de Supabase
 - [ ] `npm audit` et mise à jour des dépendances
 - [ ] Vérifier qu'aucun secret n'est exposé (code, historique git, build, fonctions)
+- [ ] Vérifier que les outils de développement (Réglages : erreur de test Sentry, « État des services », rappel de test ; page /dev/status) sont masqués hors développement, dans le build de production
 - [ ] Suppression de compte depuis l'app et depuis une page web (obligatoire pour le Play Store)
 - [ ] Nettoyage automatique des comptes d'essai (anonymes) inactifs depuis 30 jours, avec leur foyer personnel s'il n'est partagé avec personne
 - [ ] Sauvegardes automatiques de la base et test de restauration
@@ -392,6 +393,7 @@ Ancienne phase 8.
 - [ ] Statistiques avancées : aliments les plus utilisés et les plus gaspillés, tendances, conseils (au-delà de l'écran « Mon impact » de la phase 10)
 - [ ] Version iOS
 - [ ] Mode sombre
+- [ ] Saisons selon la région de l'utilisateur
 
 ---
 

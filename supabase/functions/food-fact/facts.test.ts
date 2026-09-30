@@ -2,13 +2,13 @@
 // Lancement : deno test --no-config --allow-env supabase/functions/
 
 import { assert, assertEquals } from 'jsr:@std/assert@1';
-import { FACT_SCHEMA, ORIGIN_MAX, parseFact, parseNutrition, parseOrigins, parseResolution } from './facts.ts';
+import { FACT_SCHEMA, ORIGIN_MAX, parseFact, parseNutrition, parseOrigins, parseResolution, parseSeasons, SEASON_MAX } from './facts.ts';
 
 const section = (name: string, overrides: Record<string, unknown> = {}) => ({
   name,
   description: 'Fruit doux et pratique, qui mûrit après la récolte.',
   origin: "Originaire d'Asie du Sud-Est.",
-  season: "Toute l'année (importée).",
+  season: "Toute l'année.",
   nutrition: ['Potassium', 'Vitamine C'],
   tips: ['Trop mûre, elle se congèle pour les smoothies', 'Séparez-la des autres fruits pour ralentir leur mûrissement'],
   ...overrides,
@@ -101,4 +101,14 @@ Deno.test('atouts télégraphiques refusés : liaison manquante, vitamines coll�
   assertEquals(result.value.fr, ['Source de fibres', 'Riche en fer']);
   assertEquals(result.value.en, ['Source of protein', 'Rich in iron']);
   assertEquals(result.value.es, ['Fuente de fibra', 'Rica en hierro']);
+});
+
+Deno.test('saison en quelques mots : point final retiré, majuscule, saison trop longue refusée', () => {
+  const ok = parseSeasons(JSON.stringify({ fr: 'juillet à octobre.', en: 'July to October', es: 'Julio a octubre' }));
+  assert(ok.ok);
+  assertEquals(ok.value.fr, 'Juillet à octobre');
+  const long = parseSeasons(JSON.stringify({ fr: 'x'.repeat(SEASON_MAX + 1), en: 'All year', es: 'Todo el año' }));
+  assertEquals(long.ok, false);
+  const fiche = parseFact(fact({ fr: section('Banane', { season: "Toute l'année dans les pays producteurs, sinon de juin à septembre en Europe." }) }), 'banane', null);
+  assertEquals(fiche.ok, false);
 });

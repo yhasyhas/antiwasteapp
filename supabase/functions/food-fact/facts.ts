@@ -39,7 +39,9 @@ const MISSING_LINK: Record<string, RegExp> = {
 export const isShortNutrition = (value: string, language?: string) => wordCount(value) <= NUTRITION_MAX_WORDS
   && !(language && MISSING_LINK[language]?.test(value.trim()))
   && !/\b[A-Z]\d*\s+[A-Z]\d*$/.test(value.trim());
-const LIMITS = { name: 60, description: 320, origin: ORIGIN_MAX, season: 220, item: 160, minItems: 2, maxItems: 4 };
+// Saison : quelques mots (« Juillet à octobre », « Toute l'année »), affichée dans une petite carte
+export const SEASON_MAX = 32;
+const LIMITS = { name: 60, description: 320, origin: ORIGIN_MAX, season: SEASON_MAX, item: 160, minItems: 2, maxItems: 4 };
 
 // Promesses de santé ou conseils médicaux : la fiche est refusée (les trois langues). Liste volontairement
 // étroite : « cured ham », « a sweet treat » ou « évite qu'il se dessèche » restent permis.
@@ -51,7 +53,7 @@ const section = {
     name: { type: 'string', description: 'Nom courant de l\'aliment dans cette langue, au singulier' },
     description: { type: 'string', description: 'Description courte (1 à 2 phrases)' },
     origin: { type: 'string', description: 'Origine géographique en quelques mots (2 à 5), sans phrase ni point final (ex. « Asie du Sud-Est », « Amérique centrale », « Bassin méditerranéen »)' },
-    season: { type: 'string', description: 'Saison (hémisphère nord) ou « toute l\'année », en une phrase' },
+    season: { type: 'string', description: 'Saison dans l\'hémisphère nord en quelques mots (2 à 5), sans phrase ni point final (ex. « Juillet à octobre », « Toute l\'année », « Automne et hiver »)' },
     nutrition: { type: 'array', items: { type: 'string' }, description: '2 à 4 atouts nutritionnels généraux, factuels, en trois mots au plus chacun (ex. « Source de potassium », « Riche en fibres », « Vitamine C »)' },
     tips: { type: 'array', items: { type: 'string' }, description: '2 à 4 astuces anti-gaspi (conservation, restes, parties souvent jetées)' },
   },
@@ -95,7 +97,7 @@ RÈGLES STRICTES :
 - Informations générales et factuelles uniquement. Aucune promesse de santé, aucun conseil médical : ne dis jamais qu'un aliment guérit, soigne, prévient ou traite quoi que ce soit, ne cite aucune maladie ni médicament.
 - "nutrition" : atouts nutritionnels généraux et prudents, trois mots au plus chacun, sans phrase ni point final (ex. « Source de fibres », « Riche en potassium », « Vitamine C »), sans chiffres précis ni superlatifs. Chaque atout est une expression correcte avec ses liaisons (« Source de protéines », jamais « Source protéines ») ; un seul nutriment par atout (« Vitamine C » et « Vitamine K » plutôt que « Vitamines C K »).
 - "tips" : astuces anti-gaspi concrètes (bien le conserver, utiliser les restes ou les parties souvent jetées, reconnaître quand il est encore bon).
-- "season" : pour l'hémisphère nord ; « toute l'année » pour un produit d'épicerie ou transformé.
+- "season" : pour l'hémisphère nord, sans le préciser, en quelques mots (2 à 5), sans phrase ni point final, ex. « Juillet à octobre », « Automne et hiver » ; « Toute l'année » (seul, sans pic ni mois) pour un produit disponible toute l'année, d'épicerie ou transformé.
 - "origin" : quelques mots seulement (2 à 5), sans phrase ni point final, ex. « Asie du Sud-Est », « Amérique centrale », « Bassin méditerranéen ».
 - Phrases courtes : description 1 à 2 phrases, saison 1 phrase, 2 à 4 éléments par liste.
 - Si ce n'est pas un aliment, "is_food" : false et des textes vides.`;
@@ -113,7 +115,7 @@ function cleanSection(raw: any, language: FactLanguage): FactSection | string {
   const name = text(raw.name, LIMITS.name);
   const description = text(raw.description, LIMITS.description);
   const origin = text(typeof raw.origin === 'string' ? raw.origin.trim().replace(/\.$/, '') : raw.origin, LIMITS.origin);
-  const season = text(raw.season, LIMITS.season);
+  const season = text(typeof raw.season === 'string' ? raw.season.trim().replace(/\.$/, '') : raw.season, LIMITS.season);
   if (!name || !description || !origin || !season) return 'texte manquant ou trop long';
   const list = (value: unknown) => Array.isArray(value)
     ? value.map((item) => text(item, LIMITS.item)).filter((item): item is string => item !== null)
@@ -239,4 +241,35 @@ export function parseNutrition(textResponse: string): ParseResult<Record<FactLan
     nutrition[language] = items.slice(0, 4).map((item: string) => item.charAt(0).toUpperCase() + item.slice(1));
   }
   return { ok: true, value: nutrition };
+}
+
+// Saisons trop longues des fiches existantes : réécrites en quelques mots, sans toucher au reste
+export const SEASON_SCHEMA = {
+  type: 'object',
+  properties: Object.fromEntries(LANGUAGES.map((language) => [language, { type: 'string', description: 'Saison en quelques mots (2 à 5)' }])),
+  required: [...LANGUAGES],
+  additionalProperties: false,
+};
+
+export function seasonPrompt(content: FactContent): string {
+  const lines = LANGUAGES.map((language) => `- ${language} (${content[language].name}) : « ${content[language].season} »`).join('\n');
+  return `Voici la saison d'un aliment dans trois langues :
+${lines}
+Réécris chacune en quelques mots seulement (2 à 5), dans la même langue, avec une majuscule au début, sans phrase ni point final, pour l'hémisphère nord sans le préciser : seulement les mois ou les saisons (ex. « Juillet à octobre », « July to October », « Julio a octubre » ; « Toute l'année », « All year round », « Todo el año » ; « Automne et hiver »). Une seule période : si l'aliment se trouve toute l'année, écris seulement « Toute l'année », sans ajouter de pic ni de mois. Garde la même information dans les trois langues.`;
+}
+
+export function parseSeasons(textResponse: string): ParseResult<Record<FactLanguage, string>> {
+  let raw: any;
+  try {
+    raw = JSON.parse(textResponse);
+  } catch {
+    return { ok: false, failure: `JSON invalide (${textResponse.slice(0, 120)})`, code: 'invalid_response' };
+  }
+  const seasons = {} as Record<FactLanguage, string>;
+  for (const language of LANGUAGES) {
+    const season = typeof raw?.[language] === 'string' ? raw[language].trim().replace(/\.$/, '') : '';
+    if (!season || season.length > SEASON_MAX) return { ok: false, failure: `${language} : saison absente ou trop longue`, code: 'invalid_response' };
+    seasons[language] = season.charAt(0).toUpperCase() + season.slice(1);
+  }
+  return { ok: true, value: seasons };
 }
