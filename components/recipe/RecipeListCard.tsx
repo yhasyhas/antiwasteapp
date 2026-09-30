@@ -8,26 +8,25 @@ import { toSaveCount, usePantryUrgency } from '@/hooks/usePantryUrgency';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { RecipePlaceholder } from '@/components/ui/Illustrations';
-import { Skeleton } from '@/components/ui/Skeleton';
 import { Touchable } from '@/components/ui/Touchable';
 import { colors, motion, radius, sizes, spacing, typography } from '@/constants/theme';
 import type { Recipe } from './types';
 
 interface Props {
   recipe: Recipe;
-  // Image en cours de génération : squelette dans l'emplacement jusqu'à son arrivée
+  // Image en cours de génération : l'illustration « Photo du plat » reste affichée jusqu'à son arrivée
   imageLoading?: boolean;
   onPress: () => void;
   // Cœur de favori sur la carte
   favorite?: { active: boolean; onToggle: () => void };
-  // large : image en haut (génération, favoris) ; compact : vignette à gauche (dernière recette)
+  // large : image en haut (génération, favoris) ; compact : vignette à gauche (« Mes recettes » de l'accueil)
   variant?: 'large' | 'compact';
 }
 
 // Carte de recette unique pour toutes les listes. Elle affiche l'image si elle existe, sans jamais la
 // demander elle-même (voir useRecipeImages) ; sinon une illustration. Badge « X à sauver » : aliments du
 // garde-manger utilisés qui expirent bientôt.
-export function RecipeListCard({ recipe, imageLoading = false, onPress, favorite, variant = 'large' }: Props) {
+export function RecipeListCard({ recipe, onPress, favorite, variant = 'large' }: Props) {
   const { t } = useLanguage();
   const pantry = usePantryUrgency();
   const toSave = toSaveCount(recipe, pantry);
@@ -43,9 +42,8 @@ export function RecipeListCard({ recipe, imageLoading = false, onPress, favorite
       recyclingKey={recipe.id}
       transition={motion.normal}
     />
-  ) : imageLoading ? (
-    <Skeleton height={compact ? sizes.thumbnail : sizes.recipeImage} rounded={0} />
   ) : (
+    // Pas encore d'image (ou image en cours de génération) : illustration « Photo du plat »
     <RecipePlaceholder style={styles.fill} compact={compact} label={compact ? t('recipe.photoShort') : t('recipe.photoPlaceholder')} />
   );
 
@@ -80,6 +78,7 @@ export function RecipeListCard({ recipe, imageLoading = false, onPress, favorite
           <Text style={styles.compactTitle} numberOfLines={2}>{recipe.title}</Text>
           {meta}
         </View>
+        {heart}
       </Card>
     );
   }

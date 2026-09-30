@@ -33,6 +33,8 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
   // Mode de la génération en cours (le bouton correspondant affiche l'attente)
   const [generatingMode, setGeneratingMode] = useState<GenerationMode | null>(null);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  // Explication affichée sous les résultats quand il y a moins de 3 recettes
+  const [resultNote, setResultNote] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
@@ -166,6 +168,9 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
         // quand l'utilisateur la sauvegarde (sinon elle serait insérée une seconde fois)
         const saved = await saveRecipesToHistory(data.recipes);
         setRecipes(saved);
+        // Moins de recettes que d'habitude : recettes écartées par le serveur, ou peu d'aliments
+        setResultNote(data.rejected > 0 ? t('generate.rejectedNote', { count: data.rejected })
+          : data.fewIngredients ? t('generate.fewIngredientsNote') : null);
         // Nouvelle génération seulement : images demandées en arrière-plan dès l'affichage des résultats,
         // elles apparaissent sur les cartes à leur arrivée (les autres listes n'en demandent jamais)
         images.requestAll(saved);
@@ -281,7 +286,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
       [
         {
           text: t('generate.viewSaved'),
-          onPress: () => router.navigate('/(tabs)/saved'),
+          onPress: () => router.navigate('/saved'),
         },
         { text: t('common.ok'), style: 'cancel' },
       ]
@@ -304,6 +309,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
     toggleSelected,
     clearSelection: () => setSelectedIds([]),
     hasLeftovers: cookingWith.some((i) => i.kind === 'dish'),
+    resultNote,
     // Avec leur image, dès qu'elle est connue (demandée ici ou sur un autre écran)
     recipes: recipes.map(images.withImage),
     loading,

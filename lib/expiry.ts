@@ -65,7 +65,11 @@ export function expiryStatus(iso: string | null | undefined): ExpiryStatus {
   return 'ok';
 }
 
-// Texte court : « Expiré », « Aujourd'hui », « Demain », « Dans 5 jours », ou la date au-delà d'un mois
+// Nombre de jours jusqu'auquel la date est dite relative (« Dans 7 jours ») ; au-delà, la date réelle
+export const RELATIVE_DAYS = 7;
+
+// Texte court : « Expiré », « Aujourd'hui », « Demain », « Dans 5 jours » jusqu'à 7 jours, puis la date réelle
+// dans le format de la langue (« 12 oct. », avec l'année si ce n'est pas l'année en cours)
 // short : libellé des badges (« Aujourd'hui », « Demain »)
 export function expiryLabel(t: TFunction, iso: string | null | undefined, language: string, short = true): string {
   if (!iso) return t('expiry.none');
@@ -73,8 +77,15 @@ export function expiryLabel(t: TFunction, iso: string | null | undefined, langua
   if (days < 0) return t('expiry.expiredDaysAgo', { count: -days });
   if (days === 0) return short ? t('expiry.todayShort') : t('expiry.today');
   if (days === 1) return short ? t('expiry.tomorrowShort') : t('expiry.tomorrow');
-  if (days <= 31) return t('expiry.inDays', { count: days });
-  return formatDate(iso, language);
+  if (days <= RELATIVE_DAYS) return t('expiry.inDays', { count: days });
+  return shortDate(iso, language);
+}
+
+// « 12 oct. » ; « 12 oct. 2027 » pour une autre année
+export function shortDate(iso: string, language: string): string {
+  const date = fromISODate(iso);
+  const sameYear = date.getFullYear() === new Date().getFullYear();
+  return date.toLocaleDateString(language, { day: 'numeric', month: 'short', ...(sameYear ? {} : { year: 'numeric' }) });
 }
 
 export function formatDate(iso: string, language: string): string {

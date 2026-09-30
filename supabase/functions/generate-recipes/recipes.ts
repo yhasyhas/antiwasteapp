@@ -141,8 +141,17 @@ export function normalizeName(name: string): string {
 }
 
 // Vrai si le nom contient une exception entière (« lait de coco bio » contient « lait de coco »)
+// Végétarien : produits laitiers, œufs et miel toujours permis (les modèles signalent parfois à tort la crème
+// ou le beurre). Le nom entier doit être l'un d'eux, avec ses précisions courantes (« beurre doux », « lait
+// entier ») : « beurre d'anchois » ou « fond de veau au beurre » restent contrôlés.
+const VEGETARIAN_BASE = '(beurre|creme|creme fraiche|lait|oeufs?|jaunes? d oeufs?|blancs? d oeufs?|yaourts?|yogourts?|fromage blanc|miel|butter|cream|sour cream|milk|eggs?|egg yolks?|egg whites?|yogh?urts?|honey|mantequilla|nata|crema|leche|huevos?|yemas?|claras?|yogures?|miel)';
+const VEGETARIAN_DETAIL = '(doux|demi sel|sale|entier|entiere|demi ecreme|ecreme|fraiche|epaisse|liquide|frais|nature|grec|grecque|bio|de vache|whole|skimmed|semi skimmed|heavy|double|single|unsalted|salted|plain|greek|fresh|entera|desnatada|semidesnatada|natural|griego|sin sal|con sal|para montar|de cocina|a fouetter|battus?|beaten)';
+const VEGETARIAN_ALWAYS = new RegExp(`^(${VEGETARIAN_DETAIL} )*${VEGETARIAN_BASE}( ${VEGETARIAN_DETAIL})*$`);
+
 export function isDietException(name: string, diet: StrictDiet): boolean {
-  const padded = ` ${normalizeName(name)} `;
+  const normalized = normalizeName(name);
+  if (diet === 'vegetarian' && VEGETARIAN_ALWAYS.test(normalized)) return true;
+  const padded = ` ${normalized} `;
   return DIET_EXCEPTIONS[diet].some((exception) => padded.includes(` ${exception} `));
 }
 
@@ -150,8 +159,8 @@ export function isDietException(name: string, diet: StrictDiet): boolean {
 
 // ---------- Sélection d'ingrédients ----------
 
-// Avec une sélection, les recettes n'utilisent que les ingrédients choisis, plus ces basiques
-// (disponibles partout, jamais considérés comme « un autre ingrédient du garde-manger »)
+// Basiques (sel, poivre, huile, eau) : disponibles partout, jamais « à acheter » ; avec une sélection, jamais
+// considérés comme « un autre ingrédient du garde-manger » (même liste dans l'app : lib/basics.ts)
 export const BASICS = ['sel', 'poivre', 'huile', 'eau', 'salt', 'pepper', 'oil', 'water', 'sal', 'pimienta', 'aceite', 'agua'];
 export const MAX_OTHER_PANTRY = 100;
 
@@ -385,7 +394,8 @@ export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; 
     dietary_tags: isStringArray(raw.dietary_tags) ? raw.dietary_tags : context.dietary,
     ingredients_used: ingredients,
     ingredients_from_list: unique(ingredients.filter((i) => i.pantry_id).map((i) => i.name)),
-    missing_ingredients: unique(ingredients.filter((i) => !i.pantry_id).map((i) => i.name)),
+    // À acheter : sans les basiques (sel, poivre, huile, eau), toujours disponibles
+    missing_ingredients: unique(ingredients.filter((i) => !i.pantry_id && !isBasic(i.name)).map((i) => i.name)),
     instructions: raw.instructions,
     tips: isStringArray(raw.tips) ? raw.tips : [],
     ...(suggestion && { suggestion }),
@@ -463,7 +473,7 @@ export function parseRecipes(
   return { ok: true, value: { recipes: recipes.slice(0, context.maxRecipes), dietaryRejections, refusal, invalid } };
 }
 
-// 1 recette pour 1 ou 2 ingrédients, 2 jusqu'à 5, sinon 3
+// 2 recettes pour 1 ou 2 aliments, 3 à partir de 3
 export function recipeCount(pantrySize: number): number {
-  return pantrySize <= 2 ? 1 : pantrySize <= 5 ? 2 : 3;
+  return pantrySize <= 2 ? 2 : 3;
 }

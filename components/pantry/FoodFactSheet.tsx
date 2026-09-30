@@ -5,6 +5,7 @@ import { Leaf, Sparkles, Trash2, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fetchFoodFact, reportFoodFact, type FoodFactResult } from '@/lib/foodFacts';
 import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
+import { FoodIcon } from './FoodIcon';
 import { Badge } from '@/components/ui/Badge';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/Button';
@@ -22,6 +23,7 @@ interface FactIngredient {
   food_key?: string | null;
   expires_at?: string | null;
   category?: string | null;
+  kind?: string | null;
 }
 
 interface Props {
@@ -117,7 +119,7 @@ export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact 
   return (
     <BottomSheet visible={ingredient !== null} onClose={onClose} background={colors.background} keyboard>
       <View style={styles.header}>
-        <IconChip icon={Leaf} tone="accent" size={sizes.iconChipLarge + spacing.sm} />
+        <FoodIcon category={category} kind={shown?.kind} size={sizes.iconChipLarge + spacing.sm} />
         <View style={styles.headerText}>
           <Text style={styles.title}>{title ?? capitalize((withFact ? section?.name : null) ?? shown?.name ?? '')}</Text>
           {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
@@ -150,16 +152,16 @@ export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact 
           </>
         ) : section ? (
           <>
-            <Text style={styles.description}>{section.description}</Text>
+            <Text style={styles.description}>{capitalize(section.description)}</Text>
 
             <View style={styles.facts}>
               <Card style={styles.fact}>
                 <Text style={styles.factLabel}>{t('facts.origin')}</Text>
-                <Text style={styles.factValue}>{section.origin}</Text>
+                <Text style={styles.factValue}>{capitalize(section.origin)}</Text>
               </Card>
               <Card style={styles.fact}>
                 <Text style={styles.factLabel}>{t('facts.season')}</Text>
-                <Text style={styles.factValue}>{section.season}</Text>
+                <Text style={styles.factValue}>{capitalize(section.season)}</Text>
               </Card>
             </View>
 
@@ -167,7 +169,7 @@ export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact 
               <View style={styles.group}>
                 <Text style={styles.groupTitle}>{t('facts.highlights')}</Text>
                 <View style={styles.chips}>
-                  {section.nutrition.map((item, index) => <Chip key={index} label={item} />)}
+                  {section.nutrition.map((item, index) => <Chip key={index} label={capitalize(item)} />)}
                 </View>
               </View>
             )}
@@ -180,7 +182,7 @@ export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact 
                     <View style={cardStyles.divider} />
                     <View style={styles.tip}>
                       <IconChip icon={Leaf} tone="accent" size={sizes.iconChip - spacing.sm} />
-                      <Text style={styles.tipText}>{tip}</Text>
+                      <Text style={styles.tipText}>{capitalize(tip)}</Text>
                     </View>
                   </View>
                 ))}
@@ -223,6 +225,7 @@ export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact 
   );
 }
 
+// Majuscule au début de chaque valeur (« Toute l'année »)
 const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 
 const styles = StyleSheet.create({

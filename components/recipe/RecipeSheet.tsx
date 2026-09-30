@@ -6,6 +6,7 @@ import { ChevronLeft, Clock, Flame, Heart, Languages, Sparkles, Users } from 'lu
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { toSaveCount, usePantryUrgency } from '@/hooks/usePantryUrgency';
+import { isBasic } from '@/lib/basics';
 import { dietLabel, difficultyLabel } from '@/lib/labels';
 import { failureTitle } from '@/lib/quotaReason';
 import { cachedTranslation, translateRecipe } from '@/lib/recipeTranslation';
@@ -14,7 +15,6 @@ import { Button } from '@/components/ui/Button';
 import { Card, cardStyles } from '@/components/ui/Card';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { RecipePlaceholder } from '@/components/ui/Illustrations';
-import { Skeleton } from '@/components/ui/Skeleton';
 import { Toast } from '@/components/ui/Toast';
 import { Touchable } from '@/components/ui/Touchable';
 import { colors, motion, radius, sizes, spacing, typography } from '@/constants/theme';
@@ -88,7 +88,8 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
   };
   const pantry = usePantryUrgency();
   const toSave = toSaveCount(recipe, pantry);
-  const missing = recipe.missing_ingredients ?? [];
+  // À acheter, sans les basiques (recettes enregistrées avant leur retrait côté serveur)
+  const missing = (recipe.missing_ingredients ?? []).filter((name) => !isBasic(name));
 
   // Quantité d'un ingrédient (recherchée dans ingredients_used par son nom)
   const amountOf = (name: string) => {
@@ -104,12 +105,10 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
     <Modal visible animationType="slide" statusBarTranslucent navigationBarTranslucent onRequestClose={onClose}>
       <View style={styles.container}>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-          {/* Image, ou illustration tant qu'il n'y en a pas */}
+          {/* Image, ou illustration tant qu'il n'y en a pas (génération en cours comprise) */}
           <View style={styles.hero}>
             {recipe.image_url ? (
               <Image source={{ uri: recipe.image_url }} style={styles.fill} contentFit="cover" cachePolicy="memory-disk" transition={motion.normal} />
-            ) : imageLoading ? (
-              <Skeleton height={sizes.recipeHero} rounded={0} />
             ) : (
               <RecipePlaceholder style={styles.fill} label={t('recipe.photoPlaceholder')} />
             )}

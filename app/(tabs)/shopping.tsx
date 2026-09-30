@@ -156,7 +156,6 @@ export default function ShoppingScreen() {
       <ScreenHeader
         title={t('shopping.short')}
         subtitle={household?.shared ? t('shopping.sharedSubtitle') : undefined}
-        back
       />
       <ScrollView
         ref={keyboardScroll.scrollRef}

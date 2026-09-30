@@ -191,7 +191,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Phase 6b planifiée : fiches aliments (`food_key`, table partagée `food_facts`, signalements, pré-remplissage d'une centaine d'aliments), voir PLAN.md.
 
 ### Phase 6a — build de développement, foyer partagé, notifications serveur (branche `phase-6a`, validée sur deux téléphones)
-- Build : `eas.json` (development, preview, production), `expo-dev-client`, variante de développement (`app.config.js`, `APP_VARIANT`) : paquet `com.yhasyhas.antiwasteapp.dev`, nom « Antigaspi (dev) », paquet définitif en phase 8 ; google-services.json hors de git (variable EAS de type fichier `GOOGLE_SERVICES_JSON`), clé Firebase FCM V1 associée au paquet `.dev` sur EAS, canal de notifications créé au démarrage hors d'Expo Go. Projet EAS `@yhasyhas/bolt-expo-nativewind` (à renommer en phase 8).
+- Build : `eas.json` (development, preview, production), `expo-dev-client`, variante de développement (`app.config.js`, `APP_VARIANT`) : paquet `com.yhasyhas.antiwasteapp.dev`, nom « Antigaspi (dev) », paquet définitif au lancement (phase 15) ; google-services.json hors de git (variable EAS de type fichier `GOOGLE_SERVICES_JSON`), clé Firebase FCM V1 associée au paquet `.dev` sur EAS, canal de notifications créé au démarrage hors d'Expo Go. Projet EAS `@yhasyhas/bolt-expo-nativewind` (à renommer au lancement, phase 15).
 - Foyer partagé (migration `shared_households`, tests `household_sharing.sql`) : foyer actif (partagé, sinon personnel), invitation par code 48 h, 8 membres, départ, retrait, transfert de propriété, compte supprimé sans perte du foyer, auteur des ingrédients figé, diffusion temps réel sur `household:<id>` ; écran `app/household.tsx`, état partagé `lib/household.ts`, « ajouté par » sur chaque ingrédient.
 - Résumé de 9 h par le serveur (migration `daily_digest`, tests `daily_digest.sql`) : `push_tokens`, `daily_digests`, pg_cron toutes les 15 min → fonction `daily-digest` (Expo Push, reçus, alerte Sentry `push_failure`) ; app : `lib/pushNotifications.ts`, rappels locaux en secours sans jeton.
 - Retours de test : marges du système (affichage bord à bord : barre d'onglets, en-têtes, feuilles du bas, `hooks/useSafeSpacing.ts`), clavier (`components/ui/KeyboardAvoider.tsx`), champs à couleurs explicites et œil du mot de passe (`components/ui/Input.tsx`), thème clair forcé, étiquettes de régime traduites (`dietLabel`), noms Open Food Facts nettoyés (`cleanProductName`).
@@ -232,23 +232,34 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Produits scannés par code-barres : colonnes `product_name`, `generic_name`, `brand`, `nova_group`, `nutriscore_grade`, `off_categories` (`lib/openFoodFacts.ts`) ; nom du produit gardé, nom générique en sous-titre (`useFoodNaming`), fiche générique pour NOVA 1 ou 2, sinon `components/pantry/ProductCard.tsx`. Relecture des produits existants : `scripts/products/refresh-products.ts`. Nom générique gardé en entier, sous-titre coupé à la fin d'un mot (`components/ui/WordClampText.tsx`).
 - Quantités affichées avec `displayQuantity` (`lib/quantity.ts`) : format de la langue, unité la plus naturelle (`naturalQuantity`, aussi dans `formatQuantity`).
 
+### Phase 7 — finalisation du design (validée le 30/09/2026)
+- Navigation (`app/(tabs)/_layout.tsx`, `components/ui/TabBar.tsx`) : Accueil · Garde-manger · Scanner (bouton rond au centre) · Courses · Réglages ; « Mes recettes » (`app/(tabs)/saved.tsx`) en onglet caché, ouvert depuis la section « Mes recettes » de l'accueil.
+- Icônes des aliments : `components/pantry/FoodIcon.tsx` (catégorie → icône lucide, famille → `colors.foodFamilies`).
+- Dates : relatives jusqu'à 7 jours (`RELATIVE_DAYS`), date réelle au-delà (`shortDate`, `lib/expiry.ts`).
+- Génération : recette écartée redemandée une fois ; `rejected` et `fewIngredients` dans la réponse, expliqués sous les résultats ; végétarien : produits laitiers, œufs et miel toujours permis (`isDietException`).
+- Fiches aliments : atouts de trois mots au plus (`isShortNutrition`), saison en quelques mots (`SEASON_MAX`) ; réécriture des fiches existantes par `scripts/food-facts/fix-nutrition.mjs` et `fix-seasons.mjs`.
+- « Vider le garde-manger » dans les Réglages (retrait annulable par `delete_ingredients_with_undo`) ; plus de « Tout effacer » dans le garde-manger.
+- Sel, poivre, huile et eau jamais « à acheter » (`isBasic` : serveur et `lib/basics.ts`).
+- Documentation : `CLAUDE.md` (règles, lu à chaque session), `docs/ENVIRONMENT.md` (comptes, variables, secrets, sans valeurs), `docs/REPRISE-PROJET.md` (contexte et raisons des choix).
+- Quantités : litre « L », « pièce » par défaut sans unité (`formatQuantity`) ; « X à sauver » recalculé sur le garde-manger actuel (`hooks/usePantryUrgency.ts`) ; 2 recettes pour 1 ou 2 aliments, 3 au-delà (`recipeCount`).
+
 ## 5. État actuel et problèmes connus
 
 ### Sécurité
 - Garde-manger filtré par foyer (`household_id`), auteur des ingrédients non modifiable (phase 6a). Les fonctions du foyer, des invitations et du résumé sont en SECURITY DEFINER avec `search_path` vide ; `claim_daily_digests` réservée à la clé secrète.
 
 ### Dette et finitions
-- Offres gratuites partagées par toute l'app : Groq (scan : ~1 000 tokens de sortie par minute ; génération : 8 000 tokens par minute et 1 000 requêtes par jour) et Cloudflare (≈ 57 images par jour mesurées, 173 neurones par image) ; au-delà, le secours prend le relais ou l'image n'est pas générée. À revoir avant la bêta (phase 8).
-- Confirmation d'email désactivée dans Supabase pendant le développement (à réactiver en phase 8).
-- Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`) : renommage en phase 8, nom pas encore choisi.
+- Offres gratuites partagées par toute l'app : Groq (scan : ~1 000 tokens de sortie par minute ; génération : 8 000 tokens par minute et 1 000 requêtes par jour) et Cloudflare (≈ 57 images par jour mesurées, 173 neurones par image) ; au-delà, le secours prend le relais ou l'image n'est pas générée. Offres payantes en phase 13.
+- Confirmation d'email désactivée dans Supabase pendant le développement (à réactiver en phase 13).
+- Nom du template encore présent (`bolt-expo-nativewind`, scheme `myapp`, `bolt-expo-starter`) : nom choisi en phase 11, renommage au lancement (phase 15).
 - Sauvegardes de la base dans `backups/` : jamais commitées (`.gitignore`) ni exportées.
 - Rappels locaux (secours sans jeton push) calculés sur le téléphone ; avec le temps réel, un changement fait par un autre membre les recalcule dès que l'app est ouverte.
-- « J'ai cuisiné ça » : quantité utilisée réglable seulement quand l'unité de la recette correspond à celle du garde-manger (sinon « Tout », « La moitié » ou « Un peu ») ; fermer la fiche pendant le message « Annuler » enregistre tout de suite.
+- « J'ai cuisiné ça » : quantité utilisée réglable seulement quand l'unité de la recette correspond à celle du garde-manger (sinon « Tout », « La moitié » ou « Un peu ») ; l'action est enregistrée tout de suite, « Annuler » (10 secondes) ou « Récemment retirés » (24 heures) la rétablissent.
 - Développement avec le build « Antigaspi (dev) » (`npx expo start --dev-client`) ; nouveau build seulement après un changement natif (bibliothèque native, `app.json`, `app.config.js`, `eas.json`). Expo Go reste utilisable, sans notifications push (rappels locaux).
 - Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 
 ## 6. Prochaine étape
-Phase 8 : préparer le lancement, avec la phase 8a (audit qualité et sécurité, dont un build de test optimisé pour mesurer les performances sur le Galaxy A30). Détails dans `PLAN.md`.
+Phase 8 : anti-gaspi avancé (emplacement, congélation, dates « de préférence avant », date d'ouverture, « Est-ce encore bon ? », heure du résumé), puis 9 Recettes, 10 Premier contact, 11 Point de décision, 12 Natif (un seul build), 13 Services et abonnements, 14 Audit, 15 Lancement. Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash

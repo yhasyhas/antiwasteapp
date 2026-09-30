@@ -2,14 +2,16 @@ import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import type { Tabs } from 'expo-router';
-import { colors, motion, radius, sizes, spacing, typography } from '@/constants/theme';
+import { colors, motion, radius, shadows, sizes, spacing, typography } from '@/constants/theme';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { Touchable } from './Touchable';
 
 type BottomTabBarProps = Parameters<NonNullable<React.ComponentProps<typeof Tabs>['tabBar']>>[0];
 
-// Écrans rattachés à un onglet visible : la liste de courses (onglet caché) allume « Accueil »
-const PARENT_TAB: Record<string, string> = { shopping: 'index' };
+// Écrans rattachés à un onglet visible : « Mes recettes » (onglet caché) allume « Accueil »
+const PARENT_TAB: Record<string, string> = { saved: 'index' };
+// Onglet mis en valeur au centre de la barre : bouton rond
+const FEATURED_TAB = 'camera';
 
 // Barre d'onglets : icône et libellé, pilule vert doux derrière l'icône de l'onglet actif ; au-dessus des
 // boutons de navigation d'Android (marge du système)
@@ -25,14 +27,16 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
         // Onglets cachés (href: null) : pas de bouton dans la barre
         if (route.name in PARENT_TAB) return null;
         const focused = route.name === highlighted;
+        // Sur l'écran Scanner, onglet simple : seul le déclencheur de l'appareil photo reste en rond
+        const featured = route.name === FEATURED_TAB && activeName !== FEATURED_TAB;
         const label = typeof options.title === 'string' ? options.title : route.name;
         const onPress = () => {
           const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
           if (!event.defaultPrevented && route.name !== activeName) navigation.navigate(route.name, route.params);
         };
         return (
-          <TabItem key={route.key} focused={focused} label={label} onPress={onPress}>
-            {options.tabBarIcon?.({ focused, color: focused ? colors.primary : colors.textSecondary, size: sizes.iconLarge })}
+          <TabItem key={route.key} focused={focused} featured={featured} label={label} onPress={onPress}>
+            {options.tabBarIcon?.({ focused, color: featured ? colors.onPrimary : focused ? colors.primary : colors.textSecondary, size: sizes.iconLarge })}
           </TabItem>
         );
       })}
@@ -40,7 +44,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   );
 }
 
-function TabItem({ focused, label, onPress, children }: { focused: boolean; label: string; onPress: () => void; children: React.ReactNode }) {
+function TabItem({ focused, featured = false, label, onPress, children }: { focused: boolean; featured?: boolean; label: string; onPress: () => void; children: React.ReactNode }) {
   const progress = useSharedValue(focused ? 1 : 0);
   useEffect(() => {
     progress.value = withTiming(focused ? 1 : 0, { duration: motion.normal });
@@ -59,10 +63,16 @@ function TabItem({ focused, label, onPress, children }: { focused: boolean; labe
       accessibilityState={{ selected: focused }}
       accessibilityLabel={label}
     >
-      <View style={styles.iconArea}>
-        <Animated.View style={[styles.pill, pill]} />
-        <View style={styles.icon}>{children}</View>
-      </View>
+      {featured ? (
+        <View style={styles.featuredArea}>
+          <View style={[styles.featured, focused && styles.featuredFocused]}>{children}</View>
+        </View>
+      ) : (
+        <View style={styles.iconArea}>
+          <Animated.View style={[styles.pill, pill]} />
+          <View style={styles.icon}>{children}</View>
+        </View>
+      )}
       <Text style={[styles.label, focused && styles.labelFocused]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{label}</Text>
     </Touchable>
   );
@@ -99,6 +109,27 @@ const styles = StyleSheet.create({
   },
   icon: {
     zIndex: 1,
+  },
+  // Scanner : bouton rond qui dépasse de la barre, même hauteur de ligne que les autres onglets
+  featuredArea: {
+    width: sizes.tabPill.width,
+    height: sizes.tabPill.height,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  featured: {
+    width: sizes.tabFeatured,
+    height: sizes.tabFeatured,
+    borderRadius: radius.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.primary,
+    borderWidth: sizes.borderStrong * 2,
+    borderColor: colors.surface,
+    ...shadows.floating,
+  },
+  featuredFocused: {
+    borderColor: colors.primarySoft,
   },
   label: {
     ...typography.tab,

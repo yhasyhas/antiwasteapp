@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { Camera, Plus, Search, ShoppingCart, Users } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
@@ -27,7 +27,7 @@ import { notifyPantryChanged, onPantryChanged } from '@/lib/pantryEvents';
 import { loadPantry } from '@/lib/pantry';
 import { groupLots, lotsStock, totalLabel, type LotGroup } from '@/lib/pantryLots';
 import { formatQuantity } from '@/lib/quantity';
-import { activeHouseholdId, addedByLabel } from '@/lib/household';
+import { addedByLabel } from '@/lib/household';
 import { useHousehold } from '@/hooks/useHousehold';
 import { useUndoableAction } from '@/hooks/useUndoableAction';
 import { hasGenericFact, linkPantryFoodKeys, useFoodNaming } from '@/lib/foodNames';
@@ -156,38 +156,6 @@ export default function IngredientsScreen() {
     const saved = await saveLotExpiry(editingExpiry, expiresAt);
     setSavingExpiry(false);
     if (saved) setEditingExpiry(null);
-  };
-
-  const clearAllIngredients = () => {
-    Alert.alert(
-      t('pantry.clearTitle'),
-      t('pantry.clearText'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('pantry.clearTitle'),
-          style: 'destructive',
-          onPress: async () => {
-            const householdId = await activeHouseholdId();
-            if (!user || !householdId) return;
-
-            setLoading(true);
-            const { error } = await supabase
-              .from('ingredients')
-              .delete()
-              .eq('household_id', householdId);
-
-            if (error) {
-              alertWriteError(t, 'clearing ingredients', error);
-            } else {
-              setIngredients([]);
-              notifyPantryChanged();
-            }
-            setLoading(false);
-          },
-        },
-      ]
-    );
   };
 
   // Une ligne par aliment, avec sa quantité totale, recalculée seulement quand le garde-manger change (pas à
@@ -322,11 +290,6 @@ export default function IngredientsScreen() {
         {/* Retraits et « J'ai cuisiné ça » des dernières 24 heures, rétablissables */}
         {!loading ? <RecentlyRemoved /> : null}
 
-        {!loading && allGroups.length > 0 ? (
-          <Touchable onPress={clearAllIngredients} style={styles.clear} accessibilityRole="button">
-            <Text style={styles.clearText}>{t('pantry.clearTitle')}</Text>
-          </Touchable>
-        ) : null}
       </ScrollView>
 
       {/* Ajouter : scan ou ajout à la main */}
@@ -407,16 +370,6 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'center',
     paddingVertical: spacing.xxxl,
-  },
-  clear: {
-    alignSelf: 'center',
-    minHeight: sizes.touch,
-    justifyContent: 'center',
-    paddingHorizontal: spacing.lg,
-  },
-  clearText: {
-    ...typography.bodyStrong,
-    color: colors.expired.text,
   },
   fab: {
     position: 'absolute',

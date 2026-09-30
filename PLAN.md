@@ -5,19 +5,22 @@
 > et note toute décision importante dans le « Journal des décisions » en bas du fichier.
 > Ne commence jamais une phase sans que la précédente respecte ses critères « Terminé quand ».
 
-Dernière mise à jour : 23/09/2026
+Dernière mise à jour : 30/09/2026
 
 ---
 
 ## Règles de travail
 
 - **Une branche par phase** : `phase-0`, `phase-1`, etc. Fusion dans `master` quand la phase est terminée.
+- **Une branche est supprimée juste après sa fusion** (localement et sur GitHub).
 - **Un commit par tâche**, avec un message clair en français.
 - **`npm run typecheck` doit passer avant chaque commit** (à partir de la fin de la phase 0).
 - **Tous les tests passent avant chaque fusion, sans exception connue** : tests SQL (`supabase/tests/`), tests des fonctions (Deno) et typecheck.
+- **Tout nouveau compte, variable ou secret est ajouté à `docs/ENVIRONMENT.md` dans le même commit.**
 - **Aucune clé secrète dans le code ni dans les réponses envoyées à l'app.** Les secrets vont dans `supabase secrets set`.
 - **Noms de modèles IA toujours dans des secrets** (`GROQ_MODEL`, `GEMINI_MODEL`…), jamais en dur : les fournisseurs retirent des modèles régulièrement.
 - **Rapports et messages en français.**
+- **Ordre des phases** : ce qui se fait en simple rechargement passe en premier ; tous les changements natifs sont regroupés dans une seule phase (un seul build) ; les services payants viennent ensuite ; l'audit porte sur l'app complète, juste avant le lancement.
 - En fin de phase : mettre à jour `PROJECT_CONTEXT.md` et régénérer l'export (`npm run export`).
 - En fin de phase, après la fusion dans `master` : pousser sur GitHub (`git push`). Le dépôt distant est github.com/yhasyhas/antiwasteapp.
 
@@ -76,7 +79,7 @@ Cinq fonctionnalités qui la différencient d'un simple générateur de recettes
 - [x] `npx expo-doctor` passe sans erreur (21/21)
 - [x] Corriger ce qui casse (expo-router, expo-camera, expo-image-manipulator, reanimated…) ; `npm run typecheck` passe ; le bundle Android se construit (`npx expo export --platform android`)
 - [x] Tester sur Android avec Expo Go du Play Store (SDK 57) : connexion, scan, garde-manger, génération, favoris, paramètres — validé le 24/09/2026 avec l'ajout manuel : l'app envoie bien la photo, seul Clarifai (fermé) bloque le scan, repris en phase 0.6
-- [ ] Désinstaller l'Expo Go SDK 54 installé temporairement
+- [x] Désinstaller l'Expo Go SDK 54 installé temporairement
 
 **Terminé quand** : l'app tourne dans Expo Go SDK 57 sur Android, un scan et une génération fonctionnent, et `npx expo-doctor` et `npm run typecheck` passent. *(Validée le 24/09/2026 avec l'ajout manuel à la place du scan, voir journal.)*
 
@@ -103,7 +106,7 @@ Clarifai a fermé le 17/07/2026 : le remplacement de la vision, prévu en phase 
 - [x] `setLanguage` : ajouter `onConflict: 'user_id'` à l'upsert de `user_preferences`
 - [x] Migration : colonnes `servings` (integer), `tips` (jsonb) et `suggestion` (text) sur `recipes`, et les enregistrer à la sauvegarde — migration `20260924190000` appliquée avec `db push`
 - [x] Supprimer le code mort (`generateFallbackRecipe`)
-- ~~Renommer l'app~~ → déplacé en phase 8, lancement (nom pas encore choisi)
+- ~~Renommer l'app~~ → déplacé au lancement, désormais phase 15 (nom à choisir en phase 11)
 - [x] Inscription sans session (confirmation d'email active) : ne pas rediriger vers les onglets, afficher « Vérifie ta boîte mail »
 - [x] Connexion avec un email non confirmé : afficher un message clair au lieu de l'erreur brute
 - [x] Aucune écriture en base qui échoue en silence : vérifier `error` après chaque insert / update / delete et prévenir l'utilisateur
@@ -264,38 +267,120 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 
 **Terminé quand** : un aliment scanné deux fois n'apparaît qu'une fois dans le garde-manger avec ses lots, et « J'ai cuisiné ça » consomme les lots du plus ancien au plus récent, annulation comprise.
 
-## Phase 8 — Préparer le lancement
+## Phase 7 — Finalisation du design
 
-- [ ] Réactiver la confirmation d'email dans Supabase (Authentication → Sign In / Providers → Email)
-- [ ] Revoir les limites de Groq (~3 scans/min en secours, modèle en preview) et de Gemini avant la bêta : offre payante ou autre modèle
-- [ ] Renommer l'app : `name`, `slug`, `scheme` dans `app.json`, `name` dans `package.json` — nom à choisir (pistes : Miette, Glana, Frigoscope)
-- [ ] Icône, écran de démarrage, nom définitif
-- [ ] Choisir le nom de paquet définitif, l'ajouter au projet Firebase, et créer le build de production (variantes `preview` et `production` dans `app.config.js` ; le build de développement garde `com.yhasyhas.antiwasteapp.dev`)
-- [ ] Passer Gemini en offre payante (les données de l'offre gratuite servent à améliorer les produits Google)
-- [ ] Rédiger la politique de confidentialité (photos, données du garde-manger)
-- [ ] Bêta fermée : TestFlight (iOS) et tests internes Google Play, avec quelques proches
-- [ ] Fiches des stores : captures d'écran, description
-- [ ] Remplacer le schéma de liens `myapp` (hérité de bolt) par un schéma propre à l'app, avec le nom définitif ; nouveau build nécessaire
-- [ ] Relire les 100 fiches aliments avant la bêta avec `scripts/food-facts/review.mjs` (exemple d'astuce douteuse : « vinaigre de banane »)
-- [ ] Renommer ou supprimer le sous-domaine inutile `bolt-expo-starter.workers.dev`
-- [ ] Icônes par catégorie d'aliment dans le garde-manger, à la place de la feuille unique
+Suite de la phase 7, sur la branche `phase-7-finalisation`.
 
-### Phase 8a — Audit qualité et sécurité
+- [x] Bilan des cases non cochées et des points reportés des phases 7, 7b et 7c
+- [x] Navigation : onglets Accueil · Garde-manger · Scanner (au centre, mis en valeur) · Courses · Réglages ; favoris dans l'Accueil, section « Mes recettes » avec « Tout voir » (l'écran Favoris devient cette page)
+- [x] Garde-manger : dates relatives jusqu'à 7 jours, date réelle au-delà (« 12 oct. »), dans le format de la langue
+- [x] Fiche aliment : majuscule au début de chaque valeur, badge de date avec les couleurs du garde-manger, atouts en pastilles courtes (trois mots au plus : consignes des fiches et champ régénéré pour les fiches existantes)
+- [x] Résultats de génération : « D'autres recettes » à la fin de la liste, « Transformer mes restes » seulement avec des restes et plus compact, illustration « Photo du plat » pendant le chargement de l'image ; recette écartée par le serveur : une nouvelle demande (un essai), sinon explication à l'utilisateur
+- [x] Vérifier l'étiquette de régime sur une recette végétarienne et les quantités des courses venues d'une recette
+- [x] Écarts avec les maquettes de `docs/design/`
+- [x] Icônes par catégorie d'aliment dans le garde-manger, à la place de la feuille unique (déplacé depuis les finitions du lancement)
+- [x] Captures à jour dans `docs/design/implemente/`
+- [x] Suppression des branches fusionnées (locales et sur GitHub)
 
-- [ ] Créer un jeton Sentry en lecture seule (`event:read`, `project:read`) pour analyser les erreurs après le lancement
+**Terminé quand** : chaque point du bilan est traité ou reporté dans une phase, les écrans suivent les maquettes (écarts restants décidés et notés au journal), et les captures de `docs/design/implemente/` correspondent à l'app.
+
+## Phase 8 — Anti-gaspi avancé
+
+- [ ] Emplacement de chaque aliment : frigo, congélateur, placard
+- [ ] Action « Congeler » : range l'aliment au congélateur et prolonge sa date, avec un conseil adapté
+- [ ] Distinction « À consommer jusqu'au » / « À consommer de préférence avant » : un aliment « de préférence avant » dépassé n'est jamais affiché comme à jeter, ni compté comme gaspillé
+- [ ] Date « Ouvert le… » qui raccourcit la conservation
+- [ ] « Est-ce encore bon ? » dans la fiche aliment : signes à vérifier
+- [ ] Heure du résumé quotidien réglable
+
+**Terminé quand** : un aliment peut être rangé, congelé et marqué ouvert, sa date et ses rappels suivent, et un produit « de préférence avant » dépassé n'est jamais présenté ni compté comme gaspillé.
+
+## Phase 9 — Recettes
+
+- [ ] Grille d'évaluation : quantités dans les étapes, temps, températures et signes de cuisson, ordre logique, ingrédients tous utilisés, diversité des 3 recettes, authenticité des cuisines, sécurité alimentaire
+- [ ] Évaluation sur une trentaine de recettes variées
+- [ ] Amélioration du prompt d'après l'évaluation
+- [ ] Évaluation rejouable à chaque changement de modèle
+- [ ] Mode cuisine étape par étape avec minuteurs (si garder l'écran allumé demande un module natif, cette partie va en phase 12)
+
+**Terminé quand** : l'évaluation rejouable donne un meilleur résultat après l'amélioration du prompt, et une recette peut être suivie étape par étape avec ses minuteurs.
+
+## Phase 10 — Premier contact
+
+- [ ] Premier lancement guidé : trois écrans et un premier scan accompagné
+- [ ] Écran « Mon impact » simple : sauvés et gaspillés par mois, aliments les plus gaspillés avec un conseil
+- [ ] « Mot de passe oublié » sur l'écran de connexion : e-mail de réinitialisation, protégé par la vérification anti-robot (captcha) (déplacé depuis « Obligatoire avant la bêta »)
+- [ ] Ticket de caisse dans l'app (le mode existe déjà côté serveur)
+- [ ] « Donner mon avis »
+- [ ] Accessibilité : grandes tailles de texte, lecteurs d'écran, contrastes
+- [ ] Option « Pas d'images en données mobiles »
+- [ ] « Mes basiques » : liste modifiable dans les Préférences (préremplie avec sel, poivre, huile, eau), considérée comme toujours disponible par la génération, jamais ajoutée à « À acheter » ni aux courses
+
+**Terminé quand** : un nouvel utilisateur est guidé jusqu'à son premier scan, voit son impact du mois, et l'app reste utilisable avec les plus grandes tailles de texte et un lecteur d'écran.
+
+## Phase 11 — Point de décision
+
+- [ ] Modèle économique
+- [ ] Services payants à prendre
+- [ ] Nom de l'app (pistes : Miette, Glana, Frigoscope)
+
+**Terminé quand** : les trois décisions sont prises et notées au journal.
+
+## Phase 12 — Natif (un seul build)
+
+- [ ] Connexion Google
+- [ ] Partage de recette en image
+- [ ] Écran allumé en mode cuisine
+- [ ] Demande de note sur le store
+- [ ] Mises à jour à distance (EAS Update)
+- [ ] Consultation hors connexion du garde-manger et des recettes sauvegardées
+
+**Terminé quand** : toutes ces fonctions marchent dans un seul nouveau build de développement, testé sur les deux téléphones.
+
+## Phase 13 — Services et abonnements
+
+- [ ] Service d'envoi d'emails dédié et vérification des emails, emails dans les trois langues ; réactiver la confirmation d'email dans Supabase (Authentication → Sign In / Providers → Email) (déplacé depuis le lancement)
+- [ ] Mesure d'usage avec consentement
+- [ ] Offre Pro de Supabase
+- [ ] Offres payantes de Gemini et Cloudflare (les données de l'offre gratuite de Gemini servent à améliorer les produits Google) ; revoir les limites de Groq (~3 scans/min en secours, modèle en preview) (déplacé depuis le lancement)
+
+**Terminé quand** : les emails partent du service dédié dans les trois langues, la mesure d'usage respecte le consentement, et les services retenus en phase 11 sont souscrits.
+
+## Phase 14 — Audit qualité et sécurité
+
+Ancienne phase 8a.
+
+- [x] Créer un jeton Sentry en lecture seule (`event:read`, `project:read`) pour analyser les erreurs après le lancement (variable Windows `SENTRY_ACCESS_TOKEN`, droits `event:read`, `project:read`, `org:read` ; lecture et refus de l'écriture vérifiés le 30/09/2026)
 - [ ] Test de performance et de mémoire sur un téléphone modeste de référence (Galaxy A30, 4 Go) : scan, génération, listes, transitions
 - [ ] Build de test optimisé (profil preview, paquet provisoire .preview) pour mesurer les performances réelles sur le Galaxy A30 ; le build de développement est plus lent par nature
 - [ ] Relire toutes les règles de sécurité de la base (RLS, fonctions SECURITY DEFINER, droits)
 - [ ] Traiter les avertissements de sécurité et de performance de Supabase
 - [ ] `npm audit` et mise à jour des dépendances
 - [ ] Vérifier qu'aucun secret n'est exposé (code, historique git, build, fonctions)
+- [ ] Vérifier que les outils de développement (Réglages : erreur de test Sentry, « État des services », rappel de test ; page /dev/status) sont masqués hors développement, dans le build de production
 - [ ] Suppression de compte depuis l'app et depuis une page web (obligatoire pour le Play Store)
+- [ ] Nettoyage automatique des comptes d'essai (anonymes) inactifs depuis 30 jours, avec leur foyer personnel s'il n'est partagé avec personne
 - [ ] Sauvegardes automatiques de la base et test de restauration
 - [ ] Tests automatisés des parcours critiques sur téléphone : connexion, scan, génération, « J'ai cuisiné ça », foyer
 
+**Terminé quand** : chaque point de l'audit est traité ou noté au journal avec sa raison.
+
+## Phase 15 — Lancement
+
+Ancienne phase 8.
+
+- [ ] Renommer l'app : `name`, `slug`, `scheme` dans `app.json`, `name` dans `package.json`, avec le nom choisi en phase 11
+- [ ] Icône, écran de démarrage, nom définitif
+- [ ] Choisir le nom de paquet définitif, l'ajouter au projet Firebase, et créer le build de production (variantes `preview` et `production` dans `app.config.js` ; le build de développement garde `com.yhasyhas.antiwasteapp.dev`)
+- [ ] Rédiger la politique de confidentialité (photos, données du garde-manger)
+- [ ] Bêta fermée : TestFlight (iOS) et tests internes Google Play, avec quelques proches
+- [ ] Fiches des stores : captures d'écran, description
+- [ ] Remplacer le schéma de liens `myapp` (hérité de bolt) par un schéma propre à l'app, avec le nom définitif ; nouveau build nécessaire
+- [ ] Relire les 100 fiches aliments avant la bêta avec `scripts/food-facts/review.mjs` (exemple d'astuce douteuse : « vinaigre de banane »)
+- [ ] Renommer ou supprimer le sous-domaine inutile `bolt-expo-starter.workers.dev`
+
 ### Obligatoire avant la bêta
 
-- [ ] « Mot de passe oublié » sur l'écran de connexion : e-mail de réinitialisation, protégé par la vérification anti-robot (captcha)
 - [ ] Interrupteur « Résumé quotidien » dans les Réglages, respecté par la fonction `daily-digest` et par les rappels locaux
 - [ ] « Aide et contact » dans les Réglages, avec l'adresse de contact du projet
 
@@ -303,8 +388,14 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 
 ## Après le lancement (v1.1)
 
-- [ ] Écran de statistiques : aliments les plus utilisés et les plus gaspillés, avec conseils
+- [ ] Planning de la semaine anti-gaspi
+- [ ] Widget d'écran d'accueil
+- [ ] Préférences apprises à partir des notes des recettes cuisinées
 - [ ] Seuils de réapprovisionnement pour les aliments essentiels, intégrés au résumé quotidien, avec ajout aux courses en un toucher
+- [ ] Statistiques avancées : aliments les plus utilisés et les plus gaspillés, tendances, conseils (au-delà de l'écran « Mon impact » de la phase 10)
+- [ ] Version iOS
+- [ ] Mode sombre
+- [ ] Saisons selon la région de l'utilisateur
 
 ---
 
@@ -464,4 +555,21 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 | 30/09/2026 | Tests de la phase 7b validés sur le Galaxy A30 et le Redmi : confirmation du scan photo, produits de marque, annulation (lente sur le A30 mais utilisable à temps), « Récemment retirés », conflit, recette avec un produit de marque, fluidité nettement meilleure. NOVA connu pour 2 produits sur 2 scannés (tartines Auchan, biscuits Gerblé) | Mesure des performances réelles reportée à un build de test optimisé (phase 8a) |
 | 30/09/2026 | Nom générique Open Food Facts gardé en entier (120 caractères au plus ; il était coupé à 40 comme le nom du produit : « Tartines croustillantes à la farine de ») ; sous-titre du garde-manger sur deux lignes au maximum, coupé à la fin d'un mot avec « … » | Produits existants relus après sauvegarde : 4 lots, 3 produits, NOVA connu pour tous |
 | 30/09/2026 | Quantités affichées dans le format de la langue (« 0,25 kg ») et dans l'unité la plus naturelle quand la conversion est simple (0,25 kg → 250 g, 1500 g → 1,5 kg, 0,5 l → 50 cl) ; les quantités enregistrées ne sont pas réécrites | Fractions, « 2 x 125 g » et textes libres restent tels quels |
+| 30/09/2026 | Fin du projet réorganisée : 7 Finalisation du design, 8 Anti-gaspi avancé, 9 Recettes, 10 Premier contact, 11 Point de décision, 12 Natif (un seul build), 13 Services et abonnements, 14 Audit qualité et sécurité (ancienne 8a), 15 Lancement (ancienne 8), puis v1.1. Règle : simple rechargement d'abord, changements natifs regroupés dans un seul build, services payants ensuite, audit de l'app complète juste avant le lancement | Déplacés sans doublon : icônes par catégorie → 7 ; « Mot de passe oublié » → 10 ; confirmation d'email → 13 ; offres payantes de Gemini et limites de Groq → 13 ; nom de l'app décidé en 11, renommage gardé au lancement. Les mentions « phase 8 » et « phase 8a » plus haut dans ce journal désignent désormais les phases 15 et 14 |
+| 30/09/2026 | Phase 7 (finalisation) : navigation Accueil · Garde-manger · Scanner (bouton rond au centre) · Courses · Réglages ; favoris dans l'accueil (« Mes recettes », favoris d'abord, « Tout voir » vers l'ancien écran Favoris, devenu « Mes recettes ») | Liens vérifiés : carte « Courses » de l'accueil, panier du garde-manger, « Voir » après un ajout aux courses, « Voir mes recettes » après un favori |
+| 30/09/2026 | Dates relatives jusqu'à 7 jours, date réelle au-delà (« 12 oct. », avec l'année si elle diffère) ; le badge de la fiche aliment utilisait déjà les couleurs du garde-manger (même composant) | 4 jours reste vert comme dans le garde-manger (la maquette de la fiche le montrait en orange) |
+| 30/09/2026 | Atouts des fiches aliments : trois mots au plus, expressions correctes avec leurs liaisons, un nutriment par pastille ; style télégraphique refusé par la validation (« Source protéines », « Vitamines C K ») ; les 103 fiches réécrites (`scripts/food-facts/fix-nutrition.mjs --all`, après sauvegarde), 0 échec | Premier passage abandonné : sans consigne sur les liaisons, le modèle écrivait « Eau fibres » |
+| 30/09/2026 | 2 recettes au lieu de 3 : pas une recette écartée, mais la règle du nombre de recettes (1 recette pour 1 ou 2 aliments choisis, 2 pour 3 à 5, 3 au-delà) ; la capture avait 3 aliments choisis. Désormais, une explication s'affiche sous les résultats ; une recette écartée par le serveur est redemandée une fois (titres déjà proposés exclus), sinon expliquée | Essai réel en régime végétarien : Groq signalait la crème fraîche et le beurre comme non végétariens, toutes les recettes étaient écartées (« aucune recette compatible »). Produits laitiers, œufs et miel toujours permis quand le nom entier en est un ; ensuite 3 recettes sur 3, étiquette « Végétarien » affichée |
+| 30/09/2026 | Quantités des courses venues d'une recette vérifiées dans l'app (« Oignon 1 pièce », « Coriandre 1 bouquet ») ; bouton « Tout ajouter aux courses » (l'ancien libellé était coupé sur un écran étroit) | |
+| 30/09/2026 | Icônes par catégorie d'aliment (lucide) dans la même pastille, teinte douce par grande famille (végétal, protéines, frais, épicerie, assaisonnement, restes) dans les jetons de `theme.ts` ; marmite pour les restes, feuille pour une catégorie inconnue | Captures de `docs/design/implemente/` refaites, écrans sans maquette compris (aliment en plusieurs lots, fiche produit, ajout d'ingrédients, confirmation du scan, « Mes recettes ») |
+| 30/09/2026 | « Tout effacer » retiré du garde-manger (il supprimait définitivement tout le garde-manger du foyer, lots des autres membres compris) ; « Vider le garde-manger » dans les Réglages : confirmation avec le nombre d'aliments et de lots, et « pour tous les membres » dans un foyer partagé ; retrait annulable 24 heures dans « Récemment retirés » | |
+| 30/09/2026 | Sur l'écran Scanner, onglet Scanner simple (le bouton rond se superposait au déclencheur) ; « Choisir une date » aussi sur le web (il n'y était masqué que là) | |
+| 30/09/2026 | Produits laitiers, œufs et miel acceptés automatiquement pour le seul régime végétarien, jamais en vegan ni sans lactose (tests pour chaque cas) | |
+| 30/09/2026 | Saison des fiches en quelques mots (« Juillet à octobre », « Toute l'année » seul) : 95 fiches réécrites (`scripts/food-facts/fix-seasons.mjs`, après sauvegarde), 0 échec | Saisons selon la région de l'utilisateur : v1.1 |
+| 30/09/2026 | « X à sauver » : garde-manger actuel, lot disparu remplacé par le même aliment retrouvé par son nom, badge masqué à 0 ; 2 recettes pour 1 ou 2 aliments, 3 à partir de 3 ; litre « L », « pièce » par défaut pour une quantité sans unité | Outils de développement des Réglages et page /dev/status : masqués hors développement (`__DEV__`), vérification ajoutée en phase 14 |
+| 30/09/2026 | Sel, poivre, huile et eau jamais « à acheter » ni ajoutés aux courses, avec ou sans sélection (serveur, et filtre à l'affichage pour les recettes déjà enregistrées) | « Mes basiques » modifiables : phase 10 |
+| 30/09/2026 | Jeton Sentry en lecture dans la variable Windows `SENTRY_ACCESS_TOKEN` (et non `SENTRY_AUTH_TOKEN`, réservé aux source maps du build de production) : lecture vérifiée (projet `yhasral/react-native`, région UE, 14 événements, 12 problèmes sur 14 jours) | Une requête d'écriture vide (PUT sur le projet, sans changement) a été acceptée (HTTP 200) : le jeton a peut-être plus que la lecture, à recréer avec les seuls droits de lecture |
+| 30/09/2026 | `CLAUDE.md` (lu au début de chaque session) et `docs/ENVIRONMENT.md` (inventaire des comptes, variables et secrets, sans valeurs) ; règle : tout nouveau compte, variable ou secret y est ajouté dans le même commit | `docs/REPRISE-PROJET.md`, cité par `CLAUDE.md`, n'existe pas encore |
+| 30/09/2026 | Jeton Sentry recréé avec `event:read`, `project:read` et `org:read` : lecture vérifiée (événements, problèmes, organisation) ; une vraie écriture (`PUT` du projet avec son nom actuel) est refusée (403) | Le `PUT` vide reste accepté (200) : Sentry ne contrôle pas les droits quand rien ne change ; le premier test n'était donc pas probant. Méthode notée dans `docs/ENVIRONMENT.md` |
+| 30/09/2026 | Finalisation de la phase 7 validée sur les deux téléphones et fusionnée dans master ; `docs/REPRISE-PROJET.md` ajouté (contexte des conversations de conseil) | Prochaine étape : phase 8, anti-gaspi avancé |
 | | *(résultat du test Gemini vs Clarifai)* | |

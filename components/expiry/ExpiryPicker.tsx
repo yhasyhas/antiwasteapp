@@ -30,18 +30,35 @@ export function ExpiryPicker({ value, onChange }: Props) {
     onChange(toISODate(date));
   };
 
+  // Web (captures, essais) : calendrier du navigateur, par un champ date invisible
+  const pickOnWeb = () => {
+    const input = document.createElement('input');
+    input.type = 'date';
+    input.min = today;
+    input.value = value;
+    input.style.position = 'fixed';
+    input.style.opacity = '0';
+    input.style.pointerEvents = 'none';
+    input.onchange = () => {
+      if (input.value) onChange(input.value);
+      input.remove();
+    };
+    input.onblur = () => input.remove();
+    document.body.appendChild(input);
+    if (typeof input.showPicker === 'function') input.showPicker();
+    else input.click();
+  };
+
   return (
     <View>
       <View style={styles.row}>
         {quickChoices.map((choice) => (
           <Chip key={choice.label} label={choice.label} selected={value === choice.iso} onPress={() => onChange(choice.iso)} />
         ))}
-        {Platform.OS !== 'web' && (
-          <Chip label={t('expiry.pickDate')} icon={CalendarDays} onPress={() => setShowCalendar(true)} />
-        )}
+        <Chip label={t('expiry.pickDate')} icon={CalendarDays} onPress={() => (Platform.OS === 'web' ? pickOnWeb() : setShowCalendar(true))} />
       </View>
       <Text style={styles.current}>{t('expiry.expiresOn', { date: formatDate(value, language) })}</Text>
-      {showCalendar && (
+      {showCalendar && Platform.OS !== 'web' && (
         <View>
           <DateTimePicker
             value={fromISODate(value)}
