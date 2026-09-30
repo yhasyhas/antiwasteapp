@@ -21,6 +21,8 @@ import { Toast } from '@/components/ui/Toast';
 import { useUndoableAction } from '@/hooks/useUndoableAction';
 import { ExpiryPicker } from '@/components/expiry/ExpiryPicker';
 import { expiryFromShelfLife } from '@/lib/expiry';
+import { capitalizeFirst } from '@/lib/foodNames';
+import { displayQuantity } from '@/lib/quantity';
 import {
   addShoppingItem,
   loadShoppingList,
@@ -35,7 +37,7 @@ import { colors, opacity, radius, sizes, spacing, typography } from '@/constants
 // Liste de courses du foyer : ajout à la main (ou depuis une recette), coché quand c'est acheté, puis
 // rangé au garde-manger avec une date proposée. Partagée et mise à jour en temps réel.
 export default function ShoppingScreen() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const keyboardScroll = useKeyboardScroll();
   const household = useHousehold();
   const [items, setItems] = useState<ShoppingItem[] | null>(null);
@@ -135,14 +137,14 @@ export default function ShoppingScreen() {
             onPress={() => toggle(item)}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: item.checked }}
-            accessibilityLabel={item.name}
+            accessibilityLabel={capitalizeFirst(item.name)}
           >
             <Checkbox checked={item.checked} />
             <View style={styles.itemText}>
-              <Text style={[styles.itemName, item.checked && styles.itemNameChecked]}>{item.name}</Text>
+              <Text style={[styles.itemName, item.checked && styles.itemNameChecked]}>{capitalizeFirst(item.name)}</Text>
               {details ? <Text style={styles.itemDetails}>{details}</Text> : null}
             </View>
-            {item.quantity ? <Text style={styles.quantity}>{item.quantity}</Text> : null}
+            {item.quantity ? <Text style={styles.quantity}>{displayQuantity(item.quantity, language)}</Text> : null}
           </Touchable>
         </SwipeToDelete>
       </ListItemMotion>
@@ -222,6 +224,7 @@ export default function ShoppingScreen() {
         )}
       </ScrollView>
 
+      {/* Message « Annuler » sous la liste (il ne la couvre pas) */}
       <Toast message={removal.pending ? t('shopping.removed') : null} actionLabel={t('common.undo')} onAction={removal.undo} />
 
       {/* Ranger au garde-manger : une date proposée par article, modifiable */}
@@ -231,7 +234,7 @@ export default function ShoppingScreen() {
           {stocking?.map(({ item, expires_at }, index) => (
             <View key={item.id} style={styles.stockItem}>
               {index > 0 ? <View style={cardStyles.divider} /> : null}
-              <Text style={styles.itemName}>{item.name}{item.quantity ? ` · ${item.quantity}` : ''}</Text>
+              <Text style={styles.itemName}>{capitalizeFirst(item.name)}{item.quantity ? ` · ${displayQuantity(item.quantity, language)}` : ''}</Text>
               <ExpiryPicker
                 value={expires_at}
                 onChange={(value) => setStocking((current) => current?.map((entry, i) => (i === index ? { ...entry, expires_at: value } : entry)) ?? null)}

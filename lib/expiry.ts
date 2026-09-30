@@ -117,3 +117,14 @@ const PACKAGED_SHELF_LIFE_DAYS: Record<string, number> = {
 export function expiryForPackagedProduct(category: string | null | undefined): string {
   return addDays(todayISO(), PACKAGED_SHELF_LIFE_DAYS[category ?? 'other'] ?? PACKAGED_SHELF_LIFE_DAYS.other);
 }
+
+// Date d'ajout d'un lot (horodatage), par rapport à aujourd'hui : « aujourd'hui », « hier », « il y a 3 jours »,
+// puis la date au-delà d'un mois
+export function addedWhen(t: TFunction, createdAt: string, language: string): string {
+  const day = toISODate(new Date(createdAt));
+  const days = Math.max(0, -daysUntil(day));
+  if (days === 0) return t('existing.addedToday');
+  if (days === 1) return t('existing.addedYesterday');
+  if (days <= 31) return t('existing.addedDaysAgo', { count: days });
+  return t('existing.addedOn', { date: formatDate(day, language) });
+}

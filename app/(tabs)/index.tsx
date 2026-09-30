@@ -12,8 +12,10 @@ import { activeHouseholdId } from '@/lib/household';
 import { onPantryChanged } from '@/lib/pantryEvents';
 import { loadShoppingList, onShoppingChanged } from '@/lib/shopping';
 import { expiryStatus, sortByUrgency } from '@/lib/expiry';
+import { groupLots, lotLabel } from '@/lib/pantryLots';
 import { useRecipeImages } from '@/hooks/useRecipeImages';
 import { useFoodNames } from '@/lib/foodNames';
+import { displayQuantity } from '@/lib/quantity';
 import { recipeFromRow, type Recipe } from '@/components/recipe/types';
 import { RecipeSheet } from '@/components/recipe/RecipeSheet';
 import { RecipeListCard } from '@/components/recipe/RecipeListCard';
@@ -36,7 +38,7 @@ const URGENT_COUNT = 3;
 
 export default function HomeScreen() {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const safe = useSafeSpacing();
   // null : pas encore chargé (squelettes)
   const [ingredients, setIngredients] = useState<PantryIngredient[] | null>(null);
@@ -115,8 +117,9 @@ export default function HomeScreen() {
     });
   };
 
-  // Les plus urgents (périmés ou bientôt, triés par date) ; « Cuisiner ces aliments » les présélectionne
-  const urgent = (ingredients ?? [])
+  // Les plus urgents (périmés ou bientôt, triés par date), un par aliment : son lot le plus ancien ;
+  // « Cuisiner ces aliments » les présélectionne
+  const urgent = groupLots(ingredients ?? []).map((group) => ({ ...group.first, quantity: lotLabel(group.first, group.lots, language) }))
     .filter((ingredient) => ['expired', 'soon'].includes(expiryStatus(ingredient.expires_at)))
     .slice(0, URGENT_COUNT);
   const cookUrgent = () => router.push({ pathname: '/recipe/generate', params: { priority: urgent.map((i) => i.id).join(',') } });
@@ -170,7 +173,7 @@ export default function HomeScreen() {
                       <IconChip icon={Leaf} />
                       <View style={styles.rowText}>
                         <Text style={styles.rowTitle} numberOfLines={1}>{foodName(ingredient)}</Text>
-                        {ingredient.quantity ? <Text style={styles.rowSubtitle} numberOfLines={1}>{ingredient.quantity}</Text> : null}
+                        {ingredient.quantity ? <Text style={styles.rowSubtitle} numberOfLines={1}>{displayQuantity(ingredient.quantity, language)}</Text> : null}
                       </View>
                       <View style={styles.badges}>
                         {ingredient.kind === 'dish' ? <Badge label={t('pantry.leftover')} tone="leftover" /> : null}

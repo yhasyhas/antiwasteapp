@@ -94,11 +94,56 @@ export function stepOf(stock: Quantity): number {
   return magnitude >= 100 ? magnitude / 2 : magnitude;
 }
 
-// Nombre → texte (virgule décimale en français et en espagnol), suivi de l'unité du garde-manger
-export function formatQuantity(value: number, unit: string, language: string): string {
+const nearly = (a: number, b: number) => Math.abs(a - b) < 1e-6;
+
+// Unité la plus naturelle quand la conversion est simple : 0,25 kg → 250 g, 1500 g → 1,5 kg, 0,5 l → 50 cl,
+// 0,125 l → 125 ml, 1000 ml → 1 l. Les autres unités restent telles quelles.
+export function naturalQuantity(value: number, unit: string): { value: number; unit: string } {
+  const key = normalize(unit);
+  const mass = MASS[key];
+  const volume = VOLUME[key];
+  if (mass !== undefined) {
+    const grams = value * mass;
+    if (mass === 1000 && value < 1 && nearly(grams, Math.round(grams))) return { value: Math.round(grams), unit: 'g' };
+    if (mass === 1 && grams >= 1000 && nearly(grams % 100, 0)) return { value: grams / 1000, unit: 'kg' };
+  } else if (volume !== undefined) {
+    const millilitres = value * volume;
+    if (millilitres >= 1000 && volume < 1000 && nearly(millilitres % 100, 0)) return { value: millilitres / 1000, unit: 'l' };
+    if (volume === 1000 && value < 1) {
+      if (nearly(millilitres % 10, 0)) return { value: Math.round(millilitres / 10), unit: 'cl' };
+      if (nearly(millilitres, Math.round(millilitres))) return { value: Math.round(millilitres), unit: 'ml' };
+    }
+  }
+  return { value, unit };
+}
+
+// Quantité écrite (garde-manger, courses, Open Food Facts) → texte dans le format de la langue et l'unité la
+// plus naturelle (« 0.25 kg » → « 250 g », « 1.5 l » → « 1,5 l » en français). Seul un nombre simple suivi
+// d'un mot est réécrit ; « 1/2 », « 2 x 125 g », « un peu » restent tels quels.
+export function displayQuantity(text: string | null | undefined, language: string): string {
+  if (!text) return '';
+  const match = text.trim().match(/^(\d+(?:[.,]\d+)?)\s*(\p{L}*)\.?$/u);
+  if (!match) return text;
+  const value = Number(match[1].replace(',', '.'));
+  if (!Number.isFinite(value)) return text;
+  const unit = match[2];
+  const measure = normalize(unit) in MASS || normalize(unit) in VOLUME;
+  // Mot quelconque sans décimale : texte d'origine (pas d'accord imposé à « 3 tomate »)
+  if (!measure && !/[.,]/.test(match[1])) return text;
+  return formatQuantity(value, unit, language);
+}
+
+// Nombre → texte (virgule décimale en français et en espagnol), suivi de l'unité du garde-manger, convertie
+// dans l'unité la plus naturelle quand c'est simple (0,25 kg → 250 g)
+export function formatQuantity(rawValue: number, rawUnit: string, language: string): string {
+  const { value, unit } = naturalQuantity(rawValue, rawUnit);
   const number = Number(value.toFixed(2)).toString();
   const text = language === 'en' ? number : number.replace('.', ',');
-  // « 1 œuf », « 1 tranche » : unité au singulier (sauf les unités de mesure : « 1 l », « 1 kg »)
-  const word = value <= 1 && /^\p{L}{3,}s$/u.test(unit) && !(normalize(unit) in MASS) && !(normalize(unit) in VOLUME) ? unit.slice(0, -1) : unit;
+  // « 1 œuf », « 1 tranche » : unité au singulier (sauf les unités de mesure : « 1 l », « 1 kg ») ; au-delà de 1,
+  // un mot simple prend un « s » en français et en espagnol (« 3 paquets », « 2 paquetes »)
+  const measure = normalize(unit) in MASS || normalize(unit) in VOLUME;
+  const word = value <= 1 && /^\p{L}{3,}s$/u.test(unit) && !measure ? unit.slice(0, -1)
+    : value > 1 && (language === 'fr' || language === 'es') && /^\p{L}{3,}$/u.test(unit) && !/[sxz]$/.test(unit) && !measure ? `${unit}s`
+      : unit;
   return word ? `${text} ${word}` : text;
 }

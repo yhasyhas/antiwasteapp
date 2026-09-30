@@ -13,6 +13,7 @@ import { PermissionRequest } from '@/components/scan/PermissionRequest';
 import { ScannerCamera, useScannerPermission } from '@/components/scan/ScannerCamera';
 import type { ScannerCameraHandle, ScannerFacing } from '@/components/scan/scannerCameraTypes';
 import { Button } from '@/components/ui/Button';
+import { Toast } from '@/components/ui/Toast';
 import { Touchable } from '@/components/ui/Touchable';
 import { reportCameraIssue } from '@/lib/sentry';
 import { colors, opacity, radius, sizes, spacing, typography } from '@/constants/theme';
@@ -45,7 +46,14 @@ export default function CameraScreen() {
     analyzeImage,
     toggleDetected,
     setDetectedExpiry,
+    setDetectedQuantity,
+    setDetectedChoice,
     confirmDetected,
+    groups,
+    saving,
+    closeConfirmation,
+    notice,
+    showNotice,
   } = useScan({ onManualAdd: () => setShowManualAdd(true) });
 
   // Caméra montée seulement quand elle est visible : onglet Scanner affiché (les onglets restent montés en
@@ -106,6 +114,7 @@ export default function CameraScreen() {
     <ManualAddModal
       visible={showManualAdd}
       prefill={prefill}
+      onNothingAdded={() => showNotice(t('scan.nothingAdded'))}
       onClose={() => {
         setShowManualAdd(false);
         // Scan du code-barres suivant
@@ -198,6 +207,11 @@ export default function CameraScreen() {
           </View>
         )}
 
+        {/* Information brève (« Aucun aliment ajouté ») en bas de l'aperçu */}
+        <View style={styles.notice} pointerEvents="none">
+          <Toast message={notice} />
+        </View>
+
         {/* En-tête posé sur l'aperçu */}
         <View style={[styles.header, safe.top(spacing.xl)]}>
           <Text style={styles.title}>{t('scan.shortTitle')}</Text>
@@ -238,8 +252,12 @@ export default function CameraScreen() {
         photo={capturedImage}
         onToggle={toggleDetected}
         onExpiryChange={setDetectedExpiry}
+        onQuantityChange={setDetectedQuantity}
+        onChoiceChange={setDetectedChoice}
+        groups={groups}
+        saving={saving}
         onConfirm={confirmDetected}
-        onClose={() => setShowConfirmation(false)}
+        onClose={closeConfirmation}
       />
     </View>
   );
@@ -363,6 +381,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: CORNER_WIDTH,
     borderRightWidth: CORNER_WIDTH,
     borderBottomRightRadius: radius.card,
+  },
+  notice: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: spacing.lg,
   },
   capturedImage: {
     position: 'absolute',

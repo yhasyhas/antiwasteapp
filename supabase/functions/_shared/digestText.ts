@@ -56,8 +56,19 @@ const MAX_NAMES = 3;
 const fill = (template: string, values: Record<string, string | number>) =>
   template.replace(/\{(\w+)\}/g, (_, key) => String(values[key] ?? ''));
 
+// Plusieurs lots d'un même aliment le même jour : son nom une seule fois (comme l'app)
+function uniqueNames(items: DigestItem[]): string[] {
+  const seen = new Set<string>();
+  return items.map((item) => item.name).filter((name) => {
+    const key = name.trim().toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function listNames(items: DigestItem[], texts: (typeof TEXTS)[DigestLanguage]): string {
-  const names = items.map((item) => item.name);
+  const names = uniqueNames(items);
   if (names.length > MAX_NAMES) {
     const rest = names.length - MAX_NAMES;
     return fill(rest === 1 ? texts.andMoreOne : texts.andMoreOther, { items: names.slice(0, MAX_NAMES).join(', '), count: rest });

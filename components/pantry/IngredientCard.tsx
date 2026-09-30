@@ -8,8 +8,10 @@ import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { IconChip } from '@/components/ui/IconChip';
 import { Touchable } from '@/components/ui/Touchable';
+import { WordClampText } from '@/components/ui/WordClampText';
 import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 import type { FoodKind } from '@/lib/expiry';
+import { displayQuantity } from '@/lib/quantity';
 
 export interface PantryIngredient {
   id: string;
@@ -26,6 +28,13 @@ export interface PantryIngredient {
   user_id: string | null;
   // Identifiant standard (fiche aliment) ; null avant la première ouverture de la fiche
   food_key?: string | null;
+  // Produit scanné par code-barres (Open Food Facts) ; vides pour les autres aliments
+  product_name?: string | null;
+  generic_name?: string | null;
+  brand?: string | null;
+  nova_group?: number | null;
+  nutriscore_grade?: string | null;
+  off_categories?: string[] | null;
 }
 
 interface Props {
@@ -36,26 +45,31 @@ interface Props {
   onEditExpiry: () => void;
   // Foyer partagé : nom de celui qui l'a ajouté (sinon non affiché)
   addedBy?: string;
-  // Fiche de l'aliment (pas pour un plat cuisiné)
+  // Feuille de l'aliment : ses lots, puis sa fiche
   onOpenFact?: () => void;
+  // Produit par code-barres : nom générique, sous le nom
+  subtitle?: string | null;
+  // Aliment en plusieurs lots : quantité totale et nombre de lots (date : la plus proche)
+  quantityLabel?: string;
+  lotCount?: number;
 }
 
 // Aliment du garde-manger : nom, quantité, auteur, conseil de conservation, badges de date (touchable
-// pour la modifier) et de reste. Toucher la carte ouvre la fiche de l'aliment ; glisser vers la gauche
+// pour la modifier) et de reste. Toucher la carte ouvre la feuille de l'aliment (lots, fiche) ; glisser vers la gauche
 // ou appui long : supprimer (ou les autres actions).
-export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry, addedBy, onOpenFact }: Props) {
-  const { t } = useLanguage();
+export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry, addedBy, onOpenFact, subtitle, quantityLabel, lotCount = 1 }: Props) {
+  const { t, language } = useLanguage();
   const swipeable = useRef<SwipeableMethods>(null);
   const isDish = ingredient.kind === 'dish';
   const name = displayName ?? ingredient.name;
-  const openFact = onOpenFact && !isDish ? onOpenFact : undefined;
+  const openFact = onOpenFact;
   // « ajouté par Awa » : seule la première lettre de la phrase passe en minuscule, le prénom garde sa majuscule
-  const details = [ingredient.quantity, addedBy ? addedBy.charAt(0).toLowerCase() + addedBy.slice(1) : null].filter(Boolean).join(' · ');
+  const details = [quantityLabel ?? displayQuantity(ingredient.quantity, language), lotCount > 1 ? t('lots.count', { count: lotCount }) : null, addedBy ? addedBy.charAt(0).toLowerCase() + addedBy.slice(1) : null].filter(Boolean).join(' · ');
 
   // Appui long : toutes les actions de l'aliment
   const showActions = () => {
     Alert.alert(name, undefined, [
-      ...(openFact ? [{ text: t('pantry.viewFact'), onPress: openFact }] : []),
+      ...(openFact ? [{ text: isDish ? t('pantry.viewDetails') : t('pantry.viewFact'), onPress: openFact }] : []),
       { text: t('expiry.edit'), onPress: onEditExpiry },
       { text: t('common.delete'), style: 'destructive' as const, onPress: onDelete },
       { text: t('common.cancel'), style: 'cancel' as const },
@@ -89,11 +103,12 @@ export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry
         onPress={openFact ?? showActions}
         onLongPress={showActions}
         style={styles.card}
-        accessibilityLabel={openFact ? `${name}, ${t('facts.open')}` : name}
+        accessibilityLabel={openFact ? `${name}, ${isDish ? t('pantry.viewDetails') : t('facts.open')}` : name}
       >
         <IconChip icon={Leaf} />
         <View style={styles.body}>
           <Text style={styles.name}>{name}</Text>
+          {subtitle ? <WordClampText style={styles.subtitle}>{subtitle}</WordClampText> : null}
           {details ? <Text style={styles.details}>{details}</Text> : null}
           {ingredient.storage_tip ? (
             <View style={styles.tip}>
@@ -127,6 +142,9 @@ const styles = StyleSheet.create({
   },
   name: {
     ...typography.cardTitle,
+  },
+  subtitle: {
+    ...typography.secondary,
   },
   details: {
     ...typography.secondary,

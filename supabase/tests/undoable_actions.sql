@@ -1,7 +1,7 @@
 -- Tests des actions annulables (« Annuler » pendant 5 secondes) : « J'ai cuisiné ça » et suppressions
 -- enregistrés tout de suite ; annulation tout ou rien (lignes rétablies à l'identique, quantités, compteur) ;
 -- conflit si un autre membre a modifié ou retiré un aliment entre-temps (rien rétabli) ; une seule
--- annulation, par son auteur seulement, dans les 2 minutes ; rien pour qui n'est pas du foyer.
+-- annulation, par son auteur seulement, dans les 24 heures ; rien pour qui n'est pas du foyer.
 --
 -- Lancement (base liée, mot de passe dans SUPABASE_DB_PASSWORD) :
 --   PGPASSWORD="$SUPABASE_DB_PASSWORD" psql "$(cat supabase/.temp/pooler-url)" -v ON_ERROR_STOP=1 -f supabase/tests/undoable_actions.sql
@@ -154,7 +154,7 @@ BEGIN
 END;
 $$;
 
--- Hors délai (plus de 2 minutes)
+-- Hors délai (plus de 24 heures)
 DO $$
 DECLARE
   v_action uuid := public.delete_ingredient_with_undo('00000000-0000-4000-b000-0000000008e4');
@@ -163,7 +163,7 @@ BEGIN
 END;
 $$;
 RESET ROLE;
-UPDATE public.pantry_actions SET created_at = now() - interval '3 minutes' WHERE id = (SELECT value::uuid FROM ctx WHERE key = 'late');
+UPDATE public.pantry_actions SET created_at = now() - interval '25 hours' WHERE id = (SELECT value::uuid FROM ctx WHERE key = 'late');
 SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claims', '{"sub": "00000000-0000-4000-a000-0000000008aa", "role": "authenticated"}', true);
 DO $$

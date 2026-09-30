@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { AccessibilityInfo, StyleSheet, Text, type DimensionValue } from 'react-native';
+import { AccessibilityInfo, StyleSheet, Text } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { colors, motion, radius, shadows, sizes, spacing, typography } from '@/constants/theme';
 import { Touchable } from './Touchable';
@@ -7,17 +7,18 @@ import { Touchable } from './Touchable';
 interface Props {
   // Message affiché (« Aliment retiré »), ou null pour cacher
   message: string | null;
-  // Action proposée (« Annuler », « Voir »)
-  actionLabel: string;
-  onAction: () => void;
-  // Hauteur au-dessus du bas de l'écran ou du conteneur (pour laisser voir un bouton flottant ou une barre)
-  bottom?: DimensionValue;
+  // Action proposée (« Annuler », « Voir ») ; sans action : simple information
+  actionLabel?: string;
+  onAction?: () => void;
+  // Marges sur les côtés (écran) ; false dans une barre qui a déjà les siennes
+  inset?: boolean;
 }
 
-// Message temporaire en bas de l'écran, avec une action (« Annuler », « Voir »)
-export function Toast({ message, actionLabel, onAction, bottom = spacing.xl }: Props) {
+// Message temporaire, avec une action (« Annuler », « Voir »). Placé dans la mise en page, en bas de l'écran ou
+// de la feuille (pas par-dessus) : il prend sa place au lieu de couvrir du contenu.
+export function Toast({ message, actionLabel, onAction, inset = true }: Props) {
   useEffect(() => {
-    if (message) AccessibilityInfo.announceForAccessibility(`${message}. ${actionLabel}`);
+    if (message) AccessibilityInfo.announceForAccessibility(actionLabel ? `${message}. ${actionLabel}` : message);
   }, [message]);
 
   if (!message) return null;
@@ -26,31 +27,37 @@ export function Toast({ message, actionLabel, onAction, bottom = spacing.xl }: P
       key={message}
       entering={FadeInDown.duration(motion.normal)}
       exiting={FadeOutDown.duration(motion.fast)}
-      style={[styles.toast, { bottom }]}
+      style={[styles.toast, inset && styles.inset, !(actionLabel && onAction) && styles.info]}
       accessibilityLiveRegion="polite"
     >
       <Text style={styles.message} numberOfLines={2}>{message}</Text>
-      <Touchable onPress={onAction} style={styles.action} accessibilityRole="button">
-        <Text style={styles.actionText}>{actionLabel}</Text>
-      </Touchable>
+      {actionLabel && onAction ? (
+        <Touchable onPress={onAction} style={styles.action} accessibilityRole="button">
+          <Text style={styles.actionText}>{actionLabel}</Text>
+        </Touchable>
+      ) : null}
     </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   toast: {
-    position: 'absolute',
-    left: spacing.screen,
-    right: spacing.screen,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
     minHeight: sizes.button + spacing.sm,
     paddingLeft: spacing.lg,
     paddingRight: spacing.xs,
+    marginBottom: spacing.sm,
     borderRadius: radius.control,
     backgroundColor: colors.toast.background,
     ...shadows.floating,
+  },
+  info: {
+    paddingRight: spacing.lg,
+  },
+  inset: {
+    marginHorizontal: spacing.screen,
   },
   message: {
     ...typography.bodyMedium,

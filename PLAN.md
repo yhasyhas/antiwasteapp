@@ -14,6 +14,7 @@ Dernière mise à jour : 23/09/2026
 - **Une branche par phase** : `phase-0`, `phase-1`, etc. Fusion dans `master` quand la phase est terminée.
 - **Un commit par tâche**, avec un message clair en français.
 - **`npm run typecheck` doit passer avant chaque commit** (à partir de la fin de la phase 0).
+- **Tous les tests passent avant chaque fusion, sans exception connue** : tests SQL (`supabase/tests/`), tests des fonctions (Deno) et typecheck.
 - **Aucune clé secrète dans le code ni dans les réponses envoyées à l'app.** Les secrets vont dans `supabase secrets set`.
 - **Noms de modèles IA toujours dans des secrets** (`GROQ_MODEL`, `GEMINI_MODEL`…), jamais en dur : les fournisseurs retirent des modèles régulièrement.
 - **Rapports et messages en français.**
@@ -250,6 +251,19 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 
 **Terminé quand** : l'aperçu du Scanner revient à chaque retour sur l'onglet, sur le Samsung comme sur le Redmi, en photo et en code-barres.
 
+## Phase 7b — Fiabilité du garde-manger
+
+- [x] Quantités modifiables au scan (photo avec un ou plusieurs aliments, et code-barres) : boutons + et − pour ce qui se compte, saisie libre sinon
+- [x] Doublons : si le foyer a déjà le même aliment (`food_key` ou nom normalisé), la confirmation affiche « Déjà dans ton garde-manger : [quantité], ajouté [quand] » avec trois choix : ajouter aux existants, ajouter séparément, ne pas ajouter. Même chose pour l'ajout manuel
+- [x] Lots : une ligne par aliment (quantité totale, date la plus proche), détail des lots en touchant la ligne, consommation du plus ancien d'abord ; fusion possible des lots de même date et même unité ; compteur et notifications lot par lot
+- [x] Annulation (enregistrement immédiat, rétablissement tout ou rien, conflits) quand « J'ai cuisiné ça » consomme plusieurs lots, avec tests SQL
+- [x] Historique des ajouts, utilisations (totales ou partielles) et suppressions : aliment, quantité, membre du foyer. Aucun écran pour l'instant
+- [x] Retours des tests : confirmation du scan (« Terminer », vraie photo, libellés), message « Annuler » adapté aux téléphones lents, « Récemment retirés » (24 heures), produits scannés par code-barres (Open Food Facts)
+- [x] Seconds retours des tests : « Terminer » dans la feuille « Ajouter des ingrédients », nom générique en entier (deux lignes au maximum, coupé à la fin d'un mot), quantités dans le format de la langue et dans l'unité la plus naturelle
+- [x] Fluidité vérifiée sur le Galaxy A30 : listes regroupées, détail des lots
+
+**Terminé quand** : un aliment scanné deux fois n'apparaît qu'une fois dans le garde-manger avec ses lots, et « J'ai cuisiné ça » consomme les lots du plus ancien au plus récent, annulation comprise.
+
 ## Phase 8 — Préparer le lancement
 
 - [ ] Réactiver la confirmation d'email dans Supabase (Authentication → Sign In / Providers → Email)
@@ -264,13 +278,20 @@ En touchant un aliment du garde-manger, on voit sa fiche : description courte, o
 - [ ] Remplacer le schéma de liens `myapp` (hérité de bolt) par un schéma propre à l'app, avec le nom définitif ; nouveau build nécessaire
 - [ ] Relire les 100 fiches aliments avant la bêta avec `scripts/food-facts/review.mjs` (exemple d'astuce douteuse : « vinaigre de banane »)
 - [ ] Renommer ou supprimer le sous-domaine inutile `bolt-expo-starter.workers.dev`
+- [ ] Icônes par catégorie d'aliment dans le garde-manger, à la place de la feuille unique
 
-### Phase 8a
-
-Section complétée avec la phase 7b.
+### Phase 8a — Audit qualité et sécurité
 
 - [ ] Créer un jeton Sentry en lecture seule (`event:read`, `project:read`) pour analyser les erreurs après le lancement
 - [ ] Test de performance et de mémoire sur un téléphone modeste de référence (Galaxy A30, 4 Go) : scan, génération, listes, transitions
+- [ ] Build de test optimisé (profil preview, paquet provisoire .preview) pour mesurer les performances réelles sur le Galaxy A30 ; le build de développement est plus lent par nature
+- [ ] Relire toutes les règles de sécurité de la base (RLS, fonctions SECURITY DEFINER, droits)
+- [ ] Traiter les avertissements de sécurité et de performance de Supabase
+- [ ] `npm audit` et mise à jour des dépendances
+- [ ] Vérifier qu'aucun secret n'est exposé (code, historique git, build, fonctions)
+- [ ] Suppression de compte depuis l'app et depuis une page web (obligatoire pour le Play Store)
+- [ ] Sauvegardes automatiques de la base et test de restauration
+- [ ] Tests automatisés des parcours critiques sur téléphone : connexion, scan, génération, « J'ai cuisiné ça », foyer
 
 ### Obligatoire avant la bêta
 
@@ -279,6 +300,11 @@ Section complétée avec la phase 7b.
 - [ ] « Aide et contact » dans les Réglages, avec l'adresse de contact du projet
 
 **Terminé quand** : au moins 5 testeurs utilisent l'app pendant une semaine sans plantage bloquant.
+
+## Après le lancement (v1.1)
+
+- [ ] Écran de statistiques : aliments les plus utilisés et les plus gaspillés, avec conseils
+- [ ] Seuils de réapprovisionnement pour les aliments essentiels, intégrés au résumé quotidien, avec ajout aux courses en un toucher
 
 ---
 
@@ -422,4 +448,20 @@ Section complétée avec la phase 7b.
 | 29/09/2026 | Galaxy A30 = téléphone de référence pour les appareils modestes | Samsung Galaxy A30 (SM-A305F), Android 11, 4 Go de mémoire : les tests du Scanner n'y passent qu'après avoir vidé la mémoire |
 | 29/09/2026 | Phase 7c : photo demandée en 960 × 1280 (1,2 Mpx) au lieu de la résolution par défaut de vision-camera (UHD 4:3, environ 12 Mpx) ; TextureView gardé | L'analyse réduit la photo à 800 px de large : la marge garde une image nette. Autres ressources de la caméra vérifiées : l'aperçu suit la taille de l'écran, le lecteur de codes-barres lit déjà à la résolution de l'aperçu, la photo et le lecteur ne sont jamais actifs ensemble, aucune contrainte de cadence ni de HDR demandée |
 | 29/09/2026 | Phase 7c validée sur le Galaxy A30 (plusieurs applis ouvertes, mémoire non vidée) et sur le Redmi, reconnaissance aussi bonne qu'avant ; fusionnée dans master | TextureView et photo en 1,2 Mpx retenus |
+| 29/09/2026 | Phase 7b : un lot = une ligne de `ingredients` ; l'app regroupe les lots d'un même aliment (même `food_key` ou même nom normalisé, et même sorte : aliment ou reste) sur une seule ligne, quantité totale et date la plus proche. Plus ancien = date la plus proche, puis ajouté le plus tôt | Aucune donnée existante modifiée : les doublons déjà présents se regroupent d'eux-mêmes. Le total se calcule quand tous les lots ont une unité de même sorte (« 2 » + « 3 tomates » → « 5 tomates », « 1 l » + « 50 cl » → « 1,5 l ») ; sinon les quantités sont juxtaposées (« 2 + 1 paquet ») |
+| 29/09/2026 | Doublon au scan et à l'ajout manuel : « Ajouter aux existants » ajoute la quantité au lot de même date s'il y en a un, sinon au lot le plus récent, et garde la date la plus proche des deux ; proposé seulement si les unités se correspondent. Choix proposé par défaut : « Ajouter aux existants » s'il existe un lot de même date, sinon « Ajouter séparément » (nouveau lot, sur la même ligne, avec sa propre date) | Fondre un achat récent dans un lot ancien lui ferait prendre la date de l'ancien. Ajout en une seule opération (`add_pantry_items`) : si un membre a changé le lot entre-temps, rien n'est enregistré et un message le dit |
+| 29/09/2026 | « J'ai cuisiné ça » par aliment : la quantité utilisée est prise du lot le plus ancien au plus récent (lots finis retirés et comptés « sauvés » un par un, lot entamé mis à jour). « La moitié » sans total calculable : chaque lot de moitié. Lot choisi à la génération disparu : l'aliment est retrouvé par son nom | L'annulation existante couvrait déjà plusieurs lignes ; tests SQL ajoutés pour plusieurs lots, conflits compris (`supabase/tests/pantry_lots.sql`) |
+| 29/09/2026 | Historique `pantry_history` écrit par un déclencheur sur `ingredients` (ajouté, utilisé, fusionné, modifié, retiré), avec la raison transmise par les fonctions ; chaque action annulable a son identifiant, l'annulation retire ses lignes d'historique. Fusion de lots annulable, sans compter ni « sauvé » ni « gaspillé » | Un déclencheur couvre tous les chemins (scan, saisie, courses, versions précédentes de l'app). Les changements de date et la liaison aux fiches ne sont pas notés |
+| 29/09/2026 | Rappels et résumé quotidien : toujours lot par lot (chaque lot à sa propre date) ; un aliment en plusieurs lots le même jour n'est nommé qu'une fois | Tous les lots restent présélectionnés quand on touche la notification |
+| 29/09/2026 | Fluidité : regrouper 300 lots (30 aliments) prend 1 à 4 ms sur un PC ; le regroupement n'est refait que quand le garde-manger change | Vérification sur le Galaxy A30 aux tests de la phase |
+| 29/09/2026 | Test SQL `provider_quota_events.sql` en échec, avec ou sans la migration de la phase 7b : une alerte simulée d'un jour précédent est encore en base | Sans lien avec la phase ; test à rendre indépendant des données existantes (phase 8a) |
+| 29/09/2026 | Test `provider_quota_events.sql` corrigé : il vide la table dans sa transaction (annulée à la fin) et ne dépend plus des données existantes. Les 4 alertes simulées du 26/09 (essais) supprimées de la base, après sauvegarde | Nouvelle règle : tous les tests passent avant chaque fusion, sans exception connue |
+| 29/09/2026 | Une seule feuille par aliment : toucher une ligne l'ouvre toujours (un lot ou plusieurs, restes compris). En haut « Dans ton garde-manger » (lots et actions), en dessous la fiche d'information ; le badge de date d'une ligne à un seul lot reste un raccourci. Retrait d'une ligne à plusieurs lots : « Œufs : 3 lots retirés · Annuler » | Tournure neutre plutôt que « Œufs retirés » : l'accord changerait selon l'aliment (« Lait retiré », « Tomate retirée ») |
+| 30/09/2026 | Message « Annuler » : 10 secondes, dans la mise en page (en bas de l'écran ou de la feuille, sous le contenu, jamais par-dessus), de nouveau affiché si l'on revient dans l'app dans les 2 minutes | Sur le A30, le message de 5 secondes était manqué et couvrait le nom de l'aliment dans la feuille |
+| 30/09/2026 | « Récemment retirés » en bas du garde-manger : retraits (lots, aliments, articles de courses) et « J'ai cuisiné ça » des dernières 24 heures faits par l'utilisateur, avec « Rétablir ». Annulation possible 24 heures côté serveur, mêmes règles ; la fusion de lots reste à 2 minutes. Rétablir un article de courses rajouté entre-temps : conflit (pas de doublon). Auteur ou recette supprimés entre-temps : rétabli sans eux | Tests SQL : `supabase/tests/recent_actions.sql` |
+| 30/09/2026 | « Palmito L'original » est un biscuit LU (palmier feuilleté, NOVA 4, Nutri-Score E, nom générique Open Food Facts « Biscuits feuilletés ») : la catégorie « Boulangerie » venait bien d'Open Food Facts (biscuits) ; l'erreur était « Cœur de palmier », fiche devinée à partir du nom du produit | Produit par code-barres : garde son nom, nom générique d'Open Food Facts en sous-titre ; fiche générique seulement pour NOVA 1 ou 2 (reliée par le nom générique), sinon fiche produit (marque, catégorie, Nutri-Score, NOVA, lien Open Food Facts) ; lots et doublons regroupés par code-barres ; biscuits et gâteaux rangés en « En-cas » ; catégorie tirée de la catégorie Open Food Facts la plus précise, vide si le produit n'en a pas |
+| 30/09/2026 | Produits existants relus dans Open Food Facts (`scripts/products/refresh-products.ts`, après sauvegarde) : 1 seul produit scanné en base (compote Auchan, NOVA 4, catégorie corrigée en « Fruit », nom nettoyé) ; NOVA connu pour 1 sur 1 | Règle de catégorie des fruits corrigée (`en:fruit-based-foods`, compotes) |
+| 30/09/2026 | Tests de la phase 7b validés sur le Galaxy A30 et le Redmi : confirmation du scan photo, produits de marque, annulation (lente sur le A30 mais utilisable à temps), « Récemment retirés », conflit, recette avec un produit de marque, fluidité nettement meilleure. NOVA connu pour 2 produits sur 2 scannés (tartines Auchan, biscuits Gerblé) | Mesure des performances réelles reportée à un build de test optimisé (phase 8a) |
+| 30/09/2026 | Nom générique Open Food Facts gardé en entier (120 caractères au plus ; il était coupé à 40 comme le nom du produit : « Tartines croustillantes à la farine de ») ; sous-titre du garde-manger sur deux lignes au maximum, coupé à la fin d'un mot avec « … » | Produits existants relus après sauvegarde : 4 lots, 3 produits, NOVA connu pour tous |
+| 30/09/2026 | Quantités affichées dans le format de la langue (« 0,25 kg ») et dans l'unité la plus naturelle quand la conversion est simple (0,25 kg → 250 g, 1500 g → 1,5 kg, 0,5 l → 50 cl) ; les quantités enregistrées ne sont pas réécrites | Fractions, « 2 x 125 g » et textes libres restent tels quels |
 | | *(résultat du test Gemini vs Clarifai)* | |
