@@ -13,7 +13,7 @@ import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import { useUndoableAction } from '@/hooks/useUndoableAction';
 import { BottomSheet, SheetHeader } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/Button';
-import { Card, cardStyles } from '@/components/ui/Card';
+import { cardStyles } from '@/components/ui/Card';
 import { Chip } from '@/components/ui/Chip';
 import { Toast } from '@/components/ui/Toast';
 import { Touchable } from '@/components/ui/Touchable';
@@ -297,15 +297,17 @@ export function CookedButton({ ingredientsUsed, recipeId, style }: Props) {
       <Toast message={cooking.pending ? t('cooked.removed') : notice} actionLabel={cooking.pending ? t('common.undo') : undefined} onAction={cooking.pending ? cooking.undo : undefined} inset={false} />
       {showConfirmed ? (
         <View style={styles.confirmed}>
+          <Button label={cookedLabel!} variant="soft" size="medium" disabled onPress={() => undefined} />
+          {/* Récapitulatif compact (la barre du bas ne doit pas couvrir la recette) */}
           {recap.length > 0 ? (
-            <Card variant="soft" style={styles.recap}>
-              <Text style={styles.recapTitle}>{t('cookedMore.recapTitle')}</Text>
-              {recap.map((item, index) => (
-                <Text key={index} style={styles.recapLine}>{`${item.name} : ${item.line}`}</Text>
-              ))}
-            </Card>
+            <Text
+              style={styles.recapLine}
+              numberOfLines={3}
+              accessibilityLabel={`${t('cookedMore.recapTitle')} : ${recap.map((item) => `${item.name} ${item.line}`).join(', ')}`}
+            >
+              {recap.map((item) => `${item.name} : ${item.line}`).join(' · ')}
+            </Text>
           ) : null}
-          <Button label={cookedLabel!} variant="soft" disabled onPress={() => undefined} />
           <View style={styles.links}>
             <Touchable onPress={() => open({ kind: 'modify', action: lastCook })} style={styles.link} accessibilityRole="button">
               <Text style={styles.linkText}>{t('cookedMore.modify')}</Text>
@@ -369,18 +371,11 @@ export function CookedButton({ ingredientsUsed, recipeId, style }: Props) {
 
 const styles = StyleSheet.create({
   confirmed: {
-    gap: spacing.sm,
-  },
-  recap: {
     gap: spacing.xs,
-  },
-  recapTitle: {
-    ...typography.label,
   },
   recapLine: {
     ...typography.secondary,
-    fontSize: typography.listTitle.fontSize,
-    color: colors.text,
+    textAlign: 'center',
   },
   links: {
     flexDirection: 'row',

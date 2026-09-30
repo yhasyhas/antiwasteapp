@@ -84,7 +84,7 @@ export function PantryLotsSection({ group, addedBy, onRemoveLot, onRemoveAll, on
     lot.location === 'freezer' && lot.frozen_at ? t('storage.frozenOn', { date: shortDate(lot.frozen_at, language) }) : null,
     lot.location !== 'freezer' && lot.thawed_at ? t('storage.thawedOn', { date: shortDate(lot.thawed_at, language) }) : null,
     lot.opened_at ? t('storage.openedOn', { date: shortDate(lot.opened_at, language) }) : null,
-    lot.expires_at ? t(dateKindOf(lot) === 'best_before' ? 'storage.bestBefore' : 'storage.useBy') : null,
+    lot.expires_at ? `${t(dateKindOf(lot) === 'best_before' ? 'storage.bestBefore' : 'storage.useBy')} ${shortDate(lot.expires_at, language)}` : null,
   ].filter(Boolean).join(' · ');
 
   return (
