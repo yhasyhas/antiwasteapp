@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { Alert } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { lookupBarcode, type OffProduct } from '@/lib/openFoodFacts';
+import { displayQuantity } from '@/lib/quantity';
 import type { ManualPrefill } from '@/components/scan/ManualAddModal';
 
 // Scan de code-barres (codes lus par ScannerCamera) : un seul code à la fois (la caméra en signale plusieurs
@@ -35,7 +36,8 @@ export function useBarcodeScan(onResult: (prefill: ManualPrefill) => void) {
       barcode: code,
       found: product !== null,
       name: product?.name ?? '',
-      quantity: product?.quantity ?? '',
+      // Format de la langue, unité naturelle (« 0.25 kg » → « 250 g »)
+      quantity: product ? displayQuantity(product.quantity, language) : '',
       category: product?.category ?? null,
       product: product ? {
         product_name: product.name,

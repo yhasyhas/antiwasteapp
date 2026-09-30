@@ -1,4 +1,4 @@
-import { formatQuantity, parseQuantity, type Quantity } from './quantity';
+import { displayQuantity, formatQuantity, parseQuantity, type Quantity } from './quantity';
 
 // Lots du garde-manger : chaque ligne de la table `ingredients` est un lot. Les lots d'un même aliment (même
 // food_key ou même nom normalisé, et même sorte : aliment ou plat) forment une seule ligne à l'écran, avec la
@@ -106,17 +106,17 @@ export function lotsStock(lots: Lot[]): Quantity | null {
 
 // Texte de la quantité totale : « 5 tomates », « 1,5 l » ; sinon les quantités des lots (« 2 + 1 paquet »)
 export function totalLabel(lots: Lot[], language: string): string {
-  if (lots.length === 1) return lots[0].quantity ?? '';
+  if (lots.length === 1) return displayQuantity(lots[0].quantity, language);
   const stock = lotsStock(lots);
   if (stock) return formatQuantity(stock.value, stock.unit, language);
-  return lots.map((lot) => lot.quantity).filter(Boolean).join(' + ');
+  return lots.map((lot) => displayQuantity(lot.quantity, language)).filter(Boolean).join(' + ');
 }
 
 // Quantité d'un lot, avec l'unité de la ligne s'il n'en a pas (« 2 » parmi des tomates → « 2 tomates »)
 export function lotLabel(lot: Lot, lots: Lot[], language: string): string {
   const quantity = parseQuantity(lot.quantity, lot.name);
   const stock = lotsStock(lots);
-  if (!quantity || quantity.unit !== '' || !stock || stock.unit === '') return lot.quantity ?? '';
+  if (!quantity || quantity.unit !== '' || !stock || stock.unit === '') return displayQuantity(lot.quantity, language);
   return formatQuantity(quantity.value, stock.unit, language);
 }
 

@@ -17,6 +17,7 @@ import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import { shortDuration } from '@/lib/expiry';
 import { existingFor } from '@/lib/pantry';
 import { capitalizeFirst } from '@/lib/foodNames';
+import { displayQuantity } from '@/lib/quantity';
 import type { LotGroup } from '@/lib/pantryLots';
 import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 
@@ -85,7 +86,7 @@ export function ConfirmIngredientsModal({ visible, ingredients, photo, onToggle,
                     <Text style={[styles.name, !ing.confirmed && styles.unchecked]}>{capitalizeFirst(ing.name)}</Text>
                     {ing.kind === 'dish' && <Badge label={t('pantry.leftover')} tone="leftover" />}
                   </View>
-                  {!ing.confirmed && ing.quantity !== '' && <Text style={styles.quantity}>{ing.quantity}</Text>}
+                  {!ing.confirmed && ing.quantity !== '' && <Text style={styles.quantity}>{displayQuantity(ing.quantity, language)}</Text>}
                   {ing.storage_tip ? (
                     <View style={styles.tip}>
                       <Info size={sizes.iconSmall - 2} color={colors.textSecondary} />

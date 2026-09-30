@@ -15,6 +15,7 @@ import { expiryStatus, sortByUrgency } from '@/lib/expiry';
 import { groupLots, lotLabel } from '@/lib/pantryLots';
 import { useRecipeImages } from '@/hooks/useRecipeImages';
 import { useFoodNames } from '@/lib/foodNames';
+import { displayQuantity } from '@/lib/quantity';
 import { recipeFromRow, type Recipe } from '@/components/recipe/types';
 import { RecipeSheet } from '@/components/recipe/RecipeSheet';
 import { RecipeListCard } from '@/components/recipe/RecipeListCard';
@@ -172,7 +173,7 @@ export default function HomeScreen() {
                       <IconChip icon={Leaf} />
                       <View style={styles.rowText}>
                         <Text style={styles.rowTitle} numberOfLines={1}>{foodName(ingredient)}</Text>
-                        {ingredient.quantity ? <Text style={styles.rowSubtitle} numberOfLines={1}>{ingredient.quantity}</Text> : null}
+                        {ingredient.quantity ? <Text style={styles.rowSubtitle} numberOfLines={1}>{displayQuantity(ingredient.quantity, language)}</Text> : null}
                       </View>
                       <View style={styles.badges}>
                         {ingredient.kind === 'dish' ? <Badge label={t('pantry.leftover')} tone="leftover" /> : null}
