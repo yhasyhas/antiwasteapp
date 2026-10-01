@@ -64,7 +64,8 @@ export const addMissingToShoppingList = (names: string[], quantities: string[], 
   })) as Promise<number>;
 
 // Articles achetés rangés au garde-manger, avec leur date ; renvoie le nombre d'aliments rangés
-export async function stockShoppingItems(items: { id: string; expires_at: string | null }[]): Promise<number> {
+// (expiry_estimated : date proposée par l'app, gardée telle quelle)
+export async function stockShoppingItems(items: { id: string; expires_at: string | null; expiry_estimated: boolean }[]): Promise<number> {
   const count = (await write(supabase.rpc('stock_shopping_items', { p_items: items }))) as number;
   notifyPantryChanged();
   // Aliments rangés : reliés à leur fiche en arrière-plan

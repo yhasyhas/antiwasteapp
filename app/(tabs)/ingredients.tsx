@@ -154,13 +154,14 @@ export default function IngredientsScreen() {
     if (patch.expires_at) await maybeAskNotificationPermission();
     return true;
   };
-  const saveLotExpiry = (lot: PantryIngredient, expiresAt: string | null) => updateLot(lot, { expires_at: expiresAt });
+  // Date choisie par l'utilisateur : plus estimée
+  const saveLotExpiry = (lot: PantryIngredient, expiresAt: string | null) => updateLot(lot, { expires_at: expiresAt, expiry_estimated: false });
   const saveLotPatch = (lot: PantryIngredient, patch: LotPatch) => updateLot(lot, patch);
 
   // « Congeler » : au congélateur, nouvelle date estimée selon l'aliment (qualité, indicative), conseil
   const freezeLot = async (lot: PantryIngredient) => {
     const expiresAt = frozenExpiry(lot.category, lot.kind);
-    if (!await updateLot(lot, { location: 'freezer', frozen_at: todayISO(), thawed_at: null, expires_at: expiresAt, date_kind: 'best_before' })) return;
+    if (!await updateLot(lot, { location: 'freezer', frozen_at: todayISO(), thawed_at: null, expires_at: expiresAt, date_kind: 'best_before', expiry_estimated: true })) return;
     Alert.alert(
       t('storage.freezeTipTitle'),
       `${t('storage.frozenDone', { date: formatDate(expiresAt, language) })}\n\n${t(`storage.freezeTip_${freezeFamily(lot.category, lot.kind)}`)}`,
@@ -169,15 +170,15 @@ export default function IngredientsScreen() {
   // « Décongeler » : au frigo, date courte (1 à 2 jours, stricte), rappel de ne pas recongeler
   const thawLot = async (lot: PantryIngredient) => {
     const expiresAt = thawedExpiry(lot.category, lot.kind);
-    if (!await updateLot(lot, { location: 'fridge', thawed_at: todayISO(), expires_at: expiresAt, date_kind: 'use_by' })) return;
+    if (!await updateLot(lot, { location: 'fridge', thawed_at: todayISO(), expires_at: expiresAt, date_kind: 'use_by', expiry_estimated: true })) return;
     Alert.alert(t('storage.thaw'), t('storage.thawDone', { date: formatDate(expiresAt, language) }));
   };
   // « Je l'ai ouvert » : date la plus proche entre celle d'origine et la conservation après ouverture ; si
-  // c'est celle d'après ouverture, elle devient stricte
+  // c'est celle d'après ouverture, elle devient stricte (et estimée)
   const openLot = async (lot: PantryIngredient) => {
     const expiresAt = openedExpiry(lot.expires_at, lot.category, lot.kind);
     const shortened = expiresAt !== lot.expires_at;
-    await updateLot(lot, { opened_at: todayISO(), expires_at: expiresAt, ...(shortened && { date_kind: 'use_by' }) });
+    await updateLot(lot, { opened_at: todayISO(), expires_at: expiresAt, ...(shortened && { date_kind: 'use_by', expiry_estimated: true }) });
   };
 
   const saveExpiry = async (expiresAt: string | null) => {

@@ -37,6 +37,8 @@ export interface FoodToAdd extends NewFood {
   // Emplacement et type de date choisis (sinon valeurs par défaut du serveur)
   location?: StorageLocation | null;
   date_kind?: DateKind | null;
+  // Date estimée par l'app (scan photo, valeur proposée gardée), et non lue sur l'emballage
+  expiry_estimated?: boolean;
 }
 
 // Le garde-manger a changé entre-temps (autre membre) : rien n'a été enregistré
@@ -65,6 +67,7 @@ export async function addPantryItems(foods: FoodToAdd[], groups: LotGroup<Pantry
       off_categories: food.off_categories ?? null,
       location: food.location ?? null,
       date_kind: food.date_kind ?? null,
+      expiry_estimated: food.expiry_estimated ?? false,
     };
     const group = food.choice === 'merge' ? findExisting(groups, food) : null;
     if (!group) return base;

@@ -51,6 +51,8 @@ export interface DetectedIngredient {
   date_kind: DateKind;
   // Date proposée hors congélateur (rétablie si l'aliment quitte le congélateur avant l'ajout)
   fresh_expires_at: string;
+  // Date estimée par l'app, tant que l'utilisateur ne l'a pas changée
+  expiry_estimated: boolean;
 }
 
 // Analyse d'une photo (analyze-image) et enregistrement des ingrédients confirmés
@@ -151,6 +153,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
             fresh_expires_at: freshExpiry,
             location,
             date_kind: location === 'freezer' ? 'best_before' as const : defaultDateKind(ingredient.category, kind),
+            expiry_estimated: true,
             confirmed: true,
           };
           return { ...detected, choice: defaultChoice(current, detected, language) };
@@ -181,7 +184,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
   };
 
   const setDetectedExpiry = (index: number, expires_at: string) => {
-    setDetectedIngredients(detectedIngredients.map((item, i) => i === index ? { ...item, expires_at } : item));
+    setDetectedIngredients(detectedIngredients.map((item, i) => i === index ? { ...item, expires_at, expiry_estimated: false } : item));
   };
 
   const setDetectedQuantity = (index: number, quantity: string) => {
@@ -192,8 +195,8 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
   const setDetectedLocation = (index: number, location: StorageLocation) => {
     setDetectedIngredients((current) => current.map((item, i) => {
       if (i !== index || item.location === location) return item;
-      if (location === 'freezer') return { ...item, location, expires_at: frozenExpiry(item.category, item.kind), date_kind: 'best_before' };
-      return { ...item, location, date_kind: defaultDateKind(item.category, item.kind), ...(item.location === 'freezer' && { expires_at: item.fresh_expires_at }) };
+      if (location === 'freezer') return { ...item, location, expires_at: frozenExpiry(item.category, item.kind), date_kind: 'best_before', expiry_estimated: true };
+      return { ...item, location, date_kind: defaultDateKind(item.category, item.kind), ...(item.location === 'freezer' && { expires_at: item.fresh_expires_at, expiry_estimated: true }) };
     }));
   };
 

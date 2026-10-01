@@ -1,7 +1,9 @@
 -- Tests de la phase 8 : emplacement et type de date par défaut, congélation à l'ajout, compteur (date
 -- indicative, congélateur), résumé quotidien (interrupteur, heure, lots exclus), « J'ai cuisiné ça » lié à une
 -- recette, et correction (modify_cook_action) : quantités remplacées en une opération, conflit si un autre
--- membre a changé un lot, auteur seulement, 24 heures, une seule fois.
+-- membre a changé un lot, auteur seulement, 24 heures, une seule fois ; origine de la date (estimée par l'app
+-- ou venue de l'emballage) à l'ajout, à l'ajout à un lot existant, aux courses rangées, à la fusion et à
+-- l'annulation.
 --
 -- Lancement (base liée, mot de passe dans SUPABASE_DB_PASSWORD) :
 --   PGPASSWORD="$SUPABASE_DB_PASSWORD" psql "$(cat supabase/.temp/pooler-url)" -v ON_ERROR_STOP=1 -f supabase/tests/phase8_pantry.sql
@@ -107,7 +109,8 @@ BEGIN
   RAISE NOTICE 'OK 3 : compteur : date indicative ou congélateur jamais « gaspillé », date stricte (ou inconnue) oui';
 END $$;
 
--- 3. Résumé quotidien : interrupteur, heure choisie, lots à date indicative ou au congélateur exclus
+-- 3. Résumé quotidien : interrupteur, heure choisie ; date indicative proche comprise, dépassée ou au
+-- congélateur exclue
 INSERT INTO ctx
 SELECT 'tz', tz FROM (VALUES ('UTC'), ('Europe/Paris'), ('America/New_York'), ('Asia/Tokyo'), ('Asia/Kolkata'), ('Pacific/Honolulu'), ('Australia/Sydney')) AS z(tz)
 WHERE extract(hour FROM now() AT TIME ZONE tz) BETWEEN 6 AND 19
@@ -121,7 +124,8 @@ UPDATE public.profiles SET digest_enabled = false WHERE id = '00000000-0000-4000
 INSERT INTO public.ingredients (user_id, household_id, name, quantity, expires_at, location, date_kind)
 SELECT '00000000-0000-4000-a000-000000000e0a', (SELECT value::uuid FROM ctx WHERE key = 'household'), n, '1',
        (now() AT TIME ZONE (SELECT value FROM ctx WHERE key = 'tz'))::date + d, l, k
-FROM (VALUES ('lait', 0, 'fridge', 'use_by'), ('biscuits', 0, 'pantry', 'best_before'), ('glace', 1, 'freezer', 'use_by'), ('jambon', 1, 'fridge', NULL)) AS v(n, d, l, k);
+FROM (VALUES ('lait', 0, 'fridge', 'use_by'), ('biscuits', 0, 'pantry', 'best_before'), ('glace', 1, 'freezer', 'use_by'), ('jambon', 1, 'fridge', NULL),
+            ('céréales', 1, 'pantry', 'best_before'), ('farine', -1, 'pantry', 'best_before'), ('compote', 1, 'freezer', 'best_before')) AS v(n, d, l, k);
 SET LOCAL ROLE service_role;
 INSERT INTO ctx SELECT 'digests', jsonb_agg(to_jsonb(d.*))::text FROM public.claim_daily_digests(9, NULL, false) AS d
   WHERE d.user_id IN ('00000000-0000-4000-a000-000000000e0a', '00000000-0000-4000-a000-000000000e0b');
@@ -133,11 +137,11 @@ BEGIN
   IF jsonb_array_length(v_digests) <> 1 OR v_digests->0->>'user_id' <> '00000000-0000-4000-a000-000000000e0a' THEN
     RAISE EXCEPTION 'ÉCHEC : résumés dus (%) — B l''a désactivé, A l''a réglé il y a 1 heure', v_digests;
   END IF;
-  IF (SELECT array_agg(x->>'name' ORDER BY x->>'name') FROM jsonb_array_elements(v_digests->0->'today') AS x) IS DISTINCT FROM ARRAY['lait']
-     OR (SELECT array_agg(x->>'name' ORDER BY x->>'name') FROM jsonb_array_elements(v_digests->0->'tomorrow') AS x) IS DISTINCT FROM ARRAY['jambon'] THEN
+  IF (SELECT array_agg(x->>'name' ORDER BY x->>'name') FROM jsonb_array_elements(v_digests->0->'today') AS x) IS DISTINCT FROM ARRAY['biscuits', 'lait']
+     OR (SELECT array_agg(x->>'name' ORDER BY x->>'name') FROM jsonb_array_elements(v_digests->0->'tomorrow') AS x) IS DISTINCT FROM ARRAY['céréales', 'jambon'] THEN
     RAISE EXCEPTION 'ÉCHEC : contenu du résumé (%)', v_digests->0;
   END IF;
-  RAISE NOTICE 'OK 4 : résumé : heure choisie, interrupteur respecté, dates indicatives et congélateur exclus';
+  RAISE NOTICE 'OK 4 : résumé : heure choisie, interrupteur respecté, date indicative proche comprise, dépassée ou au congélateur exclue';
 END $$;
 -- Heure pas encore venue : rien
 UPDATE public.profiles SET digest_hour = least(22, extract(hour FROM now() AT TIME ZONE (SELECT value FROM ctx WHERE key = 'tz'))::smallint + 1)
@@ -350,5 +354,105 @@ BEGIN
   RAISE NOTICE 'OK 13 : « J''ai cuisiné ça » des versions précédentes de l''app accepté';
 END $$;
 RESET ROLE;
+
+-- Origine de la date : estimée par l'app ou venue de l'emballage
+SET LOCAL ROLE authenticated;
+SELECT pg_temp.login('00000000-0000-4000-a000-000000000e0a');
+SELECT public.add_pantry_items(jsonb_build_array(
+  jsonb_build_object('name', 'Courgettes', 'quantity', '2', 'category', 'vegetable', 'expires_at', current_date + 5, 'expiry_estimated', true, 'added_via', 'camera'),
+  jsonb_build_object('name', 'Beurre', 'quantity', '250 g', 'category', 'dairy', 'expires_at', current_date + 20, 'expiry_estimated', false),
+  jsonb_build_object('name', 'Thé', 'quantity', '1', 'category', 'beverage', 'expires_at', NULL, 'expiry_estimated', true),
+  jsonb_build_object('name', 'Miel', 'quantity', '1', 'category', 'condiment', 'expires_at', current_date + 300)));
+INSERT INTO ctx SELECT 'zucchini', id::text FROM public.ingredients WHERE name = 'Courgettes' AND household_id = (SELECT value::uuid FROM ctx WHERE key = 'household');
+INSERT INTO ctx SELECT 'butter', id::text FROM public.ingredients WHERE name = 'Beurre' AND household_id = (SELECT value::uuid FROM ctx WHERE key = 'household');
+RESET ROLE;
+DO $$
+DECLARE
+  v_got text[] := ARRAY(SELECT name || '=' || expiry_estimated FROM public.ingredients
+    WHERE name IN ('Courgettes', 'Beurre', 'Thé', 'Miel') AND household_id = (SELECT value::uuid FROM ctx WHERE key = 'household') ORDER BY name);
+BEGIN
+  IF v_got IS DISTINCT FROM ARRAY['Beurre=false', 'Courgettes=true', 'Miel=false', 'Thé=false'] THEN
+    RAISE EXCEPTION 'ÉCHEC : origine de la date à l''ajout (%)', v_got;
+  END IF;
+  RAISE NOTICE 'OK 15 : ajout : date estimée gardée ; date de l''emballage, sans origine ou absente : non estimée';
+END $$;
+
+-- Ajout à un lot existant : la date retenue (la plus proche) garde son origine
+SET LOCAL ROLE authenticated;
+SELECT pg_temp.login('00000000-0000-4000-a000-000000000e0a');
+SELECT public.add_pantry_items(jsonb_build_array(
+  jsonb_build_object('name', 'Courgettes', 'quantity', '1', 'merge_into', (SELECT value FROM ctx WHERE key = 'zucchini'), 'expected_quantity', '2',
+                     'merged_quantity', '3', 'expires_at', current_date + 3, 'expiry_estimated', false),
+  jsonb_build_object('name', 'Beurre', 'quantity', '250 g', 'merge_into', (SELECT value FROM ctx WHERE key = 'butter'), 'expected_quantity', '250 g',
+                     'merged_quantity', '500 g', 'expires_at', current_date + 30, 'expiry_estimated', true)));
+RESET ROLE;
+DO $$
+BEGIN
+  IF (SELECT expires_at || '/' || expiry_estimated FROM public.ingredients WHERE id = (SELECT value::uuid FROM ctx WHERE key = 'zucchini'))
+       <> (current_date + 3) || '/false'
+     OR (SELECT expires_at || '/' || expiry_estimated FROM public.ingredients WHERE id = (SELECT value::uuid FROM ctx WHERE key = 'butter'))
+       <> (current_date + 20) || '/false' THEN
+    RAISE EXCEPTION 'ÉCHEC : origine de la date à l''ajout à un lot existant';
+  END IF;
+  RAISE NOTICE 'OK 16 : ajout à un lot existant : la date la plus proche garde son origine';
+END $$;
+
+-- Courses rangées : date proposée (estimée) ou choisie
+SET LOCAL ROLE authenticated;
+SELECT pg_temp.login('00000000-0000-4000-a000-000000000e0a');
+INSERT INTO public.shopping_items (id, name, quantity) VALUES
+  ('00000000-0000-4000-d000-000000000e51', 'Poivrons', '2'),
+  ('00000000-0000-4000-d000-000000000e52', 'Fromage', '1');
+SELECT public.stock_shopping_items(jsonb_build_array(
+  jsonb_build_object('id', '00000000-0000-4000-d000-000000000e51', 'expires_at', current_date + 7, 'expiry_estimated', true),
+  jsonb_build_object('id', '00000000-0000-4000-d000-000000000e52', 'expires_at', current_date + 12, 'expiry_estimated', false)));
+RESET ROLE;
+DO $$
+BEGIN
+  IF ARRAY(SELECT name || '=' || expiry_estimated FROM public.ingredients WHERE name IN ('Poivrons', 'Fromage') AND household_id = (SELECT value::uuid FROM ctx WHERE key = 'household') ORDER BY name)
+     IS DISTINCT FROM ARRAY['Fromage=false', 'Poivrons=true'] THEN
+    RAISE EXCEPTION 'ÉCHEC : origine de la date des courses rangées';
+  END IF;
+  RAISE NOTICE 'OK 17 : courses rangées : date proposée estimée, date choisie non estimée';
+END $$;
+
+-- Fusion : estimée seulement si toutes les dates le sont ; annulation : origine rétablie
+INSERT INTO public.ingredients (id, user_id, household_id, name, quantity, kind, expires_at, expiry_estimated) VALUES
+  ('00000000-0000-4000-b000-000000000e61', '00000000-0000-4000-a000-000000000e0a', (SELECT value::uuid FROM ctx WHERE key = 'household'), 'Poires', '2', 'ingredient', current_date + 4, true),
+  ('00000000-0000-4000-b000-000000000e62', '00000000-0000-4000-a000-000000000e0a', (SELECT value::uuid FROM ctx WHERE key = 'household'), 'Poires', '3', 'ingredient', current_date + 4, false),
+  ('00000000-0000-4000-b000-000000000e63', '00000000-0000-4000-a000-000000000e0a', (SELECT value::uuid FROM ctx WHERE key = 'household'), 'Kiwis', '2', 'ingredient', current_date + 4, true),
+  ('00000000-0000-4000-b000-000000000e64', '00000000-0000-4000-a000-000000000e0a', (SELECT value::uuid FROM ctx WHERE key = 'household'), 'Kiwis', '3', 'ingredient', current_date + 4, true);
+SET LOCAL ROLE authenticated;
+SELECT pg_temp.login('00000000-0000-4000-a000-000000000e0a');
+INSERT INTO ctx SELECT 'merge', public.merge_lots('00000000-0000-4000-b000-000000000e61', ARRAY['00000000-0000-4000-b000-000000000e62']::uuid[], '5')::text;
+SELECT public.merge_lots('00000000-0000-4000-b000-000000000e63', ARRAY['00000000-0000-4000-b000-000000000e64']::uuid[], '5');
+RESET ROLE;
+DO $$
+BEGIN
+  IF (SELECT expiry_estimated FROM public.ingredients WHERE id = '00000000-0000-4000-b000-000000000e61')
+     OR NOT (SELECT expiry_estimated FROM public.ingredients WHERE id = '00000000-0000-4000-b000-000000000e63') THEN
+    RAISE EXCEPTION 'ÉCHEC : origine de la date à la fusion';
+  END IF;
+END $$;
+SET LOCAL ROLE authenticated;
+SELECT pg_temp.login('00000000-0000-4000-a000-000000000e0a');
+SELECT public.undo_pantry_action((SELECT value::uuid FROM ctx WHERE key = 'merge'));
+RESET ROLE;
+DO $$
+BEGIN
+  IF ARRAY(SELECT expiry_estimated FROM public.ingredients
+           WHERE id IN ('00000000-0000-4000-b000-000000000e61', '00000000-0000-4000-b000-000000000e62') ORDER BY id) IS DISTINCT FROM ARRAY[true, false] THEN
+    RAISE EXCEPTION 'ÉCHEC : origine de la date après annulation de la fusion';
+  END IF;
+  -- Lot rétabli depuis un enregistrement d'avant cette migration (sans origine de la date) : non estimé
+  INSERT INTO public.ingredients
+  SELECT * FROM jsonb_populate_record(NULL::public.ingredients,
+    (SELECT to_jsonb(i.*) - 'expiry_estimated' || jsonb_build_object('id', '00000000-0000-4000-b000-000000000e65')
+     FROM public.ingredients i WHERE id = '00000000-0000-4000-b000-000000000e61'));
+  IF (SELECT expiry_estimated FROM public.ingredients WHERE id = '00000000-0000-4000-b000-000000000e65') THEN
+    RAISE EXCEPTION 'ÉCHEC : lot rétabli sans origine de la date';
+  END IF;
+  RAISE NOTICE 'OK 18 : fusion : estimée seulement si toutes les dates le sont ; annulation : origine rétablie ; lot sans origine : non estimé';
+END $$;
 
 ROLLBACK;

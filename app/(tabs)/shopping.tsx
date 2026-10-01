@@ -45,7 +45,7 @@ export default function ShoppingScreen() {
   const [quantity, setQuantity] = useState('');
   const [adding, setAdding] = useState(false);
   // Articles à ranger, avec la date choisie pour chacun
-  const [stocking, setStocking] = useState<{ item: ShoppingItem; expires_at: string }[] | null>(null);
+  const [stocking, setStocking] = useState<{ item: ShoppingItem; expires_at: string; estimated: boolean }[] | null>(null);
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
@@ -106,13 +106,13 @@ export default function ShoppingScreen() {
   };
 
   // Date proposée : une semaine (modifiable pour chaque article)
-  const openStock = () => setStocking(inCart.map((item) => ({ item, expires_at: expiryFromShelfLife(undefined) })));
+  const openStock = () => setStocking(inCart.map((item) => ({ item, expires_at: expiryFromShelfLife(undefined), estimated: true })));
 
   const confirmStock = async () => {
     if (!stocking) return;
     setSaving(true);
     try {
-      const count = await stockShoppingItems(stocking.map(({ item, expires_at }) => ({ id: item.id, expires_at })));
+      const count = await stockShoppingItems(stocking.map(({ item, expires_at, estimated }) => ({ id: item.id, expires_at, expiry_estimated: estimated })));
       setStocking(null);
       Alert.alert(t('shopping.stockedTitle'), t('shopping.stockedText', { count }));
     } catch (error) {
@@ -236,7 +236,7 @@ export default function ShoppingScreen() {
               <Text style={styles.itemName}>{capitalizeFirst(item.name)}{item.quantity ? ` · ${displayQuantity(item.quantity, language)}` : ''}</Text>
               <ExpiryPicker
                 value={expires_at}
-                onChange={(value) => setStocking((current) => current?.map((entry, i) => (i === index ? { ...entry, expires_at: value } : entry)) ?? null)}
+                onChange={(value) => setStocking((current) => current?.map((entry, i) => (i === index ? { ...entry, expires_at: value, estimated: false } : entry)) ?? null)}
               />
             </View>
           ))}

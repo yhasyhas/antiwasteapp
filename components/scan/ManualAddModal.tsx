@@ -45,6 +45,8 @@ interface ManualIngredient {
   choice: AddChoice;
   location: StorageLocation;
   date_kind: DateKind;
+  // Date proposée par l'app (non changée par l'utilisateur)
+  expiry_estimated: boolean;
 }
 
 // Saisie préremplie après un scan de code-barres : produit trouvé dans Open Food Facts, ou code seul
@@ -141,6 +143,7 @@ export function ManualAddModal({ visible, onClose, prefill, onNothingAdded }: Pr
       expires_at: newExpiry,
       location,
       date_kind: location === 'freezer' ? 'best_before' as const : defaultDateKind(pending?.category, newKind),
+      expiry_estimated: !expiryChanged,
       ...(pending && { barcode: pending.barcode, category: pending.category, product: pending.product }),
     };
     setManualIngredients([...manualIngredients, { ...ingredient, choice: defaultChoice(groups, ingredient, language) }]);

@@ -224,6 +224,7 @@ const en: Translations = {
     useByHint: "Strict date: do not go past it.",
     bestBeforeHint: "Guide date: often still good after it.",
     indicativePassed: "Best-before date passed",
+    estimated: "Date estimated by the app",
     stillGoodLink: "Is it still good?",
     freeze: "Freeze",
     thaw: "Thaw",

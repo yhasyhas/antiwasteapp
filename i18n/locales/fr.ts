@@ -225,6 +225,7 @@ const fr = {
     useByHint: "Date stricte : à ne pas dépasser.",
     bestBeforeHint: "Date indicative : souvent encore bon après.",
     indicativePassed: "Date indicative dépassée",
+    estimated: "Date estimée par l'app",
     stillGoodLink: "Est-ce encore bon ?",
     freeze: "Congeler",
     thaw: "Décongeler",

@@ -17,6 +17,7 @@ import type { PantryIngredient } from './IngredientCard';
 // Changements d'un lot enregistrés ensemble (date, type de date, emplacement)
 export interface LotPatch {
   expires_at?: string | null;
+  expiry_estimated?: boolean;
   date_kind?: DateKind;
   location?: StorageLocation;
 }
@@ -34,7 +35,7 @@ interface Props {
   onThaw: (lot: PantryIngredient) => void;
   onOpen: (lot: PantryIngredient) => void;
   onMerge: (lots: PantryIngredient[]) => void;
-  // Date indicative dépassée : lien vers « Est-ce encore bon ? » (fiche de l'aliment)
+  // Date indicative dépassée ou date estimée : lien vers « Est-ce encore bon ? » (fiche de l'aliment)
   onShowStillGood?: () => void;
 }
 
@@ -43,7 +44,7 @@ const dateKindOf = (lot: PantryIngredient) => (lot.date_kind as DateKind | null)
 
 // « Dans ton garde-manger », en haut de la feuille d'un aliment : ses lots, du plus ancien au plus récent (même
 // un seul), avec quantité, date (touchable pour modifier la date, son type et l'emplacement), auteur et date
-// d'ajout ; par lot : emplacement, « Je l'ai ouvert », « Congeler » ou « Décongeler », retrait ; fusion des lots
+// d'ajout, « Date estimée par l'app » ; par lot : emplacement, « Je l'ai ouvert », « Congeler » ou « Décongeler », retrait ; fusion des lots
 // de même date et même unité, retrait de l'aliment entier
 export function PantryLotsSection({ group, addedBy, onRemoveLot, onRemoveAll, onUpdateLot, onFreeze, onThaw, onOpen, onMerge, onShowStillGood }: Props) {
   const { t, language } = useLanguage();
@@ -74,7 +75,9 @@ export function PantryLotsSection({ group, addedBy, onRemoveLot, onRemoveAll, on
       return;
     }
     setSaving(true);
-    const saved = await onUpdateLot(lot, { expires_at: expiresAt, date_kind: editing.dateKind, location: editing.location });
+    // Date changée par l'utilisateur (ou retirée) : plus estimée
+    const dateChanged = expiresAt !== lot.expires_at;
+    const saved = await onUpdateLot(lot, { expires_at: expiresAt, date_kind: editing.dateKind, location: editing.location, ...(dateChanged && { expiry_estimated: false }) });
     setSaving(false);
     if (saved) setEditing(null);
   };
@@ -104,6 +107,7 @@ export function PantryLotsSection({ group, addedBy, onRemoveLot, onRemoveAll, on
         const frozen = locationOf(lot) === 'freezer';
         const state = stateLine(lot);
         const indicativePassed = lotUrgency(lot) === 'indicative_passed';
+        const estimated = !!lot.expiry_estimated && !!lot.expires_at;
         return (
           <View key={lot.id}>
             <View style={cardStyles.divider} />
@@ -112,6 +116,7 @@ export function PantryLotsSection({ group, addedBy, onRemoveLot, onRemoveAll, on
                 <Text style={styles.quantity}>{lotLabel(lot, lots, language) || lot.name}</Text>
                 <Text style={styles.details}>{by ? `${by} · ${when}` : t('lots.addedWhen', { when })}</Text>
                 {state ? <Text style={styles.details}>{state}</Text> : null}
+                {estimated ? <Text style={styles.details}>{t('storage.estimated')}</Text> : null}
               </View>
               <ExpiryBadge expiresAt={lot.expires_at} dateKind={dateKindOf(lot)} location={lot.location} onPress={() => startEditing(lot)} />
               {multiple ? (
@@ -120,7 +125,7 @@ export function PantryLotsSection({ group, addedBy, onRemoveLot, onRemoveAll, on
                 </Touchable>
               ) : null}
             </View>
-            {indicativePassed && onShowStillGood ? (
+            {(indicativePassed || estimated) && onShowStillGood ? (
               <Touchable onPress={onShowStillGood} style={styles.link} accessibilityRole="link">
                 <Text style={styles.linkText}>{t('storage.stillGoodLink')}</Text>
               </Touchable>

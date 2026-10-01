@@ -224,6 +224,7 @@ const es: Translations = {
     useByHint: "Fecha estricta: no la superes.",
     bestBeforeHint: "Fecha orientativa: suele seguir bien después.",
     indicativePassed: "Fecha orientativa superada",
+    estimated: "Fecha estimada por la app",
     stillGoodLink: "¿Sigue estando bueno?",
     freeze: "Congelar",
     thaw: "Descongelar",

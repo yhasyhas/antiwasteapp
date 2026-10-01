@@ -41,6 +41,8 @@ export interface PantryIngredient {
   opened_at?: string | null;
   frozen_at?: string | null;
   thawed_at?: string | null;
+  // Date estimée par l'app (scan photo, valeur proposée, congélation…), pas lue sur l'emballage
+  expiry_estimated?: boolean | null;
 }
 
 interface Props {
