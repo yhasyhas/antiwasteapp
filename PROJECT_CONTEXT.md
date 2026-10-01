@@ -249,6 +249,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - « J'ai cuisiné ça » (`components/recipe/CookedButton.tsx`) : relié à la recette, « ✓ Cuisiné aujourd'hui », récapitulatif, « Modifier » (`modify_cook_action`, `last_cook_action`), « Je l'ai cuisinée à nouveau » ; « Cuisinée le » dans « Mes recettes ».
 - Résumé quotidien réglable (`lib/digestSettings.ts`, Réglages → Notifications), respecté par `claim_daily_digests` et les rappels locaux.
 - Fiches aliments : « Est-ce encore bon ? » (`signs`, `discard`) et `seasonal` (saison affichée pour les produits frais seulement).
+- Origine de la date (`expiry_estimated`, migration `20261001120000_estimated_dates.sql`) : « Date estimée par l'app » dans la feuille de l'aliment, avec le lien « Est-ce encore bon ? » ; une date indicative proche est urgente comme une date stricte, dépassée elle ne l'est jamais.
 - Tests : `supabase/tests/phase8_pantry.sql`.
 
 ## 5. État actuel et problèmes connus
