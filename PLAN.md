@@ -26,6 +26,7 @@ Dernière mise à jour : 30/09/2026
 
 **Autonomie de Claude** (depuis la phase 2)
 - **Avance seul pour** : le code, les commits, le déploiement des fonctions, les secrets de configuration (quotas, noms de modèles), et les migrations, à condition que chacune soit testée en transaction annulée sur la base distante, avec des tests de sécurité qui passent.
+- **Toute transaction de test se termine par une annulation, même en cas d'erreur ; aucune transaction ne reste ouverte.**
 - **Avant toute migration qui modifie ou supprime des données existantes** : sauvegarde avec `npx supabase db dump --data-only` dans `backups/` (hors de git, dans le `.gitignore`).
 - **S'arrête et attend un accord explicite** : pour toute action irréversible (suppression de tables ou de colonnes contenant des données, désactivation des anciennes clés), toute action qui coûte de l'argent, tout ce qui nécessite l'accès au dashboard ou aux comptes, et tout choix produit qui change ce que l'utilisateur voit ou vit dans l'app.
 - **En fin de phase, avant de fusionner** : un rapport court (ce qui a été fait, les décisions prises, ce qui reste à surveiller) et une liste de tests limitée à l'essentiel. La fusion dans `master` attend le retour sur ces tests.
@@ -366,6 +367,7 @@ Ancienne phase 8a.
 - [ ] Suppression de compte depuis l'app et depuis une page web (obligatoire pour le Play Store)
 - [ ] Nettoyage automatique des comptes d'essai (anonymes) inactifs depuis 30 jours, avec leur foyer personnel s'il n'est partagé avec personne
 - [ ] Sauvegardes automatiques de la base et test de restauration
+- [ ] Vérifier les délais de la base (transactions inactives, requêtes longues)
 - [ ] Tests automatisés des parcours critiques sur téléphone : connexion, scan, génération, « J'ai cuisiné ça », foyer
 
 **Terminé quand** : chaque point de l'audit est traité ou noté au journal avec sa raison.
@@ -586,4 +588,5 @@ Ancienne phase 8.
 | 01/10/2026 | Validé : aliment congelé en date indicative ; correction de « J'ai cuisiné ça » qui garde la date du premier repas | Choix faits en autonomie, confirmés par l'utilisateur |
 | 01/10/2026 | Date indicative proche : traitée comme une date stricte (ambre, « À utiliser vite », « X à sauver », résumé quotidien, rappels locaux, jours restants pour la génération) ; « Aujourd'hui » en ambre, pas en rouge. Dépassée : badge neutre « Date indicative dépassée », jamais rouge, jamais « gaspillé », hors résumé | Remplace la règle « jamais à utiliser vite, même proche » ; le résumé et les rappels ne portent que sur aujourd'hui et demain, donc jamais sur une date indicative dépassée |
 | 01/10/2026 | Origine de la date de chaque lot (`ingredients.expiry_estimated`, migration `20261001120000_estimated_dates.sql`) : estimée par l'app (scan photo, date proposée gardée à la saisie, au code-barres ou aux courses, congélation, décongélation, ouverture qui raccourcit la date) ou venue de l'emballage (date choisie ou modifiée par l'utilisateur). Feuille de l'aliment : « Date estimée par l'app » et lien « Est-ce encore bon ? », même pour une date stricte | Ajout à un lot existant : la date retenue (la plus proche) garde son origine ; fusion : estimée seulement si toutes le sont ; l'annulation la rétablit. Lots existants : non estimés (origine inconnue). Le code-barres ne donne pas de date : celle proposée reste estimée tant que l'utilisateur ne la change pas |
+| 01/10/2026 | Incident : deux transactions de test abandonnées (un lancement des tests SQL interrompu en arrière-plan) sont restées ouvertes et ont bloqué les tests suivants (délai dépassé sur un verrou) ; terminées, donc annulées, sans effet sur les données. Délai des transactions inactives : 5 minutes pour le rôle `postgres` (migration `20261001130000_idle_transaction_timeout.sql`), qui n'était pas défini | Le rôle `postgres` sert à la CLI, aux migrations, aux tests et à l'éditeur SQL ; l'app (PostgREST) n'est pas concernée. Délai vérifié : coupure et annulation automatiques constatées |
 | | *(résultat du test Gemini vs Clarifai)* | |
