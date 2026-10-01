@@ -113,3 +113,24 @@ export function diversity(recipes) {
   for (let i = 0; i < sets.length; i++) for (let j = i + 1; j < sets.length; j++) pairs.push(jaccard(sets[i], sets[j]));
   return 1 - pairs.reduce((a, b) => a + b, 0) / pairs.length;
 }
+
+// Unités écrites dans une autre langue que la recette (« c. à soupe » dans une recette en anglais) : part des
+// ingrédients dont l'unité est dans la bonne langue
+const UNIT_WORDS = {
+  fr: ['c a soupe', 'c a cafe', 'cuillere', 'pincee', 'gousse', 'tranche', 'boite', 'botte', 'piece', 'sachet', 'pot'],
+  en: ['tbsp', 'tsp', 'tablespoon', 'teaspoon', 'pinch', 'clove', 'slice', 'can', 'bunch', 'piece', 'cup', 'stalk', 'head'],
+  es: ['cda', 'cdta', 'cucharada', 'cucharadita', 'pizca', 'diente', 'rebanada', 'lata', 'manojo', 'pieza', 'racion', 'taza'],
+};
+export function unitsInLanguage(recipe, language) {
+  const others = Object.entries(UNIT_WORDS).filter(([lang]) => lang !== language).flatMap(([, list]) => list)
+    .filter((word) => !UNIT_WORDS[language]?.includes(word));
+  const units = (recipe.ingredients_used ?? []).map((i) => normalize(i.unit)).filter((u) => u !== '');
+  if (units.length === 0) return 1;
+  const wrong = units.filter((unit) => others.some((word) => ` ${unit} `.includes(` ${word} `) || unit.startsWith(`${word} `) || unit === word.replace(/s$/, '')));
+  return 1 - wrong.length / units.length;
+}
+
+// Température en °C pour une cuisson sur le feu (« feu moyen (180 °C) », « medium heat (≈190 °C) ») : 1 si la
+// recette n'en contient aucune ; le four, l'huile de friture et la cuisson à cœur gardent leurs °C
+const STOVE_CELSIUS = /\b(feu|heat|fuego)\b[^.;]{0,20}?\(?\s*[≈~]?\s*\d{2,3}\s*°/i;
+export const noStoveCelsius = (recipe) => ((recipe.instructions ?? []).some((step) => STOVE_CELSIUS.test(step)) ? 0 : 1);

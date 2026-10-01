@@ -91,7 +91,7 @@ async function generate(body: any) {
   const request = (prompts: { system: string; prompt: string }) => ({
     system: prompts.system,
     prompt: prompts.prompt,
-    schema: version === 'v2' ? buildRecipeSchema(pantry, diets, 'Unité abrégée, dans la langue de la recette') : buildRecipeSchema(pantry, diets),
+    schema: version !== 'v1' ? buildRecipeSchema(pantry, diets, 'Unité abrégée, dans la langue de la recette') : buildRecipeSchema(pantry, diets),
     schemaName: 'recipes',
     temperature: 0.8,
     maxOutputTokens: MAX_OUTPUT_TOKENS,

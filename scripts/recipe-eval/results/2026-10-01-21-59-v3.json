@@ -1,0 +1,4296 @@
+{
+ "summary": {
+  "version": "v3",
+  "date": "2026-10-01T21:59:25.363Z",
+  "model": "openai/gpt-oss-120b",
+  "judge_model": "gemini-3.1-flash-lite",
+  "cases": 10,
+  "failed_cases": 1,
+  "recipes": 25,
+  "judge": {
+   "quantities": 4.36,
+   "cooking_cues": 4.36,
+   "order": 4.72,
+   "ingredients_used": 3.6,
+   "authenticity": 3.84,
+   "safety": 4.88,
+   "diet": 4.96
+  },
+  "diversity_judge": 3.888888888888889,
+  "auto": {
+   "ingredients_in_steps": 0.9628571428571427,
+   "quantities_in_steps": 0.6053333333333334,
+   "timed_cooking": 0.8011428571428572,
+   "oven_temperature": 1,
+   "reheat_cue": 1,
+   "uses_urgent": 1,
+   "rules_respected": 1,
+   "units_language": 1,
+   "diversity": 0.6855225475323513
+  },
+  "rejected_first": 0,
+  "median_ms": 6114,
+  "judge_mean": 4.388571428571429
+ },
+ "results": [
+  {
+   "id": "fr-afrique-complet",
+   "note": "Garde-manger complet, cuisine d'Afrique subsaharienne, poulet à utiliser vite",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 6114,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "diversity_auto": 0.5555555555555556,
+   "diversity_judge": 4,
+   "diversity_comment": "La sélection propose une bonne variété de textures et de méthodes (sauté, ragoût, salade), bien que la troisième recette manque de pertinence par rapport au garde-manger et à la thématique.",
+   "judge_model": "gemini-3.1-flash-lite",
+   "generation": {
+    "version": "v3",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "fr-afrique-complet-1",
+      "name": "Cuisses de poulet",
+      "quantity": "4",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "fr-afrique-complet-6",
+      "name": "Tomates",
+      "quantity": "4",
+      "daysLeft": 2,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "fr-afrique-complet-2",
+      "name": "Oignons",
+      "quantity": "5",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "fr-afrique-complet-3",
+      "name": "Citrons",
+      "quantity": "3",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "fr-afrique-complet-4",
+      "name": "Riz",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "fr-afrique-complet-5",
+      "name": "Pâte d'arachide",
+      "quantity": "1 pot",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "fr-afrique-complet-7",
+      "name": "Carottes",
+      "quantity": "3",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p8",
+      "id": "fr-afrique-complet-8",
+      "name": "Concentré de tomate",
+      "quantity": "1 boîte",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p9",
+      "id": "fr-afrique-complet-9",
+      "name": "Piment",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p10",
+      "id": "fr-afrique-complet-10",
+      "name": "Ail",
+      "quantity": "1 tête",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 6114,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 2,
+      "ms": 6109,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.094064966,
+       "prompt_tokens": 1938,
+       "prompt_time": 0.098745099,
+       "completion_tokens": 2798,
+       "completion_time": 5.874170694,
+       "total_tokens": 4736,
+       "total_time": 5.972915793,
+       "completion_tokens_details": {
+        "reasoning_tokens": 82
+       },
+       "rate_limits": {
+        "requests_per_day": "1000",
+        "remaining_requests": "982",
+        "tokens_per_minute": "8000",
+        "remaining_tokens": "5830"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Poulet DG à la tomate et citron",
+     "recipe": {
+      "title": "Poulet DG à la tomate et citron",
+      "description": "Morceaux de cuisses de poulet sautés avec tomates, oignons, citron et piment, servis avec du riz blanc. Un plat savoureux, légèrement épicé et parfait pour le dîner.",
+      "difficulty": "medium",
+      "prep_time": 15,
+      "cook_time": 30,
+      "total_time": 45,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "african",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "Cuisses de poulet",
+        "quantity": "4",
+        "unit": "pièces",
+        "pantry_id": "fr-afrique-complet-1"
+       },
+       {
+        "name": "Tomates",
+        "quantity": "4",
+        "unit": "pièces",
+        "pantry_id": "fr-afrique-complet-6"
+       },
+       {
+        "name": "Oignons",
+        "quantity": "2",
+        "unit": "pièces",
+        "pantry_id": "fr-afrique-complet-2"
+       },
+       {
+        "name": "Citrons",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-afrique-complet-3"
+       },
+       {
+        "name": "Piment",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-afrique-complet-9"
+       },
+       {
+        "name": "Ail",
+        "quantity": "2",
+        "unit": "gousses",
+        "pantry_id": "fr-afrique-complet-10"
+       },
+       {
+        "name": "Riz",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "fr-afrique-complet-4"
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "huile végétale",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Cuisses de poulet",
+       "Tomates",
+       "Oignons",
+       "Citrons",
+       "Piment",
+       "Ail",
+       "Riz"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Rince le riz à l'eau froide puis fais-le cuire dans 600 ml d'eau à feu moyen pendant 12 minutes, jusqu'à absorption complète. Égoutte et garde au chaud.",
+       "Émince les 2 oignons et hache finement les 2 gousses d'ail.",
+       "Coupe les tomates en dés et presse le citron pour en récupérer le jus.",
+       "Dans une grande poêle, chauffe 2 c. à soupe d'huile à feu moyen. Ajoute les cuisses de poulet et fais dorer 5 minutes de chaque côté, jusqu'à ce que la surface soit bien colorée.",
+       "Vérifie la cuisson interne : la température doit atteindre 74 °C (utilise un thermomètre). Retire le poulet et réserve.",
+       "Dans la même poêle, ajoute les oignons et l'ail, fais suer à feu moyen 3 minutes, jusqu'à ce qu'ils deviennent translucides.",
+       "Ajoute le piment entier, les dés de tomate et le jus de citron. Laisse mijoter 8 minutes à feu moyen, jusqu'à ce que la sauce épaississe légèrement.",
+       "Remets le poulet dans la poêle, couvre et laisse cuire 10 minutes à feu doux, jusqu'à ce que la viande soit bien tendre et que le jus soit clair.",
+       "Sale et poivre à ton goût.",
+       "Sers le poulet DG nappé de sauce avec le riz blanc chaud."
+      ],
+      "tips": [
+       "Pour une sauce plus onctueuse, ajoute une cuillère à soupe d'eau de cuisson du riz en fin de cuisson.",
+       "Si tu aimes plus piquant, écrase le piment avant de l'ajouter."
+      ],
+      "image_prompt": "Professional food photography, golden brown chicken thighs with bright red tomato sauce, sliced lemon wedges, fluffy white rice on the side, rustic wooden table, natural light"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.8,
+      "timed_cooking": 0.8333333333333334,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 10,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 4,
+      "authenticity": 2,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "Le plat est nommé 'Poulet DG' mais omet l'ingrédient indispensable : les bananes plantains frites, ce qui rend l'appellation trompeuse.",
+      "L'utilisation de seulement 4 tomates et 2 oignons est un peu chiche pour un plat censé être généreux."
+     ],
+     "strengths": [
+      "La gestion des températures de cuisson interne du poulet est exemplaire pour la sécurité alimentaire.",
+      "Les étapes sont claires et permettent une exécution sans erreur."
+     ]
+    },
+    {
+     "title": "Mafé de poulet aux carottes",
+     "recipe": {
+      "title": "Mafé de poulet aux carottes",
+      "description": "Ragoût épais à base de pâte d'arachide, tomates, carottes et cuisses de poulet, servi avec du riz. Un plat typique d'Afrique de l'Ouest, réconfortant et riche en protéines.",
+      "difficulty": "medium",
+      "prep_time": 20,
+      "cook_time": 35,
+      "total_time": 55,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "african",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "Cuisses de poulet",
+        "quantity": "4",
+        "unit": "pièces",
+        "pantry_id": "fr-afrique-complet-1"
+       },
+       {
+        "name": "Pâte d'arachide",
+        "quantity": "120",
+        "unit": "g",
+        "pantry_id": "fr-afrique-complet-5"
+       },
+       {
+        "name": "Tomates",
+        "quantity": "2",
+        "unit": "pièces",
+        "pantry_id": "fr-afrique-complet-6"
+       },
+       {
+        "name": "Carottes",
+        "quantity": "3",
+        "unit": "pièces",
+        "pantry_id": "fr-afrique-complet-7"
+       },
+       {
+        "name": "Oignons",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-afrique-complet-2"
+       },
+       {
+        "name": "Ail",
+        "quantity": "2",
+        "unit": "gousses",
+        "pantry_id": "fr-afrique-complet-10"
+       },
+       {
+        "name": "Concentré de tomate",
+        "quantity": "1",
+        "unit": "c. à soupe",
+        "pantry_id": "fr-afrique-complet-8"
+       },
+       {
+        "name": "Piment",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-afrique-complet-9"
+       },
+       {
+        "name": "Riz",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "fr-afrique-complet-4"
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "huile végétale",
+        "quantity": "3",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "eau",
+        "quantity": "400",
+        "unit": "ml",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Cuisses de poulet",
+       "Pâte d'arachide",
+       "Tomates",
+       "Carottes",
+       "Oignons",
+       "Ail",
+       "Concentré de tomate",
+       "Piment",
+       "Riz"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Rince le riz, puis fais-le cuire dans 600 ml d'eau à feu moyen pendant 12 minutes. Égoutte et garde au chaud.",
+       "Épluche les carottes et coupe-les en rondelles d'environ 1 cm d'épaisseur.",
+       "Émince l'oignon, hache les 2 gousses d'ail et coupe les 2 tomates en petits dés.",
+       "Dans une grande cocotte, chauffe 3 c. à soupe d'huile à feu moyen. Ajoute les cuisses de poulet et fais dorer 6 minutes de chaque côté, jusqu'à ce qu'une croûte dorée se forme.",
+       "Vérifie la cuisson interne du poulet (74 °C). Retire le poulet et réserve.",
+       "Dans la même cocotte, ajoute l'oignon et l'ail, fais suer 4 minutes à feu moyen jusqu'à ce qu'ils deviennent translucides.",
+       "Incorpore le concentré de tomate, les dés de tomate et le piment entier. Laisse cuire 3 minutes en remuant.",
+       "Ajoute la pâte d'arachide et mélange bien pour qu'elle se dissolve, puis verse 400 ml d'eau. Porte à ébullition puis réduis à feu doux.",
+       "Intègre les rondelles de carotte, remets les cuisses de poulet dans la cocotte, couvre et laisse mijoter 20 minutes à feu doux, jusqu'à ce que les carottes soient tendres et que la sauce épaississe.",
+       "Sale et poivre à ton goût.",
+       "Sers le mafé bien chaud avec le riz blanc."
+      ],
+      "tips": [
+       "Si la sauce est trop épaisse, ajoute un peu d'eau chaude.",
+       "Pour plus de profondeur, ajoute une petite cuillère à café de concentré de tomate supplémentaire."
+      ],
+      "image_prompt": "Professional food photography, steaming chicken mafé in a deep clay pot, rich peanut sauce, orange carrot slices, fluffy rice beside, warm ambient lighting"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.6666666666666666,
+      "timed_cooking": 0.8,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 11,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "Aucun problème majeur, la recette est techniquement solide et respecte les codes du mafé."
+     ],
+     "strengths": [
+      "Le respect de l'ordre des ajouts (oignons, concentré, pâte d'arachide) garantit une bonne base de sauce.",
+      "La gestion des temps de cuisson permet d'obtenir des carottes tendres sans dénaturer la viande."
+     ]
+    },
+    {
+     "title": "Salade de riz citronnée aux légumes croquants",
+     "recipe": {
+      "title": "Salade de riz citronnée aux légumes croquants",
+      "description": "Riz froid mélangé à des dés de tomate, carottes râpées, oignons rouges et vinaigrette au citron et piment. Légère, rafraîchissante et idéale pour un dîner léger.",
+      "difficulty": "medium",
+      "prep_time": 15,
+      "cook_time": 15,
+      "total_time": 30,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "african",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "Riz",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "fr-afrique-complet-4"
+       },
+       {
+        "name": "Tomates",
+        "quantity": "2",
+        "unit": "pièces",
+        "pantry_id": "fr-afrique-complet-6"
+       },
+       {
+        "name": "Carottes",
+        "quantity": "2",
+        "unit": "pièces",
+        "pantry_id": "fr-afrique-complet-7"
+       },
+       {
+        "name": "Oignons",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-afrique-complet-2"
+       },
+       {
+        "name": "Citrons",
+        "quantity": "2",
+        "unit": "pièces",
+        "pantry_id": "fr-afrique-complet-3"
+       },
+       {
+        "name": "Piment",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-afrique-complet-9"
+       },
+       {
+        "name": "Ail",
+        "quantity": "1",
+        "unit": "gousse",
+        "pantry_id": "fr-afrique-complet-10"
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "huile végétale",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Riz",
+       "Tomates",
+       "Carottes",
+       "Oignons",
+       "Citrons",
+       "Piment",
+       "Ail"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Fais cuire le riz dans 600 ml d'eau à feu moyen pendant 12 minutes, jusqu'à ce qu'il soit tendre. Égoutte, étale le riz sur une plaque et laisse refroidir rapidement à température ambiante, puis place-le au frais pendant 10 minutes.",
+       "Pendant ce temps, coupe les tomates en petits dés, râpe les 2 carottes et émince finement l'oignon.",
+       "Presse le jus des 2 citrons dans un bol, ajoute 2 c. à soupe d'huile végétale, la gousse d'ail hachée, le piment finement émincé, 1 pincée de sel et 1 pincée de poivre. Fouette pour émulsionner la vinaigrette.",
+       "Dans un grand saladier, mélange le riz refroidi, les dés de tomate, les carottes râpées et l'oignon émincé.",
+       "Verse la vinaigrette citron‑piment sur le mélange et remue délicatement jusqu'à ce que tout soit bien enrobé.",
+       "Laisse reposer 5 minutes à température ambiante avant de servir, afin que les saveurs se marient."
+      ],
+      "tips": [
+       "Pour une version encore plus fraîche, ajoute quelques feuilles de menthe ou de coriandre hachées.",
+       "Si tu souhaites plus de croquant, incorpore des cacahuètes grillées concassées."
+      ],
+      "suggestion": "Idéal aussi en déjeuner léger",
+      "image_prompt": "Professional food photography, vibrant cold rice salad with red tomato cubes, orange grated carrots, thinly sliced red onion, bright lemon dressing, fresh chili specks, served in a white bowl on a light wooden table"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.75,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 6,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 2,
+      "order": 4,
+      "ingredients_used": 2,
+      "authenticity": 2,
+      "safety": 2,
+      "diet": 5
+     },
+     "issues": [
+      "Le poulet, pourtant prioritaire dans le garde-manger, est totalement ignoré dans cette recette.",
+      "Le refroidissement du riz à température ambiante est une faute grave en hygiène alimentaire : risque de prolifération de Bacillus cereus.",
+      "La recette manque de lien avec la cuisine africaine traditionnelle, s'apparentant à une salade de riz générique."
+     ],
+     "strengths": [
+      "La vinaigrette est bien équilibrée en termes d'acidité et de piquant."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fr-maghreb-deux",
+   "note": "2 aliments seulement, cuisine du Maghreb",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 4943,
+   "requested": 2,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "diversity_auto": 0.7727272727272727,
+   "diversity_judge": 4,
+   "diversity_comment": "La diversité est bonne : on oppose un plat mijoté chaud et réconfortant à une salade froide et croquante, offrant deux approches distinctes pour les mêmes ingrédients de base.",
+   "judge_model": "gemini-3.1-flash-lite",
+   "generation": {
+    "version": "v3",
+    "requested": 2,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "fr-maghreb-deux-2",
+      "name": "Carottes",
+      "quantity": "500 g",
+      "daysLeft": 2,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "fr-maghreb-deux-1",
+      "name": "Pois chiches en conserve",
+      "quantity": "1 boîte",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 4943,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 1,
+      "ms": 4939,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.305557409,
+       "prompt_tokens": 1829,
+       "prompt_time": 0.34935265,
+       "completion_tokens": 2020,
+       "completion_time": 4.245682941,
+       "total_tokens": 3849,
+       "total_time": 4.595035591,
+       "completion_tokens_details": {
+        "reasoning_tokens": 126
+       },
+       "rate_limits": {
+        "requests_per_day": "1000",
+        "remaining_requests": "981",
+        "tokens_per_minute": "8000",
+        "remaining_tokens": "5971"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Tajine de carottes aux pois chiches",
+     "recipe": {
+      "title": "Tajine de carottes aux pois chiches",
+      "description": "Un tajine mijoté, riche en couleurs et en épices, où les carottes urgentes et les pois chiches en conserve se marient pour un déjeuner réconfortant.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 30,
+      "total_time": 40,
+      "servings": 4,
+      "meal_type": "lunch",
+      "cuisine": "maghreb",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "Carottes",
+        "quantity": "500",
+        "unit": "g",
+        "pantry_id": "fr-maghreb-deux-2"
+       },
+       {
+        "name": "Pois chiches en conserve",
+        "quantity": "1",
+        "unit": "boîte",
+        "pantry_id": "fr-maghreb-deux-1"
+       },
+       {
+        "name": "Oignon",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": null
+       },
+       {
+        "name": "Ail",
+        "quantity": "2",
+        "unit": "gousses",
+        "pantry_id": null
+       },
+       {
+        "name": "Huile d'olive",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "Cumin moulu",
+        "quantity": "1",
+        "unit": "c. à café",
+        "pantry_id": null
+       },
+       {
+        "name": "Ras el hanout",
+        "quantity": "1",
+        "unit": "c. à café",
+        "pantry_id": null
+       },
+       {
+        "name": "Harissa",
+        "quantity": "1",
+        "unit": "c. à café",
+        "pantry_id": null
+       },
+       {
+        "name": "Sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "Poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "Eau",
+        "quantity": "250",
+        "unit": "ml",
+        "pantry_id": null
+       },
+       {
+        "name": "Coriandre fraîche",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Carottes",
+       "Pois chiches en conserve"
+      ],
+      "missing_ingredients": [
+       "Oignon",
+       "Ail",
+       "Cumin moulu",
+       "Ras el hanout",
+       "Harissa",
+       "Coriandre fraîche"
+      ],
+      "instructions": [
+       "Émince l'oignon et écrase les 2 gousses d'ail.",
+       "Dans une cocotte ou un plat à tajine, fais chauffer 2 c. à soupe d'huile d'olive à feu moyen pendant 1 minute.",
+       "Ajoute l'oignon et l'ail, fais revenir 4 minutes, jusqu'à ce qu'ils soient translucides.",
+       "Coupe les carottes en rondelles de 0,5 cm d'épaisseur et ajoute-les dans la cocotte.",
+       "Saupoudre 1 c. à café de cumin, 1 c. à café de ras el hanout, 1 c. à café d'harissa, 1 pincée de sel et 1 pincée de poivre ; mélange 2 minutes à feu moyen.",
+       "Verse 250 ml d'eau, porte à ébullition, puis réduis le feu à doux.",
+       "Couvre et laisse mijoter 20 minutes, jusqu'à ce que les carottes soient tendres mais encore fermes.",
+       "Égoutte le pois chiche, rince-le, puis incorpore-le dans le tajine. Chauffe 5 minutes supplémentaires à feu doux, jusqu'à ce que le tout soit bien chaud (75 °C).",
+       "Parseme de coriandre fraîche hachée avant de servir."
+      ],
+      "tips": [
+       "Pour gagner du temps, utilise des carottes déjà coupées en bâtonnets.",
+       "Si tu aimes le piquant, augmente la quantité d'harissa.",
+       "Ce plat se conserve 2 jours au frais et se réchauffe rapidement au micro‑ondes."
+      ],
+      "image_prompt": "Professional food photography, bright orange carrot and chickpea tajine in a rustic clay pot, steam rising, warm kitchen light"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.6666666666666666,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 3,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "L'étape 1 ne précise pas la quantité d'oignon et d'ail à émincer.",
+      "L'étape 4 omet de préciser la quantité de carottes à ajouter.",
+      "L'étape 8 ne précise pas la quantité de pois chiches à incorporer."
+     ],
+     "strengths": [
+      "Les repères de cuisson sont excellents, notamment l'utilisation d'une température cible de 75°C.",
+      "La progression logique respecte parfaitement les temps de cuisson des ingrédients.",
+      "L'équilibre des épices est cohérent avec un tajine traditionnel."
+     ]
+    },
+    {
+     "title": "Salade méchouia de carottes et pois chiches",
+     "recipe": {
+      "title": "Salade méchouia de carottes et pois chiches",
+      "description": "Une salade froide aux influences maghrébines, idéale pour un déjeuner léger mais nourrissant, préparée en moins de 30 minutes.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 15,
+      "total_time": 25,
+      "servings": 4,
+      "meal_type": "lunch",
+      "cuisine": "maghreb",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "Carottes",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "fr-maghreb-deux-2"
+       },
+       {
+        "name": "Pois chiches en conserve",
+        "quantity": "1",
+        "unit": "boîte",
+        "pantry_id": "fr-maghreb-deux-1"
+       },
+       {
+        "name": "Poivron rouge",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": null
+       },
+       {
+        "name": "Tomate",
+        "quantity": "2",
+        "unit": "pièces",
+        "pantry_id": null
+       },
+       {
+        "name": "Cumin moulu",
+        "quantity": "1/2",
+        "unit": "c. à café",
+        "pantry_id": null
+       },
+       {
+        "name": "Paprika doux",
+        "quantity": "1/2",
+        "unit": "c. à café",
+        "pantry_id": null
+       },
+       {
+        "name": "Huile d'olive",
+        "quantity": "3",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "Jus de citron",
+        "quantity": "1",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "Sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "Poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "Persil frais",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Carottes",
+       "Pois chiches en conserve"
+      ],
+      "missing_ingredients": [
+       "Poivron rouge",
+       "Tomate",
+       "Cumin moulu",
+       "Paprika doux",
+       "Jus de citron",
+       "Persil frais"
+      ],
+      "instructions": [
+       "Épluche les carottes et, à l'aide d'un économe, forme des rubans fins.",
+       "Rince le poivron, retire les graines, puis coupe-le en petits dés.",
+       "Lave les tomates, épépine-les et coupe-les en dés de taille similaire.",
+       "Égoutte le pois chiche, rince-le à l'eau froide.",
+       "Dans un grand saladier, mélange les rubans de carotte, le poivron, la tomate et le pois chiche.",
+       "Dans un petit bol, fouette 3 c. à soupe d'huile d'olive, 1 c. à soupe de jus de citron, 1/2 c. à café de cumin, 1/2 c. à café de paprika, 1 pincée de sel et 1 pincée de poivre.",
+       "Verse la vinaigrette sur la salade, mélange 1 minute à feu doux (sur la plaque, 1 minute seulement pour que les saveurs se lient, sans cuisson des légumes).",
+       "Parseme de persil frais haché juste avant de servir."
+      ],
+      "tips": [
+       "Cette salade se prépare à l'avance ; garde la vinaigrette séparée et ajoute-la au moment de servir pour éviter que les carottes ne se ramollissent.",
+       "Pour plus de croquant, ajoute quelques olives noires dénoyautées (pantry_id: missing).",
+       "Parfaite avec du pain pita grillé."
+      ],
+      "image_prompt": "Bright Mediterranean salad bowl with orange carrot ribbons, chickpeas, fresh herbs, and a drizzle of olive oil, natural light"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.8,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 1,
+      "cooking_cues": 2,
+      "order": 3,
+      "ingredients_used": 5,
+      "authenticity": 2,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "Les étapes 1, 2, 3 et 4 ne mentionnent aucune quantité pour les ingrédients préparés.",
+      "L'étape 7 est une aberration culinaire : chauffer une salade composée sur une plaque est inutile et dégrade la texture des légumes frais.",
+      "Le nom 'Salade méchouia' est trompeur, car la recette ne comporte aucune technique de grillade ou de pelage des légumes typique de ce plat."
+     ],
+     "strengths": [
+      "La préparation est rapide et accessible pour un déjeuner léger.",
+      "La liste des ingrédients est bien définie et respectée tout au long de la recette."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "en-asian-urgent",
+   "note": "English, Asian, chicken and broccoli expiring",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 5554,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "diversity_auto": 0.6071428571428572,
+   "diversity_judge": 4,
+   "diversity_comment": "Les trois recettes proposent des techniques de cuisson distinctes (sauté au wok, rôtissage au four, riz sauté), ce qui offre une belle variété pour un même garde-manger.",
+   "judge_model": "gemini-3.1-flash-lite",
+   "generation": {
+    "version": "v3",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "en-asian-urgent-1",
+      "name": "Chicken thighs",
+      "quantity": "500 g",
+      "daysLeft": 0,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "en-asian-urgent-2",
+      "name": "Broccoli",
+      "quantity": "1",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "en-asian-urgent-3",
+      "name": "Rice",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "en-asian-urgent-4",
+      "name": "Soy sauce",
+      "quantity": "1 bottle",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "en-asian-urgent-5",
+      "name": "Ginger",
+      "quantity": "1 piece",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "en-asian-urgent-6",
+      "name": "Garlic",
+      "quantity": "1 head",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "en-asian-urgent-7",
+      "name": "Spring onions",
+      "quantity": "1 bunch",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p8",
+      "id": "en-asian-urgent-8",
+      "name": "Eggs",
+      "quantity": "6",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 5554,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 2,
+      "ms": 5549,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.214336573,
+       "prompt_tokens": 1886,
+       "prompt_time": 0.260488139,
+       "completion_tokens": 2408,
+       "completion_time": 5.028497692,
+       "total_tokens": 4294,
+       "total_time": 5.288985831,
+       "completion_tokens_details": {
+        "reasoning_tokens": 160
+       },
+       "rate_limits": {
+        "requests_per_day": "1000",
+        "remaining_requests": "980",
+        "tokens_per_minute": "8000",
+        "remaining_tokens": "3316"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Soy‑Ginger Chicken and Broccoli Stir‑Fry",
+     "recipe": {
+      "title": "Soy‑Ginger Chicken and Broccoli Stir‑Fry",
+      "description": "A quick wok‑style stir‑fry with tender chicken thighs, crisp broccoli, and a savory soy‑ginger sauce, perfect for a light dinner.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 15,
+      "total_time": 25,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "asian",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "Chicken thighs",
+        "quantity": "400",
+        "unit": "g",
+        "pantry_id": "en-asian-urgent-1"
+       },
+       {
+        "name": "Broccoli",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-asian-urgent-2"
+       },
+       {
+        "name": "Soy sauce",
+        "quantity": "3",
+        "unit": "tbsp",
+        "pantry_id": "en-asian-urgent-4"
+       },
+       {
+        "name": "Ginger",
+        "quantity": "1",
+        "unit": "tbsp",
+        "pantry_id": "en-asian-urgent-5"
+       },
+       {
+        "name": "Garlic",
+        "quantity": "2",
+        "unit": "clove",
+        "pantry_id": "en-asian-urgent-6"
+       },
+       {
+        "name": "Spring onions",
+        "quantity": "2",
+        "unit": "stalks",
+        "pantry_id": "en-asian-urgent-7"
+       },
+       {
+        "name": "Oil",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "Pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Chicken thighs",
+       "Broccoli",
+       "Soy sauce",
+       "Ginger",
+       "Garlic",
+       "Spring onions"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Trim the broccoli into bite‑size florets; set aside.",
+       "Slice the chicken thighs into 2‑cm strips.",
+       "Peel and finely mince the garlic; grate the ginger.",
+       "Heat 2 tbsp oil in a wok over high heat for 30 seconds.",
+       "Add the chicken strips, stir‑fry on high for 4 minutes, until the surface is no longer pink.",
+       "Check internal temperature with a probe: it must reach 74 °C (no pink).",
+       "Add the minced garlic and grated ginger, stir‑fry 30 seconds until fragrant.",
+       "Add the broccoli florets, continue stir‑frying on medium‑high for 3 minutes, until bright green and just tender.",
+       "Stir in 3 tbsp soy sauce, 1 pinch salt and 1 pinch pepper; toss to coat.",
+       "Slice the spring‑onion stalks thinly and sprinkle over the dish just before serving.",
+       "Serve immediately."
+      ],
+      "tips": [
+       "Cut the chicken and broccoli to uniform size for even cooking.",
+       "If you like a little heat, add a dash of chili oil."
+      ],
+      "image_prompt": "Professional food photography, bright soy‑ginger chicken thigh strips with green broccoli florets, glossy sauce, wok on a wooden table, natural light"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.75,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 11,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 4,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 3,
+      "authenticity": 4,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "La quantité de brocoli est imprécise ('1 piece'), ce qui rend le dosage difficile pour un amateur.",
+      "L'ingrédient 'Rice' est totalement absent de la recette alors qu'il est disponible dans le garde-manger pour accompagner ce plat.",
+      "Seulement 400g de poulet sont utilisés sur les 500g disponibles, ce qui contredit l'objectif anti-gaspi."
+     ],
+     "strengths": [
+      "Les repères de cuisson (température interne de 74°C) sont excellents et garantissent la sécurité alimentaire.",
+      "L'ordre des étapes est logique et permet une exécution fluide au wok."
+     ]
+    },
+    {
+     "title": "Baked Honey‑Soy Chicken Thighs with Roasted Broccoli",
+     "recipe": {
+      "title": "Baked Honey‑Soy Chicken Thighs with Roasted Broccoli",
+      "description": "Oven‑baked chicken thighs glazed with a sweet‑savory honey‑soy sauce, paired with caramelised broccoli for a simple, hearty dinner.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 25,
+      "total_time": 35,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "asian",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "Chicken thighs",
+        "quantity": "500",
+        "unit": "g",
+        "pantry_id": "en-asian-urgent-1"
+       },
+       {
+        "name": "Broccoli",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-asian-urgent-2"
+       },
+       {
+        "name": "Soy sauce",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": "en-asian-urgent-4"
+       },
+       {
+        "name": "Honey",
+        "quantity": "1",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Garlic",
+        "quantity": "2",
+        "unit": "clove",
+        "pantry_id": "en-asian-urgent-6"
+       },
+       {
+        "name": "Oil",
+        "quantity": "1",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "Pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Chicken thighs",
+       "Broccoli",
+       "Soy sauce",
+       "Garlic"
+      ],
+      "missing_ingredients": [
+       "Honey"
+      ],
+      "instructions": [
+       "Preheat the oven to 200 °C.",
+       "Pat the chicken thighs dry with paper towels; place them skin‑side up on a baking sheet.",
+       "Peel and mince the garlic.",
+       "In a small bowl, mix 2 tbsp soy sauce, 1 tbsp honey, minced garlic, 1 pinch salt, and 1 pinch pepper.",
+       "Brush the mixture over the chicken thighs, ensuring an even coating.",
+       "Wash the broccoli, cut into florets, and toss with 1 tbsp oil, a pinch of salt, and pepper; spread around the chicken on the same sheet.",
+       "Bake for 20 minutes, then flip the chicken and stir the broccoli.",
+       "Continue baking for another 5‑7 minutes, until the chicken reaches an internal temperature of 74 °C (no pink) and the broccoli edges are caramelised.",
+       "Remove from oven and let rest 3 minutes before serving."
+      ],
+      "tips": [
+       "For extra gloss, broil for the last 2 minutes, watching closely.",
+       "If you prefer less sweetness, reduce honey to ½ tbsp."
+      ],
+      "image_prompt": "Professional food photography, golden baked chicken thighs glazed with honey‑soy, roasted broccoli spears, rustic baking tray, warm lighting"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.6666666666666666,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 3,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 2,
+      "authenticity": 3,
+      "safety": 5,
+      "diet": 4
+     },
+     "issues": [
+      "La recette utilise du miel, un ingrédient qui ne figure pas dans la liste du garde-manger fourni.",
+      "Plusieurs ingrédients disponibles (riz, gingembre, oignons nouveaux) sont ignorés.",
+      "La quantité de brocoli est imprécise."
+     ],
+     "strengths": [
+      "La gestion de la cuisson au four avec des repères de température et de temps est très précise.",
+      "La sécurité alimentaire est respectée avec une vérification rigoureuse de la température à cœur."
+     ]
+    },
+    {
+     "title": "Simple Chicken Fried Rice with Egg and Spring Onion",
+     "recipe": {
+      "title": "Simple Chicken Fried Rice with Egg and Spring Onion",
+      "description": "A comforting one‑pan fried rice that uses leftover rice, chicken, and eggs, finished with fresh spring onions for a quick dinner.",
+      "difficulty": "easy",
+      "prep_time": 8,
+      "cook_time": 20,
+      "total_time": 28,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "asian",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "Rice",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "en-asian-urgent-3"
+       },
+       {
+        "name": "Chicken thighs",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "en-asian-urgent-1"
+       },
+       {
+        "name": "Eggs",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-asian-urgent-8"
+       },
+       {
+        "name": "Soy sauce",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": "en-asian-urgent-4"
+       },
+       {
+        "name": "Garlic",
+        "quantity": "1",
+        "unit": "clove",
+        "pantry_id": "en-asian-urgent-6"
+       },
+       {
+        "name": "Spring onions",
+        "quantity": "3",
+        "unit": "stalks",
+        "pantry_id": "en-asian-urgent-7"
+       },
+       {
+        "name": "Oil",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "Pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Rice",
+       "Chicken thighs",
+       "Eggs",
+       "Soy sauce",
+       "Garlic",
+       "Spring onions"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "If the rice is uncooked, rinse 300 g rice under cold water, then place in a pot with 600 ml water; bring to boil, reduce to low heat, cover and simmer 12 minutes. Remove from heat, let stand 5 minutes, then spread on a tray to cool quickly.",
+       "While rice cools, cut the chicken thighs into small cubes.",
+       "Peel and finely mince the garlic; slice the spring‑onion stalks thinly, separating white and green parts.",
+       "Heat 1 tbsp oil in a large wok over medium‑high heat.",
+       "Add the chicken cubes, stir‑fry 5 minutes until browned and no longer pink; verify internal temperature reaches 74 °C.",
+       "Push chicken to the side, add remaining 1 tbsp oil, then pour in the beaten eggs; scramble quickly until just set, then mix with the chicken.",
+       "Add the cooled rice, the white parts of the spring onions, and minced garlic; stir‑fry on high for 4 minutes, breaking up any clumps.",
+       "Stir in 2 tbsp soy sauce, a pinch of salt, and a pinch of pepper; continue tossing until the rice is evenly coated and hot throughout (≥75 °C).",
+       "Remove from heat, garnish with the green parts of the spring onions, and serve immediately."
+      ],
+      "tips": [
+       "Using day‑old rice prevents mushy texture; if you only have fresh rice, spread it thinly to cool quickly.",
+       "For extra umami, add a splash of sesame oil at the end."
+      ],
+      "image_prompt": "Professional food photography, bowl of golden chicken fried rice with scrambled egg ribbons, green spring‑onion garnish, wok background, natural light"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.8,
+      "timed_cooking": 0.6,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 3,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "Le gingembre et le brocoli, pourtant présents dans le garde-manger, ne sont pas utilisés dans cette recette.",
+      "La recette est très complète mais ignore une partie des produits frais disponibles."
+     ],
+     "strengths": [
+      "La gestion du riz est exemplaire : le refroidissement rapide est crucial pour éviter la prolifération bactérienne (Bacillus cereus).",
+      "Les quantités sont parfaitement définies pour chaque étape, facilitant le travail de l'amateur."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "es-latino-vegetariano",
+   "note": "Español, latinoamericana, vegetariano",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 7178,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "diversity_auto": 0.5457516339869282,
+   "diversity_judge": 3,
+   "diversity_comment": "La diversité est moyenne : nous avons deux plats à base de tortillas (tacos et huevos rancheros) qui partagent des bases aromatiques très similaires. Le riz frit, bien que techniquement hors sujet, apportait une texture différente.",
+   "judge_model": "gemini-3.1-flash-lite",
+   "generation": {
+    "version": "v3",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "es-latino-vegetariano-3",
+      "name": "Aguacates",
+      "quantity": "2",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "es-latino-vegetariano-1",
+      "name": "Frijoles negros",
+      "quantity": "1 lata",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "es-latino-vegetariano-2",
+      "name": "Maíz",
+      "quantity": "1 lata",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "es-latino-vegetariano-4",
+      "name": "Tomates",
+      "quantity": "3",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "es-latino-vegetariano-5",
+      "name": "Arroz",
+      "quantity": "500 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "es-latino-vegetariano-6",
+      "name": "Huevos",
+      "quantity": "6",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "es-latino-vegetariano-7",
+      "name": "Queso fresco",
+      "quantity": "200 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p8",
+      "id": "es-latino-vegetariano-8",
+      "name": "Tortillas de maíz",
+      "quantity": "10",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p9",
+      "id": "es-latino-vegetariano-9",
+      "name": "Cebolla morada",
+      "quantity": "1",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p10",
+      "id": "es-latino-vegetariano-10",
+      "name": "Limas",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 7178,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 1,
+      "ms": 7175,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.226063905,
+       "prompt_tokens": 2088,
+       "prompt_time": 0.193310267,
+       "completion_tokens": 3193,
+       "completion_time": 6.717821825,
+       "total_tokens": 5281,
+       "total_time": 6.911132092,
+       "completion_tokens_details": {
+        "reasoning_tokens": 213
+       },
+       "rate_limits": {
+        "requests_per_day": "1000",
+        "remaining_requests": "979",
+        "tokens_per_minute": "8000",
+        "remaining_tokens": "3892"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Tacos de frijol negro con guacamole y salsa de maíz",
+     "recipe": {
+      "title": "Tacos de frijol negro con guacamole y salsa de maíz",
+      "description": "Tacos crujientes de maíz rellenos de frijoles negros sazonados, cubiertos con guacamole cremoso y una salsa fresca de maíz y tomate.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 15,
+      "total_time": 25,
+      "servings": 2,
+      "meal_type": "lunch",
+      "cuisine": "latin",
+      "dietary_tags": [
+       "vegetarian"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Aguacates",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-3"
+       },
+       {
+        "name": "Frijoles negros",
+        "quantity": "1",
+        "unit": "lata",
+        "pantry_id": "es-latino-vegetariano-1"
+       },
+       {
+        "name": "Maíz",
+        "quantity": "1",
+        "unit": "lata",
+        "pantry_id": "es-latino-vegetariano-2"
+       },
+       {
+        "name": "Tomates",
+        "quantity": "2",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-4"
+       },
+       {
+        "name": "Cebolla morada",
+        "quantity": "1/2",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-9"
+       },
+       {
+        "name": "Limas",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-10"
+       },
+       {
+        "name": "Tortillas de maíz",
+        "quantity": "4",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-8"
+       },
+       {
+        "name": "Queso fresco",
+        "quantity": "50",
+        "unit": "g",
+        "pantry_id": "es-latino-vegetariano-7"
+       },
+       {
+        "name": "Aceite vegetal",
+        "quantity": "1",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "Sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "Pimienta",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Aguacates",
+       "Frijoles negros",
+       "Maíz",
+       "Tomates",
+       "Cebolla morada",
+       "Limas",
+       "Tortillas de maíz",
+       "Queso fresco"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Escurre y enjuaga los frijoles negros. En una sartén a fuego medio, calienta 1 cda de aceite vegetal y sofríe 1/2 pieza de cebolla morada picada durante 3 minutos, hasta que esté translúcida.",
+       "Añade los frijoles negros, 1 pizca de sal y 1 pizca de pimienta. Cocina 5 minutos, removiendo, hasta que estén bien calientes.",
+       "Mientras tanto, prepara el guacamole: corta 1 aguacate por la mitad, saca la pulpa y machácala en un bol. Agrega el jugo de 1/2 lima, una pizca de sal y mezcla bien.",
+       "Para la salsa de maíz, escurre el maíz y pica los 2 tomates en cubos pequeños. Mezcla el maíz, los tomates, el jugo de la otra 1/2 lima, una pizca de sal y pimienta en otro recipiente.",
+       "Calienta las tortillas de maíz en una plancha o sartén a fuego medio 30 s por lado, hasta que estén flexibles y ligeramente doradas.",
+       "Para servir, coloca una cucharada de frijoles negros sobre cada tortilla, añade una capa de guacamole, cubre con la salsa de maíz y espolvorea 25 g de queso fresco desmenuzado."
+      ],
+      "tips": [
+       "Puedes añadir unas hojas de cilantro fresco si tienes a mano para más frescura.",
+       "Si prefieres más picante, agrega una pizca de chile en polvo a los frijoles."
+      ],
+      "image_prompt": "Professional food photography, golden corn tortillas filled with black beans, bright green guacamole, red corn and tomato salsa, rustic wooden board, natural light"
+     },
+     "checks": {
+      "ingredients_in_steps": 0.875,
+      "missing_in_steps": [
+       "Aguacates"
+      ],
+      "quantities_in_steps": 0.5,
+      "timed_cooking": 0.6666666666666666,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 6,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "La recette est techniquement solide, mais l'utilisation de la lime est un peu juste si le fruit est sec."
+     ],
+     "strengths": [
+      "Les temps de cuisson sont précis et permettent une exécution fluide.",
+      "L'ordre des étapes respecte parfaitement la logique de préparation en cuisine."
+     ]
+    },
+    {
+     "title": "Arroz frito con huevo, maíz y tomate",
+     "recipe": {
+      "title": "Arroz frito con huevo, maíz y tomate",
+      "description": "Arroz blanco salteado con huevo revuelto, maíz dulce y trozos de tomate, una comida completa y rápida para el almuerzo.",
+      "difficulty": "easy",
+      "prep_time": 8,
+      "cook_time": 20,
+      "total_time": 28,
+      "servings": 2,
+      "meal_type": "lunch",
+      "cuisine": "latin",
+      "dietary_tags": [
+       "vegetarian"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Arroz",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "es-latino-vegetariano-5"
+       },
+       {
+        "name": "Huevos",
+        "quantity": "2",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-6"
+       },
+       {
+        "name": "Maíz",
+        "quantity": "1/2",
+        "unit": "lata",
+        "pantry_id": "es-latino-vegetariano-2"
+       },
+       {
+        "name": "Tomates",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-4"
+       },
+       {
+        "name": "Cebolla morada",
+        "quantity": "1/4",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-9"
+       },
+       {
+        "name": "Aguacates",
+        "quantity": "1/2",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-3"
+       },
+       {
+        "name": "Aceite vegetal",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "Salsa de soja",
+        "quantity": "1",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "Sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "Pimienta",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Arroz",
+       "Huevos",
+       "Maíz",
+       "Tomates",
+       "Cebolla morada",
+       "Aguacates"
+      ],
+      "missing_ingredients": [
+       "Salsa de soja"
+      ],
+      "instructions": [
+       "Lava el arroz bajo agua fría y cuécelo en una olla con 400 ml de agua a fuego medio‑alto. Cuando hierva, reduce a fuego bajo, tapa y cocina 12 min hasta que el agua se absorba. Extiende el arroz en una bandeja para que se enfríe rápidamente (esto evitará que se apelmace).",
+       "Mientras el arroz se enfría, bate los 2 huevos con una pizca de sal y pimienta.",
+       "Pica finamente 1/4 pieza de cebolla morada y corta el tomate en cubos pequeños.",
+       "Calienta 1 cda de aceite vegetal en un wok a fuego medio‑alto. Añade la cebolla y saltea 2 min, hasta que empiece a dorarse.",
+       "Agrega el arroz frío, el maíz escurrido y la salsa de soja. Saltea 4 min, removiendo constantemente, hasta que el arroz esté bien caliente y ligeramente dorado.",
+       "Empuja el arroz a un lado del wok, vierte los huevos batidos en el espacio libre y revuelve rápidamente a fuego medio‑alto hasta que queden revueltos pero aún suaves, luego mezcla con el arroz.",
+       "Incorpora los cubos de tomate y cocina 1 min más, solo para calentar sin deshacerse.",
+       "Sirve el arroz frito en platos y decora con 1/2 aguacate cortado en rebanadas."
+      ],
+      "tips": [
+       "Usa arroz del día anterior para un mejor resultado; el arroz recién cocido puede quedar demasiado húmedo.",
+       "Si te gusta el picante, añade una pizca de chile en polvo o salsa picante al final."
+      ],
+      "image_prompt": "High‑contrast food photo of a wok with golden fried rice, bright red tomato pieces, yellow corn kernels, fluffy scrambled egg, green avocado slices on the side, rustic kitchen setting"
+     },
+     "checks": {
+      "ingredients_in_steps": 0.7142857142857143,
+      "missing_in_steps": [
+       "Tomates",
+       "Aguacates"
+      ],
+      "quantities_in_steps": 0.8,
+      "timed_cooking": 0.8,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 4,
+      "cooking_cues": 5,
+      "order": 4,
+      "ingredients_used": 3,
+      "authenticity": 1,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "L'utilisation de sauce soja n'est pas autorisée car elle ne figure pas dans la liste des ingrédients fournis.",
+      "Le plat proposé est une cuisine asiatique, ce qui contrevient totalement à la demande de cuisine latine.",
+      "L'étape de refroidissement du riz est bien gérée pour la sécurité, mais le temps de cuisson total est sous-estimé pour un amateur."
+     ],
+     "strengths": [
+      "La gestion de la sécurité alimentaire concernant le riz cuit est exemplaire et très professionnelle."
+     ]
+    },
+    {
+     "title": "Huevos rancheros con salsa de tomate y aguacate",
+     "recipe": {
+      "title": "Huevos rancheros con salsa de tomate y aguacate",
+      "description": "Clásicos huevos rancheros: tortillas crujientes coronadas con huevo frito, salsa de tomate fresca y rodajas de aguacate.",
+      "difficulty": "easy",
+      "prep_time": 7,
+      "cook_time": 15,
+      "total_time": 22,
+      "servings": 2,
+      "meal_type": "lunch",
+      "cuisine": "latin",
+      "dietary_tags": [
+       "vegetarian"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Tortillas de maíz",
+        "quantity": "4",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-8"
+       },
+       {
+        "name": "Huevos",
+        "quantity": "2",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-6"
+       },
+       {
+        "name": "Tomates",
+        "quantity": "2",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-4"
+       },
+       {
+        "name": "Cebolla morada",
+        "quantity": "1/4",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-9"
+       },
+       {
+        "name": "Aguacates",
+        "quantity": "1/2",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-3"
+       },
+       {
+        "name": "Limas",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-10"
+       },
+       {
+        "name": "Queso fresco",
+        "quantity": "40",
+        "unit": "g",
+        "pantry_id": "es-latino-vegetariano-7"
+       },
+       {
+        "name": "Aceite vegetal",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "Sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "Pimienta",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Tortillas de maíz",
+       "Huevos",
+       "Tomates",
+       "Cebolla morada",
+       "Aguacates",
+       "Limas",
+       "Queso fresco"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Corta 1/4 pieza de cebolla morada en juliana fina.",
+       "Pica los 2 tomates en cubos pequeños y mézclalos en un bol con la cebolla, el jugo de 1/2 lima, 1 pizca de sal y pimienta. Reserva la salsa.",
+       "Calienta 1 cda de aceite vegetal en una sartén a fuego medio‑alto. Fríe las 4 tortillas una a una, 30 s por lado, hasta que estén crujientes y ligeramente doradas. Retira y coloca sobre papel absorbente.",
+       "En la misma sartén, agrega otra 1 cda de aceite y calienta a fuego medio. Rompe los 2 huevos y fríelos 3 min por lado, hasta que la clara esté bien cuajada y la yema aún líquida (temperatura interna >74 °C, sin rastros rosados).",
+       "Corta 1/2 aguacate en rebanadas finas.",
+       "Para servir, coloca 2 tortillas en cada plato, cubre cada una con una salsa de tomate, coloca un huevo frito encima, agrega rebanadas de aguacate y espolvorea 20 g de queso fresco desmenuzado."
+      ],
+      "tips": [
+       "Si prefieres la yema más cocida, deja el huevo un minuto más en la sartén.",
+       "Añade un toque de chile en polvo a la salsa para más sabor."
+      ],
+      "image_prompt": "Bright Mexican breakfast plate with two sunny‑side‑up eggs on crisp corn tortillas, red tomato salsa, green avocado slices, sprinkled with queso fresco, morning light"
+     },
+     "checks": {
+      "ingredients_in_steps": 0.8571428571428572,
+      "missing_in_steps": [
+       "Aguacates"
+      ],
+      "quantities_in_steps": 0.8333333333333334,
+      "timed_cooking": 0.3333333333333333,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 6,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "La cuisson des œufs '3 min par côté' est risquée pour garder le jaune coulant tout en cuisant le blanc, une précision sur la texture du blanc aurait été préférable."
+     ],
+     "strengths": [
+      "Recette parfaitement authentique et respectueuse des ingrédients du garde-manger.",
+      "La gestion des quantités est rigoureuse, permettant de ne rien gaspiller."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fr-restes",
+   "note": "Transformer mes restes : riz cuit et poulet rôti",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 6855,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "diversity_auto": 0.6499999999999999,
+   "diversity_judge": 4,
+   "diversity_comment": "Les trois recettes proposent des textures et des méthodes de cuisson distinctes (sauté, gratin, soupe), ce qui est excellent pour varier les plaisirs avec les mêmes ingrédients de base.",
+   "judge_model": "gemini-3.1-flash-lite",
+   "generation": {
+    "version": "v3",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "fr-restes-1",
+      "name": "Reste de riz cuit",
+      "quantity": "2 portions",
+      "daysLeft": 1,
+      "kind": "dish",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "fr-restes-2",
+      "name": "Reste de poulet rôti",
+      "quantity": "1 portion",
+      "daysLeft": 1,
+      "kind": "dish",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "fr-restes-3",
+      "name": "Courgettes",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "fr-restes-4",
+      "name": "Œufs",
+      "quantity": "4",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "fr-restes-5",
+      "name": "Emmental râpé",
+      "quantity": "100 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "fr-restes-6",
+      "name": "Oignon",
+      "quantity": "1",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 6855,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 1,
+      "ms": 6852,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.212965331,
+       "prompt_tokens": 1883,
+       "prompt_time": 0.047455745,
+       "completion_tokens": 2606,
+       "completion_time": 6.540096352,
+       "total_tokens": 4489,
+       "total_time": 6.587552097,
+       "prompt_tokens_details": {
+        "cached_tokens": 768
+       },
+       "completion_tokens_details": {
+        "reasoning_tokens": 260
+       },
+       "rate_limits": {
+        "requests_per_day": "1000",
+        "remaining_requests": "978",
+        "tokens_per_minute": "8000",
+        "remaining_tokens": "2924"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Riz sauté au poulet, courgettes et œuf brouillé",
+     "recipe": {
+      "title": "Riz sauté au poulet, courgettes et œuf brouillé",
+      "description": "Transformez votre reste de riz et de poulet rôti en un plat sauté rapide, léger et savoureux, idéal pour le dîner.",
+      "difficulty": "easy",
+      "prep_time": 5,
+      "cook_time": 15,
+      "total_time": 20,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "Reste de riz cuit",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "fr-restes-1"
+       },
+       {
+        "name": "Reste de poulet rôti",
+        "quantity": "150",
+        "unit": "g",
+        "pantry_id": "fr-restes-2"
+       },
+       {
+        "name": "Courgettes",
+        "quantity": "2",
+        "unit": "pièces",
+        "pantry_id": "fr-restes-3"
+       },
+       {
+        "name": "Oignon",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-restes-6"
+       },
+       {
+        "name": "Œufs",
+        "quantity": "2",
+        "unit": "pièces",
+        "pantry_id": "fr-restes-4"
+       },
+       {
+        "name": "Emmental râpé",
+        "quantity": "30",
+        "unit": "g",
+        "pantry_id": "fr-restes-5"
+       },
+       {
+        "name": "huile d'olive",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Reste de riz cuit",
+       "Reste de poulet rôti",
+       "Courgettes",
+       "Oignon",
+       "Œufs",
+       "Emmental râpé"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Émince l'oignon (1 pièce).",
+       "Lave les courgettes, coupe-les en fines lanières.",
+       "Dans une poêle chaude à feu moyen, fais chauffer 1 c. à soupe d'huile d'olive et fais revenir l'oignon 3 minutes, jusqu'à ce qu'il soit translucide.",
+       "Ajoute les courgettes, fais sauter 4 minutes à feu moyen, jusqu'à ce qu'elles soient légèrement dorées.",
+       "Incorpore le poulet rôti émietté (150 g) et le riz cuit (300 g). Fais chauffer 5 minutes à feu moyen, en remuant, jusqu'à ce que le tout soit fumant à cœur (≥75 °C).",
+       "Bats les œufs avec une pincée de sel et de poivre. Pousse les ingrédients sur le côté de la poêle, ajoute 1 c. à soupe d'huile d'olive et verse les œufs. Brouille rapidement à feu moyen jusqu'à ce qu'ils soient cuits mais encore moelleux.",
+       "Mélange les œufs brouillés avec le riz, saupoudre l'emmental râpé (30 g) et laisse fondre 1 minute.",
+       "Vérifie que le poulet et le riz atteignent 75 °C, puis sers immédiatement."
+      ],
+      "tips": [
+       "Étale le riz sur une plaque pendant 5 minutes après la cuisson initiale pour le refroidir rapidement avant de le réutiliser.",
+       "Ajoute un filet de sauce soja légère pour une touche umami sans alourdir le plat."
+      ],
+      "image_prompt": "Professional food photography, wok with golden fried rice, tender chicken pieces, green zucchini ribbons, scrambled egg, bright colors, natural light"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.6,
+      "timed_cooking": 0.75,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "Aucun problème majeur relevé, la recette est techniquement solide et respecte les consignes de sécurité."
+     ],
+     "strengths": [
+      "La gestion des températures internes (75°C) est exemplaire pour un reste de volaille.",
+      "L'ordre des étapes permet une exécution fluide sans temps mort.",
+      "Utilisation complète et cohérente de tous les ingrédients du garde-manger."
+     ]
+    },
+    {
+     "title": "Gratin de courgettes, œufs et poulet au four",
+     "recipe": {
+      "title": "Gratin de courgettes, œufs et poulet au four",
+      "description": "Un gratin réconfortant qui transforme le reste de poulet en une couche savoureuse entre les courgettes et les œufs, parfait pour un dîner léger.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 15,
+      "total_time": 25,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "Reste de poulet rôti",
+        "quantity": "150",
+        "unit": "g",
+        "pantry_id": "fr-restes-2"
+       },
+       {
+        "name": "Courgettes",
+        "quantity": "2",
+        "unit": "pièces",
+        "pantry_id": "fr-restes-3"
+       },
+       {
+        "name": "Œufs",
+        "quantity": "3",
+        "unit": "pièces",
+        "pantry_id": "fr-restes-4"
+       },
+       {
+        "name": "Emmental râpé",
+        "quantity": "50",
+        "unit": "g",
+        "pantry_id": "fr-restes-5"
+       },
+       {
+        "name": "Oignon",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-restes-6"
+       },
+       {
+        "name": "huile d'olive",
+        "quantity": "1",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Reste de poulet rôti",
+       "Courgettes",
+       "Œufs",
+       "Emmental râpé",
+       "Oignon"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Préchauffe le four à 180 °C.",
+       "Lave les courgettes, coupe-les en rondelles d'environ 0,5 cm d'épaisseur.",
+       "Émince l'oignon (1 pièce).",
+       "Dans une poêle à feu moyen, fais chauffer 1 c. à soupe d'huile d'olive, ajoute l'oignon et fais revenir 3 minutes jusqu'à ce qu'il soit doré.",
+       "Ajoute le poulet rôti émietté (150 g) et fais réchauffer 4 minutes à feu moyen, jusqu'à ce qu'il atteigne 75 °C (fumant à cœur).",
+       "Dans un plat à gratin, dispose une première couche de courgettes, puis répartis le mélange poulet‑oignon, et recouvre d'une nouvelle couche de courgettes.",
+       "Bats les œufs avec une pincée de sel et de poivre, verse ce mélange uniformément sur les courgettes.",
+       "Saupoudre l'emmental râpé (50 g) sur le dessus.",
+       "Enfourne 12 minutes à four moyen (180 °C), jusqu'à ce que le dessus soit doré et que les œufs soient fermes (température interne ≥70 °C).",
+       "Sors le gratin, laisse reposer 2 minutes, puis sers immédiatement."
+      ],
+      "tips": [
+       "Pour une texture encore plus moelleuse, ajoute une cuillère à soupe de crème légère dans les œufs battus.",
+       "Accompagne ce gratin d'une petite salade verte pour plus de fraîcheur."
+      ],
+      "image_prompt": "Professional food photography, golden baked casserole with sliced zucchini, chicken pieces, egg custard, melted cheese, oven background, warm lighting"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.6666666666666666,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 10,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 3,
+      "authenticity": 4,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "La recette ignore totalement le reste de riz cuit pourtant présent dans le garde-manger.",
+      "L'utilisation de seulement 50g d'emmental sur 100g disponibles est un gaspillage évitable."
+     ],
+     "strengths": [
+      "La cuisson au four est bien maîtrisée avec des repères de température précis.",
+      "La structure du gratin est logique et appétissante."
+     ]
+    },
+    {
+     "title": "Soupe légère de riz, courgettes et œuf poché",
+     "recipe": {
+      "title": "Soupe légère de riz, courgettes et œuf poché",
+      "description": "Une soupe réconfortante qui utilise le riz et les courgettes restants, agrémentée d'un œuf poché délicat, idéale pour un dîner digeste.",
+      "difficulty": "easy",
+      "prep_time": 5,
+      "cook_time": 15,
+      "total_time": 20,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "Reste de riz cuit",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "fr-restes-1"
+       },
+       {
+        "name": "Courgettes",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-restes-3"
+       },
+       {
+        "name": "Oignon",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-restes-6"
+       },
+       {
+        "name": "Œufs",
+        "quantity": "2",
+        "unit": "pièces",
+        "pantry_id": "fr-restes-4"
+       },
+       {
+        "name": "bouillon de légumes",
+        "quantity": "800",
+        "unit": "ml",
+        "pantry_id": null
+       },
+       {
+        "name": "huile d'olive",
+        "quantity": "1",
+        "unit": "c. à café",
+        "pantry_id": null
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Reste de riz cuit",
+       "Courgettes",
+       "Oignon",
+       "Œufs"
+      ],
+      "missing_ingredients": [
+       "bouillon de légumes"
+      ],
+      "instructions": [
+       "Émince l'oignon (1 pièce) et coupe la courgette en demi‑lunes fines.",
+       "Dans une casserole à feu moyen, fais chauffer 1 c. à café d'huile d'olive, ajoute l'oignon et fais revenir 3 minutes jusqu'à ce qu'il devienne translucide.",
+       "Ajoute les courgettes, fais sauter 2 minutes à feu moyen.",
+       "Verse le bouillon de légumes (800 ml), porte à ébullition puis réduis à feu doux pendant 5 minutes.",
+       "Ajoute le riz cuit (200 g) et chauffe 2 minutes en remuant, jusqu'à ce que le riz soit bien chaud (≥75 °C).",
+       "Pendant ce temps, porte une petite casserole d'eau à légère ébullition, crée un tourbillon et glisse délicatement un œuf (1 pièce) pour le pocher 3 minutes à feu doux, jusqu'à ce que le blanc soit ferme et le jaune encore coulant.",
+       "Répète l'opération pour le second œuf.",
+       "Assaisonne la soupe avec une pincée de sel et de poivre, verse dans deux bols, dépose un œuf poché dans chaque bol et sers immédiatement."
+      ],
+      "tips": [
+       "Pour un goût plus riche, ajoute une cuillère à café de sauce soja légère dans le bouillon.",
+       "Si tu souhaites une soupe plus onctueuse, mixe la moitié de la soupe avant d'ajouter le riz."
+      ],
+      "image_prompt": "Professional food photography, clear bowl of light broth with rice grains, sliced zucchini, poached egg half-open, steam rising, minimalist kitchen setting"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 4,
+      "order": 5,
+      "ingredients_used": 3,
+      "authenticity": 4,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "Le reste de poulet rôti est totalement omis de la recette, ce qui contredit l'objectif anti-gaspi.",
+      "Le repère visuel pour la cuisson des courgettes dans le bouillon est un peu vague par rapport à la précision exigée."
+     ],
+     "strengths": [
+      "La technique de l'œuf poché est bien expliquée pour un amateur.",
+      "La gestion de la sécurité alimentaire sur le riz réchauffé est rigoureuse."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "en-med-vegan",
+   "note": "English, Mediterranean, vegan",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 7028,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "diversity_auto": 0.7052015250544663,
+   "diversity_judge": 4,
+   "diversity_comment": "Les trois recettes offrent une variété intéressante de textures et de méthodes de cuisson (rôti, mijoté, salade fraîche), ce qui est excellent pour une application anti-gaspi.",
+   "judge_model": "gemini-3.1-flash-lite",
+   "generation": {
+    "version": "v3",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "en-med-vegan-6",
+      "name": "Spinach",
+      "quantity": "200 g",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "en-med-vegan-2",
+      "name": "Aubergine",
+      "quantity": "2",
+      "daysLeft": 2,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "en-med-vegan-1",
+      "name": "Chickpeas",
+      "quantity": "400 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "en-med-vegan-3",
+      "name": "Tomatoes",
+      "quantity": "4",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "en-med-vegan-4",
+      "name": "Quinoa",
+      "quantity": "300 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "en-med-vegan-5",
+      "name": "Lemon",
+      "quantity": "1",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "en-med-vegan-7",
+      "name": "Tahini",
+      "quantity": "1 jar",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p8",
+      "id": "en-med-vegan-8",
+      "name": "Feta",
+      "quantity": "200 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 7028,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 2,
+      "ms": 7023,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.303880609,
+       "prompt_tokens": 2108,
+       "prompt_time": 0.120824182,
+       "completion_tokens": 3100,
+       "completion_time": 6.55676194,
+       "total_tokens": 5208,
+       "total_time": 6.677586122,
+       "completion_tokens_details": {
+        "reasoning_tokens": 245
+       },
+       "rate_limits": {
+        "requests_per_day": "1000",
+        "remaining_requests": "977",
+        "tokens_per_minute": "8000",
+        "remaining_tokens": "3094"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Baked Eggplant Boats with Herbed Quinoa & Chickpeas",
+     "recipe": {
+      "title": "Baked Eggplant Boats with Herbed Quinoa & Chickpeas",
+      "description": "Roasted eggplant halves filled with a fragrant quinoa‑chickpea pilaf, topped with a lemon‑tahini drizzle.",
+      "difficulty": "medium",
+      "prep_time": 15,
+      "cook_time": 35,
+      "total_time": 50,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "mediterranean",
+      "dietary_tags": [
+       "vegan",
+       "Mediterranean"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Aubergine",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-med-vegan-2"
+       },
+       {
+        "name": "Quinoa",
+        "quantity": "150",
+        "unit": "g",
+        "pantry_id": "en-med-vegan-4"
+       },
+       {
+        "name": "Chickpeas",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "en-med-vegan-1"
+       },
+       {
+        "name": "Tomatoes",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-med-vegan-3"
+       },
+       {
+        "name": "Lemon",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-med-vegan-5"
+       },
+       {
+        "name": "Tahini",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": "en-med-vegan-7"
+       },
+       {
+        "name": "Olive oil",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Garlic",
+        "quantity": "2",
+        "unit": "clove",
+        "pantry_id": null
+       },
+       {
+        "name": "Salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "Black pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "Fresh parsley",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Aubergine",
+       "Quinoa",
+       "Chickpeas",
+       "Tomatoes",
+       "Lemon",
+       "Tahini"
+      ],
+      "missing_ingredients": [
+       "Garlic",
+       "Fresh parsley"
+      ],
+      "instructions": [
+       "Preheat the oven to 200°C.",
+       "Slice each eggplant lengthwise, scoop out a shallow well (about 1 cm deep) leaving a 1‑cm thick shell; reserve the flesh.",
+       "Brush the eggplant shells with 1 tbsp olive oil, season with 1 pinch salt and 1 pinch pepper, and place on a baking tray.",
+       "Roast the shells on the middle rack for 20 minutes, medium heat, until the flesh is tender and the edges begin to brown.",
+       "While the eggplant roasts, rinse 150 g quinoa under cold water, then combine with 300 ml water in a saucepan; bring to boil over medium heat, reduce to low, cover and simmer 12 minutes until water is absorbed. Fluff with a fork.",
+       "Dice the reserved eggplant flesh and the 2 tomatoes.",
+       "Heat 1 tbsp olive oil in a skillet over medium heat, add 2 minced garlic cloves and sauté 1 minute until fragrant.",
+       "Add the diced eggplant flesh and tomatoes, sauté 5 minutes until softened.",
+       "Stir in the cooked quinoa and 200 g chickpeas; cook 3 minutes, mixing well. Season with a pinch of salt, pepper, and the juice of half the lemon.",
+       "Fill each baked eggplant shell with the quinoa‑chickpea mixture, smooth the top.",
+       "In a small bowl, whisk together 2 tbsp tahini, the juice of the remaining half lemon, and 1 tbsp water until smooth; drizzle over the stuffed eggplants.",
+       "Garnish with chopped fresh parsley and serve hot."
+      ],
+      "tips": [
+       "If the quinoa looks dry, add a splash of vegetable broth while mixing.",
+       "For extra crunch, sprinkle toasted pine nuts just before serving."
+      ],
+      "image_prompt": "Professional food photography, golden baked eggplant boats filled with fluffy quinoa and chickpeas, drizzled with lemon tahini, garnished with fresh herbs, rustic wooden board, natural light"
+     },
+     "checks": {
+      "ingredients_in_steps": 0.875,
+      "missing_in_steps": [
+       "Aubergine"
+      ],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.8333333333333334,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 12,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 4,
+      "cooking_cues": 3,
+      "order": 5,
+      "ingredients_used": 3,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "La recette ignore totalement la feta disponible dans le garde-manger.",
+      "Utilisation d'ingrédients non listés (ail, persil, huile d'olive) sans précision sur leur origine.",
+      "L'indication 'medium heat' pour un four est imprécise, la température de 200°C suffit."
+     ],
+     "strengths": [
+      "La technique de préparation des aubergines est bien expliquée et logique.",
+      "Le respect du régime vegan est total.",
+      "L'équilibre des saveurs méditerranéennes est bien respecté."
+     ]
+    },
+    {
+     "title": "Hearty Spinach & Chickpea Tomato Soup",
+     "recipe": {
+      "title": "Hearty Spinach & Chickpea Tomato Soup",
+      "description": "A comforting, protein‑rich soup blending spinach, chickpeas, and ripe tomatoes, finished with a lemon‑tahini swirl.",
+      "difficulty": "medium",
+      "prep_time": 10,
+      "cook_time": 30,
+      "total_time": 40,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "mediterranean",
+      "dietary_tags": [
+       "vegan",
+       "Mediterranean"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Spinach",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "en-med-vegan-6"
+       },
+       {
+        "name": "Chickpeas",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "en-med-vegan-1"
+       },
+       {
+        "name": "Tomatoes",
+        "quantity": "4",
+        "unit": "piece",
+        "pantry_id": "en-med-vegan-3"
+       },
+       {
+        "name": "Lemon",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-med-vegan-5"
+       },
+       {
+        "name": "Tahini",
+        "quantity": "1",
+        "unit": "tbsp",
+        "pantry_id": "en-med-vegan-7"
+       },
+       {
+        "name": "Olive oil",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Onion",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": null
+       },
+       {
+        "name": "Garlic",
+        "quantity": "2",
+        "unit": "clove",
+        "pantry_id": null
+       },
+       {
+        "name": "Vegetable broth",
+        "quantity": "800",
+        "unit": "ml",
+        "pantry_id": null
+       },
+       {
+        "name": "Salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "Black pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Spinach",
+       "Chickpeas",
+       "Tomatoes",
+       "Lemon",
+       "Tahini"
+      ],
+      "missing_ingredients": [
+       "Onion",
+       "Garlic",
+       "Vegetable broth"
+      ],
+      "instructions": [
+       "Heat 2 tbsp olive oil in a large pot over medium heat.",
+       "Add 1 finely chopped onion and sauté 4 minutes until translucent.",
+       "Add 2 minced garlic cloves and cook 1 minute more.",
+       "Dice the 4 tomatoes and add them to the pot; sauté 5 minutes until they begin to break down.",
+       "Pour in 800 ml vegetable broth, bring to a gentle boil over medium‑high heat.",
+       "Add the 200 g chickpeas (drained if canned) and simmer 10 minutes.",
+       "Stir in the 200 g spinach; cook 2 minutes until wilted.",
+       "Season with 1 pinch salt, 1 pinch black pepper, and the juice of half the lemon.",
+       "Using an immersion blender, blend the soup 30 seconds for a slightly creamy texture, leaving some chunks for heartiness.",
+       "In a small bowl, whisk 1 tbsp tahini with the juice of the remaining half lemon and 1 tbsp warm broth until smooth; drizzle the mixture into each bowl just before serving."
+      ],
+      "tips": [
+       "For a richer flavor, roast the tomatoes at 180°C for 15 minutes before adding them to the pot.",
+       "Add a pinch of smoked paprika for a subtle smoky note without increasing heat."
+      ],
+      "image_prompt": "Close‑up food photography of a steaming bowl of green spinach chickpea tomato soup, swirl of lemon tahini on top, rustic spoon, wooden table, natural light"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.7142857142857143,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 10,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 4,
+      "cooking_cues": 4,
+      "order": 5,
+      "ingredients_used": 2,
+      "authenticity": 4,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "La feta n'est pas utilisée alors qu'elle aurait pu enrichir la soupe.",
+      "Utilisation d'ingrédients non listés (oignon, bouillon de légumes, ail, huile d'olive).",
+      "Le temps de cuisson des tomates est un peu court pour obtenir une base de soupe riche."
+     ],
+     "strengths": [
+      "La progression des étapes est très claire pour un amateur.",
+      "L'utilisation de l'immersion blender est une bonne technique pour la texture.",
+      "Le respect du régime vegan est total."
+     ]
+    },
+    {
+     "title": "Mediterranean Quinoa & Tomato Tahini Salad",
+     "recipe": {
+      "title": "Mediterranean Quinoa & Tomato Tahini Salad",
+      "description": "A bright, protein‑packed salad featuring quinoa, juicy tomatoes, fresh spinach, and a silky lemon‑tahini dressing.",
+      "difficulty": "medium",
+      "prep_time": 15,
+      "cook_time": 20,
+      "total_time": 35,
+      "servings": 3,
+      "meal_type": "dinner",
+      "cuisine": "mediterranean",
+      "dietary_tags": [
+       "vegan",
+       "Mediterranean"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Quinoa",
+        "quantity": "150",
+        "unit": "g",
+        "pantry_id": "en-med-vegan-4"
+       },
+       {
+        "name": "Spinach",
+        "quantity": "100",
+        "unit": "g",
+        "pantry_id": "en-med-vegan-6"
+       },
+       {
+        "name": "Tomatoes",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-med-vegan-3"
+       },
+       {
+        "name": "Lemon",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-med-vegan-5"
+       },
+       {
+        "name": "Tahini",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": "en-med-vegan-7"
+       },
+       {
+        "name": "Olive oil",
+        "quantity": "1",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Garlic",
+        "quantity": "1",
+        "unit": "clove",
+        "pantry_id": null
+       },
+       {
+        "name": "Salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "Black pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "Fresh mint leaves",
+        "quantity": "1",
+        "unit": "tbsp",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Quinoa",
+       "Spinach",
+       "Tomatoes",
+       "Lemon",
+       "Tahini"
+      ],
+      "missing_ingredients": [
+       "Garlic",
+       "Fresh mint leaves"
+      ],
+      "instructions": [
+       "Rinse 150 g quinoa under cold water, then combine with 300 ml water in a saucepan; bring to boil over medium heat.",
+       "Reduce heat to low, cover and simmer 12 minutes until water is absorbed. Remove from heat, spread quinoa on a large plate to cool quickly, then refrigerate for at least 10 minutes.",
+       "While quinoa cools, dice the 2 tomatoes into bite‑size pieces.",
+       "Roughly tear the 100 g spinach leaves.",
+       "In a small bowl, whisk together 2 tbsp tahini, the juice of the lemon, 1 tbsp olive oil, 1 minced garlic clove, and 2 tbsp cold water until the dressing is smooth and pourable.",
+       "In a large mixing bowl, combine the cooled quinoa, diced tomatoes, and spinach.",
+       "Pour the lemon‑tahini dressing over the salad, toss gently to coat evenly.",
+       "Season with 1 pinch salt, 1 pinch black pepper, and sprinkle chopped fresh mint on top.",
+       "Serve immediately at room temperature or chilled."
+      ],
+      "tips": [
+       "For extra crunch, add toasted pumpkin seeds or slivered almonds.",
+       "If you prefer a thinner dressing, increase water by 1‑2 tbsp."
+      ],
+      "image_prompt": "Vibrant bowl of quinoa salad with red tomatoes, green spinach leaves, drizzle of lemon tahini dressing, sprinkled with lemon zest, bright daylight, top‑down view"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.5,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 4,
+      "cooking_cues": 4,
+      "order": 5,
+      "ingredients_used": 2,
+      "authenticity": 4,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "La feta, ingrédient clé du garde-manger, est totalement absente.",
+      "Utilisation d'ingrédients non listés (menthe, ail, huile d'olive).",
+      "Le refroidissement du quinoa au réfrigérateur est une étape nécessaire mais qui aurait pu être mieux expliquée en termes de sécurité (ne pas laisser tiédir trop longtemps)."
+     ],
+     "strengths": [
+      "La recette est rapide et efficace pour un dîner léger.",
+      "La technique de la vinaigrette au tahini est bien maîtrisée.",
+      "Le respect du régime vegan est total."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fr-un-aliment",
+   "note": "1 aliment choisi (courgette), cuisine libre",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 3835,
+   "requested": 2,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "diversity_auto": 0.9166666666666666,
+   "diversity_judge": 4,
+   "diversity_comment": "Les deux recettes offrent des textures et des approches thermiques très différentes (légume farci chaud vs velouté froid), ce qui est excellent pour un dîner.",
+   "judge_model": "gemini-3.1-flash-lite",
+   "generation": {
+    "version": "v3",
+    "requested": 2,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "fr-un-aliment-1",
+      "name": "Courgettes",
+      "quantity": "3",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": true
+     }
+    ],
+    "ms": 3835,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 2,
+      "ms": 3831,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.051824781,
+       "prompt_tokens": 1734,
+       "prompt_time": 0.082364329,
+       "completion_tokens": 1744,
+       "completion_time": 3.659946952,
+       "total_tokens": 3478,
+       "total_time": 3.742311281,
+       "completion_tokens_details": {
+        "reasoning_tokens": 187
+       },
+       "rate_limits": {
+        "requests_per_day": "1000",
+        "remaining_requests": "976",
+        "tokens_per_minute": "8000",
+        "remaining_tokens": "3166"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Courgettes farcies express au quinoa et tomates",
+     "recipe": {
+      "title": "Courgettes farcies express au quinoa et tomates",
+      "description": "Deux courgettes farcies d'un mélange de quinoa, tomates fraîches et herbes, cuites au four en 30 minutes. Un plat complet, léger et anti-gaspi.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 20,
+      "total_time": 30,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "vegetarian"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Courgettes",
+        "quantity": "2",
+        "unit": "pièce",
+        "pantry_id": "fr-un-aliment-1"
+       },
+       {
+        "name": "Quinoa",
+        "quantity": "80",
+        "unit": "g",
+        "pantry_id": null
+       },
+       {
+        "name": "Tomates cerises",
+        "quantity": "150",
+        "unit": "g",
+        "pantry_id": null
+       },
+       {
+        "name": "Huile d'olive",
+        "quantity": "1",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "Sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "Poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "Herbes de Provence",
+        "quantity": "1",
+        "unit": "c. à café",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Courgettes"
+      ],
+      "missing_ingredients": [
+       "Quinoa",
+       "Tomates cerises",
+       "Herbes de Provence"
+      ],
+      "instructions": [
+       "Préchauffe le four à 190 °C.",
+       "Lave les courgettes, coupe les extrémités puis incise chaque courgette en deux dans le sens de la longueur.",
+       "Avec une cuillère, évide légèrement la chair pour former des coques, en conservant la chair dans un bol.",
+       "Rince le quinoa à l'eau froide, puis mets‑le dans une casserole avec 160 ml d'eau, porte à ébullition à feu moyen, couvre et laisse cuire 12 min jusqu'à absorption. Retire du feu et laisse reposer 3 min.",
+       "Hache grossièrement les tomates cerises et ajoute‑les au quinoa cuit avec 1 c. à soupe d'huile d'olive, 1 c. à café d'herbes de Provence, sel et poivre. Mélange bien.",
+       "Remplis chaque moitié de courgette avec la préparation de quinoa‑tomate, dispose les coques sur une plaque recouverte de papier cuisson.",
+       "Enfourne et fais cuire à four moyen 190 °C pendant 15 minutes, jusqu'à ce que les courgettes soient tendres et légèrement dorées.",
+       "Sers immédiatement, éventuellement accompagné d'une petite salade verte."
+      ],
+      "tips": [
+       "Si tu as du bouillon de légumes, utilise‑en 150 ml à la place de l'eau pour le quinoa pour plus de saveur.",
+       "Tu peux ajouter du fromage râpé (parmesan ou feta) en fin de cuisson, mais cela compte comme un second ingrédient acheté."
+      ],
+      "image_prompt": "Professional food photography, baked stuffed zucchini boats with fluffy quinoa, red cherry tomatoes, green herbs, bright plate, natural light"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.3333333333333333,
+      "timed_cooking": 0.4,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 3,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "La recette n'utilise que 2 courgettes alors que la consigne impose d'utiliser les 3 courgettes du garde-manger.",
+      "L'étape 3 mentionne d'évider la chair des courgettes, mais cette chair n'est jamais réutilisée dans la farce, ce qui constitue un gaspillage alimentaire contraire à l'esprit de l'application."
+     ],
+     "strengths": [
+      "Les temps de cuisson et les repères visuels sont précis et professionnels.",
+      "L'ordre des étapes est parfaitement logique pour une exécution fluide."
+     ]
+    },
+    {
+     "title": "Soupe froide de courgettes à la menthe",
+     "recipe": {
+      "title": "Soupe froide de courgettes à la menthe",
+      "description": "Une soupe légère et rafraîchissante, parfaite pour le dîner d'été. Les courgettes sont mixées avec de la menthe fraîche, un filet d'huile et un soupçon de citron.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 15,
+      "total_time": 25,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "vegan",
+       "gluten‑free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Courgettes",
+        "quantity": "3",
+        "unit": "pièce",
+        "pantry_id": "fr-un-aliment-1"
+       },
+       {
+        "name": "Menthe fraîche",
+        "quantity": "10",
+        "unit": "g",
+        "pantry_id": null
+       },
+       {
+        "name": "Citron",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": null
+       },
+       {
+        "name": "Huile d'olive",
+        "quantity": "1",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "Sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "Poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "Eau",
+        "quantity": "400",
+        "unit": "ml",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Courgettes"
+      ],
+      "missing_ingredients": [
+       "Menthe fraîche",
+       "Citron"
+      ],
+      "instructions": [
+       "Lave les courgettes, coupe les extrémités et coupe-les en morceaux d'environ 2 cm.",
+       "Dans une casserole, porte à ébullition 400 ml d'eau avec une pincée de sel à feu moyen.",
+       "Ajoute les morceaux de courgettes, baisse le feu à doux et laisse cuire 10 minutes, jusqu'à ce qu'ils soient tendres (les bords doivent se détacher facilement).",
+       "Retire la casserole du feu, laisse refroidir 5 minutes, puis verse le tout dans un blender.",
+       "Ajoute la menthe fraîche (préalablement rincée), le jus du citron, 1 c. à soupe d'huile d'olive, sel et poivre.",
+       "Mixes à haute vitesse jusqu'à obtenir une texture lisse et crémeuse. Si la soupe est trop épaisse, ajoute un peu d'eau froide, une cuillère à la fois, jusqu'à consistance désirée.",
+       "Transfère la soupe dans des bols, place au réfrigérateur 10 minutes pour la servir bien froide.",
+       "Sers immédiatement, décoré de quelques feuilles de menthe et d'un filet d'huile d'olive."
+      ],
+      "tips": [
+       "Pour une version plus riche, ajoute une cuillère à soupe de yaourt nature (compte comme un second ingrédient acheté).",
+       "Cette soupe se conserve 24 h au frais, mais consomme-la dans la journée pour la fraîcheur."
+      ],
+      "image_prompt": "Professional food photography, chilled zucchini mint soup in a white bowl, green specks of mint, drizzle of olive oil, bright kitchen background, natural light"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.5,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 4,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "L'étape 6 suggère d'ajouter de l'eau froide si la soupe est trop épaisse, ce qui peut diluer les saveurs si la quantité initiale de 400 ml est déjà trop importante."
+     ],
+     "strengths": [
+      "Utilisation complète des 3 courgettes comme demandé.",
+      "Les repères de cuisson (bords qui se détachent) sont excellents pour un amateur.",
+      "La gestion de la température (refroidissement avant mixage) est conforme aux bonnes pratiques de sécurité."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "es-sin-gluten-lactosa",
+   "note": "Español, sin gluten y sin lactosa, salmón",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 6954,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "diversity_auto": 0.5350945350945351,
+   "diversity_judge": 4,
+   "diversity_comment": "Les trois recettes proposent des textures et des méthodes de cuisson distinctes (rôti, poêlé/salade, bouilli/soupe), ce qui est excellent pour varier les plaisirs avec les mêmes ingrédients de base.",
+   "judge_model": "gemini-3.1-flash-lite",
+   "generation": {
+    "version": "v3",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "es-sin-gluten-lactosa-1",
+      "name": "Salmón",
+      "quantity": "2 lomos",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "es-sin-gluten-lactosa-3",
+      "name": "Judías verdes",
+      "quantity": "300 g",
+      "daysLeft": 2,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "es-sin-gluten-lactosa-2",
+      "name": "Patatas",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "es-sin-gluten-lactosa-4",
+      "name": "Arroz",
+      "quantity": "500 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "es-sin-gluten-lactosa-5",
+      "name": "Limón",
+      "quantity": "1",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "es-sin-gluten-lactosa-6",
+      "name": "Pasta de trigo",
+      "quantity": "500 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "es-sin-gluten-lactosa-7",
+      "name": "Mantequilla",
+      "quantity": "250 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 6954,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 1,
+      "ms": 6952,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.094157294,
+       "prompt_tokens": 1945,
+       "prompt_time": 0.892911743,
+       "completion_tokens": 2540,
+       "completion_time": 5.923919424,
+       "total_tokens": 4485,
+       "total_time": 6.816831167,
+       "prompt_tokens_details": {
+        "cached_tokens": 768
+       },
+       "completion_tokens_details": {
+        "reasoning_tokens": 200
+       },
+       "rate_limits": {
+        "requests_per_day": "1000",
+        "remaining_requests": "975",
+        "tokens_per_minute": "8000",
+        "remaining_tokens": "2862"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Salmón al horno con patatas y judías verdes",
+     "recipe": {
+      "title": "Salmón al horno con patatas y judías verdes",
+      "description": "Filetes de salmón frescos asados al horno con patatas doradas y judías verdes crujientes, aromatizados con limón.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 25,
+      "total_time": 35,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "gluten-free",
+       "dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Salmón",
+        "quantity": "2",
+        "unit": "lomоs",
+        "pantry_id": "es-sin-gluten-lactosa-1"
+       },
+       {
+        "name": "Patatas",
+        "quantity": "400",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-2"
+       },
+       {
+        "name": "Judías verdes",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-3"
+       },
+       {
+        "name": "Limón",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-sin-gluten-lactosa-5"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Salmón",
+       "Patatas",
+       "Judías verdes",
+       "Limón"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Precalienta el horno a 200 °C.",
+       "Corta las patatas en cubos de 2 cm y colócalas en una bandeja. Rocía con 1 cda de aceite de oliva, sal y pimienta; mezcla bien.",
+       "Hornea las patatas 10 min a fuego medio, hasta que empiecen a dorarse.",
+       "Mientras tanto, corta las judías verdes en trozos de 4 cm, rocíalas con la segunda cucharada de aceite, sal y pimienta.",
+       "Saca la bandeja, coloca los filetes de salmón entre las patatas y las judías, exprime el jugo del limón sobre el pescado y las verduras.",
+       "Hornea 15 min a 200 °C, hasta que el interior del salmón alcance 74 °C (sin rastros rosados) y las patatas estén crujientes.",
+       "Sirve caliente, decorando con una rodaja de limón."
+      ],
+      "tips": [
+       "Para que el salmón quede jugoso, evita abrir el horno durante los últimos 5 min.",
+       "Si prefieres una textura más crujiente, sube la temperatura a 220 °C los últimos 3 min."
+      ],
+      "image_prompt": "Professional food photography, baked salmon fillets with golden potatoes and green beans, lemon slices, rustic oven tray, natural light"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.3333333333333333,
+      "timed_cooking": 0.6666666666666666,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 7,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "Aucun problème majeur identifié, la recette est techniquement solide."
+     ],
+     "strengths": [
+      "Utilisation précise des températures et des repères visuels pour la cuisson du poisson.",
+      "Respect strict des régimes sans gluten et sans produits laitiers.",
+      "Gestion efficace du temps de cuisson pour obtenir des légumes et un poisson cuits simultanément."
+     ]
+    },
+    {
+     "title": "Ensalada tibia de judías verdes, patata y salmón a la plancha",
+     "recipe": {
+      "title": "Ensalada tibia de judías verdes, patata y salmón a la plancha",
+      "description": "Filete de salmón a la plancha sobre una cama de judías verdes al vapor y patata cocida, aliada con un aderezo de limón.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 20,
+      "total_time": 30,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "gluten-free",
+       "dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Salmón",
+        "quantity": "1",
+        "unit": "lomo",
+        "pantry_id": "es-sin-gluten-lactosa-1"
+       },
+       {
+        "name": "Judías verdes",
+        "quantity": "150",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-3"
+       },
+       {
+        "name": "Patatas",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-2"
+       },
+       {
+        "name": "Limón",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-sin-gluten-lactosa-5"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Salmón",
+       "Judías verdes",
+       "Patatas",
+       "Limón"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Pela y corta la patata en cubos de 1 cm; hiérvela en agua con sal 8 min a fuego medio, hasta que estén tiernas pero firmes. Escurre y reserva.",
+       "Lava las judías verdes, córtalas en trozos de 4 cm y cocínalas al vapor 5 min a fuego medio, hasta que estén tiernas pero crujientes.",
+       "Calienta 1 cda de aceite en una sartén a fuego medio‑alto; seca el lomo de salmón, sazónalo con sal y pimienta, y cocina 4 min por cada lado, hasta que alcance 74 °C en el centro.",
+       "En un bol grande, mezcla la patata cocida, las judías verdes y el jugo de medio limón; añade la segunda cucharada de aceite, sal y pimienta, y revuelve suavemente.",
+       "Corta el salmón en tiras y colócalas sobre la ensalada tibia. Decora con ralladura de la mitad restante del limón."
+      ],
+      "tips": [
+       "Para que la ensalada quede tibia, sirve inmediatamente después de mezclar.",
+       "Si te sobra jugo de limón, úsalo como aderezo extra al momento de servir."
+      ],
+      "image_prompt": "Professional food photography, pan-seared salmon strips on a warm green bean and potato salad, lemon zest, bright plate, natural light"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 5,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 4,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "La cuisson des pommes de terre en cubes de 1 cm est rapide, il faut surveiller la texture pour éviter qu'elles ne s'écrasent."
+     ],
+     "strengths": [
+      "Excellente gestion de la sécurité alimentaire avec le contrôle de la température à cœur.",
+      "Instructions claires pour la préparation des composants de la salade.",
+      "Utilisation cohérente des ingrédients du garde-manger."
+     ]
+    },
+    {
+     "title": "Sopa ligera de arroz, verduras y trozos de salmón",
+     "recipe": {
+      "title": "Sopa ligera de arroz, verduras y trozos de salmón",
+      "description": "Sopa reconfortante con arroz, judías verdes, patata y pequeños cubos de salmón, perfumada con limón.",
+      "difficulty": "easy",
+      "prep_time": 8,
+      "cook_time": 25,
+      "total_time": 33,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "gluten-free",
+       "dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Salmón",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-1"
+       },
+       {
+        "name": "Judías verdes",
+        "quantity": "150",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-3"
+       },
+       {
+        "name": "Patatas",
+        "quantity": "150",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-2"
+       },
+       {
+        "name": "Arroz",
+        "quantity": "100",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-4"
+       },
+       {
+        "name": "Limón",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-sin-gluten-lactosa-5"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "1",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Salmón",
+       "Judías verdes",
+       "Patatas",
+       "Arroz",
+       "Limón"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Lava y corta la patata en cubos de 1 cm; corta también las judías verdes en trozos de 3 cm.",
+       "En una olla mediana, calienta 1 cda de aceite a fuego medio y sofríe la patata 3 min, hasta que empiece a dorarse ligeramente.",
+       "Añade 800 ml de agua, la sal y lleva a ebullición.",
+       "Agrega el arroz y cocina 10 min a fuego medio, removiendo ocasionalmente.",
+       "Incorpora las judías verdes y cocina 5 min más, hasta que estén tiernas.",
+       "Corta el salmón en cubos de 2 cm y añádelos a la sopa; cocina 4 min a fuego medio‑bajo, hasta que el interior alcance 74 °C (sin rosado).",
+       "Exprime el jugo de medio limón, rectifica de sal y pimienta, y sirve caliente."
+      ],
+      "tips": [
+       "Enfría rápidamente cualquier arroz sobrante extendiéndolo en una bandeja antes de guardarlo.",
+       "Para una textura más cremosa, puedes triturar una pequeña parte del arroz antes de servir."
+      ],
+      "image_prompt": "Professional food photography, light broth soup with rice, green beans, potato cubes and salmon pieces, lemon wedge, steaming bowl, natural light"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 7,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 4,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "La recette manque d'une étape de rinçage du riz, ce qui pourrait affecter la clarté du bouillon."
+     ],
+     "strengths": [
+      "Très bonne gestion de la sécurité alimentaire concernant la cuisson du riz et du poisson.",
+      "La progression des étapes est logique et facile à suivre pour un amateur.",
+      "Utilisation intelligente des ingrédients pour créer un plat complet et équilibré."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fr-marques",
+   "note": "Produits de marque scannés par code-barres (noms commerciaux)",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 5490,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "diversity_auto": 0.8815628815628815,
+   "diversity_judge": 4,
+   "diversity_comment": "Les recettes proposent des textures et des méthodes de préparation variées (gratin, pâtes, salade), ce qui est un bon point pour une application anti-gaspi, bien que la qualité technique soit inégale.",
+   "judge_model": "gemini-3.1-flash-lite",
+   "generation": {
+    "version": "v3",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "fr-marques-3",
+      "name": "Galbani Mozzarella",
+      "quantity": "125 g",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "fr-marques-2",
+      "name": "Panzani Sauce Tomate Basilic",
+      "quantity": "400 g",
+      "daysLeft": 2,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "fr-marques-1",
+      "name": "Barilla Penne Rigate n°73",
+      "quantity": "500 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "fr-marques-4",
+      "name": "Herta Le Bon Paris",
+      "quantity": "4 tranches",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "fr-marques-5",
+      "name": "Bonduelle Maïs",
+      "quantity": "1 boîte",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 5490,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 1,
+      "ms": 5488,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.093422699,
+       "prompt_tokens": 1902,
+       "prompt_time": 0.1036764,
+       "completion_tokens": 2481,
+       "completion_time": 5.248468844,
+       "total_tokens": 4383,
+       "total_time": 5.352145244,
+       "completion_tokens_details": {
+        "reasoning_tokens": 205
+       },
+       "rate_limits": {
+        "requests_per_day": "1000",
+        "remaining_requests": "974",
+        "tokens_per_minute": "8000",
+        "remaining_tokens": "5934"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Gratin de mozzarella et maïs au four",
+     "recipe": {
+      "title": "Gratin de mozzarella et maïs au four",
+      "description": "Un gratin crémeux et réconfortant, parfait pour le déjeuner. La mozzarella fondée et le maïs doux forment le cœur du plat.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 15,
+      "total_time": 25,
+      "servings": 2,
+      "meal_type": "lunch",
+      "cuisine": "mediterranean",
+      "dietary_tags": [
+       "vegetarian"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Galbani Mozzarella",
+        "quantity": "125",
+        "unit": "g",
+        "pantry_id": "fr-marques-3"
+       },
+       {
+        "name": "Bonduelle Maïs",
+        "quantity": "1",
+        "unit": "boîte",
+        "pantry_id": "fr-marques-5"
+       },
+       {
+        "name": "Huile d'olive",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "Ail",
+        "quantity": "1",
+        "unit": "gousse",
+        "pantry_id": null
+       },
+       {
+        "name": "Sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "Poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "Persil frais",
+        "quantity": "1",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Galbani Mozzarella",
+       "Bonduelle Maïs"
+      ],
+      "missing_ingredients": [
+       "Ail",
+       "Persil frais"
+      ],
+      "instructions": [
+       "Préchauffe le four à 200 °C.",
+       "Égoutte le maïs et réserve le liquide.",
+       "Dans une poêle, fais chauffer 1 c. à soupe d'huile d'olive à feu moyen pendant 2 minutes, puis ajoute la gousse d'ail émincée et fais dorer légèrement.",
+       "Ajoute le maïs égoutté, sale 1 pincée et poivre 1 pincée, puis fais revenir 3 minutes en remuant, jusqu'à ce qu'il soit légèrement doré.",
+       "Transfère le maïs dans un petit plat à gratin.",
+       "Coupe la mozzarella en tranches de 0,5 cm et dispose les tranches en couche uniforme sur le maïs.",
+       "Arrose avec la cuillère restante d'huile d'olive, saupoudre de persil haché.",
+       "Enfourne 12 minutes à four moyen, jusqu'à ce que la mozzarella soit fondue et légèrement dorée.",
+       "Sors le gratin, laisse reposer 1 minute avant de servir."
+      ],
+      "tips": [
+       "Utilise le fond du plat à gratin pour récupérer le jus du maïs et éviter le gaspillage.",
+       "Si tu aimes le croustillant, ajoute 2 c. à soupe de chapelure juste avant d'enfourner."
+      ],
+      "image_prompt": "Professional food photography, golden baked mozzarella and corn gratin in a rustic ceramic dish, melted cheese bubbling, fresh parsley garnish, natural light"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0,
+      "timed_cooking": 0.75,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 4,
+      "cooking_cues": 4,
+      "order": 5,
+      "ingredients_used": 2,
+      "authenticity": 2,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "La recette utilise de l'ail et du persil qui ne figurent pas dans le garde-manger fourni.",
+      "Le plat manque de consistance pour un déjeuner complet, il s'agit davantage d'un accompagnement."
+     ],
+     "strengths": [
+      "Les instructions sont claires et le temps de cuisson est bien maîtrisé.",
+      "La gestion des températures de four est précise."
+     ]
+    },
+    {
+     "title": "Penne à la sauce tomate basilic et jambon grillé",
+     "recipe": {
+      "title": "Penne à la sauce tomate basilic et jambon grillé",
+      "description": "Pâtes rapides avec une sauce tomate aromatique et des tranches de jambon grillées, un plat complet et savoureux en moins de 30 minutes.",
+      "difficulty": "easy",
+      "prep_time": 5,
+      "cook_time": 20,
+      "total_time": 25,
+      "servings": 2,
+      "meal_type": "lunch",
+      "cuisine": "mediterranean",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "Barilla Penne Rigate n°73",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "fr-marques-1"
+       },
+       {
+        "name": "Panzani Sauce Tomate Basilic",
+        "quantity": "250",
+        "unit": "g",
+        "pantry_id": "fr-marques-2"
+       },
+       {
+        "name": "Herta Le Bon Paris",
+        "quantity": "2",
+        "unit": "tranches",
+        "pantry_id": "fr-marques-4"
+       },
+       {
+        "name": "Huile d'olive",
+        "quantity": "1",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "Sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "Poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "Basilic frais",
+        "quantity": "1",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Barilla Penne Rigate n°73",
+       "Panzani Sauce Tomate Basilic",
+       "Herta Le Bon Paris"
+      ],
+      "missing_ingredients": [
+       "Basilic frais"
+      ],
+      "instructions": [
+       "Porte à ébullition une grande casserole d'eau salée, ajoute les penne et fais cuire 10 minutes à feu moyen, jusqu'à ce qu'elles soient al dente.",
+       "Pendant ce temps, chauffe 1 c. à soupe d'huile d'olive dans une poêle à feu moyen pendant 1 minute.",
+       "Dépose les tranches de jambon dans la poêle et fais-les dorer 2 minutes de chaque côté, jusqu'à ce qu'elles soient légèrement croustillantes.",
+       "Retire le jambon et coupe-le en lanières.",
+       "Dans la même poêle, ajoute la sauce tomate basilic, porte à légère ébullition, puis baisse le feu à doux et laisse mijoter 5 minutes, en remuant, jusqu'à épaississement. Sale 1 pincée, poivre 1 pincée.",
+       "Égoutte les penne, conserve 50 ml d'eau de cuisson.",
+       "Ajoute les penne dans la sauce, mélange 1 minute à feu moyen, en ajoutant l'eau de cuisson si besoin pour lier.",
+       "Incorpore les lanières de jambon grillé et le basilic frais haché, mélange rapidement.",
+       "Sers immédiatement, en décorant d'un filet d'huile d'olive si désiré."
+      ],
+      "tips": [
+       "Pour un goût plus riche, ajoute 1 c. à café de concentré de tomate avec la sauce.",
+       "Si tu veux rendre le plat plus léger, utilise du jambon de dinde à la place."
+      ],
+      "image_prompt": "Professional food photography, steaming bowl of penne with bright red tomato basil sauce, golden strips of grilled ham on top, fresh basil leaves, rustic wooden table, natural light"
+     },
+     "checks": {
+      "ingredients_in_steps": 0.75,
+      "missing_in_steps": [
+       "Herta Le Bon Paris"
+      ],
+      "quantities_in_steps": 0.3333333333333333,
+      "timed_cooking": 0.7142857142857143,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 4,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "L'ajout de basilic frais n'est pas justifié par le garde-manger, bien que la sauce soit aromatisée au basilic."
+     ],
+     "strengths": [
+      "La technique de cuisson des pâtes et du jambon est parfaitement décrite.",
+      "L'ordre des étapes est logique et permet une exécution fluide."
+     ]
+    },
+    {
+     "title": "Salade fraîche de mozzarella, maïs et basilic",
+     "recipe": {
+      "title": "Salade fraîche de mozzarella, maïs et basilic",
+      "description": "Une salade colorée et nourrissante, idéale pour un déjeuner léger. La mozzarella crémeuse et le maïs sucré sont le cœur de la préparation.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 5,
+      "total_time": 15,
+      "servings": 2,
+      "meal_type": "lunch",
+      "cuisine": "mediterranean",
+      "dietary_tags": [
+       "vegetarian",
+       "gluten-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Galbani Mozzarella",
+        "quantity": "125",
+        "unit": "g",
+        "pantry_id": "fr-marques-3"
+       },
+       {
+        "name": "Bonduelle Maïs",
+        "quantity": "1",
+        "unit": "boîte",
+        "pantry_id": "fr-marques-5"
+       },
+       {
+        "name": "Huile d'olive",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "Vinaigre balsamique",
+        "quantity": "1",
+        "unit": "c. à café",
+        "pantry_id": null
+       },
+       {
+        "name": "Miel",
+        "quantity": "1",
+        "unit": "c. à café",
+        "pantry_id": null
+       },
+       {
+        "name": "Sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "Poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "Basilic frais",
+        "quantity": "5",
+        "unit": "feuilles",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Galbani Mozzarella",
+       "Bonduelle Maïs"
+      ],
+      "missing_ingredients": [
+       "Vinaigre balsamique",
+       "Miel",
+       "Basilic frais"
+      ],
+      "instructions": [
+       "Égoutte le maïs et rince-le sous l'eau froide, puis laisse-le s'égoutter dans une passoire.",
+       "Coupe la mozzarella en cubes de 2 cm.",
+       "Dans un grand saladier, mélange le maïs, les cubes de mozzarella et les feuilles de basilic déchirées.",
+       "Prépare la vinaigrette : dans un petit bol, combine 2 c. à soupe d'huile d'olive, 1 c. à café de vinaigre balsamique, 1 c. à café de miel, 1 pincée de sel et 1 pincée de poivre. Fouette vigoureusement jusqu'à émulsion.",
+       "Verse la vinaigrette sur la salade, mélange délicatement 1 minute à feu doux (simple agitation), jusqu'à ce que tous les ingrédients soient enrobés.",
+       "Sers immédiatement ou garde au frais (max 1 heure) avant de déguster."
+      ],
+      "tips": [
+       "Pour plus de croquant, ajoute quelques noix grillées (non présentes dans le garde-manger).",
+       "Si tu aimes le piquant, ajoute une pincée de flocons de piment rouge dans la vinaigrette."
+      ],
+      "suggestion": "Idéal aussi en pique-nique d'été",
+      "image_prompt": "Professional food photography, vibrant salad bowl with white mozzarella cubes, golden corn kernels, fresh green basil leaves, glossy olive oil vinaigrette, bright natural light"
+     },
+     "checks": {
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 6,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 3,
+      "cooking_cues": 1,
+      "order": 2,
+      "ingredients_used": 1,
+      "authenticity": 2,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "L'étape 5 demande de chauffer une salade à feu doux, ce qui est une aberration culinaire.",
+      "Utilisation massive d'ingrédients non présents dans le garde-manger (vinaigre balsamique, miel, basilic)."
+     ],
+     "strengths": [
+      "Le temps de préparation est très court et adapté à un déjeuner rapide."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "en-african-breakfast",
+   "error": {
+    "error": "provider_quota",
+    "failure": "Groq 429: {\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01kjbcrez8fpxrmpyj1bevz7ah` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199875, Requested 4968. Please try again in 34m52.176s. Need more tokens? Upgrade to Dev Tier today at https:/",
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 1,
+      "ms": 38,
+      "ok": false,
+      "details": "Groq 429: {\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01kjbcrez8fpxrmpyj1bevz7ah` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199875, Requested 4968. Please try again in 34m52.176s. Need more tokens? Upgrade to Dev Tier today "
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -8,7 +8,7 @@ export type Cuisine = typeof CUISINES[number];
 
 // Versions du prompt : v1 est celle de l'app ; les suivantes sont des candidates, essayées par l'évaluation
 // (generate-recipes-eval) avant d'être adoptées
-export const PROMPT_VERSIONS = ['v1', 'v2'] as const;
+export const PROMPT_VERSIONS = ['v1', 'v2', 'v3'] as const;
 export type PromptVersion = typeof PROMPT_VERSIONS[number];
 
 // ---------- Prompt ----------
@@ -99,14 +99,18 @@ export function buildPrompts(options: {
   version?: PromptVersion;
 }): { system: string; prompt: string } {
   const languageName = LANGUAGE_NAMES[options.language] || LANGUAGE_NAMES['en'];
-  const v2 = options.version === 'v2';
+  // v3 : v2, sans température en °C sur le feu (artifice relevé par l'évaluation de v2), et sans nom de plat
+  // trompeur (« façon mafé » sans arachide)
+  const v3 = options.version === 'v3';
+  const v2 = options.version === 'v2' || v3;
   const dietaryRules = options.dietary.map((diet) => DIETARY_RULES[diet.toLowerCase()]).filter(Boolean);
   const cuisineRule = options.cuisine === 'any'
     ? 'Cuisine : libre. Varie les styles d\'une recette à l\'autre.'
     : v2
       ? `Cuisine demandée : ${CUISINE_DISHES[options.cuisine]}.
 - Chaque recette est un plat réel et connu de cette cuisine, qui convient au repas demandé, avec son vrai nom ; adapte-le aux ingrédients disponibles (épices, technique) plutôt que d'inventer une fusion.
-- N'emprunte pas un plat d'une autre cuisine (ex. pas de chakchouka pour l'Afrique subsaharienne, pas de frittata ni de croquetas pour le Maghreb).`
+- N'emprunte pas un plat d'une autre cuisine (ex. pas de chakchouka pour l'Afrique subsaharienne, pas de frittata ni de croquetas pour le Maghreb).${v3 ? `
+- Le titre ne reprend le nom d'un plat que si la recette en a les ingrédients clés (pas de « façon mafé » sans arachide).` : ''}`
       : `Cuisine demandée : ${CUISINE_DESCRIPTIONS[options.cuisine]}. Les recettes doivent en être typiques (épices, techniques, noms de plats), en s'adaptant aux ingrédients disponibles.`;
 
   const system = `Tu es un chef expert en cuisine anti-gaspi. Tu écris en ${languageName} (tous les textes : titre, description, noms d'ingrédients, étapes, astuces, suggestion).
@@ -149,7 +153,7 @@ MODE « TRANSFORMER MES RESTES » (règle stricte) :
 
 ÉTAPES :${v2 ? `
 - Chaque étape reprend la quantité des ingrédients qu'elle utilise (« Ajoute les 200 g de riz », « Émince les 2 oignons ») : on cuisine sans remonter à la liste.
-- Chaque cuisson donne le feu ou la température du four (en °C), la durée et un repère visuel ou de texture (ex. « Fais dorer à feu vif 3 minutes, jusqu'à ce que les bords soient croustillants »).
+- Chaque cuisson donne ${v3 ? "le niveau de feu (doux, moyen, vif) ou la température du four en °C (jamais de °C sur le feu, sauf l'huile de friture et la cuisson à cœur)" : "le feu ou la température du four (en °C)"}, la durée et un repère visuel ou de texture (ex. « Fais dorer à feu vif 3 minutes, jusqu'à ce que les bords soient croustillants »).
 - Ordre complet : préchauffer le four, cuire le riz, les pâtes ou les légumineuses du garde-manger (crus, sauf s'ils sont marqués [reste de plat]), lancer les cuissons longues en premier.
 - Chaque ingrédient de la liste est utilisé dans les étapes, et les étapes n'utilisent rien d'autre (sauf l'eau).
 - Jamais de consigne vague comme « faites cuire jusqu'à cuisson », « bien chaud » ou « assaisonnez ».

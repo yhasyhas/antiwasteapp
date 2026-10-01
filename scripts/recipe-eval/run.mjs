@@ -14,7 +14,7 @@
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { checkRecipe, diversity } from './checks.mjs';
+import { checkRecipe, diversity, unitsInLanguage } from './checks.mjs';
 
 import { fileURLToPath } from 'node:url';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -98,7 +98,7 @@ for (const [n, situation] of cases.entries()) {
     continue;
   }
   const { recipes, pantry } = generated.data;
-  const checks = recipes.map((recipe) => checkRecipe(recipe, situation, pantry));
+  const checks = recipes.map((recipe) => ({ ...checkRecipe(recipe, situation, pantry), units_language: unitsInLanguage(recipe, situation.preferences.language) }));
   const judged = noJudge ? { status: 0, data: null } : await judgeWithRetry({
     action: 'judge', judge_model: judgeModel || undefined, recipes,
     case: {
@@ -164,6 +164,7 @@ const summary = {
     reheat_cue: mean(all.map((r) => r.checks.reheat_cue)),
     uses_urgent: mean(all.map((r) => r.checks.uses_urgent)),
     rules_respected: mean(all.map((r) => r.checks.rules_respected)),
+    units_language: mean(all.map((r) => r.checks.units_language ?? 1)),
     diversity: mean(results.filter((r) => r.recipes).map((r) => r.diversity_auto)),
   },
   rejected_first: results.reduce((total, r) => total + (r.rejected_first ?? 0), 0),

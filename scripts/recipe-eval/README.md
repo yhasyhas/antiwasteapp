@@ -18,6 +18,8 @@
   - restes réchauffés à cœur ;
   - aliment urgent utilisé ;
   - régimes, exclusions et sélection respectés ;
+  - unités dans la langue de la recette ;
+  - pas de température en °C sur le feu ;
   - diversité.
 - **Grille notée par un modèle juge** (`supabase/functions/generate-recipes-eval/judge.ts`), de 1 à 5 :
   - quantités dans les étapes ;
@@ -40,8 +42,10 @@ node scripts/recipe-eval/run.mjs --version v2
 node scripts/recipe-eval/run.mjs --version v1 --no-judge
 node scripts/recipe-eval/run.mjs --rejudge results/<fichier>.json
 
-# Comparaison de deux évaluations
+# Comparaison de deux évaluations (juge comparé sur les cas notés des deux côtés)
 node scripts/recipe-eval/compare.mjs results/<avant>.json results/<après>.json
+# Une version notée en deux fois : fichiers réunis par +
+node scripts/recipe-eval/compare.mjs results/<v1>.json results/<v2>.json+results/<v2-cas-notés-ensuite>.json
 ```
 
 **Options**
