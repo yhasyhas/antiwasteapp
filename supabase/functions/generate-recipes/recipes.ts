@@ -233,11 +233,12 @@ export const DIFFICULTIES = ['easy', 'medium', 'expert'];
 
 // Schéma construit à chaque requête : les alias du garde-manger et les régimes sélectionnés y sont
 // des listes fermées (enum). Mode strict de Groq : tous les champs sont requis, sans champ en plus.
-export function buildRecipeSchema(pantry: Pantry, diets: StrictDiet[]): Record<string, unknown> {
+// unitHint : description de l'unité (version candidate du prompt : unités dans la langue de la recette)
+export function buildRecipeSchema(pantry: Pantry, diets: StrictDiet[], unitHint = 'Unité abrégée (g, kg, ml, cl, l, c. à soupe, c. à café, pièce…)'): Record<string, unknown> {
   const ingredientProperties: Record<string, unknown> = {
     name: { type: 'string' },
     quantity: { type: 'string', description: 'Nombre seul, sans unité (ex. "500", "2", "1/2")' },
-    unit: { type: 'string', description: 'Unité abrégée (g, kg, ml, cl, l, c. à soupe, c. à café, pièce…)' },
+    unit: { type: 'string', description: unitHint },
     pantry_id: { type: 'string', enum: [...pantry.aliasOf.keys(), MISSING] },
   };
   if (diets.length > 0) {

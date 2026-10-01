@@ -1,0 +1,179 @@
+[
+  {
+    "id": "fr-afrique-complet",
+    "note": "Garde-manger complet, cuisine d'Afrique subsaharienne, poulet à utiliser vite",
+    "preferences": { "language": "fr", "cuisine": "african", "mealType": "dinner", "difficulty": "medium", "maxCookTime": 75 },
+    "ingredients": [
+      { "name": "Cuisses de poulet", "quantity": "4", "days_left": 1 },
+      { "name": "Oignons", "quantity": "5" },
+      { "name": "Citrons", "quantity": "3" },
+      { "name": "Riz", "quantity": "1 kg" },
+      { "name": "Pâte d'arachide", "quantity": "1 pot" },
+      { "name": "Tomates", "quantity": "4", "days_left": 2 },
+      { "name": "Carottes", "quantity": "3" },
+      { "name": "Concentré de tomate", "quantity": "1 boîte" },
+      { "name": "Piment", "quantity": "2" },
+      { "name": "Ail", "quantity": "1 tête" }
+    ]
+  },
+  {
+    "id": "fr-maghreb-deux",
+    "note": "2 aliments seulement, cuisine du Maghreb",
+    "preferences": { "language": "fr", "cuisine": "maghreb", "mealType": "lunch", "difficulty": "easy", "maxCookTime": 45 },
+    "ingredients": [
+      { "name": "Pois chiches en conserve", "quantity": "1 boîte" },
+      { "name": "Carottes", "quantity": "500 g", "days_left": 2 }
+    ]
+  },
+  {
+    "id": "en-asian-urgent",
+    "note": "English, Asian, chicken and broccoli expiring",
+    "preferences": { "language": "en", "cuisine": "asian", "mealType": "dinner", "difficulty": "easy", "maxCookTime": 40 },
+    "ingredients": [
+      { "name": "Chicken thighs", "quantity": "500 g", "days_left": 0 },
+      { "name": "Broccoli", "quantity": "1", "days_left": 1 },
+      { "name": "Rice", "quantity": "1 kg" },
+      { "name": "Soy sauce", "quantity": "1 bottle" },
+      { "name": "Ginger", "quantity": "1 piece" },
+      { "name": "Garlic", "quantity": "1 head" },
+      { "name": "Spring onions", "quantity": "1 bunch" },
+      { "name": "Eggs", "quantity": "6" }
+    ]
+  },
+  {
+    "id": "es-latino-vegetariano",
+    "note": "Español, latinoamericana, vegetariano",
+    "preferences": { "language": "es", "cuisine": "latin", "mealType": "lunch", "difficulty": "easy", "maxCookTime": 45, "dietary": ["vegetarian"] },
+    "ingredients": [
+      { "name": "Frijoles negros", "quantity": "1 lata" },
+      { "name": "Maíz", "quantity": "1 lata" },
+      { "name": "Aguacates", "quantity": "2", "days_left": 1 },
+      { "name": "Tomates", "quantity": "3" },
+      { "name": "Arroz", "quantity": "500 g" },
+      { "name": "Huevos", "quantity": "6" },
+      { "name": "Queso fresco", "quantity": "200 g" },
+      { "name": "Tortillas de maíz", "quantity": "10" },
+      { "name": "Cebolla morada", "quantity": "1" },
+      { "name": "Limas", "quantity": "2" }
+    ]
+  },
+  {
+    "id": "fr-restes",
+    "note": "Transformer mes restes : riz cuit et poulet rôti",
+    "mode": "leftovers",
+    "preferences": { "language": "fr", "cuisine": "any", "mealType": "dinner", "difficulty": "easy", "maxCookTime": 30 },
+    "ingredients": [
+      { "name": "Reste de riz cuit", "quantity": "2 portions", "kind": "dish", "days_left": 1 },
+      { "name": "Reste de poulet rôti", "quantity": "1 portion", "kind": "dish", "days_left": 1 },
+      { "name": "Courgettes", "quantity": "2" },
+      { "name": "Œufs", "quantity": "4" },
+      { "name": "Emmental râpé", "quantity": "100 g" },
+      { "name": "Oignon", "quantity": "1" }
+    ]
+  },
+  {
+    "id": "en-med-vegan",
+    "note": "English, Mediterranean, vegan",
+    "preferences": { "language": "en", "cuisine": "mediterranean", "mealType": "dinner", "difficulty": "medium", "maxCookTime": 60, "dietary": ["vegan"] },
+    "ingredients": [
+      { "name": "Chickpeas", "quantity": "400 g" },
+      { "name": "Aubergine", "quantity": "2", "days_left": 2 },
+      { "name": "Tomatoes", "quantity": "4" },
+      { "name": "Quinoa", "quantity": "300 g" },
+      { "name": "Lemon", "quantity": "1" },
+      { "name": "Spinach", "quantity": "200 g", "days_left": 1 },
+      { "name": "Tahini", "quantity": "1 jar" },
+      { "name": "Feta", "quantity": "200 g" }
+    ]
+  },
+  {
+    "id": "fr-un-aliment",
+    "note": "1 aliment choisi (courgette), cuisine libre",
+    "selection": true,
+    "other_pantry": ["Steak haché", "Saumon"],
+    "preferences": { "language": "fr", "cuisine": "any", "mealType": "dinner", "difficulty": "easy", "maxCookTime": 40 },
+    "ingredients": [
+      { "name": "Courgettes", "quantity": "3", "days_left": 1, "priority": true }
+    ]
+  },
+  {
+    "id": "es-sin-gluten-lactosa",
+    "note": "Español, sin gluten y sin lactosa, salmón",
+    "preferences": { "language": "es", "cuisine": "any", "mealType": "dinner", "difficulty": "easy", "maxCookTime": 40, "dietary": ["gluten-free", "dairy-free"] },
+    "ingredients": [
+      { "name": "Salmón", "quantity": "2 lomos", "days_left": 1 },
+      { "name": "Patatas", "quantity": "1 kg" },
+      { "name": "Judías verdes", "quantity": "300 g", "days_left": 2 },
+      { "name": "Arroz", "quantity": "500 g" },
+      { "name": "Limón", "quantity": "1" },
+      { "name": "Pasta de trigo", "quantity": "500 g" },
+      { "name": "Mantequilla", "quantity": "250 g" }
+    ]
+  },
+  {
+    "id": "fr-marques",
+    "note": "Produits de marque scannés par code-barres (noms commerciaux)",
+    "preferences": { "language": "fr", "cuisine": "mediterranean", "mealType": "lunch", "difficulty": "easy", "maxCookTime": 30 },
+    "ingredients": [
+      { "name": "Barilla Penne Rigate n°73", "quantity": "500 g" },
+      { "name": "Panzani Sauce Tomate Basilic", "quantity": "400 g", "days_left": 2 },
+      { "name": "Galbani Mozzarella", "quantity": "125 g", "days_left": 1 },
+      { "name": "Herta Le Bon Paris", "quantity": "4 tranches" },
+      { "name": "Bonduelle Maïs", "quantity": "1 boîte" }
+    ]
+  },
+  {
+    "id": "en-african-breakfast",
+    "note": "English, West African breakfast, ripe plantains",
+    "preferences": { "language": "en", "cuisine": "african", "mealType": "breakfast", "difficulty": "easy", "maxCookTime": 30 },
+    "ingredients": [
+      { "name": "Plantains", "quantity": "3", "days_left": 1 },
+      { "name": "Eggs", "quantity": "6" },
+      { "name": "Bread", "quantity": "1 loaf" },
+      { "name": "Tomatoes", "quantity": "2" },
+      { "name": "Onion", "quantity": "1" },
+      { "name": "Black-eyed beans", "quantity": "400 g" }
+    ]
+  },
+  {
+    "id": "fr-asie-selection",
+    "note": "Sélection (tofu, chou, riz), viandes réservées",
+    "selection": true,
+    "other_pantry": ["Blanc de poulet", "Bœuf haché", "Crevettes", "Lardons"],
+    "preferences": { "language": "fr", "cuisine": "asian", "mealType": "dinner", "difficulty": "easy", "maxCookTime": 35 },
+    "ingredients": [
+      { "name": "Tofu ferme", "quantity": "400 g", "priority": true },
+      { "name": "Chou chinois", "quantity": "1", "priority": true },
+      { "name": "Riz basmati", "quantity": "1 kg", "priority": true }
+    ]
+  },
+  {
+    "id": "es-magreb-restos",
+    "note": "Español, magrebí, sobras de cuscús y cordero picado urgente",
+    "mode": "leftovers",
+    "preferences": { "language": "es", "cuisine": "maghreb", "mealType": "dinner", "difficulty": "medium", "maxCookTime": 45 },
+    "ingredients": [
+      { "name": "Sobras de cuscús", "quantity": "2 raciones", "kind": "dish", "days_left": 1 },
+      { "name": "Cordero picado", "quantity": "400 g", "days_left": 0 },
+      { "name": "Garbanzos", "quantity": "1 lata" },
+      { "name": "Zanahorias", "quantity": "3" },
+      { "name": "Cebolla", "quantity": "2" },
+      { "name": "Pimiento rojo", "quantity": "1" }
+    ]
+  },
+  {
+    "id": "en-french-exclusions",
+    "note": "English, French cuisine, low-carb preference, mushrooms excluded, 4 people",
+    "preferences": { "language": "en", "cuisine": "french", "mealType": "dinner", "difficulty": "medium", "maxCookTime": 60, "dietary": ["low-carb"], "excluded": ["mushrooms"], "servings": 4 },
+    "ingredients": [
+      { "name": "Pork tenderloin", "quantity": "600 g", "days_left": 1 },
+      { "name": "Leeks", "quantity": "3" },
+      { "name": "Mushrooms", "quantity": "250 g", "days_left": 1 },
+      { "name": "Cream", "quantity": "20 cl" },
+      { "name": "Gruyère", "quantity": "150 g" },
+      { "name": "Green beans", "quantity": "400 g" },
+      { "name": "Shallots", "quantity": "3" },
+      { "name": "Dijon mustard", "quantity": "1 jar" }
+    ]
+  }
+]

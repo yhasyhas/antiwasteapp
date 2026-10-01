@@ -24,3 +24,8 @@ verify_jwt = false
 
 [functions.translate-recipe]
 verify_jwt = false
+
+# Évaluation des recettes (phase 9) : copie de generate-recipes réservée aux essais, appelée seulement par
+# scripts/recipe-eval avec la clé secrète (en-tête x-eval-key), jamais par l'app
+[functions.generate-recipes-eval]
+verify_jwt = false

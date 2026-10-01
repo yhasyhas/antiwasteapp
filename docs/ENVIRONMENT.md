@@ -103,6 +103,8 @@ Modèle sans valeurs : `.env.example`. Toutes ces valeurs sont **publiques par n
 
 Pour le renouveler : générer une valeur aléatoire, la poser dans les fonctions (`secrets set`), puis dans Vault (`select vault.update_secret(…)`, depuis le SQL Editor du Dashboard).
 
+**Clé secrète Supabase dans un en-tête** (aucun secret en plus) : les tests de quotas simulés (en-tête `x-simulate-key`) et la copie d'évaluation des recettes `generate-recipes-eval` (en-tête `x-eval-key`, phase 9) n'acceptent que la clé secrète. Les scripts la lisent avec `npx supabase projects api-keys --reveal` et la gardent en mémoire. L'app n'appelle jamais `generate-recipes-eval`.
+
 ---
 
 ## 4. Configuration Supabase hors secrets (Dashboard)
