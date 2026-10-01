@@ -307,6 +307,12 @@ Suite de la phase 7, sur la branche `phase-7-finalisation`.
 - [x] Évaluation sur une trentaine de recettes variées (13 cas, 36 recettes ; `scripts/recipe-eval`)
 - [ ] Amélioration du prompt d'après l'évaluation (v2 mesurée sur la copie d'évaluation, adoption en attente)
 - [x] Évaluation rejouable à chaque changement de modèle
+- [ ] v4 : feu indiqué par son niveau seulement, température à cœur pour la viande et le poisson (seuils reconnus et signe visible), règles de sécurité contrôlées par le serveur (`safety.ts` : recette corrigée ou écartée), objectif 100 % dans l'évaluation
+- [ ] Bibliothèque de plats de référence (`generate-recipes/library/`, `docs/bibliotheque-plats.md`) : inspiration tirée au hasard, seulement avec une cuisine précise ; à faire valider par des personnes qui cuisinent ces plats avant de l'utiliser dans l'app
+- [ ] Découpage plus précis des cuisines (`docs/cuisines-proposition.md`) : décision de l'utilisateur attendue, rien de changé dans l'app avant
+- [ ] Anti-répétition : titres des recettes récentes et de « Mes recettes » transmis au modèle (`generate-recipes/history.ts`)
+- [ ] Variété mesurée sur plusieurs générations, avec et sans bibliothèque (`scripts/recipe-eval/variety.mjs`) : la bibliothèque ne doit jamais la réduire
+- [ ] Comparaison de modèles plus puissants (coût par recette), sans adoption : décision en phase 11
 - [ ] Mode cuisine étape par étape avec minuteurs (si garder l'écran allumé demande un module natif, cette partie va en phase 12)
 
 **Terminé quand** : l'évaluation rejouable donne un meilleur résultat après l'amélioration du prompt, et une recette peut être suivie étape par étape avec ses minuteurs.
@@ -318,6 +324,7 @@ Suite de la phase 7, sur la branche `phase-7-finalisation`.
 - [ ] « Mot de passe oublié » sur l'écran de connexion : e-mail de réinitialisation, protégé par la vérification anti-robot (captcha) (déplacé depuis « Obligatoire avant la bêta »)
 - [ ] Ticket de caisse dans l'app (le mode existe déjà côté serveur)
 - [ ] « Donner mon avis »
+- [ ] « On a aimé » / « Pas pour nous » / « Signaler un problème » sur chaque recette ; les plats aimés enrichissent la bibliothèque après validation
 - [ ] Accessibilité : grandes tailles de texte, lecteurs d'écran, contrastes
 - [ ] Option « Pas d'images en données mobiles »
 - [ ] « Mes basiques » : liste modifiable dans les Préférences (préremplie avec sel, poivre, huile, eau), considérée comme toujours disponible par la génération, jamais ajoutée à « À acheter » ni aux courses
@@ -596,4 +603,5 @@ Ancienne phase 8.
 | 02/10/2026 | Phase 9, évaluation des recettes : copie `generate-recipes-eval` (jamais appelée par l'app, clé secrète, aucun quota d'utilisateur), prompt déplacé dans `generate-recipes/prompt.ts` (v1 identique à celui de l'app, vérifié), 13 cas fixes en trois langues, vérifications automatiques et grille notée par un juge (`gemini-3.1-flash-lite`, le seul modèle Gemini fiable ce soir-là ; les plus forts étaient saturés ou payants) | `generate-recipes` n'a pas été redéployée : les tests de la phase 8 portent sur la version actuelle |
 | 02/10/2026 | Résultats v1 (prompt de l'app) : juge 4,59/5 ; quantités reprises dans les étapes 48 % ; unités en français dans les recettes en anglais et en espagnol ; ingrédients sortis de nulle part (tofu, riz cru supposé cuit) ; repères de cuisson à cœur vagues (porc à 60 °C) ; plats empruntés (chakchouka pour un petit-déjeuner ouest-africain, frittata pour le Maghreb) ; 4 recettes écartées par le serveur (feta en vegan, restes oubliés). v2 : juge 4,68 (quantités dans les étapes +0,98) ; quantités reprises 69 % ; unités dans la bonne langue 100 % ; aucune recette écartée ; mais °C sur le feu dans 22 % des recettes, authenticité -0,33. v3 (°C seulement pour le four) : pire (« mélange 1 minute à feu doux » ajouté à des salades), écartée | Le juge est indulgent : ses notes comparent des versions, les vérifications automatiques et la relecture restent nécessaires |
 | 02/10/2026 | Limite de l'offre gratuite de Groq pour `gpt-oss-120b` : 200 000 tokens par jour (et 8 000 par minute), partagés avec l'app ; une évaluation complète en consomme ≈ 65 000. La troisième version a épuisé la limite du jour : l'app est passée sur Gemini (secours) le temps que la fenêtre se libère | Au plus 2 évaluations par jour ; à voir en phase 13 : clé Groq séparée pour l'évaluation, ou offre payante |
+| 02/10/2026 | Offre gratuite de Groq = 200 000 tokens par jour pour toute l'app (fenêtre glissante de 24 h : des tokens consommés à 22 h ne reviennent que le lendemain à 22 h) : passage à l'offre payante obligatoire avant le lancement (phase 13) | Une génération consomme ≈ 4 500 tokens, soit ≈ 45 générations par jour pour tous les utilisateurs réunis ; au plus une évaluation complète par jour en attendant |
 | | *(résultat du test Gemini vs Clarifai)* | |
