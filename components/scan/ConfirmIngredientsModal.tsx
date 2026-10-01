@@ -16,7 +16,7 @@ import { QuantityField } from '@/components/pantry/QuantityField';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import { shortDuration } from '@/lib/expiry';
 import { existingFor } from '@/lib/pantry';
-import { capitalizeFirst } from '@/lib/foodNames';
+import { useFoodNames } from '@/lib/foodNames';
 import type { StorageLocation } from '@/lib/storage';
 import { LocationChoice } from '@/components/pantry/LocationChoice';
 import { displayQuantity } from '@/lib/quantity';
@@ -48,6 +48,9 @@ export function ConfirmIngredientsModal({ visible, ingredients, photo, onToggle,
   // Aliment dont la date est en cours de modification
   const [editing, setEditing] = useState<number | null>(null);
   const confirmedCount = ingredients.filter((i) => i.confirmed).length;
+  // Nom de la fiche dans la langue de l'app quand elle existe (« Milk » pour un « lait » détecté), sinon le nom
+  // proposé par l'analyse
+  const nameOf = useFoodNames(ingredients);
 
   const thumbnail = (
     <View style={styles.thumbnail}>
@@ -81,12 +84,12 @@ export function ConfirmIngredientsModal({ visible, ingredients, photo, onToggle,
                 style={styles.itemMain}
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked: ing.confirmed }}
-                accessibilityLabel={capitalizeFirst(ing.name)}
+                accessibilityLabel={nameOf(ing)}
               >
                 <Checkbox checked={ing.confirmed} />
                 <View style={styles.itemText}>
                   <View style={styles.nameRow}>
-                    <Text style={[styles.name, !ing.confirmed && styles.unchecked]}>{capitalizeFirst(ing.name)}</Text>
+                    <Text style={[styles.name, !ing.confirmed && styles.unchecked]}>{nameOf(ing)}</Text>
                     {ing.kind === 'dish' && <Badge label={t('pantry.leftover')} tone="leftover" />}
                   </View>
                   {!ing.confirmed && ing.quantity !== '' && <Text style={styles.quantity}>{displayQuantity(ing.quantity, language)}</Text>}
