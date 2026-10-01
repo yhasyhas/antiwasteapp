@@ -118,3 +118,20 @@ export const isUrgentLot = (lot: StoredLot) => {
 // (l'aliment n'est ni urgent ni « date dépassée »)
 export const daysLeftForRecipes = (lot: StoredLot) =>
   lot.expires_at && lotUrgency(lot) !== 'frozen' && lotUrgency(lot) !== 'indicative_passed' ? daysUntil(lot.expires_at) : null;
+
+// Recongélation d'un lot décongelé, par catégorie (même règle que la base : refreeze_rule) : viande, poisson et
+// fruits de mer, surgelés (crus) à cuisiner avant de les recongeler ; plat cuisiné ou reste à consommer sans le
+// recongeler ; le reste (pain, fruits, légumes, laitages…) se recongèle, avec un avertissement (goût, texture)
+export type RefreezeRule = 'cook_first' | 'eat' | 'warn';
+export function refreezeRule(category: string | null | undefined, kind: string | null | undefined): RefreezeRule {
+  if (kind === 'dish') return 'eat';
+  if (category === 'meat' || category === 'fish' || category === 'frozen') return 'cook_first';
+  return 'warn';
+}
+
+// Lot décongelé, sorti du congélateur
+export const wasThawed = (lot: { thawed_at?: string | null; location?: string | null }) => !!lot.thawed_at && lot.location !== 'freezer';
+
+// « Congeler » possible tel quel : jamais décongelé, ou sans risque à recongeler
+export const canFreeze = (lot: { thawed_at?: string | null; location?: string | null; category?: string | null; kind?: string | null }) =>
+  !wasThawed(lot) || refreezeRule(lot.category, lot.kind) === 'warn';

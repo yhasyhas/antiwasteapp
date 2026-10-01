@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Combine, PackageOpen, Snowflake, Sun, Trash2 } from 'lucide-react-native';
+import { Combine, Info, PackageOpen, Snowflake, Sun, Trash2 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
 import { ExpiryPicker } from '@/components/expiry/ExpiryPicker';
@@ -10,8 +10,8 @@ import { Chip } from '@/components/ui/Chip';
 import { Touchable } from '@/components/ui/Touchable';
 import { addedWhen, expiryFromShelfLife, expiryLabel, shortDate } from '@/lib/expiry';
 import { lotLabel, mergeableLots, totalLabel, type LotGroup } from '@/lib/pantryLots';
-import { defaultDateKind, defaultLocation, LOCATIONS, lotUrgency, type DateKind, type StorageLocation } from '@/lib/storage';
-import { colors, sizes, spacing, typography } from '@/constants/theme';
+import { canFreeze, defaultDateKind, defaultLocation, LOCATIONS, lotUrgency, refreezeRule, wasThawed, type DateKind, type StorageLocation } from '@/lib/storage';
+import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 import type { PantryIngredient } from './IngredientCard';
 
 // Changements d'un lot enregistrés ensemble (date, type de date, emplacement)
@@ -20,6 +20,13 @@ export interface LotPatch {
   expiry_estimated?: boolean;
   date_kind?: DateKind;
   location?: StorageLocation;
+}
+
+// Message affiché sous un lot (congélation, décongélation), à la place d'une alerte du système
+export interface LotNotice {
+  id: string;
+  title: string;
+  text: string;
 }
 
 interface Props {
@@ -37,6 +44,8 @@ interface Props {
   onMerge: (lots: PantryIngredient[]) => void;
   // Date indicative dépassée ou date estimée : lien vers « Est-ce encore bon ? » (fiche de l'aliment)
   onShowStillGood?: () => void;
+  notice?: LotNotice | null;
+  onDismissNotice?: () => void;
 }
 
 const locationOf = (lot: PantryIngredient) => (lot.location as StorageLocation | null) ?? defaultLocation(lot.category, lot.kind, lot.food_key);
@@ -46,7 +55,7 @@ const dateKindOf = (lot: PantryIngredient) => (lot.date_kind as DateKind | null)
 // un seul), avec quantité, date (touchable pour modifier la date, son type et l'emplacement), auteur et date
 // d'ajout, « Date estimée par l'app » ; par lot : emplacement, « Je l'ai ouvert », « Congeler » ou « Décongeler », retrait ; fusion des lots
 // de même date et même unité, retrait de l'aliment entier
-export function PantryLotsSection({ group, addedBy, onRemoveLot, onRemoveAll, onUpdateLot, onFreeze, onThaw, onOpen, onMerge, onShowStillGood }: Props) {
+export function PantryLotsSection({ group, addedBy, onRemoveLot, onRemoveAll, onUpdateLot, onFreeze, onThaw, onOpen, onMerge, onShowStillGood, notice, onDismissNotice }: Props) {
   const { t, language } = useLanguage();
   // Lot en cours de modification : date, type de date, emplacement
   const [editing, setEditing] = useState<{ id: string; value: string; dateKind: DateKind; location: StorageLocation } | null>(null);
@@ -108,6 +117,12 @@ export function PantryLotsSection({ group, addedBy, onRemoveLot, onRemoveAll, on
         const state = stateLine(lot);
         const indicativePassed = lotUrgency(lot) === 'indicative_passed';
         const estimated = !!lot.expiry_estimated && !!lot.expires_at;
+        // Déjà décongelé : viande, poisson, plat… pas de « Congeler » (explication) ; pain, fruits, légumes…
+        // « Congeler » avec un avertissement
+        const freezable = canFreeze(lot);
+        const refreezeHint = wasThawed(lot)
+          ? t(freezable ? 'storage.refreezeWarning' : refreezeRule(lot.category, lot.kind) === 'eat' ? 'storage.thawedEat' : 'storage.thawedCookFirst')
+          : null;
         return (
           <View key={lot.id}>
             <View style={cardStyles.divider} />
@@ -136,8 +151,19 @@ export function PantryLotsSection({ group, addedBy, onRemoveLot, onRemoveAll, on
               {!lot.opened_at && !frozen ? <Chip label={t('storage.opened')} icon={PackageOpen} onPress={() => onOpen(lot)} /> : null}
               {frozen
                 ? <Chip label={t('storage.thaw')} icon={Sun} onPress={() => onThaw(lot)} />
-                : <Chip label={t('storage.freeze')} icon={Snowflake} iconColor={colors.foodFamilies.cold.icon} onPress={() => onFreeze(lot)} />}
+                : freezable ? <Chip label={t('storage.freeze')} icon={Snowflake} iconColor={colors.foodFamilies.cold.icon} onPress={() => onFreeze(lot)} /> : null}
             </View>
+            {refreezeHint && !frozen ? <Text style={styles.refreeze}>{refreezeHint}</Text> : null}
+            {notice?.id === lot.id ? (
+              <View style={styles.notice} accessibilityLiveRegion="polite">
+                <View style={styles.noticeHeader}>
+                  <Info size={sizes.icon} color={colors.primary} />
+                  <Text style={styles.noticeTitle}>{notice.title}</Text>
+                </View>
+                <Text style={styles.noticeText}>{notice.text}</Text>
+                {onDismissNotice ? <Button label={t('common.ok')} size="small" variant="soft" onPress={onDismissNotice} style={styles.noticeButton} /> : null}
+              </View>
+            ) : null}
             {isEditing ? (
               <View style={styles.editor}>
                 <ExpiryPicker value={editing.value} onChange={(value) => setEditing({ ...editing, value })} />
@@ -149,7 +175,7 @@ export function PantryLotsSection({ group, addedBy, onRemoveLot, onRemoveAll, on
                 <Text style={styles.hint}>{t(editing.dateKind === 'use_by' ? 'storage.useByHint' : 'storage.bestBeforeHint')}</Text>
                 <Text style={styles.label}>{t('storage.location')}</Text>
                 <View style={styles.choices}>
-                  {LOCATIONS.map((location) => (
+                  {LOCATIONS.filter((location) => location !== 'freezer' || freezable || frozen).map((location) => (
                     <Chip key={location} label={t(`storage.${location}`)} selected={editing.location === location} onPress={() => setEditing({ ...editing, location })} />
                   ))}
                 </View>
@@ -239,6 +265,32 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.sm,
     paddingBottom: spacing.md,
+  },
+  refreeze: {
+    ...typography.secondary,
+    paddingBottom: spacing.md,
+  },
+  notice: {
+    gap: spacing.sm,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    borderRadius: radius.control,
+    backgroundColor: colors.primarySoft,
+  },
+  noticeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  noticeTitle: {
+    ...typography.bodyStrong,
+    flex: 1,
+  },
+  noticeText: {
+    ...typography.body,
+  },
+  noticeButton: {
+    alignSelf: 'flex-start',
   },
   editor: {
     gap: spacing.md,

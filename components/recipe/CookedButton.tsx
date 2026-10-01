@@ -1,15 +1,18 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Check, Minus, Plus } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { notifyPantryChanged } from '@/lib/pantryEvents';
 import { useFoodNames } from '@/lib/foodNames';
-import { isToday, localDateOf, shortDate } from '@/lib/expiry';
-import { loadPantry } from '@/lib/pantry';
+import { formatDate, isToday, localDateOf, shortDate } from '@/lib/expiry';
+import { addPantryItems, loadPantry } from '@/lib/pantry';
+import { frozenExpiry, wasThawed } from '@/lib/storage';
+import { alertWriteError } from '@/lib/alertWriteError';
 import { consumeOldestFirst, findExisting, foodIdentity, groupLots, lotsStock, totalLabel, type LotGroup } from '@/lib/pantryLots';
 import { formatQuantity, parseQuantity, stepOf, usedFromRecipe, type Quantity } from '@/lib/quantity';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
+import { QuantityField } from '@/components/pantry/QuantityField';
 import { useUndoableAction } from '@/hooks/useUndoableAction';
 import { BottomSheet, SheetHeader } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/Button';
@@ -19,6 +22,7 @@ import { Toast } from '@/components/ui/Toast';
 import { Touchable } from '@/components/ui/Touchable';
 import { StepButton } from '@/components/ui/StepButton';
 import { colors, motion, sizes, spacing, typography } from '@/constants/theme';
+import { showDialog } from '@/lib/dialog';
 
 interface UsedIngredient {
   name: string;
@@ -32,6 +36,8 @@ interface Props {
   ingredientsUsed: UsedIngredient[] | null | undefined;
   // Recette enregistrée : le repas lui est relié (« Cuisiné aujourd'hui », « Modifier », « Cuisinée le … »)
   recipeId?: string | null;
+  // Nom du plat (restes congelés après le repas)
+  recipeTitle?: string;
   // Conteneur du bouton (barre fixée en bas de la fiche recette)
   style?: StyleProp<ViewStyle>;
 }
@@ -80,7 +86,7 @@ type Mode = { kind: 'new' } | { kind: 'modify'; action: LastCook };
 // Recette enregistrée : ensuite « ✓ Cuisiné aujourd'hui » (grisé), récapitulatif avant / après de chaque
 // aliment, « Modifier » (feuille rouverte avec les quantités saisies ; la correction remplace l'action en une
 // seule opération, conflit compris) et « Je l'ai cuisinée à nouveau » (vrai deuxième repas).
-export function CookedButton({ ingredientsUsed, recipeId, style }: Props) {
+export function CookedButton({ ingredientsUsed, recipeId, recipeTitle, style }: Props) {
   const { t, language } = useLanguage();
   const [rows, setRows] = useState<CookRow[] | null>(null);
   const [mode, setMode] = useState<Mode>({ kind: 'new' });
@@ -88,6 +94,10 @@ export function CookedButton({ ingredientsUsed, recipeId, style }: Props) {
   const [saving, setSaving] = useState(false);
   const [lastCook, setLastCook] = useState<LastCook | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  // Restes du plat au congélateur : quantité saisie (feuille ouverte), puis date une fois congelés
+  const [leftovers, setLeftovers] = useState<string | null>(null);
+  const [savingLeftovers, setSavingLeftovers] = useState(false);
+  const [leftoversFrozenUntil, setLeftoversFrozenUntil] = useState<string | null>(null);
   const recapLots = lastCook ? [...lastCook.removed, ...lastCook.updated.map((change) => change.before)] : [];
   const foodName = useFoodNames([...(rows?.map((row) => row.group.first) ?? []), ...recapLots]);
 
@@ -163,7 +173,7 @@ export function CookedButton({ ingredientsUsed, recipeId, style }: Props) {
     const pantry = await loadPantry();
     setLoading(false);
     if (!pantry) {
-      Alert.alert(t('common.error'), t('errors.writeText'));
+      showDialog(t('common.error'), t('errors.writeText'));
       return;
     }
     let base = pantry;
@@ -174,7 +184,7 @@ export function CookedButton({ ingredientsUsed, recipeId, style }: Props) {
     }
     const found = rowsFrom(base, next.kind === 'modify' ? next.action.inputs : null);
     if (found.length === 0) {
-      Alert.alert(t('cooked.button'), t('cooked.nothingLeft'));
+      showDialog(t('cooked.button'), t('cooked.nothingLeft'));
       return;
     }
     setMode(next);
@@ -235,7 +245,7 @@ export function CookedButton({ ingredientsUsed, recipeId, style }: Props) {
       p_action_id: action.id, p_ids: usedUp, p_leftovers: leftovers, p_inputs: inputs,
     });
     if (error) {
-      Alert.alert(t('cookedMore.modifyTitle'), t('undo.failedText'));
+      showDialog(t('cookedMore.modifyTitle'), t('undo.failedText'));
       return false;
     }
     const status = (data as { status: string }).status;
@@ -245,7 +255,7 @@ export function CookedButton({ ingredientsUsed, recipeId, style }: Props) {
       setNotice(t('cookedMore.modified'));
       return true;
     }
-    Alert.alert(t('cookedMore.modifyTitle'), status === 'conflict' ? t('undo.conflictText') : status === 'expired' ? t('undo.expiredText') : t('undo.failedText'));
+    showDialog(t('cookedMore.modifyTitle'), status === 'conflict' ? t('undo.conflictText') : status === 'expired' ? t('undo.expiredText') : t('undo.failedText'));
     return status !== 'conflict';
   };
 
@@ -291,6 +301,36 @@ export function CookedButton({ ingredientsUsed, recipeId, style }: Props) {
     ? isToday(lastCook.created_at) ? t('cookedMore.doneToday') : `✓ ${t('cookedMore.cookedOn', { date: shortDate(localDateOf(lastCook.created_at), language) })}`
     : null;
   const showConfirmed = lastCook && !cooking.pending;
+  // Repas avec un aliment décongelé : congeler les restes du plat est mis en avant (l'aliment ne se recongèle
+  // pas cru)
+  const thawedUsed = recapLots.some(wasThawed);
+  const leftoversExpiry = frozenExpiry(null, 'dish');
+
+  const freezeLeftovers = async () => {
+    if (!recipeTitle || leftovers === null) return;
+    setSavingLeftovers(true);
+    try {
+      await addPantryItems([{
+        name: recipeTitle,
+        quantity: leftovers.trim(),
+        kind: 'dish',
+        expires_at: leftoversExpiry,
+        added_via: 'manual',
+        choice: 'separate',
+        location: 'freezer',
+        date_kind: 'best_before',
+        expiry_estimated: true,
+      }], [], language);
+      notifyPantryChanged();
+      setLeftovers(null);
+      setLeftoversFrozenUntil(leftoversExpiry);
+    } catch (error) {
+      alertWriteError(t, 'freezing leftovers', error);
+    } finally {
+      setSavingLeftovers(false);
+    }
+  };
+  const openLeftovers = () => setLeftovers(formatQuantity(1, 'portion', language));
 
   return (
     <View style={style}>
@@ -308,10 +348,24 @@ export function CookedButton({ ingredientsUsed, recipeId, style }: Props) {
               {recap.map((item) => `${item.name} : ${item.line}`).join(' · ')}
             </Text>
           ) : null}
+          {recipeTitle && thawedUsed && !leftoversFrozenUntil ? (
+            <>
+              <Text style={styles.recapLine}>{t('cookedMore.freezeLeftoversHint')}</Text>
+              <Button label={t('cookedMore.freezeLeftovers')} variant="outline" size="medium" onPress={openLeftovers} />
+            </>
+          ) : null}
+          {leftoversFrozenUntil ? (
+            <Text style={styles.recapLine}>{t('cookedMore.leftoversDone', { date: formatDate(leftoversFrozenUntil, language) })}</Text>
+          ) : null}
           <View style={styles.links}>
             <Touchable onPress={() => open({ kind: 'modify', action: lastCook })} style={styles.link} accessibilityRole="button">
               <Text style={styles.linkText}>{t('cookedMore.modify')}</Text>
             </Touchable>
+            {recipeTitle && !thawedUsed && !leftoversFrozenUntil ? (
+              <Touchable onPress={openLeftovers} style={styles.link} accessibilityRole="button">
+                <Text style={styles.linkSecondary}>{t('cookedMore.freezeLeftovers')}</Text>
+              </Touchable>
+            ) : null}
             <Touchable onPress={() => open()} style={styles.link} accessibilityRole="button">
               <Text style={styles.linkSecondary}>{t('cookedMore.cookAgain')}</Text>
             </Touchable>
@@ -320,6 +374,22 @@ export function CookedButton({ ingredientsUsed, recipeId, style }: Props) {
       ) : (
         <Button label={t('cooked.button')} icon={Check} onPress={() => open()} loading={loading} />
       )}
+
+      {/* Restes du plat au congélateur, comme un reste : date du congélateur, conseil */}
+      <BottomSheet visible={leftovers !== null} onClose={() => setLeftovers(null)} keyboard>
+        <SheetHeader title={t('cookedMore.leftoversTitle')} subtitle={recipeTitle} onClose={() => setLeftovers(null)} />
+        <View style={styles.leftovers}>
+          <QuantityField
+            label={t('cookedMore.leftoversQuantity')}
+            value={leftovers ?? ''}
+            onChange={setLeftovers}
+            itemName={recipeTitle ?? ''}
+          />
+          <Text style={styles.remaining}>{t('storage.frozenDone', { date: formatDate(leftoversExpiry, language) })}</Text>
+          <Text style={styles.remaining}>{t('storage.freezeTip_dish')}</Text>
+        </View>
+        <Button label={t('cookedMore.leftoversConfirm')} onPress={freezeLeftovers} loading={savingLeftovers} style={styles.confirm} />
+      </BottomSheet>
 
       <BottomSheet visible={rows !== null} onClose={() => setRows(null)}>
         <SheetHeader title={t('cooked.title')} subtitle={t('cooked.subtitle')} onClose={() => setRows(null)} />
@@ -447,5 +517,8 @@ const styles = StyleSheet.create({
   },
   confirm: {
     marginTop: spacing.lg,
+  },
+  leftovers: {
+    gap: spacing.md,
   },
 });

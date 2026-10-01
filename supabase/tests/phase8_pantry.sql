@@ -3,7 +3,7 @@
 -- recette, et correction (modify_cook_action) : quantités remplacées en une opération, conflit si un autre
 -- membre a changé un lot, auteur seulement, 24 heures, une seule fois ; origine de la date (estimée par l'app
 -- ou venue de l'emballage) à l'ajout, à l'ajout à un lot existant, aux courses rangées, à la fusion et à
--- l'annulation.
+-- l'annulation ; recongélation d'un aliment décongelé selon sa catégorie.
 --
 -- Lancement (base liée, mot de passe dans SUPABASE_DB_PASSWORD) :
 --   PGPASSWORD="$SUPABASE_DB_PASSWORD" psql "$(cat supabase/.temp/pooler-url)" -v ON_ERROR_STOP=1 -f supabase/tests/phase8_pantry.sql
@@ -454,5 +454,52 @@ BEGIN
   END IF;
   RAISE NOTICE 'OK 18 : fusion : estimée seulement si toutes les dates le sont ; annulation : origine rétablie ; lot sans origine : non estimé';
 END $$;
+
+-- Recongélation : règle par catégorie, garde-fou sur un lot décongelé
+DO $$
+BEGIN
+  IF public.refreeze_rule('meat', 'ingredient') <> 'cook_first' OR public.refreeze_rule('fish', 'ingredient') <> 'cook_first'
+     OR public.refreeze_rule('frozen', 'ingredient') <> 'cook_first' OR public.refreeze_rule('meat', 'dish') <> 'eat'
+     OR public.refreeze_rule(NULL, 'dish') <> 'eat' OR public.refreeze_rule('bakery', 'ingredient') <> 'warn'
+     OR public.refreeze_rule('vegetable', 'ingredient') <> 'warn' OR public.refreeze_rule('fruit', 'ingredient') <> 'warn'
+     OR public.refreeze_rule(NULL, 'ingredient') <> 'warn' THEN
+    RAISE EXCEPTION 'ÉCHEC : règle de recongélation par catégorie';
+  END IF;
+  RAISE NOTICE 'OK 19 : recongélation : viande, poisson, surgelés à cuisiner d''abord ; plats à consommer ; le reste possible';
+END $$;
+INSERT INTO public.ingredients (id, user_id, household_id, name, quantity, category, kind, location, thawed_at) VALUES
+  ('00000000-0000-4000-b000-000000000e71', '00000000-0000-4000-a000-000000000e0a', (SELECT value::uuid FROM ctx WHERE key = 'household'), 'Steak décongelé', '2', 'meat', 'ingredient', 'fridge', current_date),
+  ('00000000-0000-4000-b000-000000000e72', '00000000-0000-4000-a000-000000000e0a', (SELECT value::uuid FROM ctx WHERE key = 'household'), 'Pain décongelé', '1', 'bakery', 'ingredient', 'pantry', current_date),
+  ('00000000-0000-4000-b000-000000000e73', '00000000-0000-4000-a000-000000000e0a', (SELECT value::uuid FROM ctx WHERE key = 'household'), 'Steak frais', '2', 'meat', 'ingredient', 'fridge', NULL),
+  ('00000000-0000-4000-b000-000000000e74', '00000000-0000-4000-a000-000000000e0a', (SELECT value::uuid FROM ctx WHERE key = 'household'), 'Lasagnes décongelées', '1', NULL, 'dish', 'fridge', current_date);
+SET LOCAL ROLE authenticated;
+SELECT pg_temp.login('00000000-0000-4000-a000-000000000e0a');
+DO $$
+DECLARE
+  v_refused text[] := '{}';
+  v_id uuid;
+BEGIN
+  FOREACH v_id IN ARRAY ARRAY['00000000-0000-4000-b000-000000000e71', '00000000-0000-4000-b000-000000000e72',
+                              '00000000-0000-4000-b000-000000000e73', '00000000-0000-4000-b000-000000000e74']::uuid[] LOOP
+    BEGIN
+      UPDATE public.ingredients SET location = 'freezer', frozen_at = current_date, thawed_at = NULL WHERE id = v_id;
+    EXCEPTION WHEN OTHERS THEN
+      IF SQLERRM <> 'refreeze_forbidden' THEN RAISE; END IF;
+      v_refused := v_refused || (SELECT name FROM public.ingredients WHERE id = v_id);
+    END;
+  END LOOP;
+  IF v_refused IS DISTINCT FROM ARRAY['Steak décongelé', 'Lasagnes décongelées'] THEN
+    RAISE EXCEPTION 'ÉCHEC : recongélations refusées (%)', v_refused;
+  END IF;
+  IF (SELECT location FROM public.ingredients WHERE id = '00000000-0000-4000-b000-000000000e71') <> 'fridge'
+     OR (SELECT location FROM public.ingredients WHERE id = '00000000-0000-4000-b000-000000000e72') <> 'freezer'
+     OR (SELECT location FROM public.ingredients WHERE id = '00000000-0000-4000-b000-000000000e73') <> 'freezer' THEN
+    RAISE EXCEPTION 'ÉCHEC : emplacements après recongélation';
+  END IF;
+  -- Ailleurs qu'au congélateur (frigo → placard) : toujours possible
+  UPDATE public.ingredients SET location = 'pantry' WHERE id = '00000000-0000-4000-b000-000000000e71';
+  RAISE NOTICE 'OK 20 : lot décongelé : viande et plat refusés au congélateur, pain accepté ; viande jamais décongelée acceptée';
+END $$;
+RESET ROLE;
 
 ROLLBACK;
