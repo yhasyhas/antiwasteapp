@@ -1,0 +1,1197 @@
+[
+  {
+    "name": "Colombo de poulet",
+    "country": "Guadeloupe, Martinique, Guyane",
+    "ingredients": [
+      "poulet (ou cabri, porc)",
+      "poudre à colombo",
+      "oignon et ail",
+      "piment",
+      "légumes (christophine, aubergine, pomme de terre)",
+      "citron vert"
+    ],
+    "techniques": [
+      "mariner la viande au citron et aux épices",
+      "revenir puis mijoter avec les légumes"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Accras de morue",
+    "country": "Guadeloupe, Martinique, Guyane",
+    "ingredients": [
+      "morue salée",
+      "farine",
+      "levure ou œuf",
+      "cive (oignon pays) et persil",
+      "piment",
+      "ail"
+    ],
+    "techniques": [
+      "dessaler et émietter la morue",
+      "préparer une pâte épaisse",
+      "frire par cuillerées"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Chiquetaille de morue",
+    "country": "Guadeloupe, Martinique",
+    "ingredients": [
+      "morue salée",
+      "citron vert",
+      "oignon ou cive",
+      "piment",
+      "huile"
+    ],
+    "techniques": [
+      "griller ou pocher la morue",
+      "effilocher et assaisonner"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Féroce d'avocat",
+    "country": "Martinique, Guadeloupe",
+    "ingredients": [
+      "avocat",
+      "morue salée",
+      "farine de manioc",
+      "piment",
+      "citron vert"
+    ],
+    "techniques": [
+      "griller et effilocher la morue",
+      "écraser avec l'avocat et la farine de manioc"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Court-bouillon de poisson",
+    "country": "Guadeloupe, Martinique, Guyane",
+    "ingredients": [
+      "poisson (vivaneau, thazard)",
+      "tomate",
+      "oignon et ail",
+      "citron vert",
+      "piment",
+      "bois d'Inde ou thym"
+    ],
+    "techniques": [
+      "mariner le poisson au citron",
+      "mijoter dans une sauce tomate relevée"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Blaff de poisson",
+    "country": "Guadeloupe, Martinique",
+    "ingredients": [
+      "poisson",
+      "citron vert",
+      "cive et ail",
+      "piment",
+      "bois d'Inde",
+      "thym"
+    ],
+    "techniques": [
+      "mariner au citron",
+      "pocher brièvement dans un bouillon aromatique"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Riz et pois rouges",
+    "country": "Guadeloupe, Martinique, Guyane",
+    "ingredients": [
+      "riz",
+      "haricots rouges",
+      "oignon ou cive",
+      "ail",
+      "thym",
+      "lard ou saindoux (facultatif)"
+    ],
+    "techniques": [
+      "cuire les haricots",
+      "cuire le riz dans le bouillon des haricots"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Dombrés aux haricots rouges",
+    "country": "Guadeloupe, Martinique",
+    "ingredients": [
+      "farine",
+      "haricots rouges",
+      "queue de cochon ou viande salée (ou crevettes)",
+      "oignon",
+      "thym"
+    ],
+    "techniques": [
+      "rouler de petites boulettes de pâte",
+      "les cuire dans le ragoût de haricots"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Giraumonade",
+    "country": "Guadeloupe, Martinique",
+    "ingredients": [
+      "giraumon (potiron)",
+      "oignon ou cive",
+      "ail",
+      "beurre ou huile",
+      "piment"
+    ],
+    "techniques": [
+      "cuire le potiron",
+      "écraser en purée assaisonnée"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Migan de fruit à pain",
+    "country": "Guadeloupe, Martinique",
+    "ingredients": [
+      "fruit à pain",
+      "viande salée (queue de cochon) ou morue",
+      "oignon",
+      "thym",
+      "piment"
+    ],
+    "techniques": [
+      "cuire le fruit à pain avec la viande",
+      "écraser grossièrement dans le bouillon"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Christophines gratinées",
+    "country": "Guadeloupe, Martinique",
+    "ingredients": [
+      "christophines (chayotes)",
+      "lait ou béchamel",
+      "fromage râpé",
+      "chapelure",
+      "oignon (ou viande hachée)"
+    ],
+    "techniques": [
+      "cuire et évider les christophines",
+      "mélanger la chair à la farce",
+      "gratiner"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Matété de crabe",
+    "country": "Guadeloupe",
+    "ingredients": [
+      "crabes de terre",
+      "riz",
+      "oignon et ail",
+      "piment",
+      "bois d'Inde ou thym"
+    ],
+    "techniques": [
+      "revenir les crabes dans les aromates",
+      "cuire le riz dans le bouillon de crabe"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Bokit",
+    "country": "Guadeloupe",
+    "ingredients": [
+      "farine",
+      "levure",
+      "huile de friture",
+      "garniture (morue, poulet, crudités, fromage)"
+    ],
+    "techniques": [
+      "frire la pâte en galette gonflée",
+      "l'ouvrir et la garnir"
+    ],
+    "moments": [
+      "snack",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Soupe z'habitant",
+    "country": "Martinique, Guadeloupe",
+    "ingredients": [
+      "légumes pays (giraumon, chou, carotte, navet)",
+      "tubercules (igname, patate douce)",
+      "viande salée ou bœuf",
+      "pâtes ou dombrés (facultatif)"
+    ],
+    "techniques": [
+      "mijoter longuement viande et légumes"
+    ],
+    "moments": [
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Calalou",
+    "country": "Guadeloupe, Martinique, Trinité-et-Tobago",
+    "ingredients": [
+      "feuilles de dachine (ou épinards)",
+      "gombos",
+      "lait de coco (Trinité)",
+      "viande salée ou crabe",
+      "oignon et ail",
+      "piment"
+    ],
+    "techniques": [
+      "mijoter feuilles et gombos",
+      "mixer ou écraser en soupe épaisse"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Bouillon d'awara",
+    "country": "Guyane",
+    "ingredients": [
+      "pâte d'awara (fruit de palmier)",
+      "viandes fumées et salées",
+      "poulet ou poisson",
+      "légumes (concombre, chou, haricots verts, épinards)"
+    ],
+    "techniques": [
+      "mijoter très longuement la pâte d'awara avec viandes et légumes"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Blanc-manger coco",
+    "country": "Guadeloupe, Martinique",
+    "ingredients": [
+      "lait de coco",
+      "lait concentré sucré",
+      "gélatine ou agar-agar",
+      "vanille ou cannelle"
+    ],
+    "techniques": [
+      "chauffer les laits avec le gélifiant",
+      "prendre au froid"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Diri ak pwa (riz collé aux haricots)",
+    "country": "Haïti",
+    "ingredients": [
+      "riz",
+      "haricots rouges ou noirs",
+      "épices (épis : persil, ail, cive, piment)",
+      "clou de girofle",
+      "thym"
+    ],
+    "techniques": [
+      "cuire les haricots",
+      "cuire le riz dans le bouillon des haricots avec l'épi"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Griot",
+    "country": "Haïti",
+    "ingredients": [
+      "épaule de porc",
+      "orange amère (ou citron et orange)",
+      "épi (ail, persil, cive, piment)",
+      "thym"
+    ],
+    "techniques": [
+      "mariner",
+      "braiser jusqu'à tendreté",
+      "frire les morceaux"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pikliz",
+    "country": "Haïti",
+    "ingredients": [
+      "chou",
+      "carotte",
+      "oignon",
+      "piments (scotch bonnet)",
+      "vinaigre"
+    ],
+    "techniques": [
+      "émincer finement",
+      "mariner plusieurs jours au vinaigre"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Bannann peze",
+    "country": "Haïti",
+    "ingredients": [
+      "bananes plantains vertes",
+      "huile de friture",
+      "sel"
+    ],
+    "techniques": [
+      "frire une première fois",
+      "aplatir",
+      "refrire jusqu'à croustillant"
+    ],
+    "moments": [
+      "lunch",
+      "dinner",
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Soup joumou",
+    "country": "Haïti",
+    "ingredients": [
+      "giraumon (potiron)",
+      "bœuf",
+      "légumes (chou, carotte, pomme de terre, navet)",
+      "pâtes",
+      "épi (ail, persil, cive)"
+    ],
+    "techniques": [
+      "cuire et mixer le potiron",
+      "mijoter avec la viande, les légumes et les pâtes"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Legim",
+    "country": "Haïti",
+    "ingredients": [
+      "aubergine",
+      "chou",
+      "christophine",
+      "carotte",
+      "épinards ou cresson",
+      "bœuf ou crabe (facultatif)"
+    ],
+    "techniques": [
+      "mijoter les légumes avec l'épi",
+      "écraser en ragoût épais"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Mayi moulen",
+    "country": "Haïti",
+    "ingredients": [
+      "semoule de maïs",
+      "haricots ou sauce pois",
+      "épi",
+      "lait de coco (facultatif)"
+    ],
+    "techniques": [
+      "cuire la semoule en remuant jusqu'à consistance épaisse"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Akra (malanga)",
+    "country": "Haïti",
+    "ingredients": [
+      "malanga (chou caraïbe) râpé",
+      "épi (ail, persil, cive)",
+      "piment",
+      "huile de friture"
+    ],
+    "techniques": [
+      "râper le malanga",
+      "assaisonner",
+      "frire par cuillerées"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Labouyi bannann",
+    "country": "Haïti",
+    "ingredients": [
+      "banane plantain verte râpée ou farine de plantain",
+      "lait (concentré ou de coco)",
+      "sucre",
+      "cannelle",
+      "badiane"
+    ],
+    "techniques": [
+      "délayer",
+      "cuire en remuant jusqu'à épaississement"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Espageti (spaghetti du matin)",
+    "country": "Haïti",
+    "ingredients": [
+      "spaghetti",
+      "saucisses (hot-dogs) ou hareng saur",
+      "concentré de tomate",
+      "oignon et poivron",
+      "épi"
+    ],
+    "techniques": [
+      "cuire les pâtes",
+      "sauter dans la sauce aux saucisses"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Ropa vieja",
+    "country": "Cuba",
+    "ingredients": [
+      "bœuf (flanc) effiloché",
+      "tomate",
+      "poivron",
+      "oignon",
+      "ail",
+      "cumin et origan"
+    ],
+    "techniques": [
+      "cuire et effilocher la viande",
+      "mijoter dans un sofrito"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Congrí / moros y cristianos",
+    "country": "Cuba",
+    "ingredients": [
+      "riz",
+      "haricots rouges (congrí) ou noirs (moros)",
+      "oignon et poivron",
+      "ail",
+      "cumin",
+      "lard (facultatif)"
+    ],
+    "techniques": [
+      "revenir un sofrito",
+      "cuire le riz avec les haricots et leur bouillon"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Frijoles negros",
+    "country": "Cuba",
+    "ingredients": [
+      "haricots noirs",
+      "oignon",
+      "poivron",
+      "ail",
+      "cumin et origan",
+      "vinaigre ou vin"
+    ],
+    "techniques": [
+      "cuire les haricots",
+      "ajouter un sofrito et épaissir"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Yuca con mojo",
+    "country": "Cuba",
+    "ingredients": [
+      "manioc",
+      "ail",
+      "orange amère (ou citron vert)",
+      "huile",
+      "oignon"
+    ],
+    "techniques": [
+      "cuire le manioc à l'eau",
+      "arroser d'un mojo chaud à l'ail"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Tostones",
+    "country": "Cuba, Porto Rico, République dominicaine",
+    "ingredients": [
+      "bananes plantains vertes",
+      "huile de friture",
+      "sel",
+      "ail (facultatif)"
+    ],
+    "techniques": [
+      "frire une première fois",
+      "aplatir",
+      "refrire"
+    ],
+    "moments": [
+      "lunch",
+      "dinner",
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Ajiaco cubano",
+    "country": "Cuba",
+    "ingredients": [
+      "viandes (porc, poulet, bœuf séché)",
+      "maïs en épi",
+      "tubercules (manioc, malanga, patate douce)",
+      "banane plantain",
+      "potiron",
+      "citron vert"
+    ],
+    "techniques": [
+      "mijoter longuement viandes et légumes jusqu'à épaississement"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Mangú",
+    "country": "République dominicaine",
+    "ingredients": [
+      "bananes plantains vertes",
+      "beurre ou huile",
+      "oignon rouge au vinaigre",
+      "fromage frit, salami, œufs (los tres golpes)"
+    ],
+    "techniques": [
+      "cuire et écraser les plantains",
+      "garnir d'oignons revenus au vinaigre"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "La bandera (riz, habichuelas et viande)",
+    "country": "République dominicaine",
+    "ingredients": [
+      "riz blanc",
+      "habichuelas guisadas (haricots en sauce)",
+      "viande en sauce (poulet, bœuf)",
+      "salade"
+    ],
+    "techniques": [
+      "cuire le riz",
+      "servir avec haricots mijotés et viande guisada"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Habichuelas guisadas",
+    "country": "République dominicaine, Porto Rico",
+    "ingredients": [
+      "haricots rouges",
+      "potiron (auyama)",
+      "sofrito (oignon, poivron, ail)",
+      "concentré de tomate",
+      "coriandre"
+    ],
+    "techniques": [
+      "mijoter les haricots avec le sofrito",
+      "épaissir avec le potiron écrasé"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Sancocho dominicano",
+    "country": "République dominicaine",
+    "ingredients": [
+      "plusieurs viandes (poulet, porc, bœuf)",
+      "tubercules (igname, manioc, malanga)",
+      "banane plantain verte",
+      "maïs",
+      "potiron",
+      "coriandre"
+    ],
+    "techniques": [
+      "mijoter longuement viandes et tubercules jusqu'à épaississement"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Moro de guandules",
+    "country": "République dominicaine",
+    "ingredients": [
+      "riz",
+      "pois d'Angole (guandules)",
+      "lait de coco (facultatif)",
+      "sofrito",
+      "olives"
+    ],
+    "techniques": [
+      "revenir le sofrito",
+      "cuire le riz avec les pois"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Avena caliente",
+    "country": "République dominicaine, Porto Rico",
+    "ingredients": [
+      "flocons d'avoine",
+      "lait (ou lait concentré)",
+      "sucre",
+      "cannelle",
+      "vanille"
+    ],
+    "techniques": [
+      "cuire l'avoine dans le lait sucré et épicé"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Arroz con gandules",
+    "country": "Porto Rico",
+    "ingredients": [
+      "riz",
+      "pois d'Angole (gandules)",
+      "sofrito (ail, poivron, ají dulce, coriandre)",
+      "porc ou jambon",
+      "olives et câpres",
+      "rocou (achiote)"
+    ],
+    "techniques": [
+      "revenir sofrito et viande",
+      "cuire le riz avec les pois"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Mofongo",
+    "country": "Porto Rico",
+    "ingredients": [
+      "bananes plantains vertes",
+      "ail",
+      "chicharrón ou lard",
+      "huile d'olive",
+      "bouillon"
+    ],
+    "techniques": [
+      "frire les plantains",
+      "piler au mortier avec l'ail et le porc"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pastelón",
+    "country": "Porto Rico, République dominicaine",
+    "ingredients": [
+      "bananes plantains mûres",
+      "viande hachée en picadillo",
+      "fromage",
+      "œufs"
+    ],
+    "techniques": [
+      "frire les plantains en lamelles",
+      "monter en couches avec la viande",
+      "cuire au four"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Bacalaítos",
+    "country": "Porto Rico",
+    "ingredients": [
+      "morue salée",
+      "farine",
+      "levure chimique",
+      "ail",
+      "coriandre"
+    ],
+    "techniques": [
+      "préparer une pâte fluide à la morue",
+      "frire en galettes fines"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Ackee and saltfish",
+    "country": "Jamaïque",
+    "ingredients": [
+      "ackee",
+      "morue salée",
+      "oignon",
+      "tomate",
+      "piment scotch bonnet",
+      "thym"
+    ],
+    "techniques": [
+      "dessaler et effeuiller la morue",
+      "sauter avec les aromates",
+      "ajouter l'ackee délicatement"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Callaloo (jamaïcain)",
+    "country": "Jamaïque",
+    "ingredients": [
+      "feuilles de callaloo (amarante) ou épinards",
+      "oignon",
+      "tomate",
+      "ail",
+      "thym",
+      "piment scotch bonnet"
+    ],
+    "techniques": [
+      "étuver les feuilles émincées avec les aromates"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Rice and peas",
+    "country": "Jamaïque",
+    "ingredients": [
+      "riz",
+      "haricots rouges",
+      "lait de coco",
+      "oignon vert",
+      "thym",
+      "piment scotch bonnet entier"
+    ],
+    "techniques": [
+      "cuire les haricots",
+      "cuire le riz dans le lait de coco et le bouillon"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Brown stew chicken",
+    "country": "Jamaïque",
+    "ingredients": [
+      "poulet",
+      "sucre roussi (browning)",
+      "oignon et poivron",
+      "tomate",
+      "thym",
+      "piment"
+    ],
+    "techniques": [
+      "mariner",
+      "dorer puis braiser en sauce brune"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Curry goat",
+    "country": "Jamaïque, Trinité-et-Tobago",
+    "ingredients": [
+      "cabri",
+      "poudre de curry",
+      "oignon et ail",
+      "thym",
+      "piment scotch bonnet",
+      "pomme de terre"
+    ],
+    "techniques": [
+      "mariner aux épices",
+      "braiser longuement"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Jerk chicken",
+    "country": "Jamaïque",
+    "ingredients": [
+      "poulet",
+      "piment scotch bonnet",
+      "piment de la Jamaïque (allspice)",
+      "oignon vert",
+      "thym",
+      "ail et gingembre"
+    ],
+    "techniques": [
+      "mariner dans la pâte jerk",
+      "griller lentement au feu de bois"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Escovitch fish",
+    "country": "Jamaïque",
+    "ingredients": [
+      "poisson entier (vivaneau)",
+      "vinaigre",
+      "oignon",
+      "carotte et poivron",
+      "piment",
+      "piment de la Jamaïque (allspice)"
+    ],
+    "techniques": [
+      "frire le poisson",
+      "napper de légumes marinés au vinaigre chaud"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Run down",
+    "country": "Jamaïque",
+    "ingredients": [
+      "maquereau salé ou poisson",
+      "lait de coco",
+      "oignon",
+      "tomate",
+      "thym",
+      "piment"
+    ],
+    "techniques": [
+      "réduire le lait de coco jusqu'à ce qu'il se sépare",
+      "mijoter le poisson dedans"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Cornmeal porridge",
+    "country": "Jamaïque",
+    "ingredients": [
+      "semoule de maïs fine",
+      "lait (ou lait de coco)",
+      "lait concentré sucré",
+      "cannelle et muscade",
+      "vanille"
+    ],
+    "techniques": [
+      "délayer la semoule",
+      "cuire en remuant jusqu'à épaississement"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Fried dumplings (Johnny cakes)",
+    "country": "Jamaïque",
+    "ingredients": [
+      "farine",
+      "levure chimique",
+      "sel",
+      "eau",
+      "huile de friture"
+    ],
+    "techniques": [
+      "pétrir une pâte ferme",
+      "frire en boules aplaties"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Doubles",
+    "country": "Trinité-et-Tobago",
+    "ingredients": [
+      "farine",
+      "curcuma",
+      "pois chiches (channa)",
+      "curry et cumin",
+      "chutney (tamarin, mangue)",
+      "piment"
+    ],
+    "techniques": [
+      "frire de petits pains plats (bara)",
+      "garnir de curry de pois chiches"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Curry channa and aloo",
+    "country": "Trinité-et-Tobago",
+    "ingredients": [
+      "pois chiches",
+      "pommes de terre",
+      "poudre de curry",
+      "oignon et ail",
+      "cumin (geera)",
+      "chadon béni (coriandre longue)"
+    ],
+    "techniques": [
+      "griller le curry dans l'huile",
+      "mijoter pois chiches et pommes de terre"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Dhalpuri roti",
+    "country": "Trinité-et-Tobago, Guyana",
+    "ingredients": [
+      "farine",
+      "pois cassés jaunes moulus épicés",
+      "cumin (geera)",
+      "ail",
+      "huile"
+    ],
+    "techniques": [
+      "farcir la pâte de pois cassés",
+      "étaler finement",
+      "cuire sur une plaque (tawa)"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Pelau",
+    "country": "Trinité-et-Tobago",
+    "ingredients": [
+      "poulet",
+      "riz",
+      "pois d'Angole",
+      "sucre caramélisé",
+      "lait de coco",
+      "potiron et carotte"
+    ],
+    "techniques": [
+      "caraméliser le sucre et y dorer le poulet",
+      "cuire le riz et les pois en une seule marmite"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Baigan choka",
+    "country": "Trinité-et-Tobago",
+    "ingredients": [
+      "aubergine",
+      "ail",
+      "oignon",
+      "tomate",
+      "piment"
+    ],
+    "techniques": [
+      "griller l'aubergine sur la flamme",
+      "écraser et arroser d'huile chaude aux aromates"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Buljol",
+    "country": "Trinité-et-Tobago",
+    "ingredients": [
+      "morue salée",
+      "tomate",
+      "oignon",
+      "poivron",
+      "piment",
+      "huile"
+    ],
+    "techniques": [
+      "dessaler et émietter la morue",
+      "mélanger aux crudités hachées"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Bake and saltfish",
+    "country": "Trinité-et-Tobago",
+    "ingredients": [
+      "farine",
+      "levure chimique",
+      "morue salée",
+      "oignon et tomate",
+      "huile de friture"
+    ],
+    "techniques": [
+      "frire des petits pains (fry bake)",
+      "garnir de morue sautée"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": ""
+  }
+]

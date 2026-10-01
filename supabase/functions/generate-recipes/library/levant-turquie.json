@@ -1,0 +1,450 @@
+[
+  {
+    "name": "Ful medames",
+    "country": "Égypte, Liban, Syrie, Palestine, Jordanie",
+    "ingredients": ["fèves sèches cuites (ful)", "ail", "citron", "huile d'olive", "cumin", "tomate, persil (en garniture)"],
+    "techniques": ["mijoter longuement les fèves", "écraser grossièrement et assaisonner"],
+    "moments": ["breakfast", "dinner"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Ta'ameya (falafel)",
+    "country": "Égypte (fèves), Liban, Syrie, Palestine, Jordanie, Israël (pois chiches)",
+    "ingredients": ["fèves sèches ou pois chiches trempés (non cuits)", "oignon et ail", "persil et coriandre", "cumin et coriandre moulue", "pain pita et tahini (pour servir)"],
+    "techniques": ["hacher cru les légumineuses trempées", "façonner des boulettes", "frire"],
+    "moments": ["breakfast", "lunch", "snack"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Hummus bi tahini",
+    "country": "Liban, Syrie, Palestine, Jordanie, Israël",
+    "ingredients": ["pois chiches cuits", "tahini", "citron", "ail", "huile d'olive"],
+    "techniques": ["mixer finement les pois chiches chauds", "monter avec le tahini et le citron"],
+    "moments": ["breakfast", "lunch", "dinner", "snack"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Fatteh hummus",
+    "country": "Syrie, Liban, Palestine, Jordanie",
+    "ingredients": ["pain pita rassis grillé ou frit", "pois chiches cuits", "yaourt à l'ail", "tahini", "pignons ou amandes grillés au beurre"],
+    "techniques": ["monter en couches pain, pois chiches chauds, sauce yaourt"],
+    "moments": ["breakfast", "lunch"],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Balila",
+    "country": "Liban, Syrie, Palestine",
+    "ingredients": ["pois chiches cuits chauds", "ail", "cumin", "citron", "huile d'olive"],
+    "techniques": ["assaisonner les pois chiches entiers encore chauds"],
+    "moments": ["breakfast", "snack"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Man'oushe za'atar",
+    "country": "Liban, Syrie, Palestine, Jordanie",
+    "ingredients": ["pâte à pain levée", "za'atar (thym, sumac, sésame)", "huile d'olive"],
+    "techniques": ["étaler la pâte", "napper du mélange za'atar-huile", "cuire au four très chaud"],
+    "moments": ["breakfast", "snack"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Labneh",
+    "country": "Liban, Syrie, Palestine, Jordanie",
+    "ingredients": ["yaourt égoutté", "sel", "huile d'olive", "za'atar ou menthe séchée", "pain, concombre, olives (pour servir)"],
+    "techniques": ["égoutter le yaourt salé dans un linge"],
+    "moments": ["breakfast", "dinner"],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Ka'ak al-Quds (pain au sésame)",
+    "country": "Palestine (Jérusalem)",
+    "ingredients": ["farine", "levure", "graines de sésame", "lait ou eau", "za'atar et œuf dur (pour servir)"],
+    "techniques": ["façonner des anneaux allongés", "rouler dans le sésame", "cuire au four"],
+    "moments": ["breakfast", "snack"],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Shakshuka",
+    "country": "Israël, Palestine (venue du Maghreb)",
+    "ingredients": ["œufs", "tomates", "poivrons", "oignon", "ail", "cumin et paprika"],
+    "techniques": ["mijoter une sauce tomate-poivron", "pocher les œufs dans la sauce"],
+    "moments": ["breakfast", "lunch", "dinner"],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Galayet bandora",
+    "country": "Jordanie, Palestine",
+    "ingredients": ["tomates", "ail", "piment vert", "huile d'olive", "pain pour saucer"],
+    "techniques": ["faire fondre les tomates à la poêle dans l'huile"],
+    "moments": ["breakfast", "lunch", "dinner"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Sabich",
+    "country": "Israël (d'origine juive irakienne)",
+    "ingredients": ["pain pita", "aubergine frite", "œuf dur", "tahini", "salade tomate-concombre", "amba (condiment à la mangue)"],
+    "techniques": ["frire les tranches d'aubergine", "garnir la pita"],
+    "moments": ["breakfast", "lunch", "snack"],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Menemen",
+    "country": "Turquie",
+    "ingredients": ["œufs", "tomates", "poivrons verts", "oignon (selon les familles)", "huile ou beurre", "piment (pul biber)"],
+    "techniques": ["fondre poivrons et tomates", "brouiller les œufs dedans"],
+    "moments": ["breakfast"],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Sucuklu yumurta",
+    "country": "Turquie",
+    "ingredients": ["sucuk (saucisse de bœuf épicée)", "œufs", "beurre"],
+    "techniques": ["dorer les rondelles de sucuk", "cuire les œufs au plat dessus"],
+    "moments": ["breakfast"],
+    "diet": ""
+  },
+  {
+    "name": "Çılbır",
+    "country": "Turquie",
+    "ingredients": ["œufs pochés", "yaourt à l'ail", "beurre fondu au piment (pul biber)", "pain"],
+    "techniques": ["pocher les œufs", "napper de beurre pimenté"],
+    "moments": ["breakfast"],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Simit",
+    "country": "Turquie",
+    "ingredients": ["farine", "levure", "mélasse de raisin (pekmez)", "graines de sésame"],
+    "techniques": ["torsader des anneaux", "tremper dans la mélasse diluée puis le sésame", "cuire au four"],
+    "moments": ["breakfast", "snack"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Gözleme",
+    "country": "Turquie",
+    "ingredients": ["pâte fine (farine, eau, sel)", "garniture : fromage frais et persil, épinards, pomme de terre ou viande hachée", "beurre"],
+    "techniques": ["étaler très finement", "garnir, plier et cuire sur une plaque (sac)"],
+    "moments": ["breakfast", "lunch", "snack"],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Börek (su böreği, sigara böreği)",
+    "country": "Turquie",
+    "ingredients": ["yufka (feuilles de pâte fine)", "fromage frais (beyaz peynir)", "persil", "œufs", "lait ou yaourt", "beurre ou huile"],
+    "techniques": ["monter en couches au four ou rouler en cigares frits"],
+    "moments": ["breakfast", "snack"],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Mercimek çorbası (shorbat adas)",
+    "country": "Turquie, Liban, Syrie, Palestine, Jordanie, Égypte",
+    "ingredients": ["lentilles corail", "oignon", "carotte", "cumin", "citron (au service)", "beurre ou huile"],
+    "techniques": ["mijoter puis mixer", "napper de beurre au piment (Turquie)"],
+    "moments": ["breakfast", "lunch", "dinner"],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Ezogelin çorbası",
+    "country": "Turquie",
+    "ingredients": ["lentilles corail", "boulgour fin", "riz", "concentré de tomate et de poivron", "menthe séchée", "piment"],
+    "techniques": ["mijoter jusqu'à épaississement", "parfumer à la menthe frite dans le beurre ou l'huile"],
+    "moments": ["lunch", "dinner"],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Tarhana çorbası",
+    "country": "Turquie",
+    "ingredients": ["tarhana (poudre fermentée de yaourt, farine et légumes)", "concentré de tomate", "beurre", "menthe séchée"],
+    "techniques": ["délayer la tarhana à froid", "mijoter en remuant"],
+    "moments": ["breakfast", "lunch", "dinner"],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Mujaddara",
+    "country": "Liban, Syrie, Palestine, Jordanie",
+    "ingredients": ["lentilles brunes", "riz ou boulgour", "oignons", "huile d'olive", "cumin"],
+    "techniques": ["cuire lentilles et céréale ensemble", "frire les oignons jusqu'à caramélisation"],
+    "moments": ["lunch", "dinner"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Koshari",
+    "country": "Égypte",
+    "ingredients": ["riz", "lentilles brunes", "petites pâtes (vermicelles, coudes)", "pois chiches", "sauce tomate vinaigrée à l'ail", "oignons frits"],
+    "techniques": ["cuire séparément les féculents", "monter en couches", "napper de sauce et d'oignons frits"],
+    "moments": ["lunch", "dinner", "snack"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Tabbouleh",
+    "country": "Liban, Syrie",
+    "ingredients": ["persil plat (en grande quantité)", "boulgour fin", "tomates", "menthe", "oignon nouveau", "citron et huile d'olive"],
+    "techniques": ["hacher finement le persil", "assaisonner au citron"],
+    "moments": ["lunch", "dinner"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Fattoush",
+    "country": "Liban, Syrie, Palestine",
+    "ingredients": ["pain pita rassis grillé ou frit", "laitue", "tomates", "concombre", "radis", "sumac", "mélasse de grenade ou citron"],
+    "techniques": ["griller le pain rassis", "assaisonner au sumac"],
+    "moments": ["lunch", "dinner"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Kısır",
+    "country": "Turquie",
+    "ingredients": ["boulgour fin", "concentré de tomate et de poivron", "persil", "oignon nouveau", "citron ou mélasse de grenade", "huile d'olive"],
+    "techniques": ["gonfler le boulgour à l'eau chaude", "pétrir avec les concentrés"],
+    "moments": ["lunch", "snack"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Moutabal (baba ghanouj)",
+    "country": "Liban, Syrie, Palestine, Jordanie, Israël",
+    "ingredients": ["aubergines", "tahini", "ail", "citron", "huile d'olive"],
+    "techniques": ["griller les aubergines à la flamme", "écraser la chair fumée"],
+    "moments": ["lunch", "dinner", "snack"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Salade israélienne (salat katzutz)",
+    "country": "Israël, Palestine",
+    "ingredients": ["tomates", "concombres", "oignon", "persil", "citron et huile d'olive"],
+    "techniques": ["couper en tout petits dés"],
+    "moments": ["breakfast", "lunch", "dinner"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Imam bayıldı",
+    "country": "Turquie",
+    "ingredients": ["aubergines", "oignons", "tomates", "ail", "persil", "huile d'olive"],
+    "techniques": ["frire les aubergines entières", "farcir d'oignons fondus", "cuire à l'étouffée, servir tiède"],
+    "moments": ["lunch", "dinner"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Taze fasulye zeytinyağlı (loubieh bi zeit)",
+    "country": "Turquie, Liban, Syrie",
+    "ingredients": ["haricots verts plats", "tomates", "oignon", "ail (au Levant)", "huile d'olive"],
+    "techniques": ["mijoter à l'étouffée dans l'huile d'olive", "servir tiède ou froid"],
+    "moments": ["lunch", "dinner"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Kuru fasulye",
+    "country": "Turquie",
+    "ingredients": ["haricots blancs secs", "oignon", "concentré de tomate et de poivron", "viande de bœuf ou pastırma (souvent)", "beurre ou huile"],
+    "techniques": ["tremper la veille", "mijoter longuement"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Pilav (roz bi sh'arieh)",
+    "country": "Turquie, Liban, Syrie, Égypte",
+    "ingredients": ["riz", "vermicelles (şehriye, sh'arieh)", "beurre ou huile", "bouillon ou eau"],
+    "techniques": ["dorer les vermicelles dans le beurre", "cuire le riz par absorption"],
+    "moments": ["lunch", "dinner"],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Bulgur pilavı",
+    "country": "Turquie",
+    "ingredients": ["boulgour gros", "oignon", "tomate ou concentré", "poivron vert", "beurre ou huile"],
+    "techniques": ["revenir l'oignon et la tomate", "cuire le boulgour par absorption"],
+    "moments": ["lunch", "dinner"],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Yaprak sarma zeytinyağlı (warak enab bi zeit)",
+    "country": "Turquie, Liban, Syrie, Palestine",
+    "ingredients": ["feuilles de vigne", "riz", "oignon", "herbes (persil, menthe)", "citron", "huile d'olive"],
+    "techniques": ["rouler serré les feuilles farcies", "cuire à l'étouffée sous une assiette"],
+    "moments": ["lunch", "dinner", "snack"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Mahshi kousa",
+    "country": "Liban, Syrie, Palestine, Jordanie, Égypte",
+    "ingredients": ["petites courgettes", "riz", "viande hachée", "tomate (sauce) ou yaourt", "menthe séchée et ail"],
+    "techniques": ["évider les courgettes", "farcir de riz cru et viande", "mijoter dans la sauce"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Karnıyarık",
+    "country": "Turquie",
+    "ingredients": ["aubergines", "viande hachée", "oignon", "tomates", "poivron vert", "ail"],
+    "techniques": ["frire les aubergines", "fendre et farcir de viande", "cuire au four"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Mantı",
+    "country": "Turquie",
+    "ingredients": ["pâte (farine, œuf, eau)", "viande hachée et oignon", "yaourt à l'ail", "beurre au piment", "menthe séchée"],
+    "techniques": ["façonner de minuscules raviolis", "pocher", "napper de yaourt et de beurre pimenté"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Köfte",
+    "country": "Turquie",
+    "ingredients": ["viande hachée (bœuf, agneau)", "oignon râpé", "chapelure ou pain rassis", "cumin", "persil"],
+    "techniques": ["pétrir la viande", "façonner", "griller ou poêler"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Kafta bil sayniyeh",
+    "country": "Liban, Syrie, Palestine, Jordanie",
+    "ingredients": ["viande hachée", "oignon et persil hachés", "pommes de terre en rondelles", "tomates", "sept épices (baharat)"],
+    "techniques": ["étaler la kafta dans un plat", "couvrir de légumes", "cuire au four"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Kebbeh bil sayniyeh",
+    "country": "Liban, Syrie",
+    "ingredients": ["boulgour fin", "viande maigre hachée (agneau ou bœuf)", "oignon", "pignons", "sept épices (baharat)", "beurre clarifié ou huile"],
+    "techniques": ["pétrir boulgour et viande en pâte", "monter en deux couches autour d'une farce", "cuire au four"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Bamia (ragoût de gombos)",
+    "country": "Égypte, Irak, Liban, Syrie, Palestine",
+    "ingredients": ["gombos", "viande d'agneau ou de bœuf", "tomates (concentré)", "ail", "coriandre", "citron"],
+    "techniques": ["revenir la viande", "mijoter avec les gombos et la tomate"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Molokhia",
+    "country": "Égypte, Liban, Syrie, Palestine, Jordanie",
+    "ingredients": ["feuilles de corète (fraîches, hachées ou séchées)", "bouillon de poulet (ou lapin)", "ail", "coriandre", "riz ou pain (pour servir)"],
+    "techniques": ["cuire les feuilles dans le bouillon", "verser l'ail frit à la coriandre (taqliya)"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Maqluba",
+    "country": "Palestine, Jordanie, Syrie",
+    "ingredients": ["riz", "poulet ou agneau", "aubergine frite", "chou-fleur frit (ou pomme de terre)", "épices (baharat, curcuma)"],
+    "techniques": ["monter en couches dans la marmite", "cuire le riz par absorption", "retourner sur le plat"],
+    "moments": ["lunch"],
+    "diet": ""
+  },
+  {
+    "name": "Musakhan",
+    "country": "Palestine",
+    "ingredients": ["poulet", "pain taboon (ou pain plat)", "oignons", "sumac", "huile d'olive", "pignons"],
+    "techniques": ["fondre longuement les oignons au sumac", "rôtir le poulet", "imbiber le pain d'huile et le garnir"],
+    "moments": ["lunch"],
+    "diet": ""
+  },
+  {
+    "name": "Mansaf",
+    "country": "Jordanie, Palestine",
+    "ingredients": ["agneau", "jameed (yaourt séché fermenté)", "riz", "pain shrak", "amandes ou pignons grillés"],
+    "techniques": ["cuire l'agneau dans la sauce jameed", "servir sur riz et pain"],
+    "moments": ["lunch"],
+    "diet": ""
+  },
+  {
+    "name": "Shish tawook",
+    "country": "Liban, Syrie, Jordanie, Turquie (tavuk şiş)",
+    "ingredients": ["blanc de poulet", "yaourt", "ail", "citron", "concentré de tomate ou paprika"],
+    "techniques": ["mariner", "griller en brochettes"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Musaqa'a",
+    "country": "Liban, Syrie",
+    "ingredients": ["aubergines", "pois chiches", "tomates", "oignon", "ail", "huile d'olive"],
+    "techniques": ["frire ou rôtir les aubergines", "mijoter avec tomate et pois chiches", "servir tiède"],
+    "moments": ["lunch", "dinner"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Sayadieh",
+    "country": "Liban, Syrie (côte), Palestine",
+    "ingredients": ["poisson blanc", "riz", "oignons très caramélisés", "cumin", "pignons ou amandes"],
+    "techniques": ["caraméliser les oignons", "cuire le riz dans le bouillon d'oignons et de poisson"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Samke harra",
+    "country": "Liban, Syrie",
+    "ingredients": ["poisson (entier ou filets)", "tahini", "citron", "ail", "piment", "coriandre et noix"],
+    "techniques": ["cuire le poisson au four", "napper de sauce tahini pimentée"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Lahmacun",
+    "country": "Turquie, Syrie (lahm bi ajeen)",
+    "ingredients": ["pâte fine", "viande hachée", "tomates", "oignon", "poivron et piment", "persil, citron (pour servir)"],
+    "techniques": ["étaler une farce crue sur la pâte", "cuire au four très chaud"],
+    "moments": ["lunch", "snack"],
+    "diet": ""
+  },
+  {
+    "name": "Fatayer sabanekh",
+    "country": "Liban, Syrie, Palestine, Jordanie",
+    "ingredients": ["pâte à pain", "épinards", "oignon", "sumac", "citron", "huile d'olive"],
+    "techniques": ["dégorger les épinards au sel", "fermer en triangles", "cuire au four"],
+    "moments": ["breakfast", "snack"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Hawawshi",
+    "country": "Égypte",
+    "ingredients": ["pain baladi (pain rond)", "viande hachée", "oignon", "poivron et piment", "épices"],
+    "techniques": ["garnir le pain de viande crue assaisonnée", "cuire au four"],
+    "moments": ["lunch", "snack"],
+    "diet": ""
+  },
+  {
+    "name": "Shawarma",
+    "country": "Liban, Syrie, Palestine, Jordanie, Israël, Turquie (döner)",
+    "ingredients": ["poulet ou viande marinée en fines tranches", "pain pita ou markouk", "toum (crème d'ail) ou tahini", "pickles", "épices (cumin, cardamome, paprika)"],
+    "techniques": ["mariner", "griller ou rôtir les tranches de viande", "rouler dans le pain"],
+    "moments": ["lunch", "dinner", "snack"],
+    "diet": ""
+  },
+  {
+    "name": "Tashreeb",
+    "country": "Irak",
+    "ingredients": ["pain plat rassis (khubz)", "bouillon de poulet, d'agneau ou de haricots", "pois chiches", "oignon", "loomi (citron séché)"],
+    "techniques": ["mijoter le bouillon", "le verser sur le pain déchiré"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Dolma irakienne",
+    "country": "Irak",
+    "ingredients": ["feuilles de vigne, oignons, courgettes, aubergines et poivrons évidés", "riz", "viande hachée", "tomate", "mélasse de grenade ou citron"],
+    "techniques": ["farcir les légumes et rouler les feuilles", "cuire serrés dans une marmite"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Roz bel laban (sütlaç)",
+    "country": "Égypte, Liban, Syrie, Turquie",
+    "ingredients": ["riz", "lait", "sucre", "eau de rose ou de fleur d'oranger (Levant), vanille ou cannelle (Turquie)"],
+    "techniques": ["cuire le riz dans le lait en remuant", "servir frais (gratiné au four pour le fırın sütlaç)"],
+    "moments": ["snack"],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Ma'amoul",
+    "country": "Liban, Syrie, Palestine, Jordanie, Égypte",
+    "ingredients": ["semoule (et farine)", "beurre clarifié", "dattes, noix ou pistaches", "eau de rose ou de fleur d'oranger"],
+    "techniques": ["sabler la semoule au beurre", "farcir et mouler", "cuire au four"],
+    "moments": ["snack", "breakfast"],
+    "diet": "vegetarian"
+  }
+]

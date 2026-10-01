@@ -1,0 +1,1187 @@
+[
+  {
+    "name": "Baizhou (congee, bouillie de riz)",
+    "country": "Chine",
+    "ingredients": [
+      "riz",
+      "eau",
+      "accompagnements salés (légumes marinés zhacai, œuf salé, cacahuètes, tofu fermenté)"
+    ],
+    "techniques": [
+      "cuire longuement le riz dans beaucoup d'eau jusqu'à épaississement"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Youtiao (beignet allongé)",
+    "country": "Chine, Taïwan",
+    "ingredients": [
+      "farine de blé",
+      "levure ou bicarbonate",
+      "sel",
+      "huile de friture"
+    ],
+    "techniques": [
+      "laisser reposer la pâte",
+      "frire deux bandes de pâte collées"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Doujiang (lait de soja chaud)",
+    "country": "Chine, Taïwan",
+    "ingredients": [
+      "soja jaune trempé",
+      "eau",
+      "sucre (ou version salée : sauce soja, vinaigre, ciboule)"
+    ],
+    "techniques": [
+      "mixer et filtrer le soja",
+      "faire bouillir le lait"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Baozi (brioches farcies à la vapeur)",
+    "country": "Chine",
+    "ingredients": [
+      "farine de blé",
+      "levure",
+      "porc haché (ou farce de légumes : chou, champignons, vermicelles)",
+      "ciboule",
+      "gingembre",
+      "sauce soja"
+    ],
+    "techniques": [
+      "pâte levée",
+      "farcir et plisser",
+      "cuire à la vapeur"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Jianbing (crêpe salée de rue)",
+    "country": "Chine du Nord (Tianjin, Shandong, Pékin)",
+    "ingredients": [
+      "farine (blé, haricot mungo)",
+      "œuf",
+      "ciboule et coriandre",
+      "sauce de soja fermenté (tianmianjiang) et sauce pimentée",
+      "galette frite croustillante (ou youtiao)"
+    ],
+    "techniques": [
+      "étaler une crêpe fine sur plaque",
+      "casser l'œuf dessus et replier"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Cong you bing (galette à la ciboule)",
+    "country": "Chine, Taïwan",
+    "ingredients": [
+      "farine de blé",
+      "ciboule",
+      "huile",
+      "sel"
+    ],
+    "techniques": [
+      "étaler, huiler, rouler en spirale",
+      "poêler"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Chaye dan (œufs au thé)",
+    "country": "Chine, Taïwan",
+    "ingredients": [
+      "œufs",
+      "thé noir",
+      "sauce soja",
+      "anis étoilé et cannelle"
+    ],
+    "techniques": [
+      "cuire les œufs, fêler la coquille",
+      "laisser infuser dans le bouillon"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Jiaozi (raviolis)",
+    "country": "Chine (surtout le Nord)",
+    "ingredients": [
+      "farine de blé",
+      "porc haché",
+      "chou chinois (ou ciboule chinoise)",
+      "gingembre",
+      "sauce soja",
+      "huile de sésame"
+    ],
+    "techniques": [
+      "pétrir une pâte à l'eau",
+      "farcir et plier",
+      "pocher (ou poêler : guotie)"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Xihongshi chao jidan (œufs brouillés à la tomate)",
+    "country": "Chine",
+    "ingredients": [
+      "tomates",
+      "œufs",
+      "ciboule",
+      "sucre",
+      "sel"
+    ],
+    "techniques": [
+      "brouiller les œufs au wok",
+      "sauter les tomates et remettre les œufs"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Chaofan (riz sauté)",
+    "country": "Chine",
+    "ingredients": [
+      "riz cuit de la veille",
+      "œuf",
+      "ciboule",
+      "légumes en dés (petits pois, carotte)",
+      "jambon, porc grillé ou crevettes",
+      "sauce soja"
+    ],
+    "techniques": [
+      "sauter à feu vif au wok",
+      "égrainer le riz froid"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Mapo doufu (tofu sauce pimentée)",
+    "country": "Chine (Sichuan)",
+    "ingredients": [
+      "tofu",
+      "porc ou bœuf haché",
+      "doubanjiang (pâte de fèves pimentée)",
+      "poivre du Sichuan",
+      "ail",
+      "ciboule"
+    ],
+    "techniques": [
+      "revenir la viande et la pâte pimentée",
+      "mijoter le tofu",
+      "lier à la fécule"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Gongbao jiding (poulet aux cacahuètes)",
+    "country": "Chine (Sichuan, Guizhou)",
+    "ingredients": [
+      "poulet en dés",
+      "cacahuètes",
+      "piments secs",
+      "poivre du Sichuan",
+      "ciboule",
+      "vinaigre noir et sucre",
+      "sauce soja"
+    ],
+    "techniques": [
+      "mariner le poulet",
+      "sauter au wok à feu vif"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Yuxiang qiezi (aubergines « parfum poisson »)",
+    "country": "Chine (Sichuan)",
+    "ingredients": [
+      "aubergines",
+      "pâte de piment (doubanjiang ou paojiao)",
+      "ail et gingembre",
+      "vinaigre",
+      "sucre",
+      "sauce soja"
+    ],
+    "techniques": [
+      "frire ou sauter les aubergines",
+      "napper de sauce aigre-douce pimentée"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Suanla tudousi (pommes de terre en julienne aigres-piquantes)",
+    "country": "Chine",
+    "ingredients": [
+      "pommes de terre",
+      "vinaigre",
+      "piments secs",
+      "ail",
+      "poivre du Sichuan"
+    ],
+    "techniques": [
+      "tailler en julienne et rincer l'amidon",
+      "sauter brièvement à feu vif"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Qingchao shucai (légumes verts sautés à l'ail)",
+    "country": "Chine",
+    "ingredients": [
+      "légume vert (pak-choï, choy sum, liseron d'eau, épinards)",
+      "ail",
+      "huile",
+      "sel"
+    ],
+    "techniques": [
+      "sauter très vite au wok à feu vif"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Pai huanggua (concombre écrasé)",
+    "country": "Chine",
+    "ingredients": [
+      "concombre",
+      "ail",
+      "vinaigre noir",
+      "sauce soja",
+      "huile pimentée ou huile de sésame"
+    ],
+    "techniques": [
+      "écraser le concombre au plat du couteau",
+      "assaisonner à cru"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Hongshao rou (porc braisé rouge)",
+    "country": "Chine (Shanghai, Hunan, Jiangnan)",
+    "ingredients": [
+      "poitrine de porc",
+      "sauce soja",
+      "sucre (candi)",
+      "vin de Shaoxing",
+      "gingembre",
+      "anis étoilé"
+    ],
+    "techniques": [
+      "caraméliser le sucre",
+      "braiser longuement"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Qingzheng yu (poisson entier à la vapeur)",
+    "country": "Chine (Canton), Hong Kong",
+    "ingredients": [
+      "poisson entier (bar, tilapia, dorade)",
+      "gingembre",
+      "ciboule",
+      "sauce soja",
+      "huile chaude"
+    ],
+    "techniques": [
+      "cuire à la vapeur",
+      "arroser d'huile fumante sur la ciboule"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Baiqie ji (poulet poché, sauce gingembre-ciboule)",
+    "country": "Chine (Canton), Hong Kong",
+    "ingredients": [
+      "poulet entier",
+      "gingembre",
+      "ciboule",
+      "sel",
+      "huile"
+    ],
+    "techniques": [
+      "pocher à frémissement",
+      "plonger dans l'eau glacée",
+      "huile chaude sur gingembre et ciboule"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Zhajiang mian (nouilles à la sauce de soja fermenté)",
+    "country": "Chine (Pékin, Shandong)",
+    "ingredients": [
+      "nouilles de blé",
+      "porc haché",
+      "pâte de soja fermenté (huangjiang, tianmianjiang)",
+      "concombre en julienne",
+      "ciboule"
+    ],
+    "techniques": [
+      "frire la pâte avec la viande",
+      "servir sur nouilles avec crudités"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Huoguo (fondue chinoise)",
+    "country": "Chine (Sichuan, Chongqing, Pékin), Taïwan",
+    "ingredients": [
+      "bouillon (pimenté ou clair)",
+      "viande en tranches fines (bœuf, agneau)",
+      "tofu",
+      "légumes à feuilles",
+      "champignons",
+      "sauce de trempage (sésame, ail)"
+    ],
+    "techniques": [
+      "cuire à table dans le bouillon frémissant"
+    ],
+    "moments": [
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Zongzi (riz gluant en feuilles de bambou)",
+    "country": "Chine, Taïwan",
+    "ingredients": [
+      "riz gluant",
+      "feuilles de bambou",
+      "poitrine de porc marinée (ou jujubes, pâte de haricot rouge)",
+      "jaune d'œuf salé",
+      "sauce soja"
+    ],
+    "techniques": [
+      "envelopper et ficeler",
+      "bouillir longuement"
+    ],
+    "moments": [
+      "lunch",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Miso shiru (soupe miso)",
+    "country": "Japon",
+    "ingredients": [
+      "dashi (kombu, bonite séchée)",
+      "miso",
+      "tofu",
+      "wakame",
+      "ciboule"
+    ],
+    "techniques": [
+      "préparer le dashi",
+      "délayer le miso hors ébullition"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Onigiri (boule de riz)",
+    "country": "Japon",
+    "ingredients": [
+      "riz japonais",
+      "sel",
+      "nori",
+      "garniture (umeboshi, saumon grillé émietté, thon-mayonnaise, konbu)"
+    ],
+    "techniques": [
+      "façonner le riz tiède à la main salée"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Tamagoyaki (omelette roulée)",
+    "country": "Japon",
+    "ingredients": [
+      "œufs",
+      "dashi",
+      "sucre",
+      "sauce soja (ou sel)"
+    ],
+    "techniques": [
+      "cuire en couches fines et rouler dans la poêle"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Natto gohan (riz au soja fermenté)",
+    "country": "Japon",
+    "ingredients": [
+      "natto",
+      "riz",
+      "sauce (soja, dashi)",
+      "moutarde karashi",
+      "ciboule"
+    ],
+    "techniques": [
+      "battre le natto pour le rendre filant",
+      "servir sur riz chaud"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Shiozake (saumon salé grillé)",
+    "country": "Japon",
+    "ingredients": [
+      "saumon (ou maquereau, saba)",
+      "sel",
+      "daikon râpé (accompagnement)"
+    ],
+    "techniques": [
+      "saler",
+      "griller"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Zōsui (riz cuit en bouillon)",
+    "country": "Japon",
+    "ingredients": [
+      "riz cuit",
+      "dashi",
+      "œuf",
+      "légumes (champignons, carotte, ciboule)",
+      "sauce soja"
+    ],
+    "techniques": [
+      "mijoter le riz cuit dans le bouillon",
+      "lier à l'œuf battu"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Nikujaga (ragoût viande et pommes de terre)",
+    "country": "Japon",
+    "ingredients": [
+      "bœuf ou porc en tranches fines",
+      "pommes de terre",
+      "oignon",
+      "carotte",
+      "sauce soja, mirin et sucre",
+      "dashi"
+    ],
+    "techniques": [
+      "revenir puis mijoter à couvert"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Karē raisu (curry japonais)",
+    "country": "Japon",
+    "ingredients": [
+      "roux de curry",
+      "pommes de terre",
+      "carottes",
+      "oignons",
+      "viande (porc, bœuf, poulet)",
+      "riz"
+    ],
+    "techniques": [
+      "revenir puis mijoter",
+      "lier avec le roux"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Oyakodon (bol de riz poulet et œuf)",
+    "country": "Japon",
+    "ingredients": [
+      "poulet",
+      "œufs",
+      "oignon",
+      "dashi",
+      "sauce soja et mirin",
+      "riz"
+    ],
+    "techniques": [
+      "mijoter dans le bouillon sucré-salé",
+      "verser l'œuf et cuire à peine"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Yakisoba (nouilles sautées)",
+    "country": "Japon",
+    "ingredients": [
+      "nouilles de blé",
+      "chou",
+      "porc en tranches",
+      "carotte et oignon",
+      "sauce yakisoba (type Worcestershire)"
+    ],
+    "techniques": [
+      "sauter à la plaque ou à la poêle"
+    ],
+    "moments": [
+      "lunch",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Okonomiyaki (galette au chou)",
+    "country": "Japon (Osaka, Hiroshima)",
+    "ingredients": [
+      "farine",
+      "chou émincé",
+      "œufs",
+      "dashi",
+      "poitrine de porc (ou fruits de mer)",
+      "sauce okonomi et mayonnaise"
+    ],
+    "techniques": [
+      "mélanger la pâte au chou",
+      "cuire épais à la plaque"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Tonjiru (soupe miso au porc)",
+    "country": "Japon",
+    "ingredients": [
+      "porc en tranches",
+      "daikon",
+      "carotte",
+      "bardane (gobō)",
+      "miso",
+      "dashi"
+    ],
+    "techniques": [
+      "revenir le porc",
+      "mijoter les racines",
+      "délayer le miso"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Kinpira gobō (bardane et carotte sautées)",
+    "country": "Japon",
+    "ingredients": [
+      "bardane (gobō)",
+      "carotte",
+      "sauce soja",
+      "mirin et sucre",
+      "sésame",
+      "piment"
+    ],
+    "techniques": [
+      "tailler en julienne",
+      "sauter puis glacer"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Hōrensō no goma-ae (épinards au sésame)",
+    "country": "Japon",
+    "ingredients": [
+      "épinards",
+      "sésame grillé",
+      "sauce soja",
+      "sucre"
+    ],
+    "techniques": [
+      "blanchir et essorer",
+      "assaisonner au sésame pilé"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Asazuke (légumes marinés minute)",
+    "country": "Japon",
+    "ingredients": [
+      "légumes (concombre, chou, daikon, navet)",
+      "sel",
+      "kombu",
+      "piment"
+    ],
+    "techniques": [
+      "saler et presser quelques heures"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Kimchi jjigae (ragoût de kimchi)",
+    "country": "Corée",
+    "ingredients": [
+      "kimchi bien fermenté",
+      "porc (ou thon en conserve)",
+      "tofu",
+      "gochugaru",
+      "oignon",
+      "ciboule"
+    ],
+    "techniques": [
+      "revenir le kimchi avec le porc",
+      "mijoter"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Doenjang jjigae (ragoût de pâte de soja)",
+    "country": "Corée",
+    "ingredients": [
+      "doenjang",
+      "tofu",
+      "courgette",
+      "pomme de terre et oignon",
+      "piment",
+      "bouillon d'anchois séchés"
+    ],
+    "techniques": [
+      "délayer la pâte dans le bouillon",
+      "mijoter"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Kimchi bokkeumbap (riz sauté au kimchi)",
+    "country": "Corée",
+    "ingredients": [
+      "riz cuit",
+      "kimchi",
+      "œuf au plat",
+      "oignon",
+      "huile de sésame",
+      "porc, jambon ou spam (facultatif)"
+    ],
+    "techniques": [
+      "sauter le kimchi puis le riz"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Bibimbap",
+    "country": "Corée",
+    "ingredients": [
+      "riz",
+      "namul (légumes assaisonnés)",
+      "gochujang",
+      "œuf",
+      "huile de sésame",
+      "bœuf haché (facultatif)"
+    ],
+    "techniques": [
+      "préparer chaque légume séparément",
+      "mélanger au moment de manger"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Namul (légumes assaisonnés : kongnamul, sigeumchi)",
+    "country": "Corée",
+    "ingredients": [
+      "légume (pousses de soja, épinards, fougère)",
+      "ail",
+      "huile de sésame",
+      "sel ou sauce soja",
+      "sésame"
+    ],
+    "techniques": [
+      "blanchir",
+      "assaisonner à la main"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Gyeran jjim (œufs vapeur)",
+    "country": "Corée",
+    "ingredients": [
+      "œufs",
+      "eau ou bouillon",
+      "ciboule",
+      "sel ou crevettes salées (saeujeot)"
+    ],
+    "techniques": [
+      "battre et cuire à la vapeur ou au poêlon"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Miyeokguk (soupe d'algues)",
+    "country": "Corée",
+    "ingredients": [
+      "algue wakame (miyeok)",
+      "bœuf (ou moules)",
+      "huile de sésame",
+      "ail",
+      "sauce soja pour soupe"
+    ],
+    "techniques": [
+      "revenir l'algue et la viande à l'huile de sésame",
+      "mijoter"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pajeon (galette à la ciboule)",
+    "country": "Corée",
+    "ingredients": [
+      "farine",
+      "ciboule",
+      "œuf",
+      "eau",
+      "fruits de mer ou kimchi (variantes haemul pajeon, kimchijeon)"
+    ],
+    "techniques": [
+      "poêler une galette fine et croustillante"
+    ],
+    "moments": [
+      "lunch",
+      "dinner",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Tteokbokki (gâteaux de riz pimentés)",
+    "country": "Corée",
+    "ingredients": [
+      "gâteaux de riz (tteok)",
+      "gochujang",
+      "gochugaru",
+      "sucre",
+      "galettes de poisson (eomuk)",
+      "ciboule"
+    ],
+    "techniques": [
+      "mijoter jusqu'à sauce épaisse"
+    ],
+    "moments": [
+      "snack",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Kimbap (rouleau de riz)",
+    "country": "Corée",
+    "ingredients": [
+      "riz assaisonné à l'huile de sésame",
+      "algue gim",
+      "carotte, épinards",
+      "omelette",
+      "radis jaune mariné (danmuji)",
+      "jambon, surimi ou thon"
+    ],
+    "techniques": [
+      "rouler avec une natte",
+      "trancher"
+    ],
+    "moments": [
+      "lunch",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Bulgogi (bœuf mariné)",
+    "country": "Corée",
+    "ingredients": [
+      "bœuf en tranches fines",
+      "sauce soja",
+      "sucre",
+      "poire nashi râpée",
+      "ail",
+      "huile de sésame"
+    ],
+    "techniques": [
+      "mariner",
+      "sauter ou griller"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Japchae (nouilles de patate douce sautées)",
+    "country": "Corée",
+    "ingredients": [
+      "nouilles de patate douce (dangmyeon)",
+      "épinards",
+      "carotte et oignon",
+      "champignons",
+      "bœuf (facultatif)",
+      "sauce soja, sucre, huile de sésame"
+    ],
+    "techniques": [
+      "cuire chaque élément séparément",
+      "mélanger et assaisonner"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Tteokguk (soupe de gâteaux de riz du Nouvel An)",
+    "country": "Corée",
+    "ingredients": [
+      "tranches de gâteau de riz (tteok)",
+      "bouillon de bœuf (ou d'anchois)",
+      "œuf",
+      "algue gim",
+      "ciboule"
+    ],
+    "techniques": [
+      "mijoter le tteok dans le bouillon",
+      "garnir d'œuf en lanières"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Hobakjuk (bouillie de potiron)",
+    "country": "Corée",
+    "ingredients": [
+      "potiron",
+      "farine de riz gluant",
+      "sucre",
+      "sel"
+    ],
+    "techniques": [
+      "cuire et écraser le potiron",
+      "lier à la farine de riz"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Hotteok (crêpe fourrée au sucre)",
+    "country": "Corée",
+    "ingredients": [
+      "farine",
+      "levure",
+      "cassonade",
+      "cannelle",
+      "graines ou noix concassées"
+    ],
+    "techniques": [
+      "pâte levée fourrée",
+      "aplatir à la poêle"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Lu rou fan (riz au porc braisé)",
+    "country": "Taïwan",
+    "ingredients": [
+      "poitrine de porc hachée ou en petits dés",
+      "sauce soja",
+      "échalotes frites",
+      "sucre",
+      "cinq-épices",
+      "riz",
+      "œuf dur braisé"
+    ],
+    "techniques": [
+      "braiser longuement"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Fan tuan (boule de riz gluant)",
+    "country": "Taïwan, Shanghai",
+    "ingredients": [
+      "riz gluant",
+      "youtiao",
+      "porc filoché séché (rousong)",
+      "légumes marinés",
+      "œuf (facultatif)"
+    ],
+    "techniques": [
+      "étaler le riz chaud",
+      "garnir et serrer en boule"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Dan bing (crêpe à l'œuf)",
+    "country": "Taïwan",
+    "ingredients": [
+      "pâte à crêpe fine (farine, eau)",
+      "œuf",
+      "ciboule",
+      "sauce soja épaisse ou sauce pimentée"
+    ],
+    "techniques": [
+      "cuire la crêpe sur l'œuf",
+      "rouler et couper"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Niurou mian (soupe de nouilles au bœuf braisé)",
+    "country": "Taïwan",
+    "ingredients": [
+      "bœuf (jarret)",
+      "doubanjiang",
+      "sauce soja",
+      "tomate, gingembre, anis étoilé",
+      "nouilles de blé",
+      "chou chinois"
+    ],
+    "techniques": [
+      "braiser le bœuf en bouillon épicé",
+      "servir sur nouilles"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Buuz (raviolis vapeur)",
+    "country": "Mongolie",
+    "ingredients": [
+      "mouton (ou bœuf) haché",
+      "oignon",
+      "ail",
+      "farine de blé",
+      "sel"
+    ],
+    "techniques": [
+      "farcir et plisser en laissant une ouverture",
+      "cuire à la vapeur"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Khuushuur (chausson frit)",
+    "country": "Mongolie",
+    "ingredients": [
+      "mouton (ou bœuf) haché",
+      "oignon",
+      "farine de blé",
+      "sel"
+    ],
+    "techniques": [
+      "farcir et aplatir",
+      "frire"
+    ],
+    "moments": [
+      "lunch",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Tsuivan (nouilles sautées à l'étuvée)",
+    "country": "Mongolie",
+    "ingredients": [
+      "nouilles maison (farine, eau)",
+      "mouton ou bœuf",
+      "carotte",
+      "chou",
+      "oignon"
+    ],
+    "techniques": [
+      "revenir la viande et les légumes",
+      "étuver les nouilles à couvert dessus"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  }
+]

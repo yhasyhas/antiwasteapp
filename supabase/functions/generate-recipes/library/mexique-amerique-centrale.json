@@ -1,0 +1,1197 @@
+[
+  {
+    "name": "Chilaquiles",
+    "country": "Mexique",
+    "ingredients": [
+      "tortillas de maïs rassises",
+      "salsa verde (tomatille) ou salsa roja (tomate, piment)",
+      "crème",
+      "fromage frais",
+      "oignon",
+      "œuf ou poulet effiloché (facultatif)"
+    ],
+    "techniques": [
+      "frire les tortillas en triangles",
+      "les enrober de salsa chaude"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Huevos rancheros",
+    "country": "Mexique",
+    "ingredients": [
+      "œufs",
+      "tortillas de maïs",
+      "sauce tomate au piment",
+      "haricots refrits (facultatif)"
+    ],
+    "techniques": [
+      "frire les œufs au plat",
+      "napper de sauce sur la tortilla chaude"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Huevos a la mexicana",
+    "country": "Mexique",
+    "ingredients": [
+      "œufs",
+      "tomate",
+      "oignon",
+      "piment vert (serrano, jalapeño)"
+    ],
+    "techniques": [
+      "revenir tomate, oignon et piment",
+      "brouiller les œufs dedans"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Molletes",
+    "country": "Mexique",
+    "ingredients": [
+      "pain (bolillo)",
+      "haricots refrits",
+      "fromage râpé",
+      "pico de gallo (tomate, oignon, piment, coriandre)"
+    ],
+    "techniques": [
+      "tartiner le pain ouvert",
+      "gratiner au four"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Atole",
+    "country": "Mexique, Guatemala, Salvador, Honduras",
+    "ingredients": [
+      "farine de maïs (masa) ou fécule",
+      "lait ou eau",
+      "sucre (piloncillo)",
+      "cannelle",
+      "vanille ou fruit (facultatif)"
+    ],
+    "techniques": [
+      "délayer la farine",
+      "cuire en remuant jusqu'à épaississement"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Champurrado",
+    "country": "Mexique",
+    "ingredients": [
+      "masa de maïs",
+      "chocolat",
+      "lait ou eau",
+      "piloncillo (sucre brun)",
+      "cannelle"
+    ],
+    "techniques": [
+      "délayer la masa",
+      "cuire avec le chocolat en fouettant"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Tamales",
+    "country": "Mexique, Amérique centrale",
+    "ingredients": [
+      "masa de maïs",
+      "saindoux (ou huile)",
+      "farce (poulet ou porc en salsa, fromage et piment)",
+      "feuilles de maïs ou de bananier"
+    ],
+    "techniques": [
+      "battre la masa avec la graisse",
+      "envelopper la farce",
+      "cuire à la vapeur"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Frijoles de la olla",
+    "country": "Mexique",
+    "ingredients": [
+      "haricots noirs ou pinto secs",
+      "oignon",
+      "ail",
+      "épazote (facultatif)"
+    ],
+    "techniques": [
+      "cuire longuement les haricots à petit feu dans leur bouillon"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Frijoles refritos",
+    "country": "Mexique, Amérique centrale",
+    "ingredients": [
+      "haricots cuits (noirs ou pinto)",
+      "saindoux ou huile",
+      "oignon"
+    ],
+    "techniques": [
+      "revenir l'oignon",
+      "écraser les haricots à la poêle jusqu'à purée épaisse"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Arroz rojo (arroz a la mexicana)",
+    "country": "Mexique",
+    "ingredients": [
+      "riz",
+      "tomate",
+      "oignon",
+      "ail",
+      "bouillon",
+      "petits légumes (carotte, petits pois)"
+    ],
+    "techniques": [
+      "faire dorer le riz cru à l'huile",
+      "cuire dans le bouillon tomaté mixé"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Sopa de fideo",
+    "country": "Mexique",
+    "ingredients": [
+      "vermicelles",
+      "tomate",
+      "oignon",
+      "ail",
+      "bouillon de poulet (ou eau)"
+    ],
+    "techniques": [
+      "dorer les vermicelles à l'huile",
+      "cuire dans le bouillon tomaté"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Sopa de tortilla",
+    "country": "Mexique",
+    "ingredients": [
+      "tortillas de maïs",
+      "tomate",
+      "piment séché (pasilla)",
+      "bouillon de poulet",
+      "avocat",
+      "fromage frais",
+      "crème"
+    ],
+    "techniques": [
+      "frire les tortillas en lanières",
+      "mixer et cuire la base tomate-piment",
+      "verser le bouillon sur les tortillas"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Caldo de res (mole de olla)",
+    "country": "Mexique",
+    "ingredients": [
+      "bœuf avec os (jarret)",
+      "maïs en épi",
+      "chayote",
+      "courgette",
+      "carotte",
+      "chou ou pomme de terre"
+    ],
+    "techniques": [
+      "cuire la viande longuement",
+      "ajouter les légumes par ordre de cuisson"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pozole",
+    "country": "Mexique",
+    "ingredients": [
+      "maïs nixtamalisé (cacahuazintle)",
+      "porc ou poulet",
+      "piment séché (guajillo) pour le rouge",
+      "chou ou laitue émincé",
+      "radis",
+      "oignon",
+      "citron vert"
+    ],
+    "techniques": [
+      "cuire le maïs jusqu'à ce qu'il éclate",
+      "mijoter avec la viande",
+      "garnir à table de crudités"
+    ],
+    "moments": [
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Mole poblano",
+    "country": "Mexique",
+    "ingredients": [
+      "piments séchés (ancho, mulato, pasilla)",
+      "chocolat",
+      "graines (sésame, cacahuète, amande)",
+      "épices (cannelle, clou de girofle)",
+      "tortilla ou pain rassis",
+      "poulet ou dinde"
+    ],
+    "techniques": [
+      "griller et réhydrater les piments",
+      "mixer et frire la pâte",
+      "mijoter longuement avec le bouillon"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Tinga de pollo",
+    "country": "Mexique",
+    "ingredients": [
+      "poulet effiloché",
+      "tomate",
+      "oignon émincé",
+      "piment chipotle"
+    ],
+    "techniques": [
+      "pocher et effilocher le poulet",
+      "mijoter dans la sauce tomate-chipotle"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Picadillo",
+    "country": "Mexique, Amérique centrale",
+    "ingredients": [
+      "viande hachée (bœuf ou porc)",
+      "tomate",
+      "pomme de terre",
+      "carotte",
+      "oignon"
+    ],
+    "techniques": [
+      "revenir la viande",
+      "mijoter avec les légumes en dés"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Enchiladas verdes",
+    "country": "Mexique",
+    "ingredients": [
+      "tortillas de maïs",
+      "tomatilles",
+      "piment vert",
+      "poulet effiloché (ou fromage)",
+      "crème",
+      "fromage frais"
+    ],
+    "techniques": [
+      "passer les tortillas dans l'huile chaude",
+      "rouler la farce",
+      "napper de sauce verte"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Enfrijoladas",
+    "country": "Mexique",
+    "ingredients": [
+      "tortillas de maïs",
+      "haricots noirs mixés en sauce",
+      "fromage frais",
+      "crème",
+      "oignon"
+    ],
+    "techniques": [
+      "tremper les tortillas dans la sauce de haricots",
+      "plier et garnir"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Chiles rellenos",
+    "country": "Mexique, Guatemala",
+    "ingredients": [
+      "piments poblanos (au Guatemala : poivrons)",
+      "fromage ou picadillo",
+      "œufs battus en neige",
+      "sauce tomate"
+    ],
+    "techniques": [
+      "griller et peler les piments",
+      "farcir, enrober d'œuf et frire",
+      "servir dans la sauce"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Rajas con crema",
+    "country": "Mexique",
+    "ingredients": [
+      "piments poblanos en lanières",
+      "oignon",
+      "crème",
+      "maïs (facultatif)",
+      "fromage"
+    ],
+    "techniques": [
+      "griller et peler les piments",
+      "mijoter avec la crème"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Calabacitas a la mexicana",
+    "country": "Mexique",
+    "ingredients": [
+      "courgettes",
+      "tomate",
+      "oignon",
+      "maïs",
+      "piment vert",
+      "fromage frais (facultatif)"
+    ],
+    "techniques": [
+      "sauter les légumes",
+      "mijoter brièvement"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Nopales con huevo",
+    "country": "Mexique",
+    "ingredients": [
+      "raquettes de cactus (nopales)",
+      "œufs",
+      "tomate",
+      "oignon",
+      "piment"
+    ],
+    "techniques": [
+      "cuire les nopales en lanières jusqu'à ce que la bave disparaisse",
+      "brouiller avec les œufs"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Cochinita pibil",
+    "country": "Mexique (Yucatán)",
+    "ingredients": [
+      "épaule de porc",
+      "pâte de rocou (achiote)",
+      "jus d'orange amère (ou orange et citron vert)",
+      "feuilles de bananier",
+      "oignon rouge mariné"
+    ],
+    "techniques": [
+      "mariner la viande",
+      "cuire longuement à l'étouffée en feuille de bananier",
+      "effilocher"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pescado a la veracruzana",
+    "country": "Mexique (Veracruz)",
+    "ingredients": [
+      "filets de poisson blanc",
+      "tomate",
+      "oignon",
+      "olives",
+      "câpres",
+      "piment (güero ou jalapeño)"
+    ],
+    "techniques": [
+      "préparer une sauce tomate aux olives",
+      "cuire le poisson dedans"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Ceviche de pescado (mexicain)",
+    "country": "Mexique, Costa Rica, Panama",
+    "ingredients": [
+      "poisson blanc cru",
+      "citron vert",
+      "tomate",
+      "oignon",
+      "coriandre",
+      "piment"
+    ],
+    "techniques": [
+      "mariner le poisson en dés dans le citron",
+      "mélanger aux légumes crus"
+    ],
+    "moments": [
+      "lunch",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Guacamole",
+    "country": "Mexique",
+    "ingredients": [
+      "avocat mûr",
+      "citron vert",
+      "oignon",
+      "piment vert",
+      "coriandre",
+      "tomate (facultatif)"
+    ],
+    "techniques": [
+      "écraser l'avocat",
+      "mélanger les crudités hachées"
+    ],
+    "moments": [
+      "snack",
+      "lunch"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Quesadillas",
+    "country": "Mexique",
+    "ingredients": [
+      "tortillas de maïs ou de blé",
+      "fromage fondant (Oaxaca)",
+      "garniture (champignons, fleurs de courgette, pomme de terre, restes)"
+    ],
+    "techniques": [
+      "garnir et plier la tortilla",
+      "cuire à sec sur le comal"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Sopes",
+    "country": "Mexique",
+    "ingredients": [
+      "masa de maïs",
+      "haricots refrits",
+      "garniture (viande, chorizo, pomme de terre)",
+      "salsa",
+      "fromage frais",
+      "laitue"
+    ],
+    "techniques": [
+      "façonner des galettes épaisses à rebord",
+      "cuire au comal puis frire légèrement",
+      "garnir"
+    ],
+    "moments": [
+      "dinner",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Tlacoyos",
+    "country": "Mexique (centre)",
+    "ingredients": [
+      "masa de maïs (souvent bleu)",
+      "haricots ou fèves ou fromage pour la farce",
+      "nopales",
+      "salsa",
+      "fromage frais"
+    ],
+    "techniques": [
+      "farcir la masa en ovale",
+      "cuire au comal"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Tostadas",
+    "country": "Mexique, Guatemala",
+    "ingredients": [
+      "tortillas de maïs frites ou séchées",
+      "haricots refrits ou guacamole",
+      "garniture (poulet, tinga, légumes)",
+      "salsa",
+      "fromage"
+    ],
+    "techniques": [
+      "frire ou griller la tortilla jusqu'à croustillant",
+      "garnir en couches"
+    ],
+    "moments": [
+      "snack",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Elote / esquites",
+    "country": "Mexique",
+    "ingredients": [
+      "maïs (épi ou grains)",
+      "mayonnaise ou crème",
+      "fromage râpé",
+      "piment en poudre",
+      "citron vert"
+    ],
+    "techniques": [
+      "bouillir ou griller le maïs",
+      "garnir de crème, fromage et piment"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Papas con chorizo",
+    "country": "Mexique",
+    "ingredients": [
+      "pommes de terre",
+      "chorizo",
+      "oignon"
+    ],
+    "techniques": [
+      "rissoler le chorizo",
+      "cuire les pommes de terre en dés dans sa graisse"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Arroz con leche",
+    "country": "Mexique, Amérique centrale",
+    "ingredients": [
+      "riz",
+      "lait",
+      "sucre",
+      "cannelle",
+      "zeste de citron (facultatif)"
+    ],
+    "techniques": [
+      "cuire le riz dans l'eau puis dans le lait sucré à feu doux"
+    ],
+    "moments": [
+      "snack",
+      "breakfast"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Pupusas",
+    "country": "Salvador, Honduras",
+    "ingredients": [
+      "masa de maïs (ou de riz)",
+      "fromage",
+      "haricots refrits",
+      "chicharrón (porc haché frit)",
+      "curtido (chou mariné)",
+      "sauce tomate"
+    ],
+    "techniques": [
+      "farcir des boules de masa et les aplatir",
+      "cuire au comal"
+    ],
+    "moments": [
+      "dinner",
+      "breakfast",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Curtido",
+    "country": "Salvador",
+    "ingredients": [
+      "chou",
+      "carotte",
+      "oignon",
+      "vinaigre",
+      "origan"
+    ],
+    "techniques": [
+      "émincer finement",
+      "mariner quelques heures au vinaigre"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Yuca frita con chicharrón",
+    "country": "Salvador, Honduras",
+    "ingredients": [
+      "manioc",
+      "porc frit (chicharrón)",
+      "curtido ou chou",
+      "sauce tomate"
+    ],
+    "techniques": [
+      "cuire puis frire le manioc",
+      "servir avec le porc croustillant"
+    ],
+    "moments": [
+      "snack",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Panes con pollo",
+    "country": "Salvador",
+    "ingredients": [
+      "pain (pan francés)",
+      "poulet mijoté en sauce tomate épicée",
+      "cresson",
+      "concombre",
+      "radis"
+    ],
+    "techniques": [
+      "mijoter le poulet en sauce",
+      "garnir le pain de poulet, sauce et crudités"
+    ],
+    "moments": [
+      "dinner",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pepián",
+    "country": "Guatemala",
+    "ingredients": [
+      "poulet ou bœuf",
+      "tomate et tomatilles",
+      "graines de courge et sésame grillées",
+      "piments séchés (guaque, pasa)",
+      "légumes (chayote, pomme de terre, haricots verts)"
+    ],
+    "techniques": [
+      "griller les graines, piments et tomates",
+      "mixer en sauce",
+      "mijoter avec la viande et les légumes"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Jocón",
+    "country": "Guatemala",
+    "ingredients": [
+      "poulet",
+      "tomatilles",
+      "coriandre",
+      "oignon vert",
+      "piment vert",
+      "tortilla (pour lier)"
+    ],
+    "techniques": [
+      "mixer une sauce verte",
+      "mijoter le poulet dedans"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Hilachas",
+    "country": "Guatemala",
+    "ingredients": [
+      "bœuf effiloché (flanc)",
+      "tomate",
+      "tomatilles",
+      "piment séché (guajillo)",
+      "pomme de terre",
+      "carotte"
+    ],
+    "techniques": [
+      "cuire et effilocher la viande",
+      "mijoter dans la sauce tomate-piment avec les légumes"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Chuchitos",
+    "country": "Guatemala",
+    "ingredients": [
+      "masa de maïs",
+      "sauce tomate (recado)",
+      "poulet ou porc",
+      "feuilles de maïs"
+    ],
+    "techniques": [
+      "garnir la masa de viande et de sauce",
+      "envelopper et cuire à la vapeur"
+    ],
+    "moments": [
+      "snack",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Frijoles volteados",
+    "country": "Guatemala",
+    "ingredients": [
+      "haricots noirs cuits",
+      "oignon",
+      "huile"
+    ],
+    "techniques": [
+      "mixer les haricots",
+      "réduire à la poêle en retournant jusqu'à pâte épaisse"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Rellenitos de plátano",
+    "country": "Guatemala",
+    "ingredients": [
+      "bananes plantains mûres",
+      "haricots noirs en purée sucrée",
+      "chocolat",
+      "cannelle",
+      "sucre"
+    ],
+    "techniques": [
+      "cuire et écraser les plantains",
+      "farcir de haricots sucrés",
+      "frire"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Baleadas",
+    "country": "Honduras",
+    "ingredients": [
+      "tortillas de blé épaisses",
+      "haricots rouges refrits",
+      "crème (mantequilla)",
+      "fromage râpé",
+      "œufs ou avocat (facultatif)"
+    ],
+    "techniques": [
+      "cuire la tortilla au comal",
+      "garnir et plier"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Sopa de caracol",
+    "country": "Honduras (côte caraïbe)",
+    "ingredients": [
+      "conque (lambi)",
+      "lait de coco",
+      "banane plantain verte",
+      "manioc",
+      "coriandre longue (culantro)"
+    ],
+    "techniques": [
+      "attendrir la conque",
+      "mijoter avec les tubercules dans le lait de coco"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Tapado",
+    "country": "Honduras, Guatemala (côte garífuna)",
+    "ingredients": [
+      "poisson et fruits de mer",
+      "lait de coco",
+      "banane plantain verte et mûre",
+      "manioc",
+      "coriandre"
+    ],
+    "techniques": [
+      "mijoter tubercules et plantains dans le lait de coco",
+      "ajouter les fruits de mer en fin de cuisson"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Sopa de frijoles",
+    "country": "Honduras, Nicaragua, Costa Rica",
+    "ingredients": [
+      "haricots rouges ou noirs",
+      "oignon",
+      "poivron",
+      "coriandre",
+      "œuf dur ou banane plantain (facultatif)"
+    ],
+    "techniques": [
+      "cuire les haricots dans beaucoup de bouillon",
+      "assaisonner avec un sofrito"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Gallo pinto",
+    "country": "Costa Rica, Nicaragua",
+    "ingredients": [
+      "riz cuit de la veille",
+      "haricots cuits (noirs au Costa Rica, rouges au Nicaragua)",
+      "oignon",
+      "poivron",
+      "coriandre",
+      "sauce Lizano (Costa Rica)"
+    ],
+    "techniques": [
+      "revenir l'oignon",
+      "sauter le riz avec les haricots et un peu de leur bouillon"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Casado",
+    "country": "Costa Rica",
+    "ingredients": [
+      "riz blanc",
+      "haricots noirs",
+      "viande ou poisson (ou œuf)",
+      "banane plantain mûre frite",
+      "salade de chou"
+    ],
+    "techniques": [
+      "assembler plusieurs préparations simples dans une assiette"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Olla de carne",
+    "country": "Costa Rica",
+    "ingredients": [
+      "bœuf avec os",
+      "manioc",
+      "banane plantain verte",
+      "maïs en épi",
+      "chayote",
+      "carotte et pomme de terre"
+    ],
+    "techniques": [
+      "cuire la viande longuement",
+      "ajouter les tubercules et légumes"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Chifrijo",
+    "country": "Costa Rica",
+    "ingredients": [
+      "riz",
+      "haricots rouges",
+      "chicharrón (porc frit)",
+      "pico de gallo",
+      "chips de tortilla",
+      "avocat"
+    ],
+    "techniques": [
+      "monter en couches riz, haricots et porc",
+      "garnir de pico de gallo"
+    ],
+    "moments": [
+      "snack",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Arroz con pollo",
+    "country": "Costa Rica, Panama, Amérique centrale",
+    "ingredients": [
+      "riz",
+      "poulet effiloché ou en morceaux",
+      "poivron",
+      "carotte et petits pois",
+      "rocou ou tomate pour la couleur"
+    ],
+    "techniques": [
+      "revenir un sofrito",
+      "cuire le riz avec le poulet et son bouillon"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Nacatamal",
+    "country": "Nicaragua, Honduras",
+    "ingredients": [
+      "masa de maïs",
+      "porc",
+      "riz",
+      "pomme de terre",
+      "tomate, oignon, poivron",
+      "feuilles de bananier"
+    ],
+    "techniques": [
+      "garnir la masa",
+      "envelopper en feuille de bananier",
+      "cuire longuement à l'eau"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Vigorón",
+    "country": "Nicaragua",
+    "ingredients": [
+      "manioc bouilli",
+      "chicharrón (couenne de porc frite)",
+      "salade de chou au vinaigre",
+      "tomate",
+      "feuille de bananier"
+    ],
+    "techniques": [
+      "cuire le manioc",
+      "dresser avec le chou et le porc"
+    ],
+    "moments": [
+      "snack",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Indio viejo",
+    "country": "Nicaragua",
+    "ingredients": [
+      "bœuf effiloché",
+      "masa de maïs ou tortillas trempées",
+      "tomate",
+      "oignon et poivron",
+      "orange amère",
+      "menthe (hierbabuena)"
+    ],
+    "techniques": [
+      "cuire et effilocher la viande",
+      "épaissir le bouillon avec la masa"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Sancocho panameño",
+    "country": "Panama",
+    "ingredients": [
+      "poulet",
+      "igname (ñame)",
+      "coriandre longue (culantro)",
+      "oignon",
+      "ail",
+      "maïs ou manioc (facultatif)"
+    ],
+    "techniques": [
+      "mijoter le poulet avec l'igname jusqu'à ce que le bouillon épaississe"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Carimañola",
+    "country": "Panama",
+    "ingredients": [
+      "manioc",
+      "viande hachée (picadillo)",
+      "oignon",
+      "huile de friture"
+    ],
+    "techniques": [
+      "cuire et écraser le manioc",
+      "farcir en fuseau",
+      "frire"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Hojaldras",
+    "country": "Panama",
+    "ingredients": [
+      "farine",
+      "levure chimique",
+      "sel et sucre",
+      "huile de friture"
+    ],
+    "techniques": [
+      "étaler une pâte simple",
+      "frire jusqu'à gonflement"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Plátanos fritos con frijoles y crema",
+    "country": "Honduras, Salvador, Guatemala",
+    "ingredients": [
+      "bananes plantains mûres",
+      "haricots refrits",
+      "crème",
+      "fromage frais",
+      "œufs (facultatif)"
+    ],
+    "techniques": [
+      "frire les plantains en tranches",
+      "servir avec les haricots et la crème"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  }
+]

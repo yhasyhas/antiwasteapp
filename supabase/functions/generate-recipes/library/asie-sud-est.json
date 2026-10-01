@@ -1,0 +1,1219 @@
+[
+  {
+    "name": "Khao tom (soupe de riz)",
+    "country": "Thaïlande",
+    "ingredients": [
+      "riz cuit",
+      "bouillon",
+      "porc haché ou crevettes",
+      "ail frit",
+      "gingembre",
+      "coriandre et ciboule"
+    ],
+    "techniques": [
+      "réchauffer le riz cuit dans le bouillon",
+      "garnir d'ail frit"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pa thong ko (beignets)",
+    "country": "Thaïlande",
+    "ingredients": [
+      "farine de blé",
+      "levure ou bicarbonate",
+      "sucre",
+      "sel",
+      "huile de friture"
+    ],
+    "techniques": [
+      "laisser reposer la pâte",
+      "frire"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Moo ping et khao niao (brochettes de porc et riz gluant)",
+    "country": "Thaïlande",
+    "ingredients": [
+      "porc",
+      "lait de coco",
+      "ail, coriandre (racine) et poivre",
+      "sauce poisson et sucre de palme",
+      "riz gluant"
+    ],
+    "techniques": [
+      "mariner",
+      "griller au charbon"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Khai jiao (omelette thaïe)",
+    "country": "Thaïlande",
+    "ingredients": [
+      "œufs",
+      "sauce poisson",
+      "huile abondante",
+      "riz",
+      "porc haché (facultatif)"
+    ],
+    "techniques": [
+      "frire l'omelette battue dans l'huile très chaude"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pad kra pao (sauté au basilic sacré)",
+    "country": "Thaïlande",
+    "ingredients": [
+      "porc ou poulet haché",
+      "basilic sacré (ou basilic thaï)",
+      "ail et piment",
+      "sauce d'huître, sauce soja, sauce poisson",
+      "riz",
+      "œuf au plat"
+    ],
+    "techniques": [
+      "piler ail et piment",
+      "sauter à feu vif"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pad thai",
+    "country": "Thaïlande",
+    "ingredients": [
+      "nouilles de riz plates",
+      "tamarin",
+      "sauce poisson et sucre de palme",
+      "œuf",
+      "tofu ferme et crevettes",
+      "pousses de soja et ciboule chinoise",
+      "cacahuètes"
+    ],
+    "techniques": [
+      "réhydrater les nouilles",
+      "sauter au wok"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Tom yam (soupe aigre-piquante)",
+    "country": "Thaïlande",
+    "ingredients": [
+      "crevettes (ou poulet, poisson)",
+      "citronnelle",
+      "galanga",
+      "feuilles de combava",
+      "citron vert et sauce poisson",
+      "piment",
+      "champignons"
+    ],
+    "techniques": [
+      "infuser les aromates dans le bouillon",
+      "assaisonner hors du feu"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Kaeng khiao wan (curry vert)",
+    "country": "Thaïlande",
+    "ingredients": [
+      "pâte de curry vert",
+      "lait de coco",
+      "poulet (ou bœuf, boulettes de poisson)",
+      "aubergines thaïes",
+      "basilic thaï",
+      "sauce poisson et sucre de palme"
+    ],
+    "techniques": [
+      "frire la pâte de curry dans la crème de coco",
+      "mijoter"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Som tam (salade de papaye verte)",
+    "country": "Thaïlande, Laos (tam mak hoong)",
+    "ingredients": [
+      "papaye verte râpée",
+      "piment et ail",
+      "citron vert",
+      "sauce poisson (ou padaek au Laos)",
+      "tomates et haricots kilomètre",
+      "crevettes séchées et cacahuètes"
+    ],
+    "techniques": [
+      "piler au mortier"
+    ],
+    "moments": [
+      "lunch",
+      "dinner",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Larb (salade de viande hachée)",
+    "country": "Laos, Thaïlande (Isan)",
+    "ingredients": [
+      "viande hachée (porc, poulet, bœuf) ou poisson",
+      "riz gluant grillé moulu",
+      "citron vert",
+      "sauce poisson",
+      "échalotes",
+      "menthe et coriandre"
+    ],
+    "techniques": [
+      "cuire la viande à sec",
+      "assaisonner tiède"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Khao niao (riz gluant)",
+    "country": "Laos, Thaïlande (Nord et Isan)",
+    "ingredients": [
+      "riz gluant",
+      "eau",
+      "accompagnements (larb, som tam, jaew, grillades)"
+    ],
+    "techniques": [
+      "tremper une nuit",
+      "cuire à la vapeur dans un panier"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Khao piak sen (soupe de nouilles)",
+    "country": "Laos",
+    "ingredients": [
+      "nouilles fraîches de riz et tapioca",
+      "bouillon de poulet",
+      "poulet",
+      "ail frit",
+      "ciboule et coriandre"
+    ],
+    "techniques": [
+      "cuire les nouilles dans le bouillon pour l'épaissir"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Phở",
+    "country": "Vietnam",
+    "ingredients": [
+      "bouillon de bœuf (ou poulet : phở gà)",
+      "nouilles de riz plates",
+      "gingembre et oignon grillés",
+      "anis étoilé, cannelle, cardamome noire",
+      "bœuf en tranches fines",
+      "herbes (basilic thaï, coriandre, ciboule)"
+    ],
+    "techniques": [
+      "griller les aromates",
+      "mijoter longuement les os"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Bánh mì",
+    "country": "Vietnam",
+    "ingredients": [
+      "baguette légère",
+      "viande (porc grillé, charcuterie, pâté) ou œuf",
+      "carotte et radis marinés",
+      "concombre",
+      "coriandre et piment",
+      "sauce soja ou mayonnaise"
+    ],
+    "techniques": [
+      "garnir un pain chaud"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Xôi (riz gluant salé ou sucré)",
+    "country": "Vietnam",
+    "ingredients": [
+      "riz gluant",
+      "haricots mungo, arachides ou maïs",
+      "échalotes frites",
+      "garniture (porc, œuf, saucisse) ou noix de coco et sucre"
+    ],
+    "techniques": [
+      "tremper",
+      "cuire à la vapeur"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Bánh cuốn (crêpes de riz vapeur farcies)",
+    "country": "Vietnam (Nord)",
+    "ingredients": [
+      "pâte de farine de riz",
+      "porc haché",
+      "champignons noirs",
+      "échalotes frites",
+      "nước chấm (sauce au nước mắm)"
+    ],
+    "techniques": [
+      "cuire une crêpe fine à la vapeur",
+      "farcir et rouler"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Cháo gà (bouillie de riz au poulet)",
+    "country": "Vietnam",
+    "ingredients": [
+      "riz",
+      "poulet",
+      "gingembre",
+      "échalotes",
+      "ciboule",
+      "nước mắm"
+    ],
+    "techniques": [
+      "pocher le poulet",
+      "cuire le riz dans le bouillon"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Cơm tấm (riz brisé au porc grillé)",
+    "country": "Vietnam (Sud)",
+    "ingredients": [
+      "riz brisé",
+      "côtelette de porc marinée (citronnelle, nước mắm, sucre)",
+      "œuf au plat ou flan d'œuf",
+      "légumes marinés",
+      "huile à la ciboule",
+      "nước chấm"
+    ],
+    "techniques": [
+      "mariner",
+      "griller"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Bún chả (porc grillé et vermicelles)",
+    "country": "Vietnam (Hanoï)",
+    "ingredients": [
+      "porc haché et poitrine",
+      "vermicelles de riz",
+      "nước chấm dilué",
+      "papaye verte ou carotte marinée",
+      "herbes fraîches",
+      "ail et sucre"
+    ],
+    "techniques": [
+      "mariner",
+      "griller au charbon",
+      "servir dans la sauce tiède"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Gỏi cuốn (rouleaux de printemps)",
+    "country": "Vietnam",
+    "ingredients": [
+      "galettes de riz",
+      "vermicelles de riz",
+      "crevettes et porc bouilli",
+      "salade et herbes",
+      "sauce hoisin-arachide ou nước chấm"
+    ],
+    "techniques": [
+      "humidifier la galette",
+      "rouler à cru"
+    ],
+    "moments": [
+      "lunch",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Chả giò / Nem rán (rouleaux frits)",
+    "country": "Vietnam",
+    "ingredients": [
+      "galettes de riz",
+      "porc haché",
+      "champignons noirs et vermicelles",
+      "carotte, taro ou chou-rave",
+      "œuf",
+      "nước chấm"
+    ],
+    "techniques": [
+      "rouler serré",
+      "frire"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Canh chua (soupe aigre au poisson)",
+    "country": "Vietnam (Sud)",
+    "ingredients": [
+      "poisson (poisson-chat) ou crevettes",
+      "tamarin",
+      "tomate et ananas",
+      "pousses de soja",
+      "tige de taro (bạc hà) ou gombo",
+      "herbes (rau om, ngò gai)"
+    ],
+    "techniques": [
+      "acidifier le bouillon au tamarin",
+      "cuire le poisson brièvement"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Cá kho tộ (poisson caramélisé)",
+    "country": "Vietnam",
+    "ingredients": [
+      "poisson (poisson-chat, maquereau)",
+      "caramel",
+      "nước mắm",
+      "échalotes et ail",
+      "poivre noir",
+      "piment"
+    ],
+    "techniques": [
+      "braiser en pot de terre jusqu'à sauce sirupeuse"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Thịt kho trứng (porc et œufs caramélisés)",
+    "country": "Vietnam (Sud)",
+    "ingredients": [
+      "poitrine de porc",
+      "œufs durs",
+      "eau de coco",
+      "nước mắm",
+      "caramel ou sucre",
+      "échalotes et ail"
+    ],
+    "techniques": [
+      "braiser longuement"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Rau muống xào tỏi (liseron d'eau sauté à l'ail)",
+    "country": "Vietnam",
+    "ingredients": [
+      "liseron d'eau",
+      "ail",
+      "huile",
+      "nước mắm ou sel"
+    ],
+    "techniques": [
+      "blanchir rapidement",
+      "sauter à feu vif"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Đậu hũ sốt cà chua (tofu à la sauce tomate)",
+    "country": "Vietnam",
+    "ingredients": [
+      "tofu ferme",
+      "tomates",
+      "ciboule",
+      "échalote",
+      "nước mắm ou sauce soja"
+    ],
+    "techniques": [
+      "frire le tofu",
+      "mijoter dans la sauce tomate"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Bánh xèo (crêpe croustillante)",
+    "country": "Vietnam (Sud et Centre)",
+    "ingredients": [
+      "farine de riz",
+      "curcuma",
+      "lait de coco",
+      "crevettes et porc",
+      "pousses de soja",
+      "salade et herbes"
+    ],
+    "techniques": [
+      "cuire une crêpe fine et croustillante",
+      "envelopper dans la salade"
+    ],
+    "moments": [
+      "lunch",
+      "dinner",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Bai sach chrouk (porc grillé et riz)",
+    "country": "Cambodge",
+    "ingredients": [
+      "porc mariné (ail, lait de coco, sauce soja)",
+      "riz",
+      "légumes marinés",
+      "bouillon clair"
+    ],
+    "techniques": [
+      "mariner",
+      "griller au charbon"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Kuy teav (soupe de nouilles au porc)",
+    "country": "Cambodge",
+    "ingredients": [
+      "nouilles de riz",
+      "bouillon d'os de porc",
+      "porc (tranches, haché, abats) ou crevettes",
+      "ail frit",
+      "pousses de soja et herbes",
+      "citron vert"
+    ],
+    "techniques": [
+      "mijoter le bouillon",
+      "blanchir nouilles et viande"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Amok trey (poisson au kroeung et coco)",
+    "country": "Cambodge",
+    "ingredients": [
+      "poisson",
+      "kroeung (citronnelle, galanga, curcuma, combava)",
+      "lait de coco",
+      "œuf",
+      "feuilles de noni ou épinards",
+      "sauce poisson"
+    ],
+    "techniques": [
+      "piler le kroeung",
+      "cuire à la vapeur en coupelle de feuille de bananier"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Samlor korko (soupe de légumes au kroeung)",
+    "country": "Cambodge",
+    "ingredients": [
+      "kroeung",
+      "prahok (pâte de poisson fermenté)",
+      "riz grillé moulu",
+      "légumes variés (courge, aubergine, papaye verte, haricots)",
+      "poisson ou porc"
+    ],
+    "techniques": [
+      "revenir le kroeung",
+      "mijoter les légumes"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Mohinga (soupe de poisson aux vermicelles)",
+    "country": "Birmanie",
+    "ingredients": [
+      "poisson (poisson-chat)",
+      "farine de riz grillée ou pois chiches",
+      "citronnelle",
+      "cœur de bananier",
+      "vermicelles de riz",
+      "œuf dur et beignets"
+    ],
+    "techniques": [
+      "mijoter le poisson avec les aromates",
+      "épaissir à la farine grillée"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Lahpet thoke (salade de feuilles de thé fermentées)",
+    "country": "Birmanie",
+    "ingredients": [
+      "feuilles de thé fermentées (lahpet)",
+      "chou ou tomate",
+      "fèves, cacahuètes et sésame frits",
+      "ail frit",
+      "crevettes séchées",
+      "citron vert"
+    ],
+    "techniques": [
+      "mélanger à la main"
+    ],
+    "moments": [
+      "snack",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Ohn no khao swè (nouilles au coco et poulet)",
+    "country": "Birmanie",
+    "ingredients": [
+      "nouilles de blé",
+      "poulet",
+      "lait de coco",
+      "farine de pois chiches",
+      "oignon, ail, gingembre",
+      "curcuma et paprika"
+    ],
+    "techniques": [
+      "mijoter un bouillon coco épaissi"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Si byan (curry birman à l'huile)",
+    "country": "Birmanie",
+    "ingredients": [
+      "poulet, porc ou poisson",
+      "oignons en grande quantité",
+      "ail et gingembre",
+      "curcuma et paprika",
+      "huile",
+      "sauce poisson ou ngapi"
+    ],
+    "techniques": [
+      "mijoter jusqu'à ce que l'huile se sépare"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Nasi lemak (riz au lait de coco)",
+    "country": "Malaisie, Singapour, Brunei",
+    "ingredients": [
+      "riz cuit au lait de coco et pandan",
+      "sambal",
+      "anchois frits (ikan bilis)",
+      "cacahuètes grillées",
+      "œuf dur ou au plat",
+      "concombre"
+    ],
+    "techniques": [
+      "cuire le riz au coco",
+      "frire les garnitures"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Roti canai (galette feuilletée)",
+    "country": "Malaisie, Singapour (roti prata)",
+    "ingredients": [
+      "farine",
+      "ghee ou huile",
+      "eau",
+      "sel",
+      "dal ou curry pour tremper"
+    ],
+    "techniques": [
+      "étirer la pâte très finement",
+      "plier et cuire à la plaque"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Kaya toast et œufs mollets",
+    "country": "Singapour, Malaisie",
+    "ingredients": [
+      "pain de mie grillé",
+      "kaya (confiture coco-œuf-pandan)",
+      "beurre",
+      "œufs mollets",
+      "sauce soja et poivre blanc"
+    ],
+    "techniques": [
+      "griller le pain",
+      "cuire les œufs à peine pris"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Nasi ayam (riz au poulet hainanais)",
+    "country": "Singapour, Malaisie",
+    "ingredients": [
+      "poulet entier",
+      "riz cuit dans le bouillon et la graisse de poulet",
+      "gingembre et ail",
+      "pandan",
+      "sauce piment-gingembre",
+      "concombre"
+    ],
+    "techniques": [
+      "pocher le poulet",
+      "cuire le riz avec le bouillon"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Char kway teow (nouilles de riz sautées)",
+    "country": "Malaisie, Singapour",
+    "ingredients": [
+      "nouilles de riz plates",
+      "crevettes ou coques",
+      "saucisse chinoise",
+      "œuf",
+      "pousses de soja et ciboule chinoise",
+      "sauce soja sucrée et claire"
+    ],
+    "techniques": [
+      "sauter au wok à très feu vif"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Laksa (curry laksa)",
+    "country": "Malaisie, Singapour",
+    "ingredients": [
+      "pâte de laksa (piment, citronnelle, galanga, crevettes séchées)",
+      "lait de coco",
+      "nouilles (vermicelles de riz, nouilles jaunes)",
+      "tofu frit",
+      "crevettes ou poulet",
+      "pousses de soja"
+    ],
+    "techniques": [
+      "frire la pâte d'épices",
+      "mijoter le bouillon coco"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Nasi goreng (riz sauté)",
+    "country": "Indonésie, Malaisie",
+    "ingredients": [
+      "riz cuit de la veille",
+      "kecap manis",
+      "échalotes et ail",
+      "piment ou sambal",
+      "œuf au plat",
+      "terasi (pâte de crevettes)"
+    ],
+    "techniques": [
+      "piler les aromates",
+      "sauter au wok"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Bubur ayam (bouillie de riz au poulet)",
+    "country": "Indonésie",
+    "ingredients": [
+      "riz",
+      "poulet effiloché",
+      "bouillon jaune ou sauce soja",
+      "échalotes frites",
+      "ciboule et céleri",
+      "krupuk et cakwe (beignet)"
+    ],
+    "techniques": [
+      "cuire le riz en bouillie",
+      "garnir"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Gado-gado (légumes sauce cacahuète)",
+    "country": "Indonésie",
+    "ingredients": [
+      "légumes blanchis (chou, haricots verts, épinards, pousses de soja)",
+      "pommes de terre",
+      "tofu et tempeh",
+      "œuf dur",
+      "sauce cacahuète",
+      "kerupuk"
+    ],
+    "techniques": [
+      "blanchir les légumes",
+      "napper de sauce cacahuète pilée"
+    ],
+    "moments": [
+      "lunch",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Tempe goreng (tempeh frit)",
+    "country": "Indonésie",
+    "ingredients": [
+      "tempeh",
+      "ail",
+      "coriandre en grains",
+      "sel",
+      "huile"
+    ],
+    "techniques": [
+      "mariner dans l'eau d'ail salée",
+      "frire"
+    ],
+    "moments": [
+      "lunch",
+      "dinner",
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Sayur asem (soupe aigre de légumes)",
+    "country": "Indonésie (Java)",
+    "ingredients": [
+      "tamarin",
+      "maïs",
+      "chayote ou chou",
+      "haricots kilomètre",
+      "feuilles et graines de melinjo",
+      "arachides"
+    ],
+    "techniques": [
+      "mijoter les légumes dans un bouillon aigre"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Sayur lodeh (légumes au lait de coco)",
+    "country": "Indonésie (Java)",
+    "ingredients": [
+      "lait de coco",
+      "légumes (chayote, haricots kilomètre, aubergine, jacquier vert)",
+      "tofu ou tempeh",
+      "échalotes, ail, galanga",
+      "feuilles de salam"
+    ],
+    "techniques": [
+      "mijoter doucement dans le coco"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Soto ayam (soupe de poulet au curcuma)",
+    "country": "Indonésie",
+    "ingredients": [
+      "poulet",
+      "curcuma",
+      "citronnelle et galanga",
+      "vermicelles de riz",
+      "œuf dur",
+      "chou et pousses de soja"
+    ],
+    "techniques": [
+      "mijoter le poulet dans un bouillon épicé",
+      "effilocher"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Sate ayam (brochettes sauce cacahuète)",
+    "country": "Indonésie, Malaisie",
+    "ingredients": [
+      "poulet en dés",
+      "kecap manis",
+      "ail et échalotes",
+      "sauce cacahuète",
+      "lontong (riz compressé)"
+    ],
+    "techniques": [
+      "mariner",
+      "griller au charbon"
+    ],
+    "moments": [
+      "dinner",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Rendang (bœuf mijoté au coco)",
+    "country": "Indonésie (Minangkabau), Malaisie",
+    "ingredients": [
+      "bœuf",
+      "lait de coco",
+      "piments, échalotes, ail, gingembre, galanga",
+      "citronnelle",
+      "feuilles de curcuma et de combava",
+      "noix de coco grillée (kerisik)"
+    ],
+    "techniques": [
+      "mijoter très longuement jusqu'à réduction complète"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pisang goreng (bananes frites)",
+    "country": "Indonésie, Malaisie",
+    "ingredients": [
+      "bananes plantain ou bananes mûres",
+      "farine de riz ou de blé",
+      "eau",
+      "sucre et sel"
+    ],
+    "techniques": [
+      "enrober de pâte",
+      "frire"
+    ],
+    "moments": [
+      "snack",
+      "breakfast"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Adobo (poulet ou porc au vinaigre et soja)",
+    "country": "Philippines",
+    "ingredients": [
+      "poulet ou porc",
+      "vinaigre",
+      "sauce soja",
+      "ail",
+      "laurier",
+      "poivre noir en grains"
+    ],
+    "techniques": [
+      "mariner",
+      "mijoter puis réduire"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Sinigang (soupe aigre)",
+    "country": "Philippines",
+    "ingredients": [
+      "porc, crevettes ou poisson",
+      "tamarin",
+      "tomate et oignon",
+      "radis, liseron d'eau, haricots kilomètre",
+      "aubergine ou gombo",
+      "sauce poisson"
+    ],
+    "techniques": [
+      "acidifier le bouillon au tamarin",
+      "mijoter"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Silog (petit-déjeuner riz à l'ail et œuf : tapsilog, longsilog)",
+    "country": "Philippines",
+    "ingredients": [
+      "riz sauté à l'ail (sinangag)",
+      "œuf au plat",
+      "viande (tapa de bœuf, longganisa, tocino)",
+      "vinaigre pour tremper"
+    ],
+    "techniques": [
+      "sauter le riz de la veille à l'ail",
+      "frire l'œuf"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Arroz caldo / Lugaw (bouillie de riz au gingembre)",
+    "country": "Philippines",
+    "ingredients": [
+      "riz (gluant ou non)",
+      "poulet",
+      "gingembre",
+      "ail frit",
+      "sauce poisson",
+      "œuf dur"
+    ],
+    "techniques": [
+      "revenir ail et gingembre",
+      "cuire le riz en bouillie"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Champorado (bouillie de riz au chocolat)",
+    "country": "Philippines",
+    "ingredients": [
+      "riz gluant",
+      "chocolat (tablea)",
+      "sucre",
+      "lait concentré"
+    ],
+    "techniques": [
+      "cuire le riz avec le chocolat"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Pancit (bihon, canton)",
+    "country": "Philippines",
+    "ingredients": [
+      "nouilles (de riz ou de blé)",
+      "poulet ou porc",
+      "chou et carotte",
+      "haricots verts",
+      "sauce soja",
+      "citron calamansi"
+    ],
+    "techniques": [
+      "sauter les légumes et la viande",
+      "cuire les nouilles dans le bouillon"
+    ],
+    "moments": [
+      "lunch",
+      "dinner",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Ginisang monggo (haricots mungo mijotés)",
+    "country": "Philippines",
+    "ingredients": [
+      "haricots mungo",
+      "ail, oignon, tomate",
+      "feuilles vertes (moringa, feuilles de margose, épinards)",
+      "porc ou crevettes séchées",
+      "sauce poisson"
+    ],
+    "techniques": [
+      "cuire les haricots",
+      "faire revenir les aromates et mijoter"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pinakbet (légumes mijotés à la pâte de crevettes)",
+    "country": "Philippines (Ilocos)",
+    "ingredients": [
+      "courge",
+      "aubergine",
+      "margose",
+      "gombo et haricots kilomètre",
+      "bagoong (pâte de crevettes ou de poisson)",
+      "porc (facultatif)"
+    ],
+    "techniques": [
+      "mijoter à l'étouffée"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Turon (rouleau de banane caramélisé)",
+    "country": "Philippines",
+    "ingredients": [
+      "banane saba",
+      "feuilles de lumpia",
+      "sucre roux",
+      "jacquier (facultatif)"
+    ],
+    "techniques": [
+      "rouler",
+      "frire en caramélisant le sucre"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": "vegan"
+  }
+]

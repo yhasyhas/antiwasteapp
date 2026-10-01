@@ -1,0 +1,1220 @@
+[
+  {
+    "name": "Thiéboudienne (ceebu jën)",
+    "country": "Sénégal, Mauritanie, Gambie",
+    "ingredients": [
+      "riz brisé",
+      "poisson (thiof, mérou, capitaine)",
+      "concentré de tomate",
+      "légumes (chou, carotte, manioc, aubergine, navet)",
+      "oignon",
+      "persil, ail et piment (rof)",
+      "poisson séché ou fermenté (guedj, yet)"
+    ],
+    "techniques": [
+      "farcir le poisson au rof",
+      "cuire les légumes dans la sauce tomate",
+      "cuire le riz dans le bouillon"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Yassa",
+    "country": "Sénégal, Gambie, Guinée",
+    "ingredients": [
+      "poulet (ou poisson)",
+      "oignons en grande quantité",
+      "citron",
+      "moutarde",
+      "ail",
+      "piment",
+      "riz blanc"
+    ],
+    "techniques": [
+      "mariner au citron et à l'oignon",
+      "griller ou dorer la viande",
+      "confire les oignons"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Mafé (tigadèguèna)",
+    "country": "Sénégal, Mali, Guinée",
+    "ingredients": [
+      "pâte d'arachide",
+      "viande (bœuf, agneau) ou poulet",
+      "tomate (concentré)",
+      "oignon",
+      "légumes (patate douce, carotte, chou, manioc)",
+      "riz blanc"
+    ],
+    "techniques": [
+      "revenir la viande",
+      "mijoter dans la sauce arachide"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Thiou (ragoût en sauce tomate)",
+    "country": "Sénégal",
+    "ingredients": [
+      "viande, poulet ou poisson",
+      "concentré de tomate",
+      "oignon",
+      "pomme de terre",
+      "carotte",
+      "ail",
+      "riz blanc"
+    ],
+    "techniques": [
+      "revenir l'oignon et la viande",
+      "mijoter en sauce tomate"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Soupou kandja (sauce gombo)",
+    "country": "Sénégal, Gambie, Guinée",
+    "ingredients": [
+      "gombo",
+      "huile de palme",
+      "poisson (frais et fumé)",
+      "viande ou fruits de mer (crevettes, crabe)",
+      "oignon",
+      "piment",
+      "riz blanc"
+    ],
+    "techniques": [
+      "couper finement le gombo",
+      "mijoter à l'huile de palme"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Thiéré (couscous de mil) en sauce",
+    "country": "Sénégal, Mali, Mauritanie",
+    "ingredients": [
+      "couscous de mil (thiéré)",
+      "viande (agneau, bœuf) ou poulet",
+      "légumes (chou, carotte, navet, niébé)",
+      "oignon",
+      "poudre de feuilles de baobab (lalo)"
+    ],
+    "techniques": [
+      "rouler et cuire le mil à la vapeur",
+      "mijoter la sauce viande et légumes"
+    ],
+    "moments": [
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Ndambé (sandwich de haricots)",
+    "country": "Sénégal",
+    "ingredients": [
+      "niébé ou haricots blancs",
+      "oignon",
+      "concentré de tomate",
+      "piment",
+      "pain"
+    ],
+    "techniques": [
+      "mijoter les haricots en sauce tomate",
+      "garnir le pain"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Fondé (bouillie de mil au lait caillé)",
+    "country": "Sénégal, Mali",
+    "ingredients": [
+      "farine de mil roulée en boulettes",
+      "lait caillé",
+      "sucre",
+      "vanille ou muscade"
+    ],
+    "techniques": [
+      "rouler la farine en boulettes",
+      "cuire en bouillie",
+      "servir avec le lait caillé"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Thiakry (dégué)",
+    "country": "Sénégal, Mali, Burkina Faso, Niger",
+    "ingredients": [
+      "semoule de mil (ou couscous de blé)",
+      "lait caillé ou yaourt",
+      "sucre",
+      "vanille, muscade",
+      "raisins secs (facultatif)"
+    ],
+    "techniques": [
+      "cuire la semoule à la vapeur",
+      "mélanger au lait caillé sucré"
+    ],
+    "moments": [
+      "snack",
+      "breakfast"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Accara (akara, kosai)",
+    "country": "Sénégal, Nigeria, Niger, Bénin, Togo, Ghana, Sierra Leone",
+    "ingredients": [
+      "niébé décortiqué",
+      "oignon",
+      "piment",
+      "sel",
+      "huile de friture"
+    ],
+    "techniques": [
+      "mixer les haricots trempés en pâte",
+      "fouetter pour aérer",
+      "frire en beignets"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Fataya",
+    "country": "Sénégal, Gambie",
+    "ingredients": [
+      "pâte (farine, eau, huile)",
+      "poisson ou viande hachée",
+      "oignon",
+      "piment",
+      "sauce tomate-oignon pimentée"
+    ],
+    "techniques": [
+      "farcir en chaussons",
+      "frire"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Benachin",
+    "country": "Gambie",
+    "ingredients": [
+      "riz",
+      "viande, poulet ou poisson",
+      "concentré de tomate",
+      "oignon",
+      "légumes (chou, carotte, aubergine)",
+      "piment"
+    ],
+    "techniques": [
+      "mijoter la sauce tomate",
+      "cuire le riz dans la sauce (un seul pot)"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Riz au gras (riz gras, zamè)",
+    "country": "Burkina Faso, Mali, Bénin, Togo, Côte d'Ivoire",
+    "ingredients": [
+      "riz",
+      "concentré de tomate",
+      "oignon",
+      "viande ou poulet",
+      "légumes (carotte, chou, aubergine)",
+      "huile"
+    ],
+    "techniques": [
+      "faire une sauce tomate à la viande",
+      "cuire le riz dans la sauce"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Tô avec sauce gombo (ou sauce feuilles)",
+    "country": "Burkina Faso, Mali, Niger, Togo, Bénin (nord)",
+    "ingredients": [
+      "farine de mil, sorgho ou maïs",
+      "gombo (frais ou séché) ou feuilles de baobab",
+      "soumbala",
+      "viande ou poisson séché",
+      "potasse ou eau acidulée (pour le tô)"
+    ],
+    "techniques": [
+      "cuire la farine en pâte ferme en remuant",
+      "préparer une sauce gluante"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Babenda",
+    "country": "Burkina Faso",
+    "ingredients": [
+      "feuilles vertes (oseille, haricot, chou)",
+      "brisures de riz ou farine de mil",
+      "soumbala",
+      "arachides grillées ou pâte d'arachide",
+      "poisson séché"
+    ],
+    "techniques": [
+      "cuire les feuilles avec la céréale en bouillie épaisse"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Gonré (gâteau de niébé à la vapeur)",
+    "country": "Burkina Faso",
+    "ingredients": [
+      "farine de niébé",
+      "feuilles (de haricot ou d'oseille) en enveloppe ou hachées",
+      "piment",
+      "sel",
+      "huile"
+    ],
+    "techniques": [
+      "façonner la pâte en boudins",
+      "cuire à la vapeur"
+    ],
+    "moments": [
+      "snack",
+      "lunch"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Maasa (beignets de mil ou de riz)",
+    "country": "Mali, Burkina Faso, Niger, Nigeria (nord)",
+    "ingredients": [
+      "farine de mil ou riz cuit",
+      "levure ou ferment",
+      "sucre",
+      "huile"
+    ],
+    "techniques": [
+      "faire fermenter la pâte",
+      "cuire dans un moule à alvéoles ou frire"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Moni (bouillie de mil en boulettes)",
+    "country": "Mali, Burkina Faso",
+    "ingredients": [
+      "farine de mil roulée en petites boulettes",
+      "eau",
+      "sucre",
+      "jus de citron ou tamarin",
+      "lait caillé (facultatif)"
+    ],
+    "techniques": [
+      "rouler la farine en grains",
+      "cuire en bouillie acidulée"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Djouka (fonio aux arachides)",
+    "country": "Mali, Guinée",
+    "ingredients": [
+      "fonio",
+      "pâte d'arachide",
+      "oignon",
+      "viande ou poisson (facultatif)"
+    ],
+    "techniques": [
+      "cuire le fonio à la vapeur",
+      "le mélanger à une sauce arachide"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Sauce feuille (feuilles de manioc)",
+    "country": "Guinée, Sierra Leone (cassava leaf), Liberia",
+    "ingredients": [
+      "feuilles de manioc pilées",
+      "huile de palme",
+      "pâte d'arachide (souvent)",
+      "viande ou poisson fumé",
+      "oignon",
+      "piment",
+      "riz blanc"
+    ],
+    "techniques": [
+      "piler les feuilles",
+      "mijoter longuement à l'huile de palme"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Potato leaf (sauce feuilles de patate douce)",
+    "country": "Sierra Leone, Liberia",
+    "ingredients": [
+      "feuilles de patate douce hachées",
+      "huile de palme",
+      "poisson fumé ou viande",
+      "oignon",
+      "piment",
+      "riz blanc"
+    ],
+    "techniques": [
+      "hacher finement les feuilles",
+      "mijoter à l'huile de palme"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Palm butter (sauce noix de palme)",
+    "country": "Liberia",
+    "ingredients": [
+      "noix de palme (pulpe ou crème de palme)",
+      "poulet, viande ou poisson fumé",
+      "oignon",
+      "piment",
+      "riz blanc"
+    ],
+    "techniques": [
+      "extraire la crème de palme",
+      "mijoter jusqu'à épaississement"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Attiéké poisson",
+    "country": "Côte d'Ivoire",
+    "ingredients": [
+      "attiéké (semoule de manioc fermentée)",
+      "poisson frit ou braisé",
+      "tomate",
+      "oignon",
+      "piment",
+      "huile"
+    ],
+    "techniques": [
+      "réchauffer l'attiéké à la vapeur",
+      "frire ou braiser le poisson",
+      "faire une crudité tomate-oignon"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Garba",
+    "country": "Côte d'Ivoire",
+    "ingredients": [
+      "attiéké",
+      "thon frit",
+      "oignon",
+      "piment frais",
+      "huile de friture",
+      "cube de bouillon"
+    ],
+    "techniques": [
+      "frire le thon en morceaux",
+      "arroser l'attiéké d'huile de friture"
+    ],
+    "moments": [
+      "lunch",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Alloco",
+    "country": "Côte d'Ivoire, Burkina Faso, Togo, Bénin",
+    "ingredients": [
+      "banane plantain mûre",
+      "huile de friture",
+      "sel",
+      "piment et oignon (sauce)"
+    ],
+    "techniques": [
+      "couper en rondelles ou dés",
+      "frire"
+    ],
+    "moments": [
+      "snack",
+      "dinner",
+      "breakfast"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Sauce graine",
+    "country": "Côte d'Ivoire, Ghana (palm nut soup)",
+    "ingredients": [
+      "noix de palme (graine) ou crème de palme",
+      "viande, poulet ou poisson fumé",
+      "aubergine ou gombo",
+      "oignon",
+      "piment",
+      "riz ou foutou"
+    ],
+    "techniques": [
+      "extraire le jus des noix de palme",
+      "mijoter longuement"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Kédjénou",
+    "country": "Côte d'Ivoire",
+    "ingredients": [
+      "poulet (ou pintade)",
+      "tomate",
+      "oignon",
+      "aubergine",
+      "piment",
+      "gingembre et ail"
+    ],
+    "techniques": [
+      "cuire à l'étouffée sans eau dans un canari fermé",
+      "secouer la marmite"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Foutou banane avec sauce claire",
+    "country": "Côte d'Ivoire",
+    "ingredients": [
+      "banane plantain",
+      "igname ou manioc (selon la version)",
+      "viande ou poisson",
+      "tomate",
+      "aubergine",
+      "piment"
+    ],
+    "techniques": [
+      "bouillir et piler le plantain en pâte",
+      "préparer une sauce légère bouillie"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Jollof rice",
+    "country": "Nigeria, Ghana, Sierra Leone, Liberia",
+    "ingredients": [
+      "riz",
+      "tomate et poivron rouge mixés",
+      "oignon",
+      "piment (scotch bonnet)",
+      "concentré de tomate",
+      "bouillon, thym, curry, laurier"
+    ],
+    "techniques": [
+      "frire la base tomate-poivron",
+      "cuire le riz dans la sauce à l'étouffée"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Egusi soup",
+    "country": "Nigeria, Ghana, Sierra Leone",
+    "ingredients": [
+      "graines de courge moulues (egusi)",
+      "légumes-feuilles (épinard, feuilles amères)",
+      "huile de palme",
+      "viande, poisson fumé ou stockfish",
+      "crevettes séchées en poudre",
+      "piment"
+    ],
+    "techniques": [
+      "frire l'egusi dans l'huile de palme",
+      "mijoter avec la viande et les feuilles"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Efo riro",
+    "country": "Nigeria (Yoruba)",
+    "ingredients": [
+      "épinards ou amarante (efo)",
+      "poivron rouge, tomate et piment mixés",
+      "huile de palme",
+      "iru (graines de néré fermentées)",
+      "viande ou poisson fumé",
+      "crevettes séchées"
+    ],
+    "techniques": [
+      "frire la base de poivrons",
+      "ajouter les feuilles en fin de cuisson"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Okra soup",
+    "country": "Nigeria, Ghana",
+    "ingredients": [
+      "gombo haché ou râpé",
+      "huile de palme",
+      "viande ou poisson",
+      "crevettes séchées",
+      "piment",
+      "feuilles (ugu ou épinard)"
+    ],
+    "techniques": [
+      "râper le gombo",
+      "cuire brièvement pour garder le vert"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Ewedu et gbegiri",
+    "country": "Nigeria (Yoruba)",
+    "ingredients": [
+      "feuilles de corète (ewedu)",
+      "haricots pelés en purée (gbegiri)",
+      "huile de palme",
+      "iru",
+      "ragoût de tomate (obe ata)",
+      "amala (pâte d'igname séchée)"
+    ],
+    "techniques": [
+      "fouetter les feuilles cuites",
+      "réduire les haricots en purée lisse"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Moi moi (moin moin)",
+    "country": "Nigeria, Ghana, Bénin",
+    "ingredients": [
+      "niébé décortiqué mixé",
+      "poivron rouge et piment",
+      "oignon",
+      "huile",
+      "œuf dur ou poisson (souvent)",
+      "crevettes séchées (souvent)"
+    ],
+    "techniques": [
+      "mixer les haricots en pâte lisse",
+      "cuire à la vapeur en feuilles ou en moules"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Ewa agoyin (haricots à la sauce pimentée)",
+    "country": "Nigeria (Lagos)",
+    "ingredients": [
+      "haricots (niébé ou haricots honey)",
+      "huile de palme",
+      "piment séché",
+      "oignon",
+      "pain (agege bread, souvent)"
+    ],
+    "techniques": [
+      "cuire les haricots jusqu'à purée",
+      "frire longuement la sauce pimentée à l'huile de palme"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Yam porridge (asaro)",
+    "country": "Nigeria",
+    "ingredients": [
+      "igname",
+      "huile de palme",
+      "tomate, poivron et piment mixés",
+      "oignon",
+      "poisson fumé ou crevettes séchées",
+      "légumes-feuilles (facultatif)"
+    ],
+    "techniques": [
+      "cuire l'igname dans la sauce",
+      "écraser en partie pour épaissir"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Ogi (akamu, pap) avec akara",
+    "country": "Nigeria, Bénin (koko), Togo",
+    "ingredients": [
+      "maïs, sorgho ou mil fermenté (ogi)",
+      "eau bouillante",
+      "sucre",
+      "lait (facultatif)",
+      "akara en accompagnement"
+    ],
+    "techniques": [
+      "faire fermenter et tamiser la pâte de céréale",
+      "délayer à l'eau bouillante"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Puff-puff (beignets)",
+    "country": "Nigeria, Ghana (bofrot), Cameroun, Togo, Bénin",
+    "ingredients": [
+      "farine",
+      "levure",
+      "sucre",
+      "eau",
+      "muscade (facultatif)",
+      "huile de friture"
+    ],
+    "techniques": [
+      "laisser lever la pâte",
+      "frire en boules à la main"
+    ],
+    "moments": [
+      "snack",
+      "breakfast"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Suya",
+    "country": "Nigeria (nord), Niger (tchinchinga), Ghana (chichinga)",
+    "ingredients": [
+      "bœuf en fines tranches",
+      "yaji (épices à la poudre d'arachide)",
+      "huile",
+      "oignon cru",
+      "tomate"
+    ],
+    "techniques": [
+      "enrober d'épices",
+      "griller en brochettes sur la braise"
+    ],
+    "moments": [
+      "snack",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Dodo (plantain frit)",
+    "country": "Nigeria, Ghana, Bénin, Togo",
+    "ingredients": [
+      "banane plantain mûre",
+      "huile de friture",
+      "sel"
+    ],
+    "techniques": [
+      "frire en tranches"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Tuwo shinkafa et miyan kuka",
+    "country": "Nigeria (nord), Niger",
+    "ingredients": [
+      "riz très cuit (tuwo)",
+      "poudre de feuilles de baobab (kuka)",
+      "viande ou poisson séché",
+      "daddawa (néré fermenté)",
+      "oignon, piment"
+    ],
+    "techniques": [
+      "cuire le riz en pâte et façonner en boules",
+      "délayer la poudre de baobab dans le bouillon"
+    ],
+    "moments": [
+      "dinner",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Fura (fura da nono)",
+    "country": "Niger, Nigeria (nord), Burkina Faso, Ghana (nord)",
+    "ingredients": [
+      "boules de mil cuites et épicées (gingembre, piment)",
+      "lait caillé ou lait fermenté",
+      "sucre"
+    ],
+    "techniques": [
+      "piler le mil cuit en boules",
+      "émietter dans le lait caillé"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Dambou",
+    "country": "Niger, Nigeria (nord)",
+    "ingredients": [
+      "semoule de mil, maïs ou riz",
+      "feuilles de moringa",
+      "arachides pilées",
+      "oignon",
+      "huile"
+    ],
+    "techniques": [
+      "cuire la semoule à la vapeur",
+      "mélanger aux feuilles et aux arachides"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Hausa koko et koose",
+    "country": "Ghana",
+    "ingredients": [
+      "mil fermenté",
+      "gingembre",
+      "piment et clou de girofle",
+      "sucre",
+      "koose (akara) en accompagnement"
+    ],
+    "techniques": [
+      "faire fermenter la pâte de mil",
+      "cuire en bouillie épicée"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Waakye",
+    "country": "Ghana",
+    "ingredients": [
+      "riz",
+      "haricots (niébé ou haricots rouges)",
+      "feuilles de sorgho séchées (pour la couleur)",
+      "shito (sauce pimentée au poisson séché)",
+      "sauce tomate",
+      "œuf, gari ou spaghetti (accompagnements)"
+    ],
+    "techniques": [
+      "cuire les haricots avec les feuilles",
+      "cuire le riz dans l'eau des haricots"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Red red",
+    "country": "Ghana",
+    "ingredients": [
+      "niébé",
+      "huile de palme",
+      "tomate",
+      "oignon",
+      "piment",
+      "plantain frit (accompagnement)"
+    ],
+    "techniques": [
+      "cuire les haricots",
+      "mijoter dans une sauce à l'huile de palme"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Kenkey avec poisson frit",
+    "country": "Ghana",
+    "ingredients": [
+      "pâte de maïs fermentée",
+      "feuilles de maïs ou de bananier",
+      "poisson frit",
+      "sauce pimentée crue (tomate, oignon, piment)"
+    ],
+    "techniques": [
+      "fermenter la pâte de maïs",
+      "envelopper et cuire à l'eau"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Banku avec okro stew ou tilapia",
+    "country": "Ghana",
+    "ingredients": [
+      "pâte de maïs fermentée",
+      "pâte de manioc",
+      "tilapia grillé ou ragoût de gombo",
+      "piment, tomate et oignon écrasés"
+    ],
+    "techniques": [
+      "cuire la pâte en remuant vigoureusement",
+      "façonner en boules"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Fufu et light soup",
+    "country": "Ghana, Côte d'Ivoire, Togo",
+    "ingredients": [
+      "manioc et plantain bouillis et pilés",
+      "tomate",
+      "oignon",
+      "piment",
+      "chèvre, poulet ou poisson",
+      "gingembre"
+    ],
+    "techniques": [
+      "piler le fufu au mortier",
+      "mixer les légumes cuits dans le bouillon"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Groundnut soup (nkate nkwan)",
+    "country": "Ghana, Sierra Leone",
+    "ingredients": [
+      "pâte d'arachide",
+      "poulet ou chèvre",
+      "tomate",
+      "oignon",
+      "piment",
+      "gingembre"
+    ],
+    "techniques": [
+      "délayer la pâte d'arachide",
+      "mijoter jusqu'à ce que l'huile remonte"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Kontomire stew (palava sauce)",
+    "country": "Ghana",
+    "ingredients": [
+      "feuilles de taro (kontomire) ou épinards",
+      "huile de palme",
+      "egusi (souvent)",
+      "tomate",
+      "oignon",
+      "poisson fumé ou œuf"
+    ],
+    "techniques": [
+      "hacher les feuilles",
+      "mijoter en ragoût à l'huile de palme"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Kelewele",
+    "country": "Ghana",
+    "ingredients": [
+      "banane plantain bien mûre",
+      "gingembre",
+      "piment",
+      "oignon",
+      "sel",
+      "huile de friture"
+    ],
+    "techniques": [
+      "mariner les dés de plantain aux épices",
+      "frire"
+    ],
+    "moments": [
+      "snack",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Tuo zaafi (TZ)",
+    "country": "Ghana (nord), Burkina Faso",
+    "ingredients": [
+      "farine de maïs ou de mil",
+      "feuilles de corète ou de baobab (soupe ayoyo)",
+      "gombo",
+      "viande ou poisson séché",
+      "dawadawa"
+    ],
+    "techniques": [
+      "cuire la pâte en remuant",
+      "préparer une soupe verte gluante"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Gboma dessi (sauce aux épinards)",
+    "country": "Bénin, Togo",
+    "ingredients": [
+      "feuilles de gboma (morelle) ou épinards",
+      "tomate",
+      "oignon",
+      "huile de palme",
+      "poisson fumé ou viande",
+      "piment"
+    ],
+    "techniques": [
+      "blanchir et presser les feuilles",
+      "mijoter en sauce tomate"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Amiwo (pâte rouge)",
+    "country": "Bénin, Togo",
+    "ingredients": [
+      "farine de maïs",
+      "concentré de tomate",
+      "oignon",
+      "huile",
+      "poulet ou poisson frit",
+      "piment"
+    ],
+    "techniques": [
+      "préparer une sauce tomate",
+      "y cuire la farine en pâte"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Ablo",
+    "country": "Togo, Bénin",
+    "ingredients": [
+      "farine de maïs et farine de riz",
+      "levure",
+      "sucre",
+      "sel"
+    ],
+    "techniques": [
+      "faire fermenter la pâte",
+      "cuire à la vapeur dans de petits moules"
+    ],
+    "moments": [
+      "lunch",
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Bouillie de maïs ou de mil (koko, gnomi koko)",
+    "country": "Burkina Faso, Togo, Bénin, Côte d'Ivoire, Ghana",
+    "ingredients": [
+      "farine de maïs ou de mil",
+      "eau",
+      "sucre",
+      "jus de citron, gingembre ou tamarin",
+      "lait (facultatif)"
+    ],
+    "techniques": [
+      "délayer la farine",
+      "cuire en remuant jusqu'à épaississement"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Cachupa",
+    "country": "Cap-Vert",
+    "ingredients": [
+      "maïs concassé (hominy)",
+      "haricots (rouges, fèves, niébé)",
+      "manioc, patate douce, courge",
+      "chou",
+      "viande (porc, chorizo) ou poisson (thon) selon la version",
+      "oignon, ail, laurier"
+    ],
+    "techniques": [
+      "mijoter longuement maïs et haricots",
+      "ajouter légumes et viande"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Cachupa refogada",
+    "country": "Cap-Vert",
+    "ingredients": [
+      "cachupa de la veille",
+      "oignon",
+      "huile ou saindoux",
+      "œuf au plat",
+      "saucisse (facultatif)"
+    ],
+    "techniques": [
+      "faire sauter les restes de cachupa à la poêle"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Cuscus de milho (couscous de maïs)",
+    "country": "Cap-Vert",
+    "ingredients": [
+      "farine de maïs",
+      "eau",
+      "sel",
+      "beurre ou lait",
+      "miel de canne (facultatif)"
+    ],
+    "techniques": [
+      "humidifier la farine",
+      "cuire à la vapeur dans un binde (pot en terre)"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  }
+]

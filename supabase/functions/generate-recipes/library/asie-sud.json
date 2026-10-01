@@ -1,0 +1,1212 @@
+[
+  {
+    "name": "Aloo paratha (galette farcie aux pommes de terre)",
+    "country": "Inde du Nord (Pendjab), Pakistan",
+    "ingredients": [
+      "farine de blé complet (atta)",
+      "pommes de terre",
+      "piment vert et coriandre",
+      "cumin ou amchur",
+      "ghee ou beurre",
+      "yaourt pour accompagner"
+    ],
+    "techniques": [
+      "farcir et étaler la pâte",
+      "cuire au tawa avec du ghee"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Poha (riz aplati aux épices)",
+    "country": "Inde (Maharashtra, Madhya Pradesh)",
+    "ingredients": [
+      "riz aplati (poha)",
+      "oignon",
+      "pomme de terre ou petits pois",
+      "graines de moutarde et feuilles de curry",
+      "curcuma",
+      "cacahuètes, citron et coriandre"
+    ],
+    "techniques": [
+      "rincer le poha",
+      "tempérer les épices et mélanger"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Upma (semoule aux épices)",
+    "country": "Inde du Sud",
+    "ingredients": [
+      "semoule de blé (rava)",
+      "oignon",
+      "graines de moutarde, urad dal et feuilles de curry",
+      "piment vert et gingembre",
+      "légumes (carotte, petits pois)",
+      "ghee ou huile"
+    ],
+    "techniques": [
+      "griller la semoule",
+      "tempérer les épices",
+      "cuire à l'eau bouillante"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Idli (gâteaux de riz vapeur)",
+    "country": "Inde du Sud, Sri Lanka",
+    "ingredients": [
+      "riz",
+      "urad dal",
+      "sel",
+      "chutney de coco et sambar"
+    ],
+    "techniques": [
+      "tremper, moudre et fermenter la pâte",
+      "cuire à la vapeur"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Dosa (crêpe fermentée)",
+    "country": "Inde du Sud",
+    "ingredients": [
+      "riz",
+      "urad dal",
+      "sel",
+      "garniture de pommes de terre épicées (masala dosa)",
+      "chutney de coco et sambar"
+    ],
+    "techniques": [
+      "fermenter la pâte",
+      "étaler finement sur plaque chaude"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Uttapam (galette épaisse aux légumes)",
+    "country": "Inde du Sud",
+    "ingredients": [
+      "pâte à dosa ou idli",
+      "oignon",
+      "tomate",
+      "piment vert",
+      "coriandre"
+    ],
+    "techniques": [
+      "cuire une galette épaisse garnie sur plaque"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Ven pongal (riz et lentilles au poivre)",
+    "country": "Inde du Sud (Tamil Nadu)",
+    "ingredients": [
+      "riz",
+      "moong dal",
+      "poivre noir et cumin",
+      "gingembre et feuilles de curry",
+      "ghee",
+      "noix de cajou"
+    ],
+    "techniques": [
+      "cuire riz et lentilles ensemble",
+      "tempérer au ghee"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Medu vada (beignet de lentilles)",
+    "country": "Inde du Sud, Sri Lanka",
+    "ingredients": [
+      "urad dal",
+      "piment vert",
+      "gingembre",
+      "feuilles de curry",
+      "poivre noir"
+    ],
+    "techniques": [
+      "mixer en pâte aérée",
+      "former un anneau et frire"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Sambar (lentilles aux légumes et tamarin)",
+    "country": "Inde du Sud, Sri Lanka",
+    "ingredients": [
+      "toor dal",
+      "tamarin",
+      "poudre de sambar",
+      "légumes (drumstick, aubergine, courge, oignon)",
+      "graines de moutarde et feuilles de curry"
+    ],
+    "techniques": [
+      "cuire les lentilles",
+      "mijoter avec légumes et tamarin",
+      "tempérer"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Rasam (bouillon poivré au tamarin)",
+    "country": "Inde du Sud",
+    "ingredients": [
+      "tamarin",
+      "tomate",
+      "poivre noir et cumin",
+      "ail",
+      "toor dal (eau de cuisson)",
+      "graines de moutarde et feuilles de curry"
+    ],
+    "techniques": [
+      "piler les épices",
+      "frémir sans bouillir longtemps",
+      "tempérer"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Thoran / Poriyal (légumes sautés à la noix de coco)",
+    "country": "Inde du Sud (Kerala, Tamil Nadu)",
+    "ingredients": [
+      "légume finement coupé (chou, haricots verts, carotte, betterave)",
+      "noix de coco râpée",
+      "graines de moutarde",
+      "feuilles de curry",
+      "piment vert",
+      "curcuma"
+    ],
+    "techniques": [
+      "tempérer les graines",
+      "sauter à couvert",
+      "finir à la noix de coco"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Avial (légumes à la noix de coco et au yaourt)",
+    "country": "Inde du Sud (Kerala)",
+    "ingredients": [
+      "légumes mélangés (banane plantain, courge, drumstick, carotte, haricots)",
+      "noix de coco",
+      "cumin et piment vert",
+      "yaourt",
+      "huile de coco et feuilles de curry"
+    ],
+    "techniques": [
+      "cuire les légumes en bâtonnets",
+      "lier à la pâte de coco"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Meen curry (curry de poisson)",
+    "country": "Inde du Sud (Kerala), Sri Lanka",
+    "ingredients": [
+      "poisson",
+      "tamarin malabar (kudampuli) ou tamarin",
+      "piment et curcuma",
+      "lait de coco (selon la région)",
+      "gingembre, ail, échalotes",
+      "feuilles de curry"
+    ],
+    "techniques": [
+      "mijoter dans la sauce acide"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Curd rice (riz au yaourt)",
+    "country": "Inde du Sud",
+    "ingredients": [
+      "riz cuit",
+      "yaourt",
+      "graines de moutarde et urad dal",
+      "feuilles de curry",
+      "piment vert et gingembre"
+    ],
+    "techniques": [
+      "écraser le riz avec le yaourt",
+      "tempérer"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Dal tadka (lentilles tempérées)",
+    "country": "Inde du Nord",
+    "ingredients": [
+      "lentilles (toor dal, masoor dal ou moong dal)",
+      "curcuma",
+      "tomate et oignon",
+      "ail",
+      "cumin",
+      "ghee"
+    ],
+    "techniques": [
+      "cuire les lentilles",
+      "verser un tadka d'épices frites au ghee"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Rajma chawal (haricots rouges et riz)",
+    "country": "Inde du Nord (Pendjab, Jammu)",
+    "ingredients": [
+      "haricots rouges",
+      "oignon, tomate",
+      "gingembre et ail",
+      "garam masala et cumin",
+      "riz"
+    ],
+    "techniques": [
+      "tremper et cuire les haricots",
+      "mijoter dans le masala"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Chole (pois chiches épicés)",
+    "country": "Inde du Nord, Pakistan",
+    "ingredients": [
+      "pois chiches",
+      "oignon et tomate",
+      "gingembre et ail",
+      "chana masala (coriandre, cumin, amchur)",
+      "thé noir pour la couleur (facultatif)"
+    ],
+    "techniques": [
+      "cuire les pois chiches",
+      "mijoter dans le masala"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Puri bhaji / Halwa puri (pains frits et accompagnement)",
+    "country": "Inde du Nord, Pakistan",
+    "ingredients": [
+      "farine de blé complet",
+      "huile de friture",
+      "pommes de terre épicées (aloo bhaji) ou chole",
+      "halwa de semoule (version pakistanaise)"
+    ],
+    "techniques": [
+      "étaler de petits disques",
+      "frire jusqu'à ce qu'ils gonflent"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Aloo gobi (pommes de terre et chou-fleur)",
+    "country": "Inde du Nord, Pakistan",
+    "ingredients": [
+      "pommes de terre",
+      "chou-fleur",
+      "oignon et tomate",
+      "curcuma et cumin",
+      "gingembre",
+      "coriandre"
+    ],
+    "techniques": [
+      "sauter puis cuire à couvert"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Bhindi masala (gombos sautés)",
+    "country": "Inde, Pakistan",
+    "ingredients": [
+      "gombos",
+      "oignon",
+      "tomate",
+      "curcuma et poudre de coriandre",
+      "amchur ou citron"
+    ],
+    "techniques": [
+      "sauter à découvert pour éviter le gluant"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Baingan bharta (aubergine fumée écrasée)",
+    "country": "Inde du Nord, Pakistan (baingan ka bharta)",
+    "ingredients": [
+      "aubergine",
+      "oignon",
+      "tomate",
+      "ail et piment vert",
+      "coriandre"
+    ],
+    "techniques": [
+      "griller l'aubergine sur la flamme",
+      "écraser et sauter avec le masala"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Palak paneer (épinards au fromage frais)",
+    "country": "Inde du Nord",
+    "ingredients": [
+      "épinards",
+      "paneer",
+      "oignon et tomate",
+      "gingembre et ail",
+      "garam masala",
+      "crème (facultatif)"
+    ],
+    "techniques": [
+      "blanchir et mixer les épinards",
+      "mijoter avec le paneer"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Kadhi pakora (sauce au yaourt et beignets)",
+    "country": "Inde du Nord (Pendjab, Rajasthan, Gujarat)",
+    "ingredients": [
+      "yaourt",
+      "farine de pois chiche (besan)",
+      "curcuma",
+      "oignon",
+      "graines de fenugrec, cumin et moutarde"
+    ],
+    "techniques": [
+      "fouetter yaourt et besan",
+      "mijoter longuement",
+      "ajouter des pakoras frits"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Sarson ka saag et makki di roti (feuilles de moutarde et galette de maïs)",
+    "country": "Inde du Nord (Pendjab), Pakistan (Pendjab)",
+    "ingredients": [
+      "feuilles de moutarde",
+      "épinards ou bathua",
+      "farine de maïs",
+      "gingembre, ail, piment vert",
+      "ghee ou beurre"
+    ],
+    "techniques": [
+      "cuire longuement et écraser les feuilles",
+      "cuire les galettes au tawa"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Khichdi / Khichuri (riz et lentilles)",
+    "country": "Inde, Bangladesh, Pakistan, Népal",
+    "ingredients": [
+      "riz",
+      "lentilles (moong dal, masoor dal)",
+      "curcuma",
+      "cumin",
+      "ghee",
+      "légumes (facultatif)"
+    ],
+    "techniques": [
+      "cuire riz et lentilles ensemble",
+      "tempérer au ghee"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Pulao (riz parfumé aux légumes)",
+    "country": "Inde, Pakistan, Bangladesh",
+    "ingredients": [
+      "riz basmati",
+      "légumes (petits pois, carotte) ou viande",
+      "oignon",
+      "épices entières (cardamome, clou de girofle, cannelle, laurier)",
+      "ghee ou huile"
+    ],
+    "techniques": [
+      "frire les épices entières",
+      "cuire le riz par absorption"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Biryani",
+    "country": "Inde (Hyderabad, Lucknow, Kolkata), Pakistan (Sindh), Bangladesh",
+    "ingredients": [
+      "riz basmati",
+      "viande (poulet, mouton) marinée au yaourt",
+      "oignons frits",
+      "épices entières et garam masala",
+      "safran ou lait",
+      "menthe et coriandre"
+    ],
+    "techniques": [
+      "mariner",
+      "précuire le riz",
+      "superposer et cuire à l'étouffée (dum)"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Murgh curry (curry de poulet maison)",
+    "country": "Inde, Pakistan, Bangladesh",
+    "ingredients": [
+      "poulet",
+      "oignon",
+      "tomate",
+      "gingembre et ail",
+      "curcuma, piment, coriandre, garam masala",
+      "yaourt (facultatif)"
+    ],
+    "techniques": [
+      "revenir longuement l'oignon (bhuna)",
+      "mijoter"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Chicken karahi (poulet sauté au karahi)",
+    "country": "Pakistan, Inde du Nord",
+    "ingredients": [
+      "poulet",
+      "tomates",
+      "gingembre et ail",
+      "piment vert",
+      "poivre noir et coriandre concassée",
+      "huile ou ghee"
+    ],
+    "techniques": [
+      "cuire à feu vif dans le karahi jusqu'à réduction de la tomate"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Aloo keema (viande hachée aux pommes de terre)",
+    "country": "Pakistan, Inde du Nord",
+    "ingredients": [
+      "viande hachée (bœuf, mouton)",
+      "pommes de terre ou petits pois",
+      "oignon et tomate",
+      "gingembre et ail",
+      "garam masala"
+    ],
+    "techniques": [
+      "revenir le masala",
+      "cuire la viande jusqu'à évaporation"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Nihari (ragoût de bœuf mijoté)",
+    "country": "Pakistan, Inde (Delhi, Lucknow)",
+    "ingredients": [
+      "jarret de bœuf ou de mouton",
+      "farine de blé (pour lier)",
+      "mélange d'épices nihari",
+      "oignon frit",
+      "gingembre et citron pour garnir"
+    ],
+    "techniques": [
+      "mijoter toute la nuit",
+      "lier à la farine"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Haleem (ragoût de céréales, lentilles et viande)",
+    "country": "Pakistan, Inde (Hyderabad), Bangladesh",
+    "ingredients": [
+      "blé concassé ou orge",
+      "lentilles mélangées",
+      "viande (bœuf, mouton, poulet)",
+      "oignons frits",
+      "gingembre, ail, garam masala"
+    ],
+    "techniques": [
+      "mijoter très longuement",
+      "battre jusqu'à texture lisse et filante"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Rogan josh (agneau au piment du Cachemire)",
+    "country": "Inde (Cachemire)",
+    "ingredients": [
+      "agneau ou mouton",
+      "yaourt",
+      "piment du Cachemire",
+      "fenouil et gingembre en poudre",
+      "cardamome et clou de girofle"
+    ],
+    "techniques": [
+      "saisir la viande",
+      "mijoter longuement"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Anda bhurji (œufs brouillés épicés)",
+    "country": "Inde, Pakistan (anda khagina)",
+    "ingredients": [
+      "œufs",
+      "oignon",
+      "tomate",
+      "piment vert",
+      "curcuma",
+      "coriandre"
+    ],
+    "techniques": [
+      "revenir le masala",
+      "brouiller les œufs"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Anda curry (curry d'œufs durs)",
+    "country": "Inde, Pakistan, Bangladesh (dimer jhol)",
+    "ingredients": [
+      "œufs durs",
+      "oignon",
+      "tomate",
+      "gingembre et ail",
+      "curcuma, piment, garam masala"
+    ],
+    "techniques": [
+      "dorer les œufs durs",
+      "mijoter dans la sauce"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Thepla (galette au fenugrec)",
+    "country": "Inde (Gujarat)",
+    "ingredients": [
+      "farine de blé complet",
+      "feuilles de fenugrec (methi)",
+      "yaourt",
+      "curcuma et piment",
+      "huile"
+    ],
+    "techniques": [
+      "pétrir une pâte souple",
+      "cuire au tawa"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Dhokla (gâteau vapeur de pois chiche)",
+    "country": "Inde (Gujarat)",
+    "ingredients": [
+      "farine de pois chiche (besan)",
+      "yaourt ou citron",
+      "gingembre et piment vert",
+      "bicarbonate (eno)",
+      "graines de moutarde et feuilles de curry"
+    ],
+    "techniques": [
+      "cuire à la vapeur",
+      "arroser d'un tadka"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Samosa (chausson frit)",
+    "country": "Inde, Pakistan, Bangladesh (singara), Népal",
+    "ingredients": [
+      "farine de blé",
+      "pommes de terre",
+      "petits pois",
+      "cumin, coriandre et garam masala",
+      "piment vert",
+      "huile de friture"
+    ],
+    "techniques": [
+      "façonner en cône",
+      "frire à feu moyen"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Pakora / Bhaji (beignets de légumes)",
+    "country": "Inde, Pakistan, Bangladesh, Népal",
+    "ingredients": [
+      "farine de pois chiche (besan)",
+      "légumes (oignon, pomme de terre, épinards, piment)",
+      "cumin ou ajwain",
+      "piment",
+      "huile de friture"
+    ],
+    "techniques": [
+      "enrober de pâte épaisse",
+      "frire"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Pav bhaji (purée de légumes épicée et petits pains)",
+    "country": "Inde (Mumbai, Maharashtra)",
+    "ingredients": [
+      "pommes de terre",
+      "légumes (chou-fleur, petits pois, poivron, tomate)",
+      "pav bhaji masala",
+      "beurre",
+      "petits pains (pav)",
+      "oignon et citron"
+    ],
+    "techniques": [
+      "écraser les légumes sur la plaque avec le beurre",
+      "griller les pains"
+    ],
+    "moments": [
+      "snack",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Vada pav (beignet de pomme de terre en petit pain)",
+    "country": "Inde (Mumbai)",
+    "ingredients": [
+      "pommes de terre épicées",
+      "farine de pois chiche (besan)",
+      "petits pains (pav)",
+      "chutney vert et chutney d'ail sec"
+    ],
+    "techniques": [
+      "façonner des boulettes",
+      "enrober et frire"
+    ],
+    "moments": [
+      "snack",
+      "breakfast"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Bhel puri / Chana chaat (en-cas croquant ou aux pois chiches)",
+    "country": "Inde, Pakistan",
+    "ingredients": [
+      "riz soufflé ou pois chiches cuits",
+      "oignon et tomate",
+      "pomme de terre cuite",
+      "chutney de tamarin et chutney vert",
+      "chaat masala",
+      "coriandre"
+    ],
+    "techniques": [
+      "assembler à la minute"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Maacher jhol (curry léger de poisson)",
+    "country": "Bangladesh, Inde (Bengale-Occidental)",
+    "ingredients": [
+      "poisson (rohu, carpe)",
+      "pommes de terre",
+      "curcuma",
+      "huile de moutarde",
+      "cumin et piment vert",
+      "panch phoron"
+    ],
+    "techniques": [
+      "frire le poisson curcumé",
+      "mijoter dans un bouillon léger"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Shorshe ilish (alose à la moutarde)",
+    "country": "Bangladesh, Inde (Bengale-Occidental)",
+    "ingredients": [
+      "alose (ilish) ou autre poisson",
+      "graines de moutarde moulues",
+      "huile de moutarde",
+      "piment vert",
+      "curcuma"
+    ],
+    "techniques": [
+      "napper de pâte de moutarde",
+      "cuire à la vapeur ou mijoter"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Bhorta (purée relevée : aloo, begun, shutki)",
+    "country": "Bangladesh, Inde (Bengale)",
+    "ingredients": [
+      "pomme de terre, aubergine grillée ou poisson séché",
+      "huile de moutarde",
+      "oignon cru",
+      "piment (vert ou sec grillé)",
+      "coriandre"
+    ],
+    "techniques": [
+      "cuire ou griller",
+      "écraser à la main avec les condiments"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Masoor dal (lentilles corail)",
+    "country": "Bangladesh, Inde, Pakistan",
+    "ingredients": [
+      "lentilles corail",
+      "curcuma",
+      "oignon",
+      "ail",
+      "piment vert ou sec",
+      "cumin"
+    ],
+    "techniques": [
+      "cuire les lentilles fluides",
+      "tempérer à l'huile"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Panta bhat (riz fermenté dans l'eau)",
+    "country": "Bangladesh, Inde (Bengale, Odisha : pakhala)",
+    "ingredients": [
+      "riz cuit de la veille",
+      "eau",
+      "sel",
+      "oignon et piment vert",
+      "bhorta ou poisson frit en accompagnement"
+    ],
+    "techniques": [
+      "laisser tremper le riz cuit une nuit"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Dal bhat (riz, lentilles et accompagnements)",
+    "country": "Népal",
+    "ingredients": [
+      "riz",
+      "lentilles (dal)",
+      "légumes de saison (tarkari)",
+      "achar (condiment)",
+      "épinards ou feuilles sautées (saag)"
+    ],
+    "techniques": [
+      "cuire le dal et tempérer",
+      "servir en assiette composée"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Momo (raviolis)",
+    "country": "Népal, Tibet, Inde (Himalaya)",
+    "ingredients": [
+      "farine de blé",
+      "viande hachée (buffle, poulet, porc) ou légumes",
+      "oignon",
+      "gingembre et ail",
+      "achar de tomate et sésame"
+    ],
+    "techniques": [
+      "farcir et plisser",
+      "cuire à la vapeur"
+    ],
+    "moments": [
+      "snack",
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Aloo tama (pommes de terre et pousses de bambou)",
+    "country": "Népal",
+    "ingredients": [
+      "pousses de bambou fermentées (tama)",
+      "pommes de terre",
+      "haricots à œil noir",
+      "tomate",
+      "curcuma et cumin"
+    ],
+    "techniques": [
+      "mijoter"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Gundruk ko jhol (soupe de feuilles fermentées)",
+    "country": "Népal",
+    "ingredients": [
+      "gundruk (feuilles de moutarde ou de radis fermentées séchées)",
+      "tomate",
+      "oignon et ail",
+      "piment",
+      "soja grillé (facultatif)"
+    ],
+    "techniques": [
+      "réhydrater le gundruk",
+      "mijoter en soupe"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Sel roti (anneau de riz frit)",
+    "country": "Népal",
+    "ingredients": [
+      "farine de riz",
+      "sucre",
+      "ghee ou beurre",
+      "banane (facultatif)",
+      "huile de friture"
+    ],
+    "techniques": [
+      "verser la pâte en anneau",
+      "frire"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Kiribath (riz au lait de coco)",
+    "country": "Sri Lanka",
+    "ingredients": [
+      "riz",
+      "lait de coco",
+      "sel",
+      "lunu miris (oignon et piment pilés)"
+    ],
+    "techniques": [
+      "cuire le riz puis ajouter le lait de coco",
+      "étaler et couper en losanges"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Appa (hoppers, crêpes en bol)",
+    "country": "Sri Lanka, Inde du Sud (appam)",
+    "ingredients": [
+      "farine de riz",
+      "lait de coco",
+      "levure ou toddy",
+      "sucre",
+      "œuf (version egg hopper)"
+    ],
+    "techniques": [
+      "fermenter la pâte",
+      "cuire en faisant tourner dans une petite poêle bombée"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Indiappa (string hoppers, nids de vermicelles vapeur)",
+    "country": "Sri Lanka, Inde du Sud (idiyappam)",
+    "ingredients": [
+      "farine de riz",
+      "eau chaude",
+      "sel",
+      "kiri hodi (sauce au lait de coco) ou curry"
+    ],
+    "techniques": [
+      "presser la pâte en vermicelles",
+      "cuire à la vapeur"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Parippu (curry de lentilles au coco)",
+    "country": "Sri Lanka",
+    "ingredients": [
+      "lentilles corail",
+      "lait de coco",
+      "curcuma",
+      "oignon et ail",
+      "piment vert",
+      "feuilles de curry et graines de moutarde"
+    ],
+    "techniques": [
+      "cuire les lentilles",
+      "finir au lait de coco et tempérer"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Pol sambol (condiment de noix de coco)",
+    "country": "Sri Lanka",
+    "ingredients": [
+      "noix de coco râpée",
+      "piment en poudre ou flocons",
+      "oignon rouge",
+      "citron vert",
+      "sel",
+      "poisson séché de Maldive (facultatif)"
+    ],
+    "techniques": [
+      "piler et mélanger à la main"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Gotu kola sambol (salade de centella)",
+    "country": "Sri Lanka",
+    "ingredients": [
+      "feuilles de centella (gotu kola)",
+      "noix de coco râpée",
+      "échalotes",
+      "piment vert",
+      "citron vert"
+    ],
+    "techniques": [
+      "émincer très finement",
+      "mélanger à cru"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Kottu roti (galette hachée sautée)",
+    "country": "Sri Lanka",
+    "ingredients": [
+      "godamba roti (galette) en lanières",
+      "légumes (chou, carotte, poireau, oignon)",
+      "œuf",
+      "poulet ou bœuf (facultatif)",
+      "sauce de curry"
+    ],
+    "techniques": [
+      "hacher et sauter sur plaque avec deux lames"
+    ],
+    "moments": [
+      "dinner",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Ambul thiyal (thon aigre aux épices)",
+    "country": "Sri Lanka (Sud)",
+    "ingredients": [
+      "thon",
+      "goraka (tamarin malabar)",
+      "poivre noir",
+      "ail et gingembre",
+      "cannelle et feuilles de curry"
+    ],
+    "techniques": [
+      "enrober d'épices",
+      "cuire à sec à feu doux jusqu'à réduction"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  }
+]
