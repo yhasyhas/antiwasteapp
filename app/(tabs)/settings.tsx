@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Bell, Globe, LogOut, Minus, Plus, Trash2, UserRound, Users, Utensils } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -24,6 +24,7 @@ import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { Touchable } from '@/components/ui/Touchable';
 import { APP_LANGUAGES } from '@/lib/languages';
 import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
+import { showDialog } from '@/lib/dialog';
 
 export default function SettingsScreen() {
   const { language, t } = useLanguage();
@@ -43,7 +44,7 @@ export default function SettingsScreen() {
       signOut();
       return;
     }
-    Alert.alert(t('settings.guestSignOutTitle'), t('settings.guestSignOutText'), [
+    showDialog(t('settings.guestSignOutTitle'), t('settings.guestSignOutText'), [
       { text: t('common.cancel'), style: 'cancel' },
       { text: t('upgrade.title'), onPress: () => router.push('/auth/upgrade') },
       { text: t('settings.signOut'), style: 'destructive', onPress: () => signOut() },
@@ -56,7 +57,7 @@ export default function SettingsScreen() {
       await setDisplayName(name);
       setEditingName(false);
     } catch {
-      Alert.alert(t('common.error'), t('household.errors.unknown'));
+      showDialog(t('common.error'), t('household.errors.unknown'));
     } finally {
       setSavingName(false);
     }
@@ -65,8 +66,8 @@ export default function SettingsScreen() {
   const testNotification = async () => {
     if (!user) return;
     const result = await sendTestReminder(user.id);
-    if (result === 'denied') Alert.alert(t('notifications.deniedTitle'), t('notifications.deniedText'));
-    else Alert.alert(t('notifications.testButton'), t('notifications.testSent'));
+    if (result === 'denied') showDialog(t('notifications.deniedTitle'), t('notifications.deniedText'));
+    else showDialog(t('notifications.testButton'), t('notifications.testSent'));
   };
 
   // « Vider le garde-manger » : tous les lots du foyer retirés en une action, rétablissable pendant 24 heures
@@ -76,11 +77,11 @@ export default function SettingsScreen() {
     if (!rows) return;
     const foods = pantryGroups(rows).length;
     if (foods === 0) {
-      Alert.alert(t('settings.clearPantry'), t('settings.clearPantryEmpty'));
+      showDialog(t('settings.clearPantry'), t('settings.clearPantryEmpty'));
       return;
     }
     const shared = household?.shared ?? false;
-    Alert.alert(
+    showDialog(
       t('settings.clearPantryTitle'),
       `${t(shared ? 'settings.clearPantryShared' : 'settings.clearPantryPersonal', { count: foods })} ${t('settings.clearPantryLots', { count: rows.length })} ${t('settings.clearPantryUndo')}`,
       [
@@ -95,7 +96,7 @@ export default function SettingsScreen() {
               return;
             }
             notifyPantryChanged();
-            Alert.alert(t('settings.clearPantry'), t('settings.clearPantryDone', { count: foods }));
+            showDialog(t('settings.clearPantry'), t('settings.clearPantryDone', { count: foods }));
           },
         },
       ],

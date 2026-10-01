@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, RefreshControl, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
+import { RefreshControl, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { Share2, UserMinus } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -26,6 +26,7 @@ import {
 } from '@/lib/household';
 import { inviteLink, normalizeInviteCode } from '@/lib/invite';
 import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
+import { showDialog } from '@/lib/dialog';
 
 // Écran « Mon foyer » : code d'invitation (partage du lien), membres, rejoindre un foyer, quitter le foyer ;
 // le propriétaire peut retirer un membre. Le nom affiché se modifie dans Réglages.
@@ -46,7 +47,7 @@ export default function HouseholdScreen() {
     if (!invitedCode) return;
     setCode(invitedCode);
     if (household?.shared && household.invite?.code !== invitedCode) {
-      Alert.alert(t('household.title'), t('household.errors.already_in_household'));
+      showDialog(t('household.title'), t('household.errors.already_in_household'));
     }
   }, [invitedCode, household?.shared]);
 
@@ -62,7 +63,7 @@ export default function HouseholdScreen() {
 
   const showError = (error: unknown) => {
     const key = error instanceof HouseholdActionError ? error.code : 'unknown';
-    Alert.alert(t('common.error'), t(`household.errors.${key}`));
+    showDialog(t('common.error'), t(`household.errors.${key}`));
   };
 
   // Action avec indicateur sur son bouton ; erreurs traduites
@@ -128,19 +129,19 @@ export default function HouseholdScreen() {
     }
     await joinHousehold(trimmed, transfer);
     setCode('');
-    Alert.alert(t('household.joinedTitle'), t('household.joinedText'));
+    showDialog(t('household.joinedTitle'), t('household.joinedText'));
   });
 
   const leave = () => {
     const last = (household?.members.length ?? 0) <= 1;
-    Alert.alert(t('household.leaveTitle'), last ? t('household.leaveLastText') : t('household.leaveText'), [
+    showDialog(t('household.leaveTitle'), last ? t('household.leaveLastText') : t('household.leaveText'), [
       { text: t('common.cancel'), style: 'cancel' },
       { text: t('household.leave'), style: 'destructive', onPress: () => run('leave', leaveHousehold) },
     ]);
   };
 
   const remove = (member: HouseholdMember) => {
-    Alert.alert(t('household.removeTitle'), t('household.removeText', { name: member.name ?? t('household.guest') }), [
+    showDialog(t('household.removeTitle'), t('household.removeText', { name: member.name ?? t('household.guest') }), [
       { text: t('common.cancel'), style: 'cancel' },
       { text: t('household.remove'), style: 'destructive', onPress: () => run(`remove-${member.user_id}`, () => removeMember(member.user_id)) },
     ]);
@@ -285,7 +286,7 @@ export default function HouseholdScreen() {
 // Question avec plusieurs réponses (Annuler en plus) ; null si annulée
 function ask(title: string, message: string, cancel: string, options: { label: string; value: string }[]): Promise<string | null> {
   return new Promise((resolve) => {
-    Alert.alert(
+    showDialog(
       title,
       message,
       [

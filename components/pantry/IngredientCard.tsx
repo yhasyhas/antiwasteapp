@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import ReanimatedSwipeable, { type SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { Info, Trash2 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -12,6 +12,7 @@ import { FoodIcon } from './FoodIcon';
 import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 import type { FoodKind } from '@/lib/expiry';
 import { displayQuantity } from '@/lib/quantity';
+import { showDialog } from '@/lib/dialog';
 
 export interface PantryIngredient {
   id: string;
@@ -76,7 +77,7 @@ export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry
 
   // Appui long : toutes les actions de l'aliment
   const showActions = () => {
-    Alert.alert(name, undefined, [
+    showDialog(name, undefined, [
       ...(openFact ? [{ text: isDish ? t('pantry.viewDetails') : t('pantry.viewFact'), onPress: openFact }] : []),
       { text: t('expiry.edit'), onPress: onEditExpiry },
       { text: t('common.delete'), style: 'destructive' as const, onPress: onDelete },

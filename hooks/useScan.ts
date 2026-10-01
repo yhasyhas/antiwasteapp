@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Alert } from 'react-native';
+
 import * as ImageManipulator from 'expo-image-manipulator';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,6 +16,7 @@ import { addPantryItems, defaultChoice, loadPantry, PantryConflictError, pantryG
 import type { LotGroup } from '@/lib/pantryLots';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import type { AddChoice } from '@/components/pantry/ExistingFoodChoice';
+import { showDialog } from '@/lib/dialog';
 
 // Durée de l'information « Aucun aliment ajouté »
 const NOTICE_MS = 3000;
@@ -117,7 +118,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
         });
       } catch (error) {
         if (!(error instanceof SessionExpiredError)) throw error;
-        Alert.alert(t('common.sessionExpiredTitle'), t('common.sessionExpiredText'));
+        showDialog(t('common.sessionExpiredTitle'), t('common.sessionExpiredText'));
         return;
       }
       const { response, data } = result;
@@ -127,7 +128,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
         const message = [data?.message || data?.error, data?.details].filter(Boolean).join('\n') || `HTTP ${response.status}`;
         // Quota personnel, quota des fournisseurs (secours compris) ou panne : le message du serveur l'explique,
         // l'ajout manuel reste possible
-        Alert.alert(failureTitle(t, failureReasonOf(data), t('scan.analysisFailed')), message, [
+        showDialog(failureTitle(t, failureReasonOf(data), t('scan.analysisFailed')), message, [
           { text: t('scan.addManually'), onPress: onManualAdd },
           { text: t('common.ok'), style: 'cancel' },
         ]);
@@ -161,7 +162,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
         confirming = true;
         setShowConfirmation(true);
       } else {
-        Alert.alert(
+        showDialog(
           t('scan.noIngredientsTitle'),
           t('scan.noIngredientsText'),
           [
@@ -172,7 +173,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
       }
     } catch (error) {
       console.error('[scan] analyse impossible :', error);
-      Alert.alert(t('common.error'), t('scan.analyzeError', { message: error instanceof Error ? error.message : String(error) }));
+      showDialog(t('common.error'), t('scan.analyzeError', { message: error instanceof Error ? error.message : String(error) }));
     } finally {
       setAnalyzing(false);
       if (!confirming) setCapturedImage(null);
@@ -219,7 +220,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
       if (error instanceof PantryConflictError) {
         // Un membre du foyer vient de changer un lot : garde-manger relu, choix à vérifier
         setGroups(pantryGroups(await loadPantry()));
-        Alert.alert(t('existing.conflictTitle'), t('existing.conflictText'));
+        showDialog(t('existing.conflictTitle'), t('existing.conflictText'));
       } else {
         alertWriteError(t, 'saving scanned ingredients', error);
       }
@@ -246,7 +247,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
     linkPantryFoodKeys();
     // Premier ajout d'une date : proposition des rappels avant le message de confirmation
     await maybeAskNotificationPermission();
-    Alert.alert(
+    showDialog(
       t('scan.ingredientsAdded'),
       t('scan.addedToPantry', { count: confirmed.length }),
       [

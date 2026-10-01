@@ -15,6 +15,7 @@ import { Figtree_700Bold } from '@expo-google-fonts/figtree/700Bold';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext';
+import { DialogHost } from '@/components/ui/DialogHost';
 import { useExpiryReminders } from '@/hooks/useExpiryReminders';
 import { useHouseholdSession } from '@/hooks/useHousehold';
 import { colors, motion } from '@/constants/theme';
@@ -88,6 +89,7 @@ function RootLayout() {
       <AuthProvider>
         <LanguageProvider>
           <RootNavigator />
+          <DialogHost />
           <StatusBar style="dark" />
         </LanguageProvider>
       </AuthProvider>

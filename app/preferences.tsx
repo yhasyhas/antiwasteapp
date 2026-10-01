@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,6 +14,7 @@ import { colors, sizes, spacing, typography } from '@/constants/theme';
 import { CookTimeChoice, ExcludedEditor, ServingsStepper } from '@/components/recipe/PreferenceControls';
 import { cuisineOptions, dietaryOptions } from '@/components/recipe/options';
 import { DEFAULT_PREFERENCES, loadPreferences, savePreferences, type Preferences } from '@/lib/preferences';
+import { showDialog } from '@/lib/dialog';
 
 // Préférences de génération : régimes, aliments exclus (allergies, goûts), temps maximum, cuisine
 // préférée, nombre de personnes. Appliquées par défaut à chaque génération (modifiables dans les filtres).
@@ -40,7 +41,7 @@ export default function PreferencesScreen() {
       router.back();
     } catch (error) {
       console.warn('[préférences]', error);
-      Alert.alert(t('errors.writeTitle'), t('errors.writeText'));
+      showDialog(t('errors.writeTitle'), t('errors.writeText'));
     } finally {
       setSaving(false);
     }

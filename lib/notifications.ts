@@ -1,4 +1,5 @@
-import { Alert, Platform } from 'react-native';
+import { Platform } from 'react-native';
+import { showDialog } from '@/lib/dialog';
 import { isRunningInExpoGo } from 'expo';
 import * as Notifications from '@/lib/notificationsApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -205,7 +206,7 @@ export async function maybeAskNotificationPermission(): Promise<void> {
 
     const t = i18n.t;
     const accepted = await new Promise<boolean>((resolve) => {
-      Alert.alert(
+      showDialog(
         t('notifications.permissionTitle'),
         t('notifications.permissionText'),
         [

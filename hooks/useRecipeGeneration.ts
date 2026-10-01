@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Alert } from 'react-native';
+
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -18,6 +18,7 @@ import { groupLots, totalLabel } from '@/lib/pantryLots';
 import { useFoodNaming } from '@/lib/foodNames';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import type { Filters, Recipe } from '@/components/recipe/types';
+import { showDialog } from '@/lib/dialog';
 
 // standard : toutes les recettes ; leftovers : « Transformer mes restes » (plats cuisinés du garde-manger)
 export type GenerationMode = 'standard' | 'leftovers';
@@ -128,7 +129,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
 
   const generateRecipes = async (mode: GenerationMode = 'standard') => {
     if (ingredients.length === 0) {
-      Alert.alert(t('generate.noIngredientsTitle'), t('generate.noIngredientsText'));
+      showDialog(t('generate.noIngredientsTitle'), t('generate.noIngredientsText'));
       return;
     }
 
@@ -178,13 +179,13 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
         images.requestAll(saved);
       } else if (data?.error) {
         // Quota personnel, quota des fournisseurs (secours compris) ou panne
-        Alert.alert(failureTitle(t, failureReasonOf(data), t('common.error')), data.message || t('generate.failed'));
+        showDialog(failureTitle(t, failureReasonOf(data), t('common.error')), data.message || t('generate.failed'));
       } else {
-        Alert.alert(t('common.error'), t('generate.failed'));
+        showDialog(t('common.error'), t('generate.failed'));
       }
     } catch (error) {
       console.error('Error generating recipes:', error);
-      Alert.alert(t('common.error'), t('generate.failed'));
+      showDialog(t('common.error'), t('generate.failed'));
     } finally {
       setGenerating(false);
       setGeneratingMode(null);
@@ -282,7 +283,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
     images.request({ id, image_url: recipe.image_url });
     if (!favorite) return;
 
-    Alert.alert(
+    showDialog(
       t('generate.savedTitle'),
       t('generate.savedText'),
       [

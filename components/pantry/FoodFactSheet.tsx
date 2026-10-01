@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 import { router } from 'expo-router';
 import { Ban, Eye, Leaf, Sparkles, Trash2, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -16,6 +16,7 @@ import { TextField } from '@/components/ui/Input';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Touchable } from '@/components/ui/Touchable';
 import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
+import { showDialog } from '@/lib/dialog';
 
 interface FactIngredient {
   id: string;
@@ -96,10 +97,10 @@ export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact 
     setSending(true);
     const sent = await reportFoodFact(result.foodKey, lang, message);
     setSending(false);
-    if (!sent) return Alert.alert(t('errors.writeTitle'), t('errors.writeText'));
+    if (!sent) return showDialog(t('errors.writeTitle'), t('errors.writeText'));
     setReporting(false);
     setMessage('');
-    Alert.alert(t('facts.reportedTitle'), t('facts.reportedText'));
+    showDialog(t('facts.reportedTitle'), t('facts.reportedText'));
   };
 
   const cook = () => {

@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, AppState } from 'react-native';
+import { AppState } from 'react-native';
 import type { TFunction } from 'i18next';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { alertWriteError } from '@/lib/alertWriteError';
 import { supabase } from '@/lib/supabase';
 import { motion } from '@/constants/theme';
+import { showDialog } from '@/lib/dialog';
 
 // Action annulable (suppression, « J'ai cuisiné ça ») : enregistrée tout de suite par une fonction du serveur
 // qui garde l'état d'avant (rien ne se perd si l'app passe en arrière-plan, est fermée ou perd la
@@ -22,11 +23,11 @@ export async function undoPantryAction(t: TFunction, actionId: string): Promise<
   const result = data as UndoResult | null;
   if (error) {
     console.warn('[annulation]', error.message);
-    Alert.alert(t('undo.failedTitle'), t('undo.failedText'));
+    showDialog(t('undo.failedTitle'), t('undo.failedText'));
     return false;
   }
-  if (result === 'conflict') Alert.alert(t('undo.failedTitle'), t('undo.conflictText'));
-  else if (result === 'expired') Alert.alert(t('undo.failedTitle'), t('undo.expiredText'));
+  if (result === 'conflict') showDialog(t('undo.failedTitle'), t('undo.conflictText'));
+  else if (result === 'expired') showDialog(t('undo.failedTitle'), t('undo.expiredText'));
   return result === 'undone';
 }
 

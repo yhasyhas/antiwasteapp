@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { ListChecks, Plus } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -33,6 +33,7 @@ import {
   type ShoppingItem,
 } from '@/lib/shopping';
 import { colors, opacity, radius, sizes, spacing, typography } from '@/constants/theme';
+import { showDialog } from '@/lib/dialog';
 
 // Liste de courses du foyer : ajout à la main (ou depuis une recette), coché quand c'est acheté, puis
 // rangé au garde-manger avec une date proposée. Partagée et mise à jour en temps réel.
@@ -77,7 +78,7 @@ export default function ShoppingScreen() {
 
   const failed = (error: unknown) => {
     console.warn('[courses]', error);
-    Alert.alert(t('errors.writeTitle'), t('errors.writeText'));
+    showDialog(t('errors.writeTitle'), t('errors.writeText'));
   };
 
   const add = async () => {
@@ -114,7 +115,7 @@ export default function ShoppingScreen() {
     try {
       const count = await stockShoppingItems(stocking.map(({ item, expires_at, estimated }) => ({ id: item.id, expires_at, expiry_estimated: estimated })));
       setStocking(null);
-      Alert.alert(t('shopping.stockedTitle'), t('shopping.stockedText', { count }));
+      showDialog(t('shopping.stockedTitle'), t('shopping.stockedText', { count }));
     } catch (error) {
       failed(error);
     } finally {

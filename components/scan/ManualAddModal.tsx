@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { Check, Plus, X } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
@@ -30,6 +30,7 @@ import { addPantryItems, defaultChoice, existingFor, loadPantry, PantryConflictE
 import { capitalizeFirst } from '@/lib/foodNames';
 import { displayQuantity } from '@/lib/quantity';
 import type { LotGroup } from '@/lib/pantryLots';
+import { showDialog } from '@/lib/dialog';
 
 interface ManualIngredient {
   name: string;
@@ -197,7 +198,7 @@ export function ManualAddModal({ visible, onClose, prefill, onNothingAdded }: Pr
     if (error instanceof PantryConflictError) {
       // Un membre du foyer vient de changer un lot : garde-manger relu, choix à vérifier
       loadPantry().then((rows) => rows && setGroups(pantryGroups(rows)));
-      Alert.alert(t('existing.conflictTitle'), t('existing.conflictText'));
+      showDialog(t('existing.conflictTitle'), t('existing.conflictText'));
     } else if (error) {
       alertWriteError(t, 'saving manual ingredients', error);
     } else {
@@ -208,7 +209,7 @@ export function ManualAddModal({ visible, onClose, prefill, onNothingAdded }: Pr
       linkPantryFoodKeys();
       // Premier ajout d'une date : proposition des rappels avant le message de confirmation
       await maybeAskNotificationPermission();
-      Alert.alert(
+      showDialog(
         t('manual.successTitle'),
         t('scan.addedToPantry', { count: toSave.length }),
         [
