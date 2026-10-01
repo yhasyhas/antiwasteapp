@@ -250,6 +250,9 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Résumé quotidien réglable (`lib/digestSettings.ts`, Réglages → Notifications), respecté par `claim_daily_digests` et les rappels locaux.
 - Fiches aliments : « Est-ce encore bon ? » (`signs`, `discard`) et `seasonal` (saison affichée pour les produits frais seulement).
 - Origine de la date (`expiry_estimated`, migration `20261001120000_estimated_dates.sql`) : « Date estimée par l'app » dans la feuille de l'aliment, avec le lien « Est-ce encore bon ? » ; une date indicative proche est urgente comme une date stricte, dépassée elle ne l'est jamais.
+- Recongélation (`refreezeRule`, `canFreeze` ; base : `refreeze_rule`, déclencheur `guard_refreeze`) : un aliment cru décongelé (viande, poisson, surgelés) ou un plat ne retourne pas au congélateur ; restes du plat congelés depuis « J'ai cuisiné ça ».
+- Messages : `showDialog` (`lib/dialog.ts`, `components/ui/DialogHost.tsx`, montée dans `app/_layout.tsx`) remplace `Alert.alert` dans toute l'app ; messages de congélation et de décongélation dans la feuille de l'aliment (`LotNotice`).
+- Unités courantes traduites selon la langue (`translateUnit`, `lib/quantity.ts`) ; scan : exemples et sortie du modèle dans la langue de l'app.
 - Tests : `supabase/tests/phase8_pantry.sql`.
 
 ## 5. État actuel et problèmes connus
