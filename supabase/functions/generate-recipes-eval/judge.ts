@@ -89,3 +89,45 @@ ${JSON.stringify(recipes.map((recipe: any, index: number) => ({
     tips: recipe.tips,
   })), null, 1)}`;
 }
+
+// ---------- Variété sur plusieurs générations (même garde-manger) ----------
+
+export const VARIETY_SCHEMA = {
+  type: 'object',
+  properties: {
+    recipes: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          generation: { type: 'integer' },
+          index: { type: 'integer' },
+          group: { type: 'integer', description: 'Numéro du plat : même numéro pour le même plat ou une variante trop proche' },
+          library_dish: { type: 'string', description: 'Plat de référence le plus proche, ou chaîne vide' },
+          relation: { type: 'string', enum: ['copy', 'variant', 'new'] },
+        },
+        required: ['generation', 'index', 'group', 'library_dish', 'relation'],
+      },
+    },
+    comment: { type: 'string' },
+  },
+  required: ['recipes', 'comment'],
+};
+
+export function varietyPrompt(cuisine: string, generations: { title: string; description?: string; ingredients?: string[]; instructions?: string[] }[][], libraryNames: string[]): string {
+  return `Tu compares des recettes proposées par une application de cuisine à la même personne, avec le même garde-manger, lors de ${generations.length} générations successives (cuisine : ${cuisine === 'any' ? 'libre' : cuisine}).
+
+1. Regroupe les recettes qui sont le même plat ou une variante trop proche pour que la personne ait l'impression qu'on lui propose la même chose (même plat de base, même technique, mêmes saveurs dominantes ; un simple changement d'accompagnement ou d'épice ne suffit pas à en faire un autre plat). "group" : un numéro par plat distinct (1, 2, 3…), le même pour les recettes regroupées.
+2. Compare chaque recette aux plats de référence ci-dessous :
+   - "copy" : c'est un plat de référence reproduit tel quel (même plat, ses ingrédients essentiels et sa technique, sans adaptation notable) ;
+   - "variant" : inspirée d'un plat de référence, mais adaptée (ingrédients changés, technique ou forme différente) ;
+   - "new" : aucun plat de référence n'y correspond vraiment.
+   "library_dish" : le nom du plat de référence le plus proche ("" pour "new").
+
+PLATS DE RÉFÉRENCE (noms) : ${libraryNames.length > 0 ? libraryNames.join(' ; ') : 'aucun'}
+
+RECETTES
+${generations.map((recipes, g) => recipes.map((recipe, i) => `- génération ${g}, index ${i} : ${recipe.title}${recipe.description ? ` — ${recipe.description}` : ''}${recipe.ingredients?.length ? ` [${recipe.ingredients.join(', ')}]` : ''}${recipe.instructions?.length ? ` Étapes : ${recipe.instructions.join(' / ').slice(0, 600)}` : ''}`).join('\n')).join('\n')}
+
+"comment" : en français, deux phrases sur la variété observée.`;
+}

@@ -106,7 +106,7 @@ export function geminiProvider(options: {
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 async function requestGroq(
-  options: { apiKey: string; model: string; timeoutMs: number; reasoningEffort: string },
+  options: { apiKey: string; model: string; timeoutMs: number; reasoningEffort?: string },
   request: AiRequest,
   signal: AbortSignal,
 ): Promise<ProviderResult> {
@@ -174,7 +174,8 @@ export function groqProvider(options: {
   apiKey: string;
   model: string;
   timeoutMs: number;
-  reasoningEffort: 'none' | 'low' | 'medium' | 'high';
+  // Absent : paramètre non envoyé (modèles sans raisonnement réglable, comparaison de modèles)
+  reasoningEffort?: 'none' | 'low' | 'medium' | 'high';
 }): AiProvider {
   return {
     name: 'groq',

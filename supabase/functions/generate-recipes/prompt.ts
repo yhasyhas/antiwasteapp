@@ -2,13 +2,14 @@
 // generate-recipes-eval (évaluation des recettes : scripts/recipe-eval), qui essaie aussi les versions candidates.
 
 import type { GenerationMode } from './recipes.ts';
+import { dishLine, type SampledDish } from './library.ts';
 
 export const CUISINES = ['any', 'african', 'maghreb', 'asian', 'latin', 'mediterranean', 'french'] as const;
 export type Cuisine = typeof CUISINES[number];
 
 // Versions du prompt : v1 est celle de l'app ; les suivantes sont des candidates, essayées par l'évaluation
 // (generate-recipes-eval) avant d'être adoptées
-export const PROMPT_VERSIONS = ['v1', 'v2', 'v3'] as const;
+export const PROMPT_VERSIONS = ['v1', 'v2', 'v3', 'v4'] as const;
 export type PromptVersion = typeof PROMPT_VERSIONS[number];
 
 // ---------- Prompt ----------
@@ -76,6 +77,31 @@ const SAFETY_RULES = `SÉCURITÉ ALIMENTAIRE (règle stricte, à écrire dans le
 - Riz cuit pour la recette et servi plus tard (riz sauté, salade) : refroidi vite (étalé) et mis au frais.
 - Légumineuses sèches : trempage et longue cuisson ; en conserve : égouttées et rincées.`;
 
+// ---------- Version candidate v4 (phase 9) ----------
+// v2, plus : feu indiqué seulement par son niveau (jamais de °C, rien pour une étape sans cuisson) ; température à
+// cœur seulement pour la viande et le poisson, aux seuils reconnus, toujours avec un signe visible ; règles de
+// sécurité vérifiées ensuite par le serveur (safety.ts) ; cuisine inspirée de plats de référence tirés au hasard
+// (library.ts), sans recopier ; titres des recettes récentes de l'utilisateur à ne pas reproposer.
+
+const CUISINE_NAMES: Record<Cuisine, string> = {
+  any: '',
+  african: "cuisines d'Afrique subsaharienne (Afrique de l'Ouest, centrale, de l'Est, australe, océan Indien)",
+  maghreb: 'cuisine du Maghreb (Maroc, Algérie, Tunisie, Libye)',
+  asian: "cuisines d'Asie (Asie de l'Est, du Sud-Est, du Sud)",
+  latin: "cuisines d'Amérique latine (Mexique et Amérique centrale, Caraïbes, Amérique du Sud)",
+  mediterranean: 'cuisines méditerranéennes (Europe du Sud, Proche-Orient et Turquie)',
+  french: 'cuisine française (cuisine du quotidien et des régions)',
+};
+
+const SAFETY_RULES_V4 = `SÉCURITÉ ALIMENTAIRE (règle stricte, vérifiée après coup : une recette qui ne la respecte pas est écartée) :
+- Tout ingrédient cru qui se mange cuit (riz, pâtes, céréales, pommes de terre, manioc, viande, poisson) est cuit dans les étapes, avec la durée et un repère, avant d'être servi ou ajouté à une préparation.
+- Viande et poisson : la température à cœur au seuil sanitaire, toujours avec un signe visible. Volaille : 74 °C, jus clair, plus aucune trace rose. Viande hachée et saucisses : 71 °C, plus rosée au centre. Porc : 63 °C puis 3 minutes de repos, jus clair. Bœuf, veau, agneau en morceaux : 63 °C puis 3 minutes de repos (en mijoté : viande tendre qui se détache). Poisson : 63 °C, chair opaque qui se détache en lamelles. Fruits de mer : chair opaque.
+- Aucune température à cœur pour les autres aliments (légumes, restes, œufs, sauces) : seulement des signes visibles.
+- Poisson cru (ceviche, tartare) : seulement un poisson très frais préalablement congelé, et l'écrire.
+- Légumineuses sèches (haricots, pois chiches, niébé…) : trempage d'une nuit puis au moins 45 minutes de cuisson, durées écrites. Sinon, en conserve : écrire « en conserve » dans la liste et dans l'étape (égouttées et rincées). Lentilles et pois cassés : au moins 15 minutes de cuisson dans l'eau.
+- Reste de plat et riz déjà cuit : réchauffés une seule fois, jusqu'à être fumants à cœur, et servis aussitôt ; jamais laissés tièdes.
+- Riz cuit pour la recette et servi froid ou sauté ensuite : étalé pour refroidir vite, puis mis au réfrigérateur.`;
+
 export function buildPrompts(options: {
   pantryText: string;
   count: number;
@@ -97,15 +123,29 @@ export function buildPrompts(options: {
   avoidTitles?: string[];
   // Version du prompt (v1 par défaut : celle de l'app)
   version?: PromptVersion;
+  // v4 : plats de référence tirés au hasard (library.ts), absents avec une cuisine libre ; titres des recettes
+  // récentes de l'utilisateur (historique et « Mes recettes »)
+  examples?: SampledDish[];
+  recentTitles?: string[];
 }): { system: string; prompt: string } {
   const languageName = LANGUAGE_NAMES[options.language] || LANGUAGE_NAMES['en'];
   // v3 : v2, sans température en °C sur le feu (artifice relevé par l'évaluation de v2), et sans nom de plat
   // trompeur (« façon mafé » sans arachide)
   const v3 = options.version === 'v3';
-  const v2 = options.version === 'v2' || v3;
+  const v4 = options.version === 'v4';
+  const v2 = options.version === 'v2' || v3 || v4;
+  const examples = options.examples ?? [];
   const dietaryRules = options.dietary.map((diet) => DIETARY_RULES[diet.toLowerCase()]).filter(Boolean);
   const cuisineRule = options.cuisine === 'any'
     ? 'Cuisine : libre. Varie les styles d\'une recette à l\'autre.'
+    : v4
+      ? `Cuisine demandée : ${CUISINE_NAMES[options.cuisine]}.
+- Inspire-toi de l'esprit de cette cuisine (ingrédients, épices, techniques, associations) pour créer des recettes adaptées au garde-manger : un plat traditionnel adapté, une variante ou une création anti-gaspi, que quelqu'un qui cuisine cette cuisine au quotidien reconnaîtrait. Varie les pays et les régions.
+- N'emprunte pas un plat d'une autre cuisine.
+- Le titre ne reprend le nom d'un plat que si la recette en a les ingrédients clés (pas de « mafé » sans arachide) ; sinon, un titre qui décrit la recette.${examples.length > 0 ? `
+- Quelques plats de cette cuisine, tirés au hasard, pour l'inspiration seulement : ne les recopie pas et ne t'y limite pas.
+${examples.map(dishLine).join('\n')}` : `
+- Repères : ${CUISINE_DISHES[options.cuisine]}.`}`
     : v2
       ? `Cuisine demandée : ${CUISINE_DISHES[options.cuisine]}.
 - Chaque recette est un plat réel et connu de cette cuisine, qui convient au repas demandé, avec son vrai nom ; adapte-le aux ingrédients disponibles (épices, technique) plutôt que d'inventer une fusion.
@@ -153,12 +193,12 @@ MODE « TRANSFORMER MES RESTES » (règle stricte) :
 
 ÉTAPES :${v2 ? `
 - Chaque étape reprend la quantité des ingrédients qu'elle utilise (« Ajoute les 200 g de riz », « Émince les 2 oignons ») : on cuisine sans remonter à la liste.
-- Chaque cuisson donne ${v3 ? "le niveau de feu (doux, moyen, vif) ou la température du four en °C (jamais de °C sur le feu, sauf l'huile de friture et la cuisson à cœur)" : "le feu ou la température du four (en °C)"}, la durée et un repère visuel ou de texture (ex. « Fais dorer à feu vif 3 minutes, jusqu'à ce que les bords soient croustillants »).
+- ${v4 ? "Chaque cuisson donne la durée et un repère visuel ou de texture ; sur le feu, seulement le niveau (feu doux, moyen ou vif), jamais de °C ; au four, la température en °C. Une étape sans cuisson (couper, mélanger, assaisonner, dresser) n'indique ni feu ni durée de cuisson" : `Chaque cuisson donne ${v3 ? "le niveau de feu (doux, moyen, vif) ou la température du four en °C (jamais de °C sur le feu, sauf l'huile de friture et la cuisson à cœur)" : "le feu ou la température du four (en °C)"}, la durée et un repère visuel ou de texture`} (ex. « Fais dorer à feu vif 3 minutes, jusqu'à ce que les bords soient croustillants »).
 - Ordre complet : préchauffer le four, cuire le riz, les pâtes ou les légumineuses du garde-manger (crus, sauf s'ils sont marqués [reste de plat]), lancer les cuissons longues en premier.
 - Chaque ingrédient de la liste est utilisé dans les étapes, et les étapes n'utilisent rien d'autre (sauf l'eau).
 - Jamais de consigne vague comme « faites cuire jusqu'à cuisson », « bien chaud » ou « assaisonnez ».
 
-${SAFETY_RULES}
+${v4 ? SAFETY_RULES_V4 : SAFETY_RULES}
 ` : `
 - Précises et actionnables : technique, température, durée et repère visuel (ex. « Faites dorer à feu vif 3 minutes, jusqu'à ce que les bords soient croustillants »).
 - Jamais de consigne vague comme « faites cuire jusqu'à cuisson » ou « assaisonnez ».
@@ -175,10 +215,26 @@ ${options.pantryText}
 Crée exactement ${options.count} recette${options.count > 1 ? 's' : ''}${options.count > 1 ? (v2 ? ' vraiment différentes : des plats de types différents (ex. un plat mijoté, un plat au four, une salade ou une soupe), jamais deux fois la même base (deux plats de pâtes à la tomate)' : ' vraiment différentes les unes des autres (plat, technique de cuisson, texture)') : ''}.
 - Difficulté : ${options.difficulty}
 - Temps total maximum : ${options.maxCookTime} minutes${options.avoidTitles && options.avoidTitles.length > 0 ? `
-- Déjà proposées, à ne pas refaire (autre plat, autre technique) : ${options.avoidTitles.map((title) => `« ${title} »`).join(', ')}` : ''}${options.servings ? `
+- Déjà proposées, à ne pas refaire (autre plat, autre technique) : ${options.avoidTitles.map((title) => `« ${title} »`).join(', ')}` : ''}${v4 && options.recentTitles && options.recentTitles.length > 0 ? `
+- Recettes récentes de l'utilisateur : ne repropose ni le même plat, ni une variante trop proche (autre plat ou autre technique) : ${options.recentTitles.slice(0, 30).map((title) => `« ${title} »`).join(', ')}` : ''}${options.servings ? `
 - Pour ${options.servings} personne${options.servings > 1 ? 's' : ''} : quantités adaptées, "servings" = ${options.servings}` : ''}
 
 ${refusal}`;
 
   return { system, prompt };
+}
+
+// Demande de correction (v4) des recettes qui ne respectent pas les règles de sécurité (safety.ts) : mêmes
+// consignes système, mêmes ingrédients ; le serveur vérifie de nouveau et écarte celles qui restent en défaut.
+export function buildCorrectionPrompt(pantryText: string, flawed: { recipe: unknown; problems: string[] }[]): string {
+  return `Garde-manger (identifiant : nom) :
+${pantryText}
+
+Ces recettes ne respectent pas les règles de sécurité alimentaire. Corrige chacune : garde le même plat, les mêmes ingrédients (ajoute seulement ce qui manque, par exemple « en conserve ») et la même langue, et réécris les étapes concernées. Renvoie exactement ${flawed.length} recette${flawed.length > 1 ? 's' : ''} complète${flawed.length > 1 ? 's' : ''}, dans le même ordre ; "refusal" est une chaîne vide.
+
+${flawed.map((item, i) => `RECETTE ${i + 1}
+Problèmes :
+${item.problems.map((problem) => `- ${problem}`).join('\n')}
+Recette (JSON) :
+${JSON.stringify(item.recipe)}`).join('\n\n')}`;
 }

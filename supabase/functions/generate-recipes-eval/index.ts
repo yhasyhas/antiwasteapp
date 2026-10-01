@@ -2,16 +2,23 @@
 // Accès par l'en-tête x-eval-key égal à la clé secrète (script scripts/recipe-eval/run.mjs) ; aucun quota
 // d'utilisateur compté, aucune alerte de quota envoyée.
 //
-//   { action: "generate", prompt_version, ingredients, preferences, mode, selection, other_pantry }
+//   { action: "generate", prompt_version, ingredients, preferences, mode, selection, other_pantry,
+//     providers?, model?, library?, recent_titles?, safety? }
 //     même génération que generate-recipes (mêmes fournisseurs, même lecture de la réponse, une demande de plus
-//     si des recettes sont écartées), avec la version du prompt demandée (v1 : celle de l'app)
+//     si des recettes sont écartées), avec la version du prompt demandée (v1 : celle de l'app). En v4 : plats de
+//     référence tirés au hasard (library: false pour s'en passer), titres récents à ne pas reproposer, et
+//     contrôle de sécurité (safety.ts) qui fait corriger, puis écarte, les recettes en défaut.
+//     model : un autre modèle du fournisseur nommé dans providers (comparaison de modèles)
 //   { action: "models" } : modèles disponibles chez les deux fournisseurs (choix du juge)
 //   { action: "judge", case, recipes, judge_model, judge_provider }
 //     notes d'un modèle juge (Gemini) sur la grille d'évaluation, pour chaque recette et pour la diversité
+//   { action: "variety", generations, library_names } : plats différents sur plusieurs générations (juge)
+//   { action: "quota", model? } : le quota du jour de Groq laisse-t-il passer une génération ? (≈ 10 tokens)
+//   { action: "recent_titles" } : vérifie la lecture des titres récents (nombres seulement, aucun titre)
 
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { withCors } from '../_shared/cors.ts';
-import { SUPABASE_SECRET_KEY } from '../_shared/keys.ts';
+import { SUPABASE_SECRET_KEY, SUPABASE_URL } from '../_shared/keys.ts';
 import { type AiProvider, type AttemptLog, geminiProvider, groqProvider, orderProviders, runWithFallback } from '../_shared/ai.ts';
 import {
   buildOtherPantry,
@@ -21,14 +28,20 @@ import {
   cleanServings,
   type GenerationMode,
   leftoverItems,
+  MISSING,
+  type Pantry,
   pantryForPrompt,
   parseRecipes,
+  type Recipe,
   recipeCount,
   strictDietsOf,
   urgentItems,
 } from '../generate-recipes/recipes.ts';
-import { buildPrompts, CUISINES, type Cuisine, PROMPT_VERSIONS, type PromptVersion } from '../generate-recipes/prompt.ts';
-import { JUDGE_SCHEMA, judgePrompt } from './judge.ts';
+import { buildCorrectionPrompt, buildPrompts, CUISINES, type Cuisine, PROMPT_VERSIONS, type PromptVersion } from '../generate-recipes/prompt.ts';
+import { sampleDishes } from '../generate-recipes/library.ts';
+import { type SafetyIssue, safetyIssues } from '../generate-recipes/safety.ts';
+import { recentTitles } from '../generate-recipes/history.ts';
+import { JUDGE_SCHEMA, judgePrompt, VARIETY_SCHEMA, varietyPrompt } from './judge.ts';
 
 const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') || '';
 const GROQ_MODEL = Deno.env.get('GROQ_MODEL') || 'openai/gpt-oss-120b';
@@ -39,13 +52,35 @@ const MAX_OUTPUT_TOKENS = 8000;
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
-function providersFor(order: string | undefined): AiProvider[] {
+function providersFor(order: string | undefined, model?: string): AiProvider[] {
+  // Autre modèle (comparaison) : raisonnement réglé seulement pour gpt-oss, comme dans l'app
+  const groqModel = model && order?.startsWith('groq') ? model : GROQ_MODEL;
+  const geminiModel = model && order?.startsWith('gemini') ? model : GEMINI_RECIPE_MODEL;
   const all = orderProviders([
-    groqProvider({ apiKey: GROQ_API_KEY, model: GROQ_MODEL, timeoutMs: 40_000, reasoningEffort: 'low' }),
-    geminiProvider({ apiKey: GEMINI_API_KEY, model: GEMINI_RECIPE_MODEL, timeoutMs: 45_000, thinkingLevel: 'low' }),
+    groqProvider({ apiKey: GROQ_API_KEY, model: groqModel, timeoutMs: 60_000, ...(groqModel.includes('gpt-oss') && { reasoningEffort: 'low' as const }) }),
+    geminiProvider({ apiKey: GEMINI_API_KEY, model: geminiModel, timeoutMs: 90_000, thinkingLevel: 'low' }),
   ], order || RECIPE_PROVIDERS);
   // Ordre imposé : seulement les fournisseurs nommés (mesure d'un seul modèle)
   return order ? all.filter((provider) => order.split(',').includes(provider.name)) : all;
+}
+
+// Recette sous la forme envoyée par le modèle (alias du garde-manger), pour la demande de correction
+function rawRecipe(recipe: Recipe, pantry: Pantry) {
+  const aliasOf = new Map([...pantry.aliasOf.entries()].map(([alias, item]) => [item.id, alias]));
+  return {
+    title: recipe.title,
+    description: recipe.description,
+    difficulty: recipe.difficulty,
+    prep_time: recipe.prep_time,
+    cook_time: recipe.cook_time,
+    total_time: recipe.total_time,
+    servings: recipe.servings,
+    ingredients: recipe.ingredients_used.map((i) => ({ name: i.name, quantity: i.quantity, unit: i.unit, pantry_id: (i.pantry_id && aliasOf.get(i.pantry_id)) || MISSING })),
+    instructions: recipe.instructions,
+    tips: recipe.tips,
+    suggestion: recipe.suggestion ?? '',
+    image_prompt: recipe.image_prompt,
+  };
 }
 
 async function generate(body: any) {
@@ -67,6 +102,9 @@ async function generate(body: any) {
   const excluded = cleanExcluded(preferences.excluded);
   const servings = cleanServings(preferences.servings);
   const context = { mealType: preferences.mealType || 'dinner', cuisine, difficulty, dietary, maxRecipes: count, mode, otherPantry, excluded, servings };
+  const v4 = version === 'v4';
+  // Plats de référence : seulement avec une cuisine précise ; library: false pour mesurer sans
+  const examples = v4 && body.library !== false ? sampleDishes(cuisine, { mealType: context.mealType, diets }) : [];
   const promptOptions = {
     pantryText: pantryForPrompt(pantry),
     count,
@@ -85,18 +123,22 @@ async function generate(body: any) {
     excluded,
     servings,
     version,
+    examples,
+    recentTitles: Array.isArray(body.recent_titles) ? body.recent_titles.filter((t: unknown) => typeof t === 'string').slice(0, 30) : [],
   };
-  const providers = providersFor(body.providers);
+  const providers = providersFor(body.providers, typeof body.model === 'string' && body.model ? body.model : undefined);
   const log: AttemptLog[] = [];
+  const schema = version !== 'v1' ? buildRecipeSchema(pantry, diets, 'Unité abrégée, dans la langue de la recette') : buildRecipeSchema(pantry, diets);
   const request = (prompts: { system: string; prompt: string }) => ({
     system: prompts.system,
     prompt: prompts.prompt,
-    schema: version !== 'v1' ? buildRecipeSchema(pantry, diets, 'Unité abrégée, dans la langue de la recette') : buildRecipeSchema(pantry, diets),
+    schema,
     schemaName: 'recipes',
     temperature: 0.8,
     maxOutputTokens: MAX_OUTPUT_TOKENS,
   });
-  const result = await runWithFallback(providers, request(buildPrompts(promptOptions)),
+  const prompts = buildPrompts(promptOptions);
+  const result = await runWithFallback(providers, request(prompts),
     (text) => parseRecipes(text, pantry, diets, context), { label: 'generate-recipes-eval', log, t0 });
   if (!result.ok) return json({ error: result.reason, failure: result.failure, attempts: log }, 502);
 
@@ -113,6 +155,41 @@ async function generate(body: any) {
       recipes = [...recipes, ...second.value.recipes.filter((r) => !titles.has(r.title.toLowerCase()))].slice(0, count);
     }
   }
+
+  // Contrôle de sécurité (v4, ou safety: true) : une demande de correction pour les recettes en défaut, puis
+  // celles qui restent en défaut sont écartées
+  const safety = { checked: false, first: [] as { title: string; issues: SafetyIssue[] }[], corrected: [] as string[], dropped: [] as { title: string; issues: SafetyIssue[] }[] };
+  if (body.safety ?? v4) {
+    safety.checked = true;
+    const checked = recipes.map((recipe) => ({ recipe, issues: safetyIssues(recipe, pantry.items) }));
+    const flawed = checked.filter((c) => c.issues.length > 0);
+    safety.first = flawed.map((c) => ({ title: c.recipe.title, issues: c.issues }));
+    if (flawed.length > 0) {
+      const correction = await runWithFallback(providers, {
+        ...request(prompts),
+        prompt: buildCorrectionPrompt(promptOptions.pantryText, flawed.map((c) => ({ recipe: rawRecipe(c.recipe, pantry), problems: c.issues.map((i) => i.message) }))),
+      }, (text) => parseRecipes(text, pantry, diets, { ...context, maxRecipes: flawed.length }), { label: 'generate-recipes-eval:correction', log, t0 });
+      const fixed = correction.ok ? correction.value.recipes : [];
+      const kept: Recipe[] = [];
+      let k = 0;
+      for (const c of checked) {
+        if (c.issues.length === 0) {
+          kept.push(c.recipe);
+          continue;
+        }
+        const candidate = fixed[k++];
+        const remaining = candidate ? safetyIssues(candidate, pantry.items) : c.issues;
+        if (candidate && remaining.length === 0) {
+          kept.push(candidate);
+          safety.corrected.push(candidate.title);
+        } else {
+          safety.dropped.push({ title: c.recipe.title, issues: remaining });
+        }
+      }
+      recipes = kept;
+    }
+  }
+
   return json({
     version,
     requested: count,
@@ -122,6 +199,9 @@ async function generate(body: any) {
     dietary_rejections: first.dietaryRejections,
     refusal: first.refusal,
     retried,
+    safety,
+    // Plats de référence envoyés au modèle pour cette génération
+    examples: examples.map((dish) => ({ name: dish.name, region: dish.region })),
     provider: result.provider.name,
     model: result.provider.model,
     // Alias du garde-manger envoyés au modèle (vérifications du script)
@@ -131,28 +211,23 @@ async function generate(body: any) {
   });
 }
 
-async function judge(body: any) {
+async function askJudge(model: string, prompt: string, schema: Record<string, unknown>, isValid: (value: any) => boolean) {
   const t0 = Date.now();
-  const model = typeof body.judge_model === 'string' && body.judge_model ? body.judge_model : Deno.env.get('GEMINI_MODEL') || 'gemini-3.1-flash-lite';
-  const provider = geminiProvider({ apiKey: GEMINI_API_KEY, model, timeoutMs: 90_000, thinkingLevel: 'medium' });
+  const provider = geminiProvider({ apiKey: GEMINI_API_KEY, model, timeoutMs: 120_000, thinkingLevel: 'medium' });
   const log: AttemptLog[] = [];
-  const result = await runWithFallback([provider], {
-    prompt: judgePrompt(body.case, body.recipes),
-    schema: JUDGE_SCHEMA,
-    schemaName: 'judgement',
-    temperature: 0,
-    maxOutputTokens: 8000,
-  }, (text) => {
+  const result = await runWithFallback([provider], { prompt, schema, schemaName: 'judgement', temperature: 0, maxOutputTokens: 12000 }, (text) => {
     try {
       const value = JSON.parse(text);
-      return Array.isArray(value?.recipes) ? { ok: true, value } : { ok: false, failure: 'notes absentes', code: 'invalid_response' };
+      return isValid(value) ? { ok: true, value } : { ok: false, failure: 'notes absentes', code: 'invalid_response' };
     } catch {
       return { ok: false, failure: 'JSON invalide', code: 'invalid_response' };
     }
   }, { label: 'generate-recipes-eval:judge', log, t0 });
   if (!result.ok) return json({ error: result.reason, failure: result.failure, attempts: log }, 502);
-  return json({ ...result.value, judge_model: model, ms: Date.now() - t0 });
+  return json({ ...result.value, judge_model: model, ms: Date.now() - t0, usage: log.at(-1)?.usage ?? null });
 }
+
+const judgeModel = (body: any) => (typeof body.judge_model === 'string' && body.judge_model ? body.judge_model : Deno.env.get('GEMINI_MODEL') || 'gemini-3.1-flash-lite');
 
 // Modèles disponibles chez les deux fournisseurs (choix du juge), sans les clés
 async function models() {
@@ -164,13 +239,49 @@ async function models() {
   });
 }
 
+// Quota du jour de Groq (fenêtre glissante de 24 h) : une requête minuscule qui réserve `reserve` tokens ;
+// refusée (429) si le reste du jour est plus petit. Le message de refus donne la consommation des 24 h.
+async function quota(body: any) {
+  const model = typeof body.model === 'string' && body.model ? body.model : GROQ_MODEL;
+  const reserve = Math.min(Number(body.reserve) || 6000, 7500);
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${GROQ_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model, messages: [{ role: 'user', content: 'Réponds OK.' }], max_completion_tokens: reserve, ...(model.includes('gpt-oss') && { reasoning_effort: 'low' }) }),
+  });
+  const text = await response.text();
+  if (response.ok) return json({ model, available: true, reserve, usage: JSON.parse(text).usage ?? null });
+  const numbers = text.match(/Limit (\d+), Used (\d+), Requested (\d+)/);
+  return json({
+    model,
+    available: false,
+    status: response.status,
+    per_day: /TPD|per day/.test(text),
+    limit: numbers ? Number(numbers[1]) : null,
+    used: numbers ? Number(numbers[2]) : null,
+    retry_in: text.match(/try again in ([\dhms.]+)/)?.[1] ?? null,
+  });
+}
+
 Deno.serve(withCors(async (req: Request) => {
   if (!SUPABASE_SECRET_KEY || req.headers.get('x-eval-key') !== SUPABASE_SECRET_KEY) return json({ error: 'unauthorized' }, 401);
   try {
     const body = await req.json();
     if (body.action === 'generate') return await generate(body);
-    if (body.action === 'judge') return await judge(body);
+    if (body.action === 'judge') {
+      return await askJudge(judgeModel(body), judgePrompt(body.case, body.recipes), JUDGE_SCHEMA, (value) => Array.isArray(value?.recipes));
+    }
+    if (body.action === 'variety') {
+      return await askJudge(judgeModel(body), varietyPrompt(body.cuisine ?? 'any', body.generations ?? [], body.library_names ?? []), VARIETY_SCHEMA, (value) => Array.isArray(value?.recipes));
+    }
     if (body.action === 'models') return await models();
+    if (body.action === 'quota') return await quota(body);
+    if (body.action === 'recent_titles') {
+      // Utilisateur qui a la recette la plus récente : nombres seulement, aucun titre ni identifiant renvoyé
+      const latest = await fetch(`${SUPABASE_URL}/rest/v1/recipes?select=user_id&order=created_at.desc&limit=1`, { headers: { apikey: SUPABASE_SECRET_KEY, Authorization: `Bearer ${SUPABASE_SECRET_KEY}` } }).then((r) => r.json());
+      const titles = latest?.[0]?.user_id ? await recentTitles(latest[0].user_id) : [];
+      return json({ titles: titles.length, distinct: new Set(titles).size, longest: Math.max(0, ...titles.map((t) => t.length)) });
+    }
     return json({ error: 'unknown_action' }, 400);
   } catch (error) {
     return json({ error: 'exception', details: error instanceof Error ? error.message : String(error) }, 500);
