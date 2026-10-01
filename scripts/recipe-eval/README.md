@@ -20,6 +20,8 @@
   - régimes, exclusions et sélection respectés ;
   - unités dans la langue de la recette ;
   - pas de température en °C sur le feu ;
+  - règles de sécurité du serveur (`generate-recipes/safety.ts`) : ingrédients crus cuits, légumineuses sèches trempées ou « en conserve », viande et poisson avec température à cœur et signe visible, restes réchauffés à cœur, riz refroidi vite ;
+  - pas de feu dans une étape sans cuisson, pas de °C à cœur hors viande et poisson ;
   - diversité.
 - **Grille notée par un modèle juge** (`supabase/functions/generate-recipes-eval/judge.ts`), de 1 à 5 :
   - quantités dans les étapes ;
@@ -52,6 +54,29 @@ node scripts/recipe-eval/compare.mjs results/<v1>.json results/<v2>.json+results
 - `--cases id1,id2` : seulement ces cas.
 - `--judge-model` : le modèle juge. Par défaut `gemini-3.1-flash-lite`. Garde le même juge pour comparer deux versions.
 - `--providers` : le générateur. Par défaut `groq`, le fournisseur principal de l'app.
+- `--model` : un autre modèle de ce fournisseur (comparaison de modèles), ex. `--providers gemini --model gemini-3.7-flash --pause 15000`.
+- `--no-library` : v4 sans plats de référence.
+
+**v4** : la copie d'évaluation applique aussi le contrôle de sécurité du serveur (`generate-recipes/safety.ts`). Une recette en défaut est renvoyée au modèle pour correction, puis écartée si elle reste en défaut. La comparaison montre la part de recettes sûres au premier jet, après correction, et le nombre de recettes corrigées et écartées.
+
+**Coût** : `compare.mjs` estime le coût par recette à partir des tokens consommés et des prix de l'offre payante (table `PRICES`, à tenir à jour).
+
+## Variété sur plusieurs générations
+
+```bash
+# 2 garde-manger × 3 générations × (avec, sans bibliothèque) ≈ 70 000 tokens Groq
+node scripts/recipe-eval/variety.mjs --cases fr-afrique-complet,en-asian-urgent --generations 3
+```
+
+Chaque génération reçoit les titres des précédentes comme « recettes récentes ». Un juge regroupe ensuite les recettes qui sont le même plat, et compare chacune aux plats de la bibliothèque : copie telle quelle, variante ou plat nouveau.
+
+## Quota du jour
+
+```bash
+node scripts/recipe-eval/call.mjs '{"action":"quota"}'
+```
+
+Le quota de Groq est une fenêtre glissante de 24 h. Cette commande dit si une génération passe encore (≈ 100 tokens consommés).
 
 Les résultats complets (recettes, mesures, notes, problèmes relevés) sont écrits dans `results/`.
 

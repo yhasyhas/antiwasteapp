@@ -1,6 +1,8 @@
 // Vérifications automatiques des recettes (sans modèle) : mêmes résultats à chaque lancement pour les mêmes
 // recettes. Chaque mesure est une part entre 0 et 1 (1 : parfait).
 
+import { celsiusWithoutMeat, heatWithoutCooking, safetyIssues } from '../../supabase/functions/generate-recipes/safety.ts';
+
 const BASICS = ['sel', 'poivre', 'huile', 'eau', 'salt', 'pepper', 'oil', 'water', 'sal', 'pimienta', 'aceite', 'agua'];
 // Mots trop généraux pour reconnaître un ingrédient dans les étapes
 const STOP = new Set(['de', 'du', 'des', 'la', 'le', 'les', 'en', 'au', 'aux', 'et', 'a', 'of', 'the', 'and', 'with', 'y', 'con', 'el', 'los', 'las', 'del',
@@ -91,7 +93,13 @@ export function checkRecipe(recipe, situation, pantry) {
     ...uses(recipe, situation.preferences.excluded ?? []).map((n) => `${n} (exclu)`),
     ...uses(recipe, situation.other_pantry ?? []).map((n) => `${n} (hors sélection)`),
   ];
+  // Règles de sécurité contrôlées par le serveur en v4 (safety.ts), et indications de feu (v4)
+  const safety = safetyIssues(recipe, pantry);
   return {
+    safety_rules: safety.length === 0 ? 1 : 0,
+    safety_issues: safety.map((issue) => `${issue.code} : ${issue.ingredient}`),
+    no_heat_without_cooking: heatWithoutCooking(recipe).length === 0 ? 1 : 0,
+    no_celsius_without_meat: celsiusWithoutMeat(recipe) ? 0 : 1,
     ingredients_in_steps: ingredients.length ? 1 - missingInSteps.length / ingredients.length : 1,
     missing_in_steps: missingInSteps,
     quantities_in_steps: measurable.length ? quantitiesInSteps / measurable.length : 1,

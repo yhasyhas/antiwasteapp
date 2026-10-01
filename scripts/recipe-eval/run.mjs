@@ -3,6 +3,8 @@
 //   node scripts/recipe-eval/run.mjs [--version v1] [--cases id1,id2] [--judge-model gemini-…] [--providers groq]
 //   node scripts/recipe-eval/run.mjs --no-judge : génération et vérifications automatiques seulement
 //   node scripts/recipe-eval/run.mjs --rejudge results/<fichier>.json [--judge-model …]
+//   --providers gemini --model gemini-3.8-flash : un autre modèle pour écrire les recettes (comparaison)
+//   --no-library : v4 sans plats de référence (mesure de leur effet)
 //     nouvelles notes du juge sur des recettes déjà générées (sans nouvelle génération)
 //
 // Pour chaque cas fixe (cases.json) : une génération par la copie d'évaluation de la fonction
@@ -29,6 +31,8 @@ const onlyCases = arg('cases', '')?.split(',').filter(Boolean) ?? [];
 const judgeModel = arg('judge-model', 'gemini-3.1-flash-lite');
 const providers = arg('providers', 'groq');
 const rejudge = arg('rejudge', '');
+const model = arg('model', '');
+const noLibrary = process.argv.includes('--no-library');
 // Génération seule (notes du juge plus tard avec --rejudge)
 const noJudge = process.argv.includes('--no-judge');
 // Pause entre deux générations : l'offre gratuite de Groq limite gpt-oss-120b à 8 000 tokens par minute
@@ -79,13 +83,13 @@ for (const [n, situation] of cases.entries()) {
     if (n > 0 && !noJudge) await sleep(13_000);
   } else {
     if (n > 0) await sleep(PAUSE_MS);
-    // Limite par minute atteinte : nouvel essai après la pause indiquée par le fournisseur
+    // Limite par minute atteinte (ou modèle surchargé) : nouvel essai après une pause
     for (let attempt = 0; ; attempt++) {
       generated = await call({
-        action: 'generate', prompt_version: version, providers,
+        action: 'generate', prompt_version: version, providers, ...(model && { model }), ...(noLibrary && { library: false }),
         ingredients, preferences: situation.preferences, mode: situation.mode, selection: situation.selection, other_pantry: situation.other_pantry,
       });
-      const perMinute = generated.status !== 200 && /per minute|TPM|RPM/.test(JSON.stringify(generated.data));
+      const perMinute = generated.status !== 200 && /per minute|TPM|RPM|503|high demand|overloaded/.test(JSON.stringify(generated.data));
       if (!perMinute || attempt >= 3) break;
       await sleep(30_000);
     }
@@ -119,6 +123,9 @@ for (const [n, situation] of cases.entries()) {
     rejected_first: generated.data.invalid.length + generated.data.dietary_rejections.length,
     rejections: [...generated.data.invalid, ...generated.data.dietary_rejections],
     retried: generated.data.retried,
+    // Contrôle de sécurité (v4) : recettes en défaut au premier jet, corrigées, écartées
+    safety: generated.data.safety ?? null,
+    examples: generated.data.examples ?? [],
     diversity_auto: diversity(recipes),
     diversity_judge: judgement ? clamp(judgement.diversity) : null,
     diversity_comment: judgement?.diversity_comment ?? null,
@@ -139,8 +146,9 @@ for (const [n, situation] of cases.entries()) {
   };
   results.push(entry);
   const judgeMean = mean(entry.recipes.flatMap((r) => (r.scores ? Object.values(r.scores) : [])));
-  console.log(`${situation.id} : ${recipes.length}/${entry.requested} recettes (${entry.provider}, ${Math.round(entry.ms / 1000)} s${entry.rejected_first ? `, ${entry.rejected_first} écartée(s)` : ''}) · juge ${judgeMean?.toFixed(2) ?? '—'} · diversité ${entry.diversity_judge ?? '—'}/5`);
-  for (const r of entry.recipes) console.log(`   - ${r.title}${r.checks.forbidden.length ? ` ⚠ ${r.checks.forbidden.join(', ')}` : ''}`);
+  const safetyNote = entry.safety?.checked ? ` · sécurité : ${entry.safety.first.length} en défaut, ${entry.safety.corrected.length} corrigée(s), ${entry.safety.dropped.length} écartée(s)` : '';
+  console.log(`${situation.id} : ${recipes.length}/${entry.requested} recettes (${entry.provider}, ${Math.round(entry.ms / 1000)} s${entry.rejected_first ? `, ${entry.rejected_first} écartée(s)` : ''}) · juge ${judgeMean?.toFixed(2) ?? '—'} · diversité ${entry.diversity_judge ?? '—'}/5${safetyNote}`);
+  for (const r of entry.recipes) console.log(`   - ${r.title}${r.checks.forbidden.length ? ` ⚠ ${r.checks.forbidden.join(', ')}` : ''}${r.checks.safety_issues.length ? ` ⚠ ${r.checks.safety_issues.join(', ')}` : ''}`);
 }
 
 // Résumé : moyennes du juge par critère (1 à 5) et des vérifications automatiques (en %)
@@ -165,6 +173,9 @@ const summary = {
     uses_urgent: mean(all.map((r) => r.checks.uses_urgent)),
     rules_respected: mean(all.map((r) => r.checks.rules_respected)),
     units_language: mean(all.map((r) => r.checks.units_language ?? 1)),
+    safety_rules: mean(all.map((r) => r.checks.safety_rules)),
+    no_heat_without_cooking: mean(all.map((r) => r.checks.no_heat_without_cooking)),
+    no_celsius_without_meat: mean(all.map((r) => r.checks.no_celsius_without_meat)),
     diversity: mean(results.filter((r) => r.recipes).map((r) => r.diversity_auto)),
   },
   rejected_first: results.reduce((total, r) => total + (r.rejected_first ?? 0), 0),
@@ -176,7 +187,8 @@ const summary = {
 summary.judge_mean = mean(Object.values(summary.judge).filter((v) => v !== null));
 
 fs.mkdirSync(path.join(HERE, 'results'), { recursive: true });
-const file = path.join(HERE, 'results', `${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}-${version}${previous ? '-rejuge' : ''}.json`);
+const label = `${version}${model ? `-${model.replace(/[^a-z0-9.]+/gi, '_')}` : ''}${noLibrary ? '-sans-bibliotheque' : ''}${previous ? '-rejuge' : ''}`;
+const file = path.join(HERE, 'results', `${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}-${label}.json`);
 fs.writeFileSync(file, JSON.stringify({ summary, results }, null, 1));
 console.log('\nRésumé :', JSON.stringify(summary, (k, v) => (typeof v === 'number' && !Number.isInteger(v) ? Number(v.toFixed(2)) : v), 1));
 console.log('Résultat complet :', path.relative(process.cwd(), file));

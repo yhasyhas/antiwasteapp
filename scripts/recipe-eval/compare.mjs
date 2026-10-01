@@ -8,6 +8,25 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { noStoveCelsius, unitsInLanguage } from './checks.mjs';
+import { celsiusWithoutMeat, heatWithoutCooking, safetyIssues } from '../../supabase/functions/generate-recipes/safety.ts';
+
+// Prix par million de tokens (entrée, sortie), offre payante, relevés le 02/10/2026 : à vérifier avant toute
+// décision (phase 11). Le raisonnement compte comme sortie.
+const PRICES = {
+  'openai/gpt-oss-120b': [0.15, 0.6],
+  'gemini-3.8-flash': [0.75, 3.75],
+  'gemini-3.7-flash': [0.75, 3.75],
+  'gemini-3.1-pro-preview': [2, 12],
+  'gemini-pro-latest': [2, 12],
+};
+// Tokens d'un appel (Groq : usage au format OpenAI ; Gemini : usage de l'API Interactions)
+const tokensOf = (usage) => {
+  if (!usage) return null;
+  const input = usage.prompt_tokens ?? usage.total_input_tokens ?? usage.input_tokens ?? 0;
+  const output = usage.completion_tokens ?? ((usage.total_output_tokens ?? usage.output_tokens ?? 0) + (usage.total_thought_tokens ?? usage.thought_tokens ?? 0));
+  return { input, output };
+};
+const cents = (value) => (value === null || value === undefined ? '—' : `${(value * 100).toFixed(3)} c$`);
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const LANGUAGE = Object.fromEntries(JSON.parse(fs.readFileSync(path.join(HERE, 'cases.json'), 'utf8')).map((c) => [c.id, c.preferences.language]));
@@ -51,6 +70,13 @@ function stats(side) {
   // Mêmes cas des deux côtés (une évaluation interrompue, par un quota, n'en compte qu'une partie)
   const entries = commonIds.map((id) => side.cases.get(id));
   const all = entries.flatMap((entry) => entry.recipes ?? []);
+  // Tokens et coût de toutes les demandes (génération, nouvelle demande, correction)
+  const calls = entries.flatMap((e) => (e.generation?.attempts ?? []).filter((a) => a.ok).map((a) => tokensOf(a.usage)).filter(Boolean));
+  const tokens = calls.reduce((t, c) => ({ input: t.input + c.input, output: t.output + c.output }), { input: 0, output: 0 });
+  const price = PRICES[side.model];
+  // Recettes au premier jet (avant le contrôle de sécurité) et recettes en défaut
+  const drafts = entries.reduce((n, e) => n + (e.recipes?.length ?? 0) + (e.safety?.dropped?.length ?? 0), 0);
+  const firstFlawed = entries.reduce((n, e) => n + (e.safety?.checked ? e.safety.first.length : (e.recipes ?? []).filter((r) => safetyIssues(r.recipe, e.generation.pantry).length > 0).length), 0);
   const judged = judgedIds.flatMap((id) => side.cases.get(id).recipes.filter((r) => r.scores));
   const judge = Object.fromEntries(Object.keys(CRITERIA).map((c) => [c, mean(judged.map((r) => r.scores[c]))]));
   return {
@@ -59,9 +85,17 @@ function stats(side) {
     diversity: mean(judgedIds.map((id) => side.cases.get(id).diversity_judge).filter(Boolean)),
     auto: { ...Object.fromEntries(Object.keys(AUTO).map((c) => [c, mean(all.map((r) => r.checks[c]))])),
       stove_celsius: mean(all.map((r) => noStoveCelsius(r.recipe))),
+      safety_rules: mean(entries.flatMap((e) => e.recipes.map((r) => (safetyIssues(r.recipe, e.generation.pantry).length === 0 ? 1 : 0)))),
+      safety_first: drafts ? 1 - firstFlawed / drafts : null,
+      no_heat_without_cooking: mean(all.map((r) => (heatWithoutCooking(r.recipe).length === 0 ? 1 : 0))),
+      no_celsius_without_meat: mean(all.map((r) => (celsiusWithoutMeat(r.recipe) ? 0 : 1))),
       units_language: mean(commonIds.flatMap((id) => side.cases.get(id).recipes.map((r) => unitsInLanguage(r.recipe, LANGUAGE[id])))),
       diversity: mean(entries.map((e) => e.diversity_auto)) },
     recipes: all.length,
+    corrected: entries.reduce((n, e) => n + (e.safety?.corrected?.length ?? 0), 0),
+    dropped: entries.reduce((n, e) => n + (e.safety?.dropped?.length ?? 0), 0),
+    tokens_per_generation: entries.length ? (tokens.input + tokens.output) / entries.length : null,
+    cost_per_recipe: price && all.length ? (tokens.input * price[0] + tokens.output * price[1]) / 1e6 / all.length : null,
     rejected: entries.reduce((total, e) => total + (e.rejected_first ?? 0), 0),
     failed: [...side.cases.values()].filter((e) => e.error).length,
     median_ms: (() => {
@@ -84,8 +118,11 @@ console.log([
   '',
   `| Vérification automatique | ${before.version} | ${after.version} | Écart |`,
   '|---|---|---|---|',
-  ...Object.entries({ ...AUTO, units_language: 'Unités dans la langue de la recette', stove_celsius: 'Pas de °C sur le feu (artifice)', diversity: 'Diversité (ingrédients et titres)' }).map(([key, label]) => `| ${label} | ${fmt(a.auto[key], true)} | ${fmt(b.auto[key], true)} | ${delta(a.auto[key], b.auto[key], true)} |`),
+  ...Object.entries({ ...AUTO, safety_rules: 'Règles de sécurité respectées (recettes servies)', safety_first: 'Règles de sécurité au premier jet', no_heat_without_cooking: 'Pas de feu dans une étape sans cuisson', no_celsius_without_meat: 'Pas de °C à cœur hors viande et poisson', units_language: 'Unités dans la langue de la recette', stove_celsius: 'Pas de °C sur le feu (artifice)', diversity: 'Diversité (ingrédients et titres)' }).map(([key, label]) => `| ${label} | ${fmt(a.auto[key], true)} | ${fmt(b.auto[key], true)} | ${delta(a.auto[key], b.auto[key], true)} |`),
   `| Recettes écartées par le serveur (1re demande) | ${a.rejected} | ${b.rejected} | |`,
+  `| Recettes corrigées / écartées par le contrôle de sécurité | ${a.corrected} / ${a.dropped} | ${b.corrected} / ${b.dropped} | |`,
+  `| Tokens par génération (toutes demandes) | ${Math.round(a.tokens_per_generation ?? 0)} | ${Math.round(b.tokens_per_generation ?? 0)} | |`,
+  `| Coût estimé par recette (offre payante) | ${cents(a.cost_per_recipe)} | ${cents(b.cost_per_recipe)} | |`,
   `| Générations en échec | ${a.failed} | ${b.failed} | |`,
   `| Temps médian d'une génération | ${(a.median_ms / 1000).toFixed(1)} s | ${(b.median_ms / 1000).toFixed(1)} s | |`,
 ].join('\n'));
