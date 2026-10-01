@@ -14,6 +14,7 @@ import { celsiusWithoutMeat, heatWithoutCooking, safetyIssues } from '../../supa
 // décision (phase 11). Le raisonnement compte comme sortie.
 const PRICES = {
   'openai/gpt-oss-120b': [0.15, 0.6],
+  'qwen/qwen3.8-27b': [0.8, 4],
   'gemini-3.8-flash': [0.75, 3.75],
   'gemini-3.7-flash': [0.75, 3.75],
   'gemini-3.1-pro-preview': [2, 12],

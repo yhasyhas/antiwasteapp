@@ -13,10 +13,10 @@
 // scripts/recipe-eval/results/<date>-<version>.json, résumé à l'écran ; comparaison : compare.mjs.
 // La clé secrète est lue avec le CLI Supabase et reste en mémoire (jamais affichée ni écrite).
 
-import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { checkRecipe, diversity, unitsInLanguage } from './checks.mjs';
+import { evalClient } from './call.mjs';
 
 import { fileURLToPath } from 'node:url';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -33,26 +33,16 @@ const providers = arg('providers', 'groq');
 const rejudge = arg('rejudge', '');
 const model = arg('model', '');
 const noLibrary = process.argv.includes('--no-library');
+// Nouveaux essais d'une génération refusée (limite par minute, modèle surchargé) ; 0 pour économiser un quota
+// quotidien en requêtes (Gemini : 20 par jour et par modèle dans l'offre gratuite)
+const RETRIES = Number(arg('retries', '3'));
 // Génération seule (notes du juge plus tard avec --rejudge)
 const noJudge = process.argv.includes('--no-judge');
 // Pause entre deux générations : l'offre gratuite de Groq limite gpt-oss-120b à 8 000 tokens par minute
 // (≈ 2 générations), limite partagée avec l'app
 const PAUSE_MS = Number(arg('pause', '45000'));
 
-const env = Object.fromEntries(fs.readFileSync('.env', 'utf8').split(/\r?\n/).filter((l) => l.includes('=') && !l.startsWith('#'))
-  .map((l) => [l.slice(0, l.indexOf('=')), l.slice(l.indexOf('=') + 1)]));
-const keys = JSON.parse(execSync('npx supabase projects api-keys --project-ref iqzjonmjlscuckdmiehk --reveal -o json', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }));
-const SECRET = keys.find((k) => k.type === 'secret' && k.name === 'default')?.api_key;
-if (!SECRET) throw new Error('clé secrète introuvable');
-
-const call = async (body) => {
-  const response = await fetch(`${env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/generate-recipes-eval`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', apikey: env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY, 'x-eval-key': SECRET },
-    body: JSON.stringify(body),
-  });
-  return { status: response.status, data: await response.json() };
-};
+const call = evalClient();
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const mean = (values) => (values.length ? values.reduce((a, b) => a + b, 0) / values.length : null);
 const clamp = (value) => Math.min(5, Math.max(1, Math.round(Number(value) || 1)));
@@ -90,7 +80,7 @@ for (const [n, situation] of cases.entries()) {
         ingredients, preferences: situation.preferences, mode: situation.mode, selection: situation.selection, other_pantry: situation.other_pantry,
       });
       const perMinute = generated.status !== 200 && /per minute|TPM|RPM|503|high demand|overloaded/.test(JSON.stringify(generated.data));
-      if (!perMinute || attempt >= 3) break;
+      if (!perMinute || attempt >= RETRIES) break;
       await sleep(30_000);
     }
   }

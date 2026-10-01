@@ -16,13 +16,21 @@ export function secretKey() {
 }
 
 export function evalClient(secret = secretKey()) {
+  // Coupure réseau passagère : jusqu'à 3 nouveaux essais, 30 s d'intervalle
   return async (body) => {
-    const response = await fetch(`${env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/generate-recipes-eval`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', apikey: env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY, 'x-eval-key': secret },
-      body: JSON.stringify(body),
-    });
-    return { status: response.status, data: await response.json() };
+    for (let attempt = 0; ; attempt++) {
+      try {
+        const response = await fetch(`${env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/generate-recipes-eval`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', apikey: env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY, 'x-eval-key': secret },
+          body: JSON.stringify(body),
+        });
+        return { status: response.status, data: await response.json() };
+      } catch (error) {
+        if (attempt >= 3) return { status: 0, data: { error: 'network', details: String(error) } };
+        await new Promise((resolve) => setTimeout(resolve, 30_000));
+      }
+    }
   };
 }
 
