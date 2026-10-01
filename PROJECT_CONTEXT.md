@@ -255,6 +255,10 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Unités courantes traduites selon la langue (`translateUnit`, `lib/quantity.ts`) ; scan : exemples et sortie du modèle dans la langue de l'app.
 - Tests : `supabase/tests/phase8_pantry.sql`.
 
+### Phase 9 — recettes (branche `phase-9`, en cours)
+- Prompt de `generate-recipes` dans `supabase/functions/generate-recipes/prompt.ts` (`buildPrompts`, versions `PROMPT_VERSIONS` : v1 utilisée par l'app, v2 et v3 candidates).
+- Évaluation rejouable : `scripts/recipe-eval` (cas fixes, `run.mjs`, `checks.mjs`, `compare.mjs`, résultats dans `results/`) et la copie `generate-recipes-eval` (génération et juge, clé secrète seulement).
+
 ## 5. État actuel et problèmes connus
 
 ### Sécurité
