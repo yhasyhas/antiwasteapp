@@ -368,6 +368,7 @@ Ancienne phase 8a.
 - [ ] Nettoyage automatique des comptes d'essai (anonymes) inactifs depuis 30 jours, avec leur foyer personnel s'il n'est partagé avec personne
 - [ ] Sauvegardes automatiques de la base et test de restauration
 - [ ] Vérifier les délais de la base (transactions inactives, requêtes longues)
+- [ ] Environnement de test séparé (second projet Supabase) pour ne plus déployer sur la base utilisée par l'app pendant le développement
 - [ ] Tests automatisés des parcours critiques sur téléphone : connexion, scan, génération, « J'ai cuisiné ça », foyer
 
 **Terminé quand** : chaque point de l'audit est traité ou noté au journal avec sa raison.
