@@ -22,14 +22,15 @@ export const EXPIRY_TONES: Record<ExpiryStatus, BadgeTone> = {
 
 const URGENCY_TONES: Record<LotUrgency, BadgeTone> = { ...EXPIRY_TONES, frozen: 'frozen', indicative_passed: 'neutral' };
 
-// Badge de date : expiré (rouge), bientôt (ambre), OK (vert), sans date (neutre) ; date indicative dépassée
+// Badge de date : expiré (rouge), bientôt (ambre, date stricte ou indicative), OK (vert), sans date (neutre) ; date indicative dépassée
 // (neutre, « Date indicative dépassée ») ; au congélateur (bleu frais) ; touchable pour la modifier
 export function ExpiryBadge({ expiresAt, dateKind, location, onPress }: Props) {
   const { t, language } = useLanguage();
   const urgency = lotUrgency({ expires_at: expiresAt ?? null, date_kind: dateKind, location });
   const label = urgency === 'indicative_passed' ? t('storage.indicativePassed') : expiryLabel(t, expiresAt, language);
-  // « Aujourd'hui » en rouge, comme une date passée (dernier jour pour l'utiliser), pour une date stricte
-  const tone = urgency === 'soon' && expiresAt && daysUntil(expiresAt) === 0 ? 'expired' : URGENCY_TONES[urgency];
+  // « Aujourd'hui » en rouge, comme une date passée (dernier jour pour l'utiliser), pour une date stricte ;
+  // en ambre pour une date indicative
+  const tone = urgency === 'soon' && expiresAt && daysUntil(expiresAt) === 0 && dateKind !== 'best_before' ? 'expired' : URGENCY_TONES[urgency];
   return (
     <Badge
       label={label}

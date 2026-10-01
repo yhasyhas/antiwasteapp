@@ -143,7 +143,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
           id: i.id,
           name: modelName(i),
           quantity: i.quantity || '',
-          // Date stricte hors congélateur seulement : un aliment congelé ou à date indicative n'est pas urgent
+          // Hors congélateur seulement ; date indicative dépassée : aucune (l'aliment n'est pas urgent)
           days_left: daysLeftForRecipes(i),
           kind: i.kind,
         })),

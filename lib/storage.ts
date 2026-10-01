@@ -97,25 +97,24 @@ export interface StoredLot {
 }
 
 // État d'un lot : congelé (jamais urgent), date indicative dépassée (jamais rouge ni gaspillé), sinon l'état
-// de sa date ; une date indicative n'est jamais « bientôt » ni « expirée »
+// de sa date ; une date indicative proche est « bientôt » comme une date stricte, jamais « expirée »
 export type LotUrgency = ExpiryStatus | 'frozen' | 'indicative_passed';
 export function lotUrgency(lot: StoredLot): LotUrgency {
   if (lot.location === 'freezer') return 'frozen';
   if (!lot.expires_at) return 'none';
   const days = daysUntil(lot.expires_at);
-  if (lot.date_kind === 'best_before') return days < 0 ? 'indicative_passed' : 'ok';
-  if (days < 0) return 'expired';
+  if (days < 0) return lot.date_kind === 'best_before' ? 'indicative_passed' : 'expired';
   if (days <= 2) return 'soon';
   return 'ok';
 }
 
-// « À utiliser vite » : date stricte passée ou proche, hors congélateur
+// « À utiliser vite » : date stricte passée, ou date proche (stricte ou indicative), hors congélateur
 export const isUrgentLot = (lot: StoredLot) => {
   const urgency = lotUrgency(lot);
   return urgency === 'expired' || urgency === 'soon';
 };
 
-// Jours restants transmis au modèle pour la génération : seulement pour une date stricte hors congélateur
-// (sinon l'aliment n'est ni urgent ni « date dépassée »)
+// Jours restants transmis au modèle pour la génération, hors congélateur ; date indicative dépassée : aucun
+// (l'aliment n'est ni urgent ni « date dépassée »)
 export const daysLeftForRecipes = (lot: StoredLot) =>
-  lot.expires_at && lot.location !== 'freezer' && lot.date_kind !== 'best_before' ? daysUntil(lot.expires_at) : null;
+  lot.expires_at && lotUrgency(lot) !== 'frozen' && lotUrgency(lot) !== 'indicative_passed' ? daysUntil(lot.expires_at) : null;

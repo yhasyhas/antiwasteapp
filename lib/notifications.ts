@@ -45,7 +45,6 @@ interface ReminderItem {
   id: string;
   name: string;
   expires_at: string | null;
-  date_kind?: string | null;
   location?: string | null;
 }
 
@@ -125,7 +124,7 @@ async function loadPantry(_userId: string): Promise<ReminderItem[] | null> {
   if (!householdId) return null;
   const { data, error } = await supabase
     .from('ingredients')
-    .select('id, name, expires_at, date_kind, location')
+    .select('id, name, expires_at, location')
     .eq('household_id', householdId);
   if (error) {
     console.warn('[rappels] garde-manger illisible :', error.message);
@@ -159,8 +158,9 @@ async function scheduleReminders(userId: string | null) {
   if (!pantry) return;
   await cancelReminders();
   await ensureChannel();
-  // Date indicative ou congélateur : jamais dans le rappel (comme le résumé du serveur)
-  const strict = pantry.filter((item) => (item.date_kind ?? 'use_by') === 'use_by' && item.location !== 'freezer');
+  // Congélateur : jamais dans le rappel ; date indicative : comme une date stricte (le rappel ne porte que sur
+  // aujourd'hui et demain, jamais sur une date dépassée), comme le résumé du serveur
+  const reminded = pantry.filter((item) => item.location !== 'freezer');
 
   const now = Date.now();
   const firstDay = todayISO();
@@ -170,8 +170,8 @@ async function scheduleReminders(userId: string | null) {
     fireAt.setHours(settings.hour, 0, 0, 0);
     if (fireAt.getTime() <= now) continue;
 
-    const today = strict.filter((item) => item.expires_at === day);
-    const tomorrow = strict.filter((item) => item.expires_at === addDays(day, 1));
+    const today = reminded.filter((item) => item.expires_at === day);
+    const tomorrow = reminded.filter((item) => item.expires_at === addDays(day, 1));
     if (today.length === 0 && tomorrow.length === 0) continue;
 
     await Notifications.scheduleNotificationAsync({

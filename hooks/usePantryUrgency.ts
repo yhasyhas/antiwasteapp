@@ -38,7 +38,7 @@ async function reload() {
   const byId = new Map<string, string | null>();
   const byFood = new Map<string, string | null>();
   for (const row of data ?? []) {
-    // Seules les dates des lots à utiliser vite comptent (congelé, date indicative ou lointaine : sans date)
+    // Seules les dates des lots à utiliser vite comptent (congelé, date indicative dépassée ou date lointaine : sans date)
     const date = isUrgentLot(row as { expires_at: string | null; date_kind: string | null; location: string | null })
       ? (row.expires_at as string) : null;
     byId.set(row.id as string, date);
