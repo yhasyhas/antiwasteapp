@@ -1,6 +1,6 @@
 # Contexte du projet : app mobile anti-gaspi de recettes IA
 
-> Analyse rédigée le 2026-09-23, mise à jour à la fin de la phase 5 (validée). La feuille de route est dans `PLAN.md`.
+> Analyse rédigée le 2026-09-23, mise à jour à la fin de la phase 8 (validée). La feuille de route est dans `PLAN.md`.
 
 ## 1. Le produit
 
@@ -243,7 +243,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Documentation : `CLAUDE.md` (règles, lu à chaque session), `docs/ENVIRONMENT.md` (comptes, variables, secrets, sans valeurs), `docs/REPRISE-PROJET.md` (contexte et raisons des choix).
 - Quantités : litre « L », « pièce » par défaut sans unité (`formatQuantity`) ; « X à sauver » recalculé sur le garde-manger actuel (`hooks/usePantryUrgency.ts`) ; 2 recettes pour 1 ou 2 aliments, 3 au-delà (`recipeCount`).
 
-### Phase 8 — anti-gaspi avancé (branche `phase-8`)
+### Phase 8 — anti-gaspi avancé (validée, fusionnée le 02/10/2026)
 - Rangement des lots (`lib/storage.ts`, migration `20261001100000_phase8_pantry.sql`) : `location`, `date_kind`, `opened_at`, `frozen_at`, `thawed_at` ; valeurs par défaut identiques dans l'app et la base (`default_location`, `default_date_kind`, déclencheur `fill_storage_defaults`) ; urgence par lot (`lotUrgency`, `isUrgentLot`).
 - Feuille de l'aliment (`components/pantry/PantryLotsSection.tsx`) : emplacement, type de date, « Je l'ai ouvert », « Congeler » / « Décongeler » ; emplacement proposé au scan et à la saisie (`LocationChoice`) ; filtres et section « Au congélateur » dans le garde-manger.
 - « J'ai cuisiné ça » (`components/recipe/CookedButton.tsx`) : relié à la recette, « ✓ Cuisiné aujourd'hui », récapitulatif, « Modifier » (`modify_cook_action`, `last_cook_action`), « Je l'ai cuisinée à nouveau » ; « Cuisinée le » dans « Mes recettes ».
@@ -277,7 +277,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 
 ## 6. Prochaine étape
-Tests de la phase 8 sur téléphone (dont la fluidité sur le Galaxy A30), puis 9 Recettes, 10 Premier contact, 11 Point de décision, 12 Natif (un seul build), 13 Services et abonnements, 14 Audit, 15 Lancement. Détails dans `PLAN.md`.
+Phase 9 Recettes (branche `phase-9`), puis 10 Premier contact, 11 Point de décision, 12 Natif (un seul build), 13 Services et abonnements, 14 Audit, 15 Lancement. Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash

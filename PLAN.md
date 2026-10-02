@@ -297,7 +297,7 @@ Suite de la phase 7, sur la branche `phase-7-finalisation`.
 - [x] Saison affichée seulement pour les produits frais (fruits, légumes, poissons, fruits de mer), jamais pour le reste
 - [x] Fiches aliments régénérées une seule fois pour « Est-ce encore bon ? » et la saison, après sauvegarde, avec un contrôle de qualité
 - [x] Compteur anti-gaspi et notifications cohérents avec les nouvelles règles (congelés, dates indicatives)
-- [ ] Fluidité vérifiée sur le Galaxy A30
+- [x] Fluidité vérifiée sur le Galaxy A30
 
 **Terminé quand** : un aliment peut être rangé, congelé et marqué ouvert, sa date et ses rappels suivent, un produit « de préférence avant » dépassé n'est jamais présenté ni compté comme gaspillé, et « J'ai cuisiné ça » peut être confirmé et corrigé.
 
@@ -619,3 +619,4 @@ Ancienne phase 8.
 | 02/10/2026 | v4.1 retenue. Recul en Asie du Sud-Est et au Maghreb : pas les types de plats, mais des noms de plats repris sans leurs ingrédients essentiels (« Tom yum » sans galanga, « curry » sans pâte de curry, « mhadjeb » éloigné de l'original) et des associations étrangères à la cuisine (miel sur une omelette). Règle des noms renforcée dans la v4.1 ; deux séries : Asie du Sud-Est 2,8 → 3,5 (v4 : 4,3), Maghreb 3,3 → 4,0 (v4 : 3,8), Afrique de l'Ouest 4,0 → 3,3 (v4 : 3,2), cas de base 4,74 (v4 : 4,75-4,78). Un seul garde-manger par région (6 recettes) : écart de ± 0,7 d'une série à l'autre | Avant de juger une région isolée : plusieurs garde-manger par région dans les cas fixes |
 | 02/10/2026 | Limite d'achats (v4.1) : au plus 3 ingrédients à acheter par recette hors sel, poivre, huile, eau, consigne et contrôle du serveur. Cas de base : 100 % des recettes à 3 achats au plus (86-97 % avant), 1,1 achat en moyenne, 37/37 recettes servies, juge 4,71 (4,73-4,75 avant) ; 4 recettes corrigées pour trop d'achats. Asie du Sud : 2,5 achats en moyenne (4,3 avant, jusqu'à 7). Contrôle : le temps de trempage n'est plus pris pour une cuisson (pois chiches trempés 4 h puis cuits 20 minutes) | La sélection garde sa consigne plus stricte (au plus 2) ; les épices de « Mes basiques » ne compteront pas (phase 10) |
 | | *(résultat du test Gemini vs Clarifai)* | |
+| 02/10/2026 | **Phase 8 validée** sur les deux téléphones (langue du scan, recongélation, restes congelés, messages dans le style de l’app) et fusionnée dans `master`. Choix validés : surgelés traités comme de la viande crue, restes à 1 portion par défaut | — |
