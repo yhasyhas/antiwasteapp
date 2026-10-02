@@ -61,6 +61,16 @@ node scripts/recipe-eval/compare.mjs results/<v1>.json results/<v2>.json+results
 
 **Coût** : `compare.mjs` estime le coût par recette à partir des tokens consommés et des prix de l'offre payante (table `PRICES`, à tenir à jour).
 
+## Plusieurs séries côte à côte
+
+```bash
+node scripts/recipe-eval/summary.mjs "v4 n°1=results/<a>.json" "v4 n°2=results/<b>.json" "v5=results/<c>.json"
+```
+
+Une colonne par série, sur les cas communs : notes, sécurité (contrôle actuel, recalculé), indications de feu, temps et coût par génération. Deux séries d'une même version montrent la part de hasard.
+
+**Régions** : `--cases-file cases-regions.json` (un cas par région et un pour « Autre cuisine », v4 et suivantes).
+
 ## Variété sur plusieurs générations
 
 ```bash

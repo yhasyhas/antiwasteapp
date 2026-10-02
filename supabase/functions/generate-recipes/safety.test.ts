@@ -50,6 +50,15 @@ Deno.test('safetyIssues : ingrédient au pluriel dans la liste, au singulier dan
   assertEquals(codes(recipe([['Ignames', null]], ['Épluche l\'igname et coupe-la en dés.'])), ['not_cooked']);
 });
 
+Deno.test('safetyIssues : fausses alertes relevées par l\'évaluation des régions', () => {
+  // Nouilles cuites dans l'eau portée à ébullition quatre étapes plus tôt (soupe)
+  assertEquals(codes(recipe([['Fideos de trigo', null]], ['Lleva 800 ml de agua a ebullición.', 'Corta la col.', 'Pica la cebolleta.', 'Añade la salsa de soja.', 'Añade los fideos y cocina 4 minutos, hasta que estén al dente.'])), []);
+  // Plantain râpé dans des galettes, frites dans une étape qui ne le nomme pas
+  assertEquals(codes(recipe([['Bananes plantains', null]], ['Râpe les 3 plantains et mélange-les à la farine.', 'Fais frire les galettes 4 minutes de chaque côté, jusqu\'à ce qu\'elles soient dorées.'])), []);
+  // « pierda el color rosado » : signe visible
+  assertEquals(codes(recipe([['Cordero picado', null]], ['Dora el cordero 6 minutos, hasta que pierda el color rosado y alcance 71 °C.'])), []);
+});
+
 Deno.test('safetyIssues : poisson cru seulement s\'il a été congelé avant', () => {
   assertEquals(codes(recipe([['Dorade', 'fish']], ['Coupe la dorade en dés et arrose de citron vert 15 minutes.'])), ['raw_fish']);
   assertEquals(codes(recipe([['Dorade', 'fish']], ['Utilise une dorade très fraîche, préalablement congelée 7 jours.', 'Coupe la dorade en dés et arrose de citron vert.'])), []);

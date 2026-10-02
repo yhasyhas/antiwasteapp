@@ -1,0 +1,4933 @@
+{
+ "version": "v5",
+ "model": null,
+ "providers": "groq",
+ "judge_model": "gemini-3.1-flash-lite",
+ "generations": 4,
+ "runs": [
+  {
+   "id": "fr-afrique-complet",
+   "condition": "library",
+   "generations": [
+    {
+     "examples": [
+      {
+       "name": "Kédjénou",
+       "region": "Afrique de l'Ouest"
+      },
+      {
+       "name": "Matoke (ndizi nyama)",
+       "region": "Afrique de l'Est"
+      },
+      {
+       "name": "Muamba de galinha",
+       "region": "Afrique australe"
+      },
+      {
+       "name": "Cari poulet",
+       "region": "Océan Indien"
+      },
+      {
+       "name": "Sanga",
+       "region": "Afrique centrale"
+      }
+     ],
+     "recipes": [
+      {
+       "title": "Mafé de cuisses de poulet à la pâte d'arachide",
+       "description": "Cuisses de poulet mijotées dans une sauce onctueuse à la pâte d'arachide, relevées de tomate, citron et piment, servies avec du riz blanc.",
+       "difficulty": "medium",
+       "prep_time": 15,
+       "cook_time": 45,
+       "total_time": 60,
+       "servings": 4,
+       "meal_type": "dinner",
+       "cuisine": "african",
+       "dietary_tags": [
+        "gluten-free"
+       ],
+       "ingredients_used": [
+        {
+         "name": "Cuisses de poulet",
+         "quantity": "4",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-1"
+        },
+        {
+         "name": "Tomates",
+         "quantity": "3",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-6"
+        },
+        {
+         "name": "Oignons",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-2"
+        },
+        {
+         "name": "Ail",
+         "quantity": "3",
+         "unit": "gousses",
+         "pantry_id": "fr-afrique-complet-10"
+        },
+        {
+         "name": "Piment",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-9"
+        },
+        {
+         "name": "Pâte d'arachide",
+         "quantity": "120",
+         "unit": "g",
+         "pantry_id": "fr-afrique-complet-5"
+        },
+        {
+         "name": "Concentré de tomate",
+         "quantity": "2",
+         "unit": "c. à soupe",
+         "pantry_id": "fr-afrique-complet-8"
+        },
+        {
+         "name": "Citrons",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-3"
+        },
+        {
+         "name": "Riz",
+         "quantity": "300",
+         "unit": "g",
+         "pantry_id": "fr-afrique-complet-4"
+        },
+        {
+         "name": "sel",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "poivre",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "huile végétale",
+         "quantity": "2",
+         "unit": "c. à soupe",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Cuisses de poulet",
+        "Tomates",
+        "Oignons",
+        "Ail",
+        "Piment",
+        "Pâte d'arachide",
+        "Concentré de tomate",
+        "Citrons",
+        "Riz"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Rince le riz à l'eau froide, puis fais-le cuire dans 600 ml d'eau à feu moyen pendant 12 minutes, jusqu'à ce qu'il soit tendre et l'eau absorbée. Réserve au chaud.",
+        "Dans une grande cocotte, fais chauffer 2 c. à soupe d'huile végétale à feu moyen.",
+        "Ajoute les 1 oignon émincé et fais-le dorer 4 minutes, jusqu'à ce qu'il devienne translucide.",
+        "Incorpore les 3 gousses d'ail écrasées et le 1 piment finement haché, fais revenir 2 minutes, en remuant constamment.",
+        "Ajoute les 4 cuisses de poulet, sale 1 pincée et poivre 1 pincée, fais dorer chaque face 5 minutes, jusqu'à ce qu'elles soient bien colorées.",
+        "Coupe les 3 tomates en dés et ajoute-les avec le 2 c. à soupe de concentré de tomate. Mélange et laisse mijoter 5 minutes, jusqu'à ce que les tomates ramollissent.",
+        "Verse la pâte d'arachide (120 g) diluée dans 200 ml d'eau tiède, mélange bien pour éviter les grumeaux.",
+        "Couvre la cocotte, réduis le feu à doux et laisse mijoter 25 minutes, jusqu'à ce que le poulet atteigne 74 °C au centre (jus clair) et que la sauce épaississe.",
+        "Juste avant de servir, presse le jus du 1 citron sur le plat et remue rapidement.",
+        "Serre le mafé bien chaud avec le riz blanc à côté."
+       ],
+       "tips": [
+        "Pour une sauce plus onctueuse, ajoute un filet de lait de coco en fin de cuisson.",
+        "Si le plat devient trop épais, déglace avec un peu d'eau chaude.",
+        "Le piment peut être retiré avant de servir pour les plus sensibles."
+       ],
+       "image_prompt": "Professional food photography, braised chicken thighs in creamy peanut sauce, bright red tomatoes, green lemon wedges, steaming white rice, rustic clay pot, natural light"
+      },
+      {
+       "title": "Riz sauté aux carottes, citron et poulet déchiqueté",
+       "description": "Riz parfumé sauté avec carottes, zestes de citron, oignon et morceaux de poulet rôtis, rappelant les saveurs légères de la cuisine ouest‑africaine.",
+       "difficulty": "medium",
+       "prep_time": 10,
+       "cook_time": 30,
+       "total_time": 40,
+       "servings": 4,
+       "meal_type": "dinner",
+       "cuisine": "african",
+       "dietary_tags": [
+        "gluten-free"
+       ],
+       "ingredients_used": [
+        {
+         "name": "Cuisses de poulet",
+         "quantity": "2",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-1"
+        },
+        {
+         "name": "Riz",
+         "quantity": "350",
+         "unit": "g",
+         "pantry_id": "fr-afrique-complet-4"
+        },
+        {
+         "name": "Carottes",
+         "quantity": "2",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-7"
+        },
+        {
+         "name": "Oignons",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-2"
+        },
+        {
+         "name": "Ail",
+         "quantity": "2",
+         "unit": "gousses",
+         "pantry_id": "fr-afrique-complet-10"
+        },
+        {
+         "name": "Citrons",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-3"
+        },
+        {
+         "name": "Piment",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-9"
+        },
+        {
+         "name": "sel",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "poivre",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "huile végétale",
+         "quantity": "3",
+         "unit": "c. à soupe",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Cuisses de poulet",
+        "Riz",
+        "Carottes",
+        "Oignons",
+        "Ail",
+        "Citrons",
+        "Piment"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Préchauffe le four à 200 °C.",
+        "Dispose les 2 cuisses de poulet sur une plaque, badigeonne d'1 c. à soupe d'huile, sale 1 pincée et poivre 1 pincée. Enfourne 25 minutes, jusqu'à ce que la température interne atteigne 74 °C (jus clair).",
+        "Pendant ce temps, fais cuire le riz dans 700 ml d'eau à feu moyen pendant 12 minutes, puis égoutte et étale sur une plaque pour le refroidir rapidement.",
+        "Épluche et coupe les 2 carottes en fines rondelles ou en julienne.",
+        "Émince l'oignon et hache l'ail.",
+        "Une fois le poulet cuit, laisse-le reposer 5 minutes puis désosse‑le et effiloche la viande à la fourchette.",
+        "Dans un wok ou une grande poêle, chauffe 2 c. à soupe d'huile à feu moyen‑vif.",
+        "Ajoute l'oignon et fais-le revenir 3 minutes, jusqu'à ce qu'il soit doré.",
+        "Incorpore l'ail et le piment haché, fais sauter 1 minute.",
+        "Ajoute les carottes, continue 4 minutes, jusqu'à ce qu'elles soient légèrement tendres mais encore croquantes.",
+        "Verse le riz refroidi, augmente le feu à vif et fais sauter 5 minutes, en remuant constamment, jusqu'à ce que le riz soit bien doré.",
+        "Ajoute le poulet effiloché, le zeste du citron (râpé fin) et le jus du demi‑citron, mélange 2 minutes pour réchauffer le tout.",
+        "Rectifie l'assaisonnement avec une pincée de sel et de poivre, puis sers immédiatement."
+       ],
+       "tips": [
+        "Utilise du riz du jour précédent pour un meilleur résultat de friture.",
+        "Le zeste de citron apporte une fraîcheur qui équilibre le piment.",
+        "Pour plus de couleur, ajoute quelques feuilles de coriandre hachées juste avant de servir."
+       ],
+       "image_prompt": "Close‑up of golden fried rice with orange carrot strips, lemon zest, shredded chicken, bright green cilantro, served in a wok, natural light"
+      },
+      {
+       "title": "Soupe épicée de tomates, carottes et poulet",
+       "description": "Velouté rouge de tomates et carottes parfumé d'ail, citron et piment, agrémenté de morceaux de poulet tendre, parfait comme entrée légère du soir.",
+       "difficulty": "medium",
+       "prep_time": 10,
+       "cook_time": 35,
+       "total_time": 45,
+       "servings": 4,
+       "meal_type": "dinner",
+       "cuisine": "african",
+       "dietary_tags": [
+        "gluten-free"
+       ],
+       "ingredients_used": [
+        {
+         "name": "Cuisses de poulet",
+         "quantity": "2",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-1"
+        },
+        {
+         "name": "Tomates",
+         "quantity": "2",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-6"
+        },
+        {
+         "name": "Carottes",
+         "quantity": "2",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-7"
+        },
+        {
+         "name": "Oignons",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-2"
+        },
+        {
+         "name": "Ail",
+         "quantity": "2",
+         "unit": "gousses",
+         "pantry_id": "fr-afrique-complet-10"
+        },
+        {
+         "name": "Piment",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-9"
+        },
+        {
+         "name": "Concentré de tomate",
+         "quantity": "1",
+         "unit": "c. à soupe",
+         "pantry_id": "fr-afrique-complet-8"
+        },
+        {
+         "name": "Citrons",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-3"
+        },
+        {
+         "name": "sel",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "poivre",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "huile végétale",
+         "quantity": "2",
+         "unit": "c. à soupe",
+         "pantry_id": null
+        },
+        {
+         "name": "eau",
+         "quantity": "800",
+         "unit": "ml",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Cuisses de poulet",
+        "Tomates",
+        "Carottes",
+        "Oignons",
+        "Ail",
+        "Piment",
+        "Concentré de tomate",
+        "Citrons"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Coupe les 2 cuisses de poulet en gros morceaux.",
+        "Dans une grande casserole, fais chauffer 2 c. à soupe d'huile à feu moyen.",
+        "Ajoute l'oignon émincé et fais-le suer 4 minutes, jusqu'à ce qu'il devienne translucide.",
+        "Incorpore l'ail haché et le piment émincé, fais revenir 1 minute.",
+        "Ajoute les morceaux de poulet, sale 1 pincée, poivre 1 pincée, et fais dorer 6 minutes, jusqu'à ce qu'ils soient légèrement colorés.",
+        "Coupe les 2 tomates en dés, les 2 carottes en rondelles.",
+        "Verse les tomates, les carottes et le 1 c. à soupe de concentré de tomate dans la casserole.",
+        "Ajoute 800 ml d'eau, porte à ébullition à feu vif, puis réduis à feu moyen‑doux.",
+        "Laisse mijoter 20 minutes, jusqu'à ce que les carottes soient tendres et que le poulet atteigne 74 °C au centre (jus clair).",
+        "Retire la casserole du feu, mixe la soupe à l'aide d'un mixeur plongeant jusqu'à obtenir un velouté lisse.",
+        "Remets la casserole sur feu doux, ajoute le jus du 1/2 citron, goûte et ajuste l'assaisonnement avec une pincée supplémentaire de sel ou de poivre si besoin.",
+        "Serre la soupe bien chaude, décorée d'un filet d'huile et d'un quartier de citron."
+       ],
+       "tips": [
+        "Pour une texture plus crémeuse, ajoute 50 ml de lait de coco après le mixage.",
+        "Si tu aimes les épices, ajoute une demi‑cuillère à café de paprika fumé avec le concentré de tomate.",
+        "Cette soupe se conserve 2 jours au réfrigérateur ; réchauffe doucement avant de servir."
+       ],
+       "image_prompt": "Warm bowl of bright red tomato carrot soup with shredded chicken, drizzle of olive oil, lemon wedge on the side, rustic wooden table, soft natural light"
+      }
+     ],
+     "safety": {
+      "checked": true,
+      "first": [],
+      "corrected": [],
+      "dropped": []
+     },
+     "attempts": [
+      {
+       "provider": "groq",
+       "started_at_ms": 3,
+       "ms": 7692,
+       "ok": true,
+       "usage": {
+        "queue_time": 0.050482895,
+        "prompt_tokens": 2514,
+        "prompt_time": 0.13957297,
+        "completion_tokens": 3184,
+        "completion_time": 7.457956682,
+        "total_tokens": 5698,
+        "total_time": 7.597529652,
+        "prompt_tokens_details": {
+         "cached_tokens": 256
+        },
+        "completion_tokens_details": {
+         "reasoning_tokens": 189
+        },
+        "rate_limits": {
+         "requests_per_day": "500000",
+         "remaining_requests": "183489",
+         "tokens_per_minute": "250000",
+         "remaining_tokens": "244401"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "examples": [
+      {
+       "name": "Bouchons",
+       "region": "Océan Indien"
+      },
+      {
+       "name": "Pampoenkoekies (beignets de courge)",
+       "region": "Afrique australe"
+      },
+      {
+       "name": "Fumbwa",
+       "region": "Afrique centrale"
+      },
+      {
+       "name": "Sauce graine",
+       "region": "Afrique de l'Ouest"
+      },
+      {
+       "name": "Tibs",
+       "region": "Afrique de l'Est"
+      }
+     ],
+     "recipes": [
+      {
+       "title": "Poulet braisé à la sauce tomate épicée",
+       "description": "Cuisses de poulet mijotées dans une sauce tomate relevée au piment, ail et citron, servies avec du riz parfumé.",
+       "difficulty": "medium",
+       "prep_time": 15,
+       "cook_time": 35,
+       "total_time": 50,
+       "servings": 4,
+       "meal_type": "dinner",
+       "cuisine": "african",
+       "dietary_tags": [
+        "non-vegetarian"
+       ],
+       "ingredients_used": [
+        {
+         "name": "Cuisses de poulet",
+         "quantity": "4",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-1"
+        },
+        {
+         "name": "Tomates",
+         "quantity": "4",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-6"
+        },
+        {
+         "name": "Oignons",
+         "quantity": "2",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-2"
+        },
+        {
+         "name": "Ail",
+         "quantity": "3",
+         "unit": "gousses",
+         "pantry_id": "fr-afrique-complet-10"
+        },
+        {
+         "name": "Piment",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-9"
+        },
+        {
+         "name": "Concentré de tomate",
+         "quantity": "2",
+         "unit": "c. à soupe",
+         "pantry_id": "fr-afrique-complet-8"
+        },
+        {
+         "name": "Citrons",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-3"
+        },
+        {
+         "name": "Riz",
+         "quantity": "300",
+         "unit": "g",
+         "pantry_id": "fr-afrique-complet-4"
+        },
+        {
+         "name": "sel",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "poivre",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "huile végétale",
+         "quantity": "2",
+         "unit": "c. à soupe",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Cuisses de poulet",
+        "Tomates",
+        "Oignons",
+        "Ail",
+        "Piment",
+        "Concentré de tomate",
+        "Citrons",
+        "Riz"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Émince les 2 oignons et hache les 3 gousses d'ail.",
+        "Coupe les 4 tomates en dés.",
+        "Coupe le piment en deux, retire les graines et hache-le finement.",
+        "Dans une grande casserole, fais chauffer 2 c. à soupe d'huile végétale à feu moyen.",
+        "Fais dorer les 4 cuisses de poulet, côté peau vers le bas, 5 minutes, jusqu'à ce qu'elles soient bien colorées.",
+        "Retourne les cuisses, ajoute les oignons, l'ail et le piment, fais revenir 3 minutes, jusqu'à ce que les oignons deviennent translucides.",
+        "Incorpore les dés de tomate, le concentré de tomate, le jus du citron et 200 ml d'eau.",
+        "Assaisonne avec 1 pincée de sel et de poivre.",
+        "Couvre et laisse mijoter à feu doux 25 minutes, jusqu'à ce que le poulet atteigne 74 °C au cœur et que la sauce épaississe.",
+        "Pendant ce temps, porte à ébullition 600 ml d'eau salée, ajoute le riz, porte à ébullition puis baisse le feu à doux, couvre et laisse cuire 12 minutes, jusqu'à ce que l'eau soit absorbée et le riz tendre.",
+        "Égoutte le riz si nécessaire, puis laisse-le reposer 2 minutes à couvert.",
+        "Serre les cuisses nappées de sauce tomate sur un lit de riz."
+       ],
+       "tips": [
+        "Ajoute une branche de thym ou de la feuille de laurier pour plus d'arômes.",
+        "Si tu aimes le goût citronné, ajoute le zeste d'un deuxième citron en fin de cuisson."
+       ],
+       "image_prompt": "Professional food photography, braised chicken thighs in a rich red tomato sauce, fluffy white rice, fresh lemon wedge, vibrant African kitchen, natural light"
+      },
+      {
+       "title": "Poulet au citron et carottes rôties à la mode ouest‑africaine",
+       "description": "Cuisses de poulet marinées au citron, grillées et servies avec des carottes rôties à l'ail et au piment, accompagnées de riz parfumé.",
+       "difficulty": "medium",
+       "prep_time": 20,
+       "cook_time": 40,
+       "total_time": 60,
+       "servings": 4,
+       "meal_type": "dinner",
+       "cuisine": "african",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Cuisses de poulet",
+         "quantity": "4",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-1"
+        },
+        {
+         "name": "Carottes",
+         "quantity": "3",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-7"
+        },
+        {
+         "name": "Ail",
+         "quantity": "2",
+         "unit": "gousses",
+         "pantry_id": "fr-afrique-complet-10"
+        },
+        {
+         "name": "Piment",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-9"
+        },
+        {
+         "name": "Citrons",
+         "quantity": "2",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-3"
+        },
+        {
+         "name": "Riz",
+         "quantity": "250",
+         "unit": "g",
+         "pantry_id": "fr-afrique-complet-4"
+        },
+        {
+         "name": "sel",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "poivre",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "huile d'arachide",
+         "quantity": "3",
+         "unit": "c. à soupe",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Cuisses de poulet",
+        "Carottes",
+        "Ail",
+        "Piment",
+        "Citrons",
+        "Riz"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Presse le jus d'1 citron et râpe le zeste de ce même citron.",
+        "Mélange le jus, le zeste, 1 c. à soupe d'huile d'arachide, 1 pincée de sel et de poivre dans un bol.",
+        "Dépose les 4 cuisses de poulet dans le mélange, tourne-les pour bien les enrober, puis couvre et laisse mariner 15 minutes à température ambiante.",
+        "Préchauffe le four à 200 °C.",
+        "Épluche les 3 carottes et coupe-les en bâtonnets de 1 cm d'épaisseur.",
+        "Émince les 2 gousses d'ail et hache le piment.",
+        "Dispose les carottes sur une plaque de cuisson, arrose avec 1 c. à soupe d'huile d'arachide, ajoute l'ail, le piment, 1 pincée de sel et mélange bien.",
+        "Enfourne les carottes 20 minutes, en les retournant à mi‑cuisson, jusqu'à ce qu'elles soient dorées et tendres.",
+        "Pendant ce temps, fais chauffer une poêle à feu moyen‑vif, ajoute 1 c. à soupe d'huile d'arachide et dépose les cuisses marinées, peau vers le bas.",
+        "Saisis 6 minutes jusqu'à ce que la peau soit bien dorée, puis retourne et poursuis 12 minutes, jusqu'à ce que la température interne atteigne 74 °C (jus clair, aucune trace rose).",
+        "Laisse reposer les cuisses 3 minutes, puis retire-les du feu.",
+        "Pendant la cuisson du poulet, porte à ébullition 500 ml d'eau salée, ajoute le riz, porte à nouveau à ébullition, couvre et laisse cuire 12 minutes à feu doux, jusqu'à absorption complète.",
+        "Éteins le feu, laisse le riz reposer 5 minutes, puis aère-le avec une fourchette.",
+        "Serre les cuisses de poulet avec les carottes rôties et le riz chaud."
+       ],
+       "tips": [
+        "Pour un goût plus acidulé, ajoute un filet de jus de citron supplémentaire juste avant de servir.",
+        "Si tu aimes le piquant, garde les graines du piment."
+       ],
+       "image_prompt": "Crispy baked chicken thighs with lemon zest, caramelized carrot sticks, fluffy rice, African wooden table, bright natural light"
+      },
+      {
+       "title": "Riz créole à la pâte d'arachide et poulet épicé",
+       "description": "Riz sauté aux morceaux de poulet, relevé de pâte d'arachide, tomates, citron et piment, inspiré des saveurs de l'Afrique de l'Ouest.",
+       "difficulty": "medium",
+       "prep_time": 15,
+       "cook_time": 40,
+       "total_time": 55,
+       "servings": 4,
+       "meal_type": "dinner",
+       "cuisine": "african",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Cuisses de poulet",
+         "quantity": "4",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-1"
+        },
+        {
+         "name": "Riz",
+         "quantity": "300",
+         "unit": "g",
+         "pantry_id": "fr-afrique-complet-4"
+        },
+        {
+         "name": "Tomates",
+         "quantity": "2",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-6"
+        },
+        {
+         "name": "Oignons",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-2"
+        },
+        {
+         "name": "Ail",
+         "quantity": "2",
+         "unit": "gousses",
+         "pantry_id": "fr-afrique-complet-10"
+        },
+        {
+         "name": "Piment",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-9"
+        },
+        {
+         "name": "Pâte d'arachide",
+         "quantity": "3",
+         "unit": "c. à soupe",
+         "pantry_id": "fr-afrique-complet-5"
+        },
+        {
+         "name": "Citrons",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-3"
+        },
+        {
+         "name": "sel",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "poivre",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "huile de palme rouge",
+         "quantity": "2",
+         "unit": "c. à soupe",
+         "pantry_id": null
+        },
+        {
+         "name": "Concentré de tomate",
+         "quantity": "1",
+         "unit": "c. à soupe",
+         "pantry_id": "fr-afrique-complet-8"
+        }
+       ],
+       "ingredients_from_list": [
+        "Cuisses de poulet",
+        "Riz",
+        "Tomates",
+        "Oignons",
+        "Ail",
+        "Piment",
+        "Pâte d'arachide",
+        "Citrons",
+        "Concentré de tomate"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Coupe les cuisses de poulet en morceaux de 5 cm.",
+        "Émince l'oignon, hache les 2 gousses d'ail et coupe le piment en petits dés.",
+        "Coupe les 2 tomates en dés.",
+        "Dans une casserole, porte à ébullition 900 ml d'eau salée, ajoute le riz, porte à nouveau à ébullition, couvre et laisse cuire 12 minutes à feu doux, jusqu'à absorption complète.",
+        "Égoutte le riz et étale-le sur un plat pour le refroidir rapidement.",
+        "Dans une grande poêle, chauffe 2 c. à soupe d'huile de palme rouge à feu moyen.",
+        "Ajoute les morceaux de poulet, fais dorer 8 minutes, jusqu'à ce qu'ils soient bien colorés et atteignent 74 °C à cœur (jus clair, aucune trace rose).",
+        "Retire le poulet et réserve-le sur une assiette.",
+        "Dans la même poêle, ajoute l'oignon, l'ail et le piment, fais revenir 3 minutes jusqu'à ce que l'oignon devienne translucide.",
+        "Incorpore les dés de tomate, 1 c. à soupe de concentré de tomate, 1 c. à soupe de pâte d'arachide, le jus du citron et 100 ml d'eau.",
+        "Laisse mijoter 5 minutes à feu doux, jusqu'à ce que la sauce épaississe légèrement.",
+        "Remets le poulet dans la poêle, mélange 2 minutes pour l'enrober de sauce.",
+        "Ajoute le riz cuit, assaisonne avec 1 pincée de sel et de poivre, mélange bien et fais sauter 4 minutes à feu moyen, jusqu'à ce que le tout soit bien chaud.",
+        "Serre immédiatement."
+       ],
+       "tips": [
+        "Pour plus de profondeur, ajoute une petite cuillère de concentré de tomate en même temps que la pâte d'arachide.",
+        "Garde un peu de zeste de citron pour décorer le plat."
+       ],
+       "image_prompt": "Vibrant West African peanut rice with spiced chicken pieces, bright red tomato chunks, green lemon slice, rustic clay bowl, natural daylight"
+      }
+     ],
+     "safety": {
+      "checked": true,
+      "first": [
+       {
+        "title": "Poulet au citron et carottes rôties à la mode ouest‑africaine",
+        "issues": [
+         {
+          "code": "core_temperature",
+          "ingredient": "Cuisses de poulet",
+          "message": "« Cuisses de poulet » : écrire la température à cœur (volaille : 74 °C à cœur et jus clair, plus aucune trace rose)."
+         }
+        ]
+       },
+       {
+        "title": "Riz créole à la pâte d'arachide et poulet épicé",
+        "issues": [
+         {
+          "code": "core_temperature",
+          "ingredient": "Cuisses de poulet",
+          "message": "« Cuisses de poulet » : écrire la température à cœur (volaille : 74 °C à cœur et jus clair, plus aucune trace rose)."
+         },
+         {
+          "code": "doneness_sign",
+          "ingredient": "Cuisses de poulet",
+          "message": "« Cuisses de poulet » : ajouter un signe visible de cuisson (volaille : 74 °C à cœur et jus clair, plus aucune trace rose)."
+         }
+        ]
+       }
+      ],
+      "corrected": [
+       "Poulet au citron et carottes rôties à la mode ouest‑africaine",
+       "Riz créole à la pâte d'arachide et poulet épicé"
+      ],
+      "dropped": []
+     },
+     "attempts": [
+      {
+       "provider": "groq",
+       "started_at_ms": 2,
+       "ms": 7287,
+       "ok": true,
+       "usage": {
+        "queue_time": 0.209442324,
+        "prompt_tokens": 2595,
+        "prompt_time": 0.375789962,
+        "completion_tokens": 2867,
+        "completion_time": 6.660900717,
+        "total_tokens": 5462,
+        "total_time": 7.036690679,
+        "prompt_tokens_details": {
+         "cached_tokens": 256
+        },
+        "completion_tokens_details": {
+         "reasoning_tokens": 116
+        },
+        "rate_limits": {
+         "requests_per_day": "500000",
+         "remaining_requests": "183551",
+         "tokens_per_minute": "250000",
+         "remaining_tokens": "244194"
+        }
+       }
+      },
+      {
+       "provider": "groq",
+       "started_at_ms": 7297,
+       "ms": 4990,
+       "ok": true,
+       "usage": {
+        "queue_time": 0.363937632,
+        "prompt_tokens": 4140,
+        "prompt_time": 0.218291175,
+        "completion_tokens": 2054,
+        "completion_time": 4.370360907,
+        "total_tokens": 6194,
+        "total_time": 4.588652082,
+        "completion_tokens_details": {
+         "reasoning_tokens": 38
+        },
+        "rate_limits": {
+         "requests_per_day": "500000",
+         "remaining_requests": "183592",
+         "tokens_per_minute": "250000",
+         "remaining_tokens": "242676"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "examples": [
+      {
+       "name": "Tamatie smoor (sauce tomate-oignon)",
+       "region": "Afrique australe"
+      },
+      {
+       "name": "Tuo zaafi (TZ)",
+       "region": "Afrique de l'Ouest"
+      },
+      {
+       "name": "Sauce d'arachide (poulet ou poisson)",
+       "region": "Afrique centrale"
+      },
+      {
+       "name": "Briani (biryani mauricien)",
+       "region": "Océan Indien"
+      },
+      {
+       "name": "Bamia (ragoût de gombos)",
+       "region": "Afrique de l'Est"
+      }
+     ],
+     "recipes": [
+      {
+       "title": "Poulet pilau à la tomate‑piment",
+       "description": "Riz pilau parfumé aux épices, cuit avec des cuisses de poulet, tomates, piment et citron, inspiré des plats de fête d’Afrique de l’Ouest.",
+       "difficulty": "medium",
+       "prep_time": 15,
+       "cook_time": 45,
+       "total_time": 60,
+       "servings": 4,
+       "meal_type": "dinner",
+       "cuisine": "african",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Cuisses de poulet",
+         "quantity": "4",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-1"
+        },
+        {
+         "name": "Riz",
+         "quantity": "300",
+         "unit": "g",
+         "pantry_id": "fr-afrique-complet-4"
+        },
+        {
+         "name": "Tomates",
+         "quantity": "2",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-6"
+        },
+        {
+         "name": "Oignons",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-2"
+        },
+        {
+         "name": "Piment",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-9"
+        },
+        {
+         "name": "Ail",
+         "quantity": "2",
+         "unit": "gousses",
+         "pantry_id": "fr-afrique-complet-10"
+        },
+        {
+         "name": "Citrons",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-3"
+        },
+        {
+         "name": "huile végétale",
+         "quantity": "2",
+         "unit": "c. à soupe",
+         "pantry_id": null
+        },
+        {
+         "name": "sel",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "poivre",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Cuisses de poulet",
+        "Riz",
+        "Tomates",
+        "Oignons",
+        "Piment",
+        "Ail",
+        "Citrons"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Émince l'1 oignon et hache les 2 gousses d'ail.",
+        "Coupe les 2 tomates en dés.",
+        "Dans une grande casserole, fais chauffer 2 c. à soupe d'huile à feu moyen.",
+        "Ajoute l'oignon émincé et fais-le dorer 4 minutes, jusqu'à ce qu'il devienne translucide.",
+        "Incorpore l'ail, le piment entier et fais revenir 1 minute, jusqu'à ce que les arômes se dégagent.",
+        "Ajoute les 4 cuisses de poulet, sale et poivre, puis fais-les dorer 6 minutes de chaque côté, jusqu'à ce qu'elles prennent une couleur dorée.",
+        "Verse les dés de tomate, mélange et laisse mijoter 5 minutes, jusqu'à ce que les tomates ramollissent.",
+        "Râpe le zeste du citron et presse son jus, ajoute les deux au mélange.",
+        "Rince le riz à l'eau froide, puis ajoute les 300 g de riz dans la casserole.",
+        "Couvre avec 600 ml d'eau, porte à ébullition puis baisse le feu à doux.",
+        "Cuis pendant 20 minutes, jusqu'à ce que le riz soit tendre et que le liquide soit absorbé, le poulet doit atteindre 74 °C (jus clair).",
+        "Éteins le feu, couvre et laisse reposer 5 minutes avant de servir."
+       ],
+       "tips": [
+        "Pour plus de profondeur, ajoute une petite cuillère de concentré de tomate (p8) avec les tomates.",
+        "Tu peux remplacer le citron par du citron vert pour une note plus acidulée."
+       ],
+       "image_prompt": "Professional food photography, golden brown chicken pilau with fragrant rice, bright red tomato pieces, green piment, a slice of lemon on the side, rustic clay pot, natural light"
+      },
+      {
+       "title": "Poulet grillé au citron et carottes confites",
+       "description": "Cuisses de poulet marinées au citron, grillées puis servies avec des carottes confites au miel et à l'ail, une touche sucrée‑salée très appréciée en Afrique de l'Est.",
+       "difficulty": "medium",
+       "prep_time": 20,
+       "cook_time": 30,
+       "total_time": 50,
+       "servings": 4,
+       "meal_type": "dinner",
+       "cuisine": "african",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Cuisses de poulet",
+         "quantity": "4",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-1"
+        },
+        {
+         "name": "Carottes",
+         "quantity": "3",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-7"
+        },
+        {
+         "name": "Citrons",
+         "quantity": "2",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-3"
+        },
+        {
+         "name": "Oignons",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-2"
+        },
+        {
+         "name": "Ail",
+         "quantity": "2",
+         "unit": "gousses",
+         "pantry_id": "fr-afrique-complet-10"
+        },
+        {
+         "name": "huile végétale",
+         "quantity": "3",
+         "unit": "c. à soupe",
+         "pantry_id": null
+        },
+        {
+         "name": "sel",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "poivre",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Cuisses de poulet",
+        "Carottes",
+        "Citrons",
+        "Oignons",
+        "Ail"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Dans un bol, presse le jus des 2 citrons, ajoute 1 c. à soupe d'huile, 1 pincée de sel, 1 pincée de poivre et mélange.",
+        "Badigeonne les 4 cuisses de poulet avec la moitié de la marinade citronnée, couvre et laisse reposer 10 minutes à température ambiante.",
+        "Épluche les 3 carottes et coupe‑les en bâtonnets de 1 cm d'épaisseur.",
+        "Émince l'1 oignon et hache les 2 gousses d'ail.",
+        "Dans une poêle à feu moyen, fais chauffer 1 c. à soupe d'huile, ajoute l'oignon et l'ail, fais revenir 3 minutes jusqu'à ce qu'ils soient dorés.",
+        "Ajoute les bâtonnets de carotte, verse le reste de la marinade citronnée, couvre et laisse confire 15 minutes, en remuant à mi‑cuisson, jusqu'à ce que les carottes soient tendres et légèrement caramélisées.",
+        "Préchauffe le grill du four à 200 °C.",
+        "Dispose les cuisses de poulet sur une grille, badigeonne avec le reste d'huile et place sous le grill 12 minutes de chaque côté, jusqu'à ce que la température interne atteigne 74 °C (jus clair).",
+        "Laisse reposer 5 minutes, puis sers le poulet avec les carottes confites."
+       ],
+       "tips": [
+        "Si tu aimes le sucré, ajoute une cuillère à café de miel dans la poêle avec les carottes.",
+        "Pour un goût plus épicé, ajoute une petite tranche de piment (p9) aux carottes pendant la cuisson."
+       ],
+       "image_prompt": "Professional food photography, grilled chicken thighs glazed with lemon, surrounded by glossy caramelized carrot sticks, rustic wooden board, bright daylight"
+      },
+      {
+       "title": "Soupe de riz à l'arachide et poulet",
+       "description": "Velouté épais à base de riz, pâte d'arachide et tomates, agrémenté de morceaux de poulet tendre, rappelant les soupes nourrissantes du Sahel.",
+       "difficulty": "medium",
+       "prep_time": 10,
+       "cook_time": 50,
+       "total_time": 60,
+       "servings": 4,
+       "meal_type": "dinner",
+       "cuisine": "african",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Cuisses de poulet",
+         "quantity": "4",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-1"
+        },
+        {
+         "name": "Riz",
+         "quantity": "200",
+         "unit": "g",
+         "pantry_id": "fr-afrique-complet-4"
+        },
+        {
+         "name": "Pâte d'arachide",
+         "quantity": "100",
+         "unit": "g",
+         "pantry_id": "fr-afrique-complet-5"
+        },
+        {
+         "name": "Tomates",
+         "quantity": "2",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-6"
+        },
+        {
+         "name": "Concentré de tomate",
+         "quantity": "1",
+         "unit": "c. à soupe",
+         "pantry_id": "fr-afrique-complet-8"
+        },
+        {
+         "name": "Oignons",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-2"
+        },
+        {
+         "name": "Piment",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-9"
+        },
+        {
+         "name": "Ail",
+         "quantity": "1",
+         "unit": "gousse",
+         "pantry_id": "fr-afrique-complet-10"
+        },
+        {
+         "name": "huile végétale",
+         "quantity": "2",
+         "unit": "c. à soupe",
+         "pantry_id": null
+        },
+        {
+         "name": "sel",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "poivre",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "eau",
+         "quantity": "1,2",
+         "unit": "l",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Cuisses de poulet",
+        "Riz",
+        "Pâte d'arachide",
+        "Tomates",
+        "Concentré de tomate",
+        "Oignons",
+        "Piment",
+        "Ail"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Émince l'1 oignon, hache la gousse d'ail et coupe les 2 tomates en dés.",
+        "Dans une grande marmite, fais chauffer 2 c. à soupe d'huile à feu moyen.",
+        "Ajoute l'oignon et l'ail, fais revenir 4 minutes, jusqu'à ce qu'ils soient translucides.",
+        "Incorpore les dés de tomate et le concentré de tomate, mélange et laisse cuire 5 minutes, jusqu'à ce que le mélange épaississe légèrement.",
+        "Ajoute le piment entier, la pâte d'arachide (100 g) et 200 ml d'eau, mélange bien pour obtenir une sauce lisse.",
+        "Verse le reste de l'eau (1 l), porte à ébullition.",
+        "Pendant ce temps, coupe les 4 cuisses de poulet en morceaux de taille moyenne.",
+        "Ajoute les morceaux de poulet dans la marmite, sale, poivre, puis laisse mijoter 20 minutes à feu doux, jusqu'à ce que le poulet atteigne 74 °C (jus clair).",
+        "Rince le riz rapidement à l'eau froide, puis ajoute les 200 g de riz dans la soupe.",
+        "Poursuis la cuisson 15 minutes, en remuant de temps en temps, jusqu'à ce que le riz soit tendre et que la soupe ait une consistance crémeuse.",
+        "Retire le piment, ajuste l'assaisonnement si besoin, et sers chaud."
+       ],
+       "tips": [
+        "Pour une version plus épicée, écrase le piment avant de le mettre dans la soupe.",
+        "Une cuillère à café de sucre peut équilibrer l'acidité des tomates si nécessaire."
+       ],
+       "image_prompt": "Professional food photography, thick peanut‑tomato chicken soup with fluffy rice grains, steaming bowl, rustic wooden spoon, warm ambient light"
+      }
+     ],
+     "safety": {
+      "checked": true,
+      "first": [],
+      "corrected": [],
+      "dropped": []
+     },
+     "attempts": [
+      {
+       "provider": "groq",
+       "started_at_ms": 2,
+       "ms": 7251,
+       "ok": true,
+       "usage": {
+        "queue_time": 0.207187323,
+        "prompt_tokens": 2655,
+        "prompt_time": 0.128002423,
+        "completion_tokens": 3263,
+        "completion_time": 6.876738823,
+        "total_tokens": 5918,
+        "total_time": 7.004741246,
+        "completion_tokens_details": {
+         "reasoning_tokens": 632
+        },
+        "rate_limits": {
+         "requests_per_day": "500000",
+         "remaining_requests": "183638",
+         "tokens_per_minute": "250000",
+         "remaining_tokens": "244125"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "examples": [
+      {
+       "name": "Mi sao (mine frit)",
+       "region": "Océan Indien"
+      },
+      {
+       "name": "Banku avec okro stew ou tilapia",
+       "region": "Afrique de l'Ouest"
+      },
+      {
+       "name": "Matoke (ndizi nyama)",
+       "region": "Afrique de l'Est"
+      },
+      {
+       "name": "Kpwem (feuilles de manioc à l'arachide)",
+       "region": "Afrique centrale"
+      },
+      {
+       "name": "Roosterkoek",
+       "region": "Afrique australe"
+      }
+     ],
+     "recipes": [
+      {
+       "title": "Poulet Yassa au citron",
+       "description": "Poulet mariné aux oignons, citron et piment, cuit doucement puis grillé, servi avec du riz blanc vapeur.",
+       "difficulty": "medium",
+       "prep_time": 15,
+       "cook_time": 45,
+       "total_time": 60,
+       "servings": 4,
+       "meal_type": "dinner",
+       "cuisine": "african",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Cuisses de poulet",
+         "quantity": "4",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-1"
+        },
+        {
+         "name": "Oignons",
+         "quantity": "2",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-2"
+        },
+        {
+         "name": "Citrons",
+         "quantity": "2",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-3"
+        },
+        {
+         "name": "Ail",
+         "quantity": "3",
+         "unit": "gousses",
+         "pantry_id": "fr-afrique-complet-10"
+        },
+        {
+         "name": "Piment",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-9"
+        },
+        {
+         "name": "huile végétale",
+         "quantity": "2",
+         "unit": "c. à soupe",
+         "pantry_id": null
+        },
+        {
+         "name": "sel",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "poivre",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "Riz",
+         "quantity": "300",
+         "unit": "g",
+         "pantry_id": "fr-afrique-complet-4"
+        }
+       ],
+       "ingredients_from_list": [
+        "Cuisses de poulet",
+        "Oignons",
+        "Citrons",
+        "Ail",
+        "Piment",
+        "Riz"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Émince les 2 oignons et hache les 3 gousses d'ail.",
+        "Dans un bol, presse les 2 citrons et ajoute 1 pincée de sel, 1 pincée de poivre, le piment finement haché, la moitié des oignons émincés et l'ail haché.",
+        "Fais dorer les 4 cuisses de poulet dans 1 c. à soupe d'huile végétale à feu moyen pendant 5 minutes de chaque côté, jusqu'à ce qu'elles soient légèrement colorées.",
+        "Verse la marinade citron‑oignon sur le poulet, couvre et laisse reposer 20 minutes à température ambiante.",
+        "Pendant ce temps, rince le riz et le mets dans une casserole avec 600 ml d'eau, porte à ébullition puis baisse le feu à doux, couvre et laisse cuire 12 minutes, jusqu'à ce que l'eau soit absorbée et le riz tendre.",
+        "Après le repos, fais griller le poulet mariné à feu moyen‑vif 8 minutes de chaque côté, jusqu'à ce que la chair atteigne 74 °C (jus clair) et que la surface soit légèrement caramélisée.",
+        "Retire le poulet, laisse reposer 3 minutes, puis découpe les cuisses en deux.",
+        "Serre le poulet yassa avec le riz blanc, parseme du reste d'oignons crus pour le croquant."
+       ],
+       "tips": [
+        "Pour plus de douceur, ajoute une cuillère à café de miel à la marinade.",
+        "Utilise un couvercle hermétique pendant le repos pour intensifier les arômes."
+       ],
+       "image_prompt": "Professional food photography, grilled chicken thighs glazed with lemon and onions, served on a bed of fluffy white rice, vibrant West African colors, natural light"
+      },
+      {
+       "title": "Ragoût de poulet à la pâte d'arachide et tomates",
+       "description": "Mijoté épais où le poulet s'imprègne de la richesse de la pâte d'arachide, relevé de concentré de tomate et de citron.",
+       "difficulty": "medium",
+       "prep_time": 10,
+       "cook_time": 55,
+       "total_time": 65,
+       "servings": 4,
+       "meal_type": "dinner",
+       "cuisine": "african",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Cuisses de poulet",
+         "quantity": "4",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-1"
+        },
+        {
+         "name": "Tomates",
+         "quantity": "3",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-6"
+        },
+        {
+         "name": "Concentré de tomate",
+         "quantity": "2",
+         "unit": "c. à soupe",
+         "pantry_id": "fr-afrique-complet-8"
+        },
+        {
+         "name": "Pâte d'arachide",
+         "quantity": "3",
+         "unit": "c. à soupe",
+         "pantry_id": "fr-afrique-complet-5"
+        },
+        {
+         "name": "Oignons",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-2"
+        },
+        {
+         "name": "Ail",
+         "quantity": "2",
+         "unit": "gousses",
+         "pantry_id": "fr-afrique-complet-10"
+        },
+        {
+         "name": "Citrons",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-3"
+        },
+        {
+         "name": "Piment",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-9"
+        },
+        {
+         "name": "huile végétale",
+         "quantity": "2",
+         "unit": "c. à soupe",
+         "pantry_id": null
+        },
+        {
+         "name": "eau",
+         "quantity": "400",
+         "unit": "ml",
+         "pantry_id": null
+        },
+        {
+         "name": "sel",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "poivre",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "Riz",
+         "quantity": "250",
+         "unit": "g",
+         "pantry_id": "fr-afrique-complet-4"
+        }
+       ],
+       "ingredients_from_list": [
+        "Cuisses de poulet",
+        "Tomates",
+        "Concentré de tomate",
+        "Pâte d'arachide",
+        "Oignons",
+        "Ail",
+        "Citrons",
+        "Piment",
+        "Riz"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Coupe les 4 cuisses de poulet en morceaux de taille moyenne.",
+        "Émince l'oignon et hache les 2 gousses d'ail.",
+        "Dans une grande cocotte, fais chauffer 2 c. à soupe d'huile végétale à feu moyen et fais dorer les morceaux de poulet 6 minutes, jusqu'à ce qu'ils soient légèrement colorés.",
+        "Vérifie la température interne du poulet : elle doit atteindre 74 °C, le jus doit être clair et ne plus contenir de trace rose.",
+        "Ajoute l'oignon et l'ail, fais revenir 3 minutes jusqu'à ce qu'ils soient translucides.",
+        "Incorpore le concentré de tomate, la pâte d'arachide, les 3 tomates coupées en dés et le piment haché, mélange bien.",
+        "Verse 400 ml d'eau, porte à ébullition, puis baisse le feu à doux.",
+        "Laisse mijoter 35 minutes, en remuant de temps en temps, jusqu'à ce que le poulet soit tendre et que la sauce épaississe.",
+        "Presse le citron, ajoute le jus et rectifie l'assaisonnement avec sel et poivre.",
+        "Pendant que le ragoût mijote, rince le riz, mets‑le dans une casserole avec 500 ml d'eau, porte à ébullition puis couvre et laisse cuire 12 minutes à feu doux, jusqu'à absorption complète.",
+        "Serre le ragoût bien chaud sur le riz blanc."
+       ],
+       "tips": [
+        "Si la sauce devient trop épaisse, ajoute un peu d'eau chaude.",
+        "Pour un goût plus fumé, ajoute une petite feuille de laurier pendant la cuisson."
+       ],
+       "image_prompt": "Rustic West African chicken stew with creamy peanut sauce, bright red tomatoes, served over steaming white rice, earthy bowl, natural light"
+      },
+      {
+       "title": "Riz sauté aux carottes, citron et piment",
+       "description": "Riz du jour sauté avec carottes, tomate, citron et un soupçon de piment, façon wok léger et parfumé.",
+       "difficulty": "medium",
+       "prep_time": 10,
+       "cook_time": 30,
+       "total_time": 40,
+       "servings": 4,
+       "meal_type": "dinner",
+       "cuisine": "african",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Riz",
+         "quantity": "350",
+         "unit": "g",
+         "pantry_id": "fr-afrique-complet-4"
+        },
+        {
+         "name": "Carottes",
+         "quantity": "3",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-7"
+        },
+        {
+         "name": "Tomates",
+         "quantity": "2",
+         "unit": "pièces",
+         "pantry_id": "fr-afrique-complet-6"
+        },
+        {
+         "name": "Oignons",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-2"
+        },
+        {
+         "name": "Ail",
+         "quantity": "2",
+         "unit": "gousses",
+         "pantry_id": "fr-afrique-complet-10"
+        },
+        {
+         "name": "Citrons",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-3"
+        },
+        {
+         "name": "Piment",
+         "quantity": "1",
+         "unit": "pièce",
+         "pantry_id": "fr-afrique-complet-9"
+        },
+        {
+         "name": "huile végétale",
+         "quantity": "3",
+         "unit": "c. à soupe",
+         "pantry_id": null
+        },
+        {
+         "name": "sel",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        },
+        {
+         "name": "poivre",
+         "quantity": "1",
+         "unit": "pincée",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Riz",
+        "Carottes",
+        "Tomates",
+        "Oignons",
+        "Ail",
+        "Citrons",
+        "Piment"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Rince le riz à l'eau froide jusqu'à ce que l'eau soit claire, puis fais-le cuire dans une casserole avec 700 ml d'eau, porte à ébullition, couvre et laisse cuire 12 minutes à feu doux. Étale le riz cuit sur un plat, laisse refroidir 5 minutes puis place au réfrigérateur pour qu'il soit bien détendu.",
+        "Épluche les carottes et coupe‑les en bâtonnets fins. Coupe les tomates en dés, émince l'oignon et hache les 2 gousses d'ail.",
+        "Dans un wok ou une grande poêle, fais chauffer 3 c. à soupe d'huile végétale à feu moyen‑vif.",
+        "Ajoute l'oignon et l'ail, fais sauter 2 minutes jusqu'à ce qu'ils soient dorés.",
+        "Incorpore les bâtonnets de carotte, fais revenir 4 minutes jusqu'à ce qu'ils soient légèrement tendres mais encore croquants.",
+        "Ajoute les dés de tomate et le piment finement haché, continue de sauter 2 minutes, la tomate doit commencer à se décomposer.",
+        "Verse le riz froid dans la poêle, augmente le feu à vif et fais sauter 5 minutes en remuant constamment, jusqu'à ce que le riz soit bien chaud et légèrement doré.",
+        "Presse le citron, verse le jus sur le riz, ajoute 1 pincée de sel et de poivre, mélange rapidement.",
+        "Sers immédiatement, décoré d'un zeste de citron supplémentaire si désiré."
+       ],
+       "tips": [
+        "Utilise du riz du jour précédent pour un meilleur résultat, mais le riz fraîchement cuit refroidi fonctionne aussi.",
+        "Pour plus de profondeur, ajoute une cuillère à café de pâte de tomate en fin de cuisson."
+       ],
+       "image_prompt": "Vibrant West African fried rice with orange carrot strips, red tomato chunks, green lemon zest, bright chili, captured in a rustic wok, natural daylight"
+      }
+     ],
+     "safety": {
+      "checked": true,
+      "first": [
+       {
+        "title": "Ragoût de poulet à la pâte d'arachide et tomates",
+        "issues": [
+         {
+          "code": "core_temperature",
+          "ingredient": "Cuisses de poulet",
+          "message": "« Cuisses de poulet » : écrire la température à cœur (volaille : 74 °C à cœur et jus clair, plus aucune trace rose)."
+         }
+        ]
+       }
+      ],
+      "corrected": [
+       "Ragoût de poulet à la pâte d'arachide et tomates"
+      ],
+      "dropped": []
+     },
+     "attempts": [
+      {
+       "provider": "groq",
+       "started_at_ms": 2,
+       "ms": 6849,
+       "ok": true,
+       "usage": {
+        "queue_time": 0.027800412,
+        "prompt_tokens": 2704,
+        "prompt_time": 0.131933918,
+        "completion_tokens": 3137,
+        "completion_time": 6.646324306,
+        "total_tokens": 5841,
+        "total_time": 6.778258224,
+        "completion_tokens_details": {
+         "reasoning_tokens": 502
+        },
+        "rate_limits": {
+         "requests_per_day": "500000",
+         "remaining_requests": "183697",
+         "tokens_per_minute": "250000",
+         "remaining_tokens": "244112"
+        }
+       }
+      },
+      {
+       "provider": "groq",
+       "started_at_ms": 6859,
+       "ms": 4037,
+       "ok": true,
+       "usage": {
+        "queue_time": 0.053548566,
+        "prompt_tokens": 3295,
+        "prompt_time": 0.493119707,
+        "completion_tokens": 1050,
+        "completion_time": 3.456450415,
+        "total_tokens": 4345,
+        "total_time": 3.949570122,
+        "prompt_tokens_details": {
+         "cached_tokens": 256
+        },
+        "completion_tokens_details": {
+         "reasoning_tokens": 46
+        },
+        "rate_limits": {
+         "requests_per_day": "500000",
+         "remaining_requests": "183735",
+         "tokens_per_minute": "250000",
+         "remaining_tokens": "243521"
+        }
+       }
+      }
+     ]
+    }
+   ],
+   "judge": {
+    "comment": "L'application propose une variété satisfaisante en alternant entre des classiques emblématiques comme le Mafé, le Yassa et le Pilau. Cependant, on observe une récurrence marquée des mêmes ingrédients de base (poulet, riz, citron, arachide) déclinés sous des formes légèrement différentes.",
+    "recipes": [
+     {
+      "generation": 0,
+      "index": 0,
+      "group": 1,
+      "library_dish": "Mafé (tigadèguèna)",
+      "relation": "copy"
+     },
+     {
+      "generation": 0,
+      "index": 1,
+      "group": 2,
+      "library_dish": "Riz au gras (riz gras, zamè)",
+      "relation": "variant"
+     },
+     {
+      "generation": 0,
+      "index": 2,
+      "group": 3,
+      "library_dish": "Thiou (ragoût en sauce tomate)",
+      "relation": "variant"
+     },
+     {
+      "generation": 1,
+      "index": 0,
+      "group": 4,
+      "library_dish": "Poulet braisé",
+      "relation": "variant"
+     },
+     {
+      "generation": 1,
+      "index": 1,
+      "group": 5,
+      "library_dish": "Poulet braisé",
+      "relation": "variant"
+     },
+     {
+      "generation": 1,
+      "index": 2,
+      "group": 1,
+      "library_dish": "Mafé (tigadèguèna)",
+      "relation": "variant"
+     },
+     {
+      "generation": 2,
+      "index": 0,
+      "group": 6,
+      "library_dish": "Pilau",
+      "relation": "copy"
+     },
+     {
+      "generation": 2,
+      "index": 1,
+      "group": 5,
+      "library_dish": "Poulet braisé",
+      "relation": "variant"
+     },
+     {
+      "generation": 2,
+      "index": 2,
+      "group": 1,
+      "library_dish": "Mafé (tigadèguèna)",
+      "relation": "variant"
+     },
+     {
+      "generation": 3,
+      "index": 0,
+      "group": 7,
+      "library_dish": "Yassa",
+      "relation": "copy"
+     },
+     {
+      "generation": 3,
+      "index": 1,
+      "group": 1,
+      "library_dish": "Mafé (tigadèguèna)",
+      "relation": "copy"
+     },
+     {
+      "generation": 3,
+      "index": 2,
+      "group": 2,
+      "library_dish": "Riz au gras (riz gras, zamè)",
+      "relation": "variant"
+     }
+    ]
+   },
+   "metrics": {
+    "recipes": 12,
+    "distinct_dishes": 7,
+    "copies": 4,
+    "variants": 8,
+    "new": 0,
+    "repeated_titles": 0,
+    "library_names_in_titles": 3,
+    "examples_in_titles": 0
+   }
+  },
+  {
+   "id": "en-asian-urgent",
+   "condition": "library",
+   "generations": [
+    {
+     "examples": [
+      {
+       "name": "Tsuivan (nouilles sautées à l'étuvée)",
+       "region": "Asie de l'Est"
+      },
+      {
+       "name": "Palak paneer (épinards au fromage frais)",
+       "region": "Inde et Asie du Sud"
+      },
+      {
+       "name": "Pad kra pao (sauté au basilic sacré)",
+       "region": "Asie du Sud-Est"
+      },
+      {
+       "name": "Kimchi jjigae (ragoût de kimchi)",
+       "region": "Asie de l'Est"
+      },
+      {
+       "name": "Masoor dal (lentilles corail)",
+       "region": "Inde et Asie du Sud"
+      }
+     ],
+     "recipes": [
+      {
+       "title": "Garlic Ginger Chicken and Broccoli Stir‑Fry with Rice",
+       "description": "A quick, light stir‑fry of tender chicken thighs and crisp broccoli in a savory ginger‑garlic soy sauce, served over fluffy rice.",
+       "difficulty": "easy",
+       "prep_time": 10,
+       "cook_time": 20,
+       "total_time": 30,
+       "servings": 2,
+       "meal_type": "dinner",
+       "cuisine": "asian",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Chicken thighs",
+         "quantity": "500",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-1"
+        },
+        {
+         "name": "Broccoli",
+         "quantity": "1",
+         "unit": "piece",
+         "pantry_id": "en-asian-urgent-2"
+        },
+        {
+         "name": "Rice",
+         "quantity": "200",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-3"
+        },
+        {
+         "name": "Soy sauce",
+         "quantity": "3",
+         "unit": "tbsp",
+         "pantry_id": "en-asian-urgent-4"
+        },
+        {
+         "name": "Ginger",
+         "quantity": "1",
+         "unit": "tbsp",
+         "pantry_id": "en-asian-urgent-5"
+        },
+        {
+         "name": "Garlic",
+         "quantity": "3",
+         "unit": "clove",
+         "pantry_id": "en-asian-urgent-6"
+        },
+        {
+         "name": "Spring onions",
+         "quantity": "2",
+         "unit": "stalk",
+         "pantry_id": "en-asian-urgent-7"
+        },
+        {
+         "name": "Oil",
+         "quantity": "2",
+         "unit": "tbsp",
+         "pantry_id": null
+        },
+        {
+         "name": "Salt",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        },
+        {
+         "name": "Pepper",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Chicken thighs",
+        "Broccoli",
+        "Rice",
+        "Soy sauce",
+        "Ginger",
+        "Garlic",
+        "Spring onions"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Rinse the rice under cold water, then combine with 400 ml water in a pot; bring to a boil, cover, reduce to low heat and simmer 12 minutes, until water is absorbed and rice is tender. Fluff and set aside.",
+        "Slice the chicken thighs into bite‑size strips.",
+        "Cut the broccoli into florets; rinse and pat dry.",
+        "Peel and mince the garlic; grate the ginger.",
+        "Heat 1 tbsp oil in a large wok over medium‑high heat. Add the chicken and stir‑fry 5 minutes, until the surface is golden and the internal temperature reaches 74 °C (clear juices).",
+        "Add the garlic, ginger and the broccoli florets; stir‑fry 3 minutes, until the broccoli is bright green and still crisp.",
+        "Stir in the soy sauce, a pinch of salt and pepper; cook 1 minute more, allowing the sauce to coat the ingredients.",
+        "Slice the spring‑onion stalks thinly.",
+        "Serve the stir‑fry over the cooked rice, garnished with the spring‑onion slices."
+       ],
+       "tips": [
+        "If you like a little heat, add a pinch of red pepper flakes with the garlic.",
+        "Use the white parts of the spring onions for garnish and keep the green tops for another dish."
+       ],
+       "image_prompt": "Professional food photography, sizzling chicken and broccoli stir-fry in a dark wok, glossy ginger‑garlic soy sauce, steaming white rice on the side, bright spring onions garnish, natural light"
+      },
+      {
+       "title": "Korean‑Style Chicken‑Broccoli Rice Soup (Dak‑Bokkeum Guk)",
+       "description": "A comforting, broth‑based soup featuring shredded chicken, broccoli, and rice, flavored with ginger, garlic and a splash of soy sauce – perfect for a light evening meal.",
+       "difficulty": "easy",
+       "prep_time": 8,
+       "cook_time": 25,
+       "total_time": 33,
+       "servings": 2,
+       "meal_type": "dinner",
+       "cuisine": "asian",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Chicken thighs",
+         "quantity": "250",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-1"
+        },
+        {
+         "name": "Broccoli",
+         "quantity": "0.5",
+         "unit": "piece",
+         "pantry_id": "en-asian-urgent-2"
+        },
+        {
+         "name": "Rice",
+         "quantity": "100",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-3"
+        },
+        {
+         "name": "Soy sauce",
+         "quantity": "2",
+         "unit": "tbsp",
+         "pantry_id": "en-asian-urgent-4"
+        },
+        {
+         "name": "Ginger",
+         "quantity": "1",
+         "unit": "tsp",
+         "pantry_id": "en-asian-urgent-5"
+        },
+        {
+         "name": "Garlic",
+         "quantity": "2",
+         "unit": "clove",
+         "pantry_id": "en-asian-urgent-6"
+        },
+        {
+         "name": "Spring onions",
+         "quantity": "2",
+         "unit": "stalk",
+         "pantry_id": "en-asian-urgent-7"
+        },
+        {
+         "name": "Eggs",
+         "quantity": "2",
+         "unit": "piece",
+         "pantry_id": "en-asian-urgent-8"
+        },
+        {
+         "name": "Oil",
+         "quantity": "1",
+         "unit": "tbsp",
+         "pantry_id": null
+        },
+        {
+         "name": "Water",
+         "quantity": "800",
+         "unit": "ml",
+         "pantry_id": null
+        },
+        {
+         "name": "Salt",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        },
+        {
+         "name": "Pepper",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Chicken thighs",
+        "Broccoli",
+        "Rice",
+        "Soy sauce",
+        "Ginger",
+        "Garlic",
+        "Spring onions",
+        "Eggs"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Slice the chicken thighs thinly; set aside.",
+        "Cut the broccoli into small florets.",
+        "Rinse the rice quickly under running water.",
+        "Peel and mince the garlic; grate the ginger.",
+        "In a pot, heat 1 tbsp oil over medium heat. Add the garlic and ginger; sauté 1 minute until fragrant.",
+        "Add the sliced chicken and stir‑cook 4 minutes, until the surface is no longer pink and the internal temperature reaches 74 °C.",
+        "Pour in 800 ml water, bring to a gentle boil, then reduce to a simmer.",
+        "Add the rice and broccoli; simmer 12 minutes, until the rice is tender and the broccoli is just cooked through.",
+        "Stir in the soy sauce, a pinch of salt and pepper; simmer another 2 minutes.",
+        "Crack the two eggs into a small bowl, beat lightly, then slowly drizzle into the soup while stirring to create silky egg ribbons (similar to an egg drop).",
+        "Slice the spring‑onion stalks thinly; sprinkle on top just before serving."
+       ],
+       "tips": [
+        "For extra richness, finish the soup with a drizzle of sesame oil (optional).",
+        "If you prefer a thicker broth, dissolve a teaspoon of cornstarch in cold water and add it 5 minutes before the end of cooking."
+       ],
+       "suggestion": "Ideal for chilly evenings",
+       "image_prompt": "Warm bowl of clear chicken broth with rice, shredded chicken, green broccoli florets, and sliced spring onions, steam rising, rustic wooden table, soft natural lighting"
+      },
+      {
+       "title": "Japanese‑Inspired Chicken‑Egg Fried Rice with Broccoli",
+       "description": "A classic fried rice dish that turns leftover rice, urgent chicken and broccoli into a satisfying, lightly seasoned dinner, finished with a soft‑scrambled egg center.",
+       "difficulty": "easy",
+       "prep_time": 7,
+       "cook_time": 18,
+       "total_time": 25,
+       "servings": 2,
+       "meal_type": "dinner",
+       "cuisine": "asian",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Chicken thighs",
+         "quantity": "250",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-1"
+        },
+        {
+         "name": "Broccoli",
+         "quantity": "0.5",
+         "unit": "piece",
+         "pantry_id": "en-asian-urgent-2"
+        },
+        {
+         "name": "Rice",
+         "quantity": "300",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-3"
+        },
+        {
+         "name": "Soy sauce",
+         "quantity": "2",
+         "unit": "tbsp",
+         "pantry_id": "en-asian-urgent-4"
+        },
+        {
+         "name": "Ginger",
+         "quantity": "1",
+         "unit": "tsp",
+         "pantry_id": "en-asian-urgent-5"
+        },
+        {
+         "name": "Garlic",
+         "quantity": "2",
+         "unit": "clove",
+         "pantry_id": "en-asian-urgent-6"
+        },
+        {
+         "name": "Spring onions",
+         "quantity": "2",
+         "unit": "stalk",
+         "pantry_id": "en-asian-urgent-7"
+        },
+        {
+         "name": "Eggs",
+         "quantity": "2",
+         "unit": "piece",
+         "pantry_id": "en-asian-urgent-8"
+        },
+        {
+         "name": "Oil",
+         "quantity": "2",
+         "unit": "tbsp",
+         "pantry_id": null
+        },
+        {
+         "name": "Salt",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        },
+        {
+         "name": "Pepper",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Chicken thighs",
+        "Broccoli",
+        "Rice",
+        "Soy sauce",
+        "Ginger",
+        "Garlic",
+        "Spring onions",
+        "Eggs"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "If the rice is uncooked, rinse 300 g rice, combine with 600 ml water in a pot, bring to boil, cover and simmer 12 minutes. Remove from heat, let sit 5 minutes, then fluff and spread on a tray to cool (or use pre‑cooked rice, cooled).",
+        "Dice the chicken thighs into 1‑cm cubes.",
+        "Cut the broccoli into small florets.",
+        "Peel and mince the garlic; grate the ginger.",
+        "Slice the spring‑onion stalks thinly; separate green tops for garnish.",
+        "Heat 1 tbsp oil in a large skillet over medium‑high heat. Add the chicken and stir‑fry 5 minutes, until the interior reaches 74 °C and juices run clear.",
+        "Add the garlic, ginger and broccoli; stir‑fry 3 minutes, until the broccoli is bright green but still crisp.",
+        "Push the mixture to the side of the pan, add the remaining 1 tbsp oil to the cleared space, then add the cooled rice. Break up any clumps and stir‑fry 4 minutes, allowing the rice to get lightly toasted.",
+        "Drizzle the soy sauce over the rice, add a pinch of salt and pepper, and toss everything together for 1 minute.",
+        "Create a well in the centre of the pan, crack the two eggs directly into it, and scramble gently for 30 seconds until just set; then fold the egg into the fried rice.",
+        "Stir in the sliced spring‑onion stalks, turn off the heat, and garnish with the green tops of the spring onions."
+       ],
+       "tips": [
+        "For a non‑sticky result, use day‑old rice or spread freshly cooked rice on a tray to cool quickly before frying.",
+        "A splash of mirin or a dash of sesame oil (optional) adds a subtle sweetness and aroma."
+       ],
+       "image_prompt": "Close‑up of golden fried rice with diced chicken, green broccoli bits, and a creamy egg swirl on top, wok background, bright kitchen lighting"
+      }
+     ],
+     "safety": {
+      "checked": true,
+      "first": [],
+      "corrected": [],
+      "dropped": []
+     },
+     "attempts": [
+      {
+       "provider": "groq",
+       "started_at_ms": 2,
+       "ms": 7839,
+       "ok": true,
+       "usage": {
+        "queue_time": 0.207258875,
+        "prompt_tokens": 2480,
+        "prompt_time": 0.176291767,
+        "completion_tokens": 2668,
+        "completion_time": 7.413587133,
+        "total_tokens": 5148,
+        "total_time": 7.5898789,
+        "prompt_tokens_details": {
+         "cached_tokens": 256
+        },
+        "completion_tokens_details": {
+         "reasoning_tokens": 107
+        },
+        "rate_limits": {
+         "requests_per_day": "500000",
+         "remaining_requests": "183835",
+         "tokens_per_minute": "250000",
+         "remaining_tokens": "244281"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "examples": [
+      {
+       "name": "Sambar (lentilles aux légumes et tamarin)",
+       "region": "Inde et Asie du Sud"
+      },
+      {
+       "name": "Qingchao shucai (légumes verts sautés à l'ail)",
+       "region": "Asie de l'Est"
+      },
+      {
+       "name": "Pinakbet (légumes mijotés à la pâte de crevettes)",
+       "region": "Asie du Sud-Est"
+      },
+      {
+       "name": "Dal bhat (riz, lentilles et accompagnements)",
+       "region": "Inde et Asie du Sud"
+      },
+      {
+       "name": "Bibimbap",
+       "region": "Asie de l'Est"
+      }
+     ],
+     "recipes": [
+      {
+       "title": "Chicken‑Broccoli Congee with Ginger‑Garlic Broth",
+       "description": "A comforting rice porridge infused with savory chicken, tender broccoli, and aromatic ginger‑garlic broth, perfect for a light dinner.",
+       "difficulty": "easy",
+       "prep_time": 5,
+       "cook_time": 30,
+       "total_time": 35,
+       "servings": 2,
+       "meal_type": "dinner",
+       "cuisine": "asian",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Chicken thighs",
+         "quantity": "300",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-1"
+        },
+        {
+         "name": "Rice",
+         "quantity": "150",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-3"
+        },
+        {
+         "name": "Broccoli",
+         "quantity": "1",
+         "unit": "head",
+         "pantry_id": "en-asian-urgent-2"
+        },
+        {
+         "name": "Ginger",
+         "quantity": "1",
+         "unit": "tbsp",
+         "pantry_id": "en-asian-urgent-5"
+        },
+        {
+         "name": "Garlic",
+         "quantity": "2",
+         "unit": "cloves",
+         "pantry_id": "en-asian-urgent-6"
+        },
+        {
+         "name": "Spring onions",
+         "quantity": "2",
+         "unit": "stalks",
+         "pantry_id": "en-asian-urgent-7"
+        },
+        {
+         "name": "Soy sauce",
+         "quantity": "1",
+         "unit": "tbsp",
+         "pantry_id": "en-asian-urgent-4"
+        },
+        {
+         "name": "Water",
+         "quantity": "900",
+         "unit": "ml",
+         "pantry_id": null
+        },
+        {
+         "name": "Salt",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        },
+        {
+         "name": "White pepper",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Chicken thighs",
+        "Rice",
+        "Broccoli",
+        "Ginger",
+        "Garlic",
+        "Spring onions",
+        "Soy sauce"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Trim the broccoli, cut into small florets and set aside.",
+        "Dice the chicken thighs into 2‑cm pieces.",
+        "Peel and finely mince the garlic; grate the ginger.",
+        "Rinse the rice under cold water, then combine the rice and 900 ml water in a pot; bring to a gentle boil over medium heat.",
+        "Reduce to a low simmer and cook for 10 minutes, stirring occasionally, until the rice begins to soften.",
+        "Add the diced chicken, minced garlic, and grated ginger to the pot; stir.",
+        "Continue to simmer on low heat for 15 minutes, stirring occasionally, until the rice breaks down into a creamy porridge and the chicken reaches an internal temperature of 74 °C (juices run clear, no pink).",
+        "Add the broccoli florets and simmer for 5 minutes, until they are bright green and just tender.",
+        "Stir in 1 tbsp soy sauce, a pinch of salt, and a pinch of white pepper; taste and adjust seasoning.",
+        "Serve the congee in bowls, garnished with sliced spring‑onion stalks."
+       ],
+       "tips": [
+        "For extra silkiness, rinse the rice twice before cooking.",
+        "If you prefer a thinner broth, add an extra 200 ml water during the last 5 minutes."
+       ],
+       "image_prompt": "Professional food photography, creamy chicken and broccoli congee in a rustic bowl, garnish of sliced spring onions, steam rising, soft lighting"
+      },
+      {
+       "title": "Soy‑Glazed Chicken Thighs with Steamed Broccoli and Rice",
+       "description": "Crispy‑seared chicken thighs brushed with a sweet‑savory soy glaze, served with fluffy steamed rice and bright broccoli.",
+       "difficulty": "easy",
+       "prep_time": 10,
+       "cook_time": 25,
+       "total_time": 35,
+       "servings": 2,
+       "meal_type": "dinner",
+       "cuisine": "asian",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Chicken thighs",
+         "quantity": "200",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-1"
+        },
+        {
+         "name": "Rice",
+         "quantity": "200",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-3"
+        },
+        {
+         "name": "Broccoli",
+         "quantity": "1",
+         "unit": "head",
+         "pantry_id": "en-asian-urgent-2"
+        },
+        {
+         "name": "Soy sauce",
+         "quantity": "2",
+         "unit": "tbsp",
+         "pantry_id": "en-asian-urgent-4"
+        },
+        {
+         "name": "Ginger",
+         "quantity": "1",
+         "unit": "tsp",
+         "pantry_id": "en-asian-urgent-5"
+        },
+        {
+         "name": "Garlic",
+         "quantity": "1",
+         "unit": "clove",
+         "pantry_id": "en-asian-urgent-6"
+        },
+        {
+         "name": "Spring onions",
+         "quantity": "2",
+         "unit": "stalks",
+         "pantry_id": "en-asian-urgent-7"
+        },
+        {
+         "name": "Honey",
+         "quantity": "1",
+         "unit": "tbsp",
+         "pantry_id": null
+        },
+        {
+         "name": "Water",
+         "quantity": "100",
+         "unit": "ml",
+         "pantry_id": null
+        },
+        {
+         "name": "Salt",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Chicken thighs",
+        "Rice",
+        "Broccoli",
+        "Soy sauce",
+        "Ginger",
+        "Garlic",
+        "Spring onions"
+       ],
+       "missing_ingredients": [
+        "Honey"
+       ],
+       "instructions": [
+        "Rinse the rice, then place it in a saucepan with 400 ml water; bring to a boil over medium heat.",
+        "Cover, reduce to low heat, and simmer for 15 minutes until the water is absorbed; remove from heat and let sit covered for 5 minutes.",
+        "While the rice cooks, cut the chicken thighs into bite‑size pieces and pat dry.",
+        "Combine 2 tbsp soy sauce, 1 tsp grated ginger, 1 clove minced garlic, 1 tbsp honey, and 100 ml water in a small bowl to make the glaze.",
+        "Heat a non‑stick skillet over medium‑high heat; add the chicken pieces and sear for 4 minutes per side, until golden brown.",
+        "Brush the glaze over the chicken, continue cooking for another 3 minutes, turning once, until the sauce thickens and the chicken reaches an internal temperature of 74 °C (clear juices).",
+        "Meanwhile, cut the broccoli into florets, steam them over boiling water for 5 minutes, until bright green and just tender.",
+        "Fluff the rice with a fork, plate the rice, top with glazed chicken, and arrange broccoli on the side.",
+        "Garnish with sliced spring‑onion stalks and a pinch of salt if needed."
+       ],
+       "tips": [
+        "Press the chicken pieces with a paper towel before searing for a crisper crust.",
+        "If you like a richer glaze, add an extra half‑tbsp honey."
+       ],
+       "image_prompt": "Close‑up shot of glossy soy‑glazed chicken thighs on a plate beside steamed broccoli and a mound of white rice, garnish of spring onion, natural light"
+      }
+     ],
+     "safety": {
+      "checked": true,
+      "first": [
+       {
+        "title": "Chicken‑Broccoli Congee with Ginger‑Garlic Broth",
+        "issues": [
+         {
+          "code": "core_temperature",
+          "ingredient": "Chicken thighs",
+          "message": "« Chicken thighs » : écrire la température à cœur (volaille : 74 °C à cœur et jus clair, plus aucune trace rose)."
+         }
+        ]
+       },
+       {
+        "title": "Savory Chicken‑Egg Pancake (Okonomiyaki‑Style) with Broccoli",
+        "issues": [
+         {
+          "code": "doneness_sign",
+          "ingredient": "Chicken thighs",
+          "message": "« Chicken thighs » : ajouter un signe visible de cuisson (volaille : 74 °C à cœur et jus clair, plus aucune trace rose)."
+         },
+         {
+          "code": "starch_not_cooked",
+          "ingredient": "Rice",
+          "message": "« Rice » est cru : une étape doit le cuire (eau ou bouillon, durée et repère), avant de l'utiliser."
+         }
+        ]
+       }
+      ],
+      "corrected": [
+       "Chicken‑Broccoli Congee with Ginger‑Garlic Broth"
+      ],
+      "dropped": [
+       {
+        "title": "Savory Chicken‑Egg Pancake (Okonomiyaki‑Style) with Broccoli",
+        "issues": [
+         {
+          "code": "rice_cooling",
+          "ingredient": "Rice",
+          "message": "« Rice » refroidi : l'étaler pour le refroidir vite et le mettre au réfrigérateur (jamais laissé tiède à température ambiante)."
+         }
+        ],
+        "instructions": [
+         "Finely chop the broccoli into small pieces; set aside.",
+         "Dice the chicken thighs into 1‑cm cubes.",
+         "Peel and mince the garlic; grate the ginger.",
+         "In a small saucepan, combine 50 g rice with 150 ml water; bring to a boil over medium heat, then simmer for 12 minutes until the rice is fully cooked and soft.",
+         "Allow the cooked rice to cool slightly, then transfer to a bowl.",
+         "Peel and whisk the 2 eggs in the bowl with the cooked rice, 1 tbsp soy sauce, minced garlic, grated ginger, and a pinch of salt; mix until a uniform batter forms.",
+         "Stir in the diced chicken and chopped broccoli, mixing until evenly distributed.",
+         "Heat 2 tbsp vegetable oil in a non‑stick skillet over medium heat.",
+         "Pour the batter into the skillet, spreading to a 10‑cm‑diameter pancake; cook for 4 minutes until the edges turn golden and the bottom is set.",
+         "Flip the pancake with a spatula and cook another 4 minutes, checking that the chicken pieces have reached an internal temperature of 74 °C (clear juices, no pink) and the pancake is fluffy.",
+         "Transfer to a plate, drizzle with an extra splash of soy sauce if desired, and garnish with sliced spring‑onion stalks."
+        ]
+       }
+      ]
+     },
+     "attempts": [
+      {
+       "provider": "groq",
+       "started_at_ms": 2,
+       "ms": 5621,
+       "ok": true,
+       "usage": {
+        "queue_time": 0.153557751,
+        "prompt_tokens": 2585,
+        "prompt_time": 0.192369133,
+        "completion_tokens": 2476,
+        "completion_time": 5.231554155,
+        "total_tokens": 5061,
+        "total_time": 5.423923288,
+        "completion_tokens_details": {
+         "reasoning_tokens": 176
+        },
+        "rate_limits": {
+         "requests_per_day": "500000",
+         "remaining_requests": "183897",
+         "tokens_per_minute": "250000",
+         "remaining_tokens": "244176"
+        }
+       }
+      },
+      {
+       "provider": "groq",
+       "started_at_ms": 5635,
+       "ms": 4244,
+       "ok": true,
+       "usage": {
+        "queue_time": 0.222141449,
+        "prompt_tokens": 3732,
+        "prompt_time": 0.192517545,
+        "completion_tokens": 1792,
+        "completion_time": 3.795546592,
+        "total_tokens": 5524,
+        "total_time": 3.988064137,
+        "completion_tokens_details": {
+         "reasoning_tokens": 101
+        },
+        "rate_limits": {
+         "requests_per_day": "500000",
+         "remaining_requests": "183928",
+         "tokens_per_minute": "250000",
+         "remaining_tokens": "243029"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "examples": [
+      {
+       "name": "Pulao (riz parfumé aux légumes)",
+       "region": "Inde et Asie du Sud"
+      },
+      {
+       "name": "Mapo doufu (tofu sauce pimentée)",
+       "region": "Asie de l'Est"
+      },
+      {
+       "name": "Sayur asem (soupe aigre de légumes)",
+       "region": "Asie du Sud-Est"
+      },
+      {
+       "name": "Rajma chawal (haricots rouges et riz)",
+       "region": "Inde et Asie du Sud"
+      },
+      {
+       "name": "Qingzheng yu (poisson entier à la vapeur)",
+       "region": "Asie de l'Est"
+      }
+     ],
+     "recipes": [
+      {
+       "title": "Soy‑Ginger Braised Chicken Thighs with Garlic‑Broccoli Rice Pilaf",
+       "description": "Tender chicken thighs braised in a sweet‑savory soy‑ginger sauce, served over fragrant rice cooked together with broccoli, garlic, and spring onions.",
+       "difficulty": "easy",
+       "prep_time": 10,
+       "cook_time": 25,
+       "total_time": 35,
+       "servings": 2,
+       "meal_type": "dinner",
+       "cuisine": "asian",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Chicken thighs",
+         "quantity": "500",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-1"
+        },
+        {
+         "name": "Broccoli",
+         "quantity": "1",
+         "unit": "piece",
+         "pantry_id": "en-asian-urgent-2"
+        },
+        {
+         "name": "Rice",
+         "quantity": "200",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-3"
+        },
+        {
+         "name": "Soy sauce",
+         "quantity": "3",
+         "unit": "tbsp",
+         "pantry_id": "en-asian-urgent-4"
+        },
+        {
+         "name": "Ginger",
+         "quantity": "1",
+         "unit": "tbsp",
+         "pantry_id": "en-asian-urgent-5"
+        },
+        {
+         "name": "Garlic",
+         "quantity": "3",
+         "unit": "clove",
+         "pantry_id": "en-asian-urgent-6"
+        },
+        {
+         "name": "Spring onions",
+         "quantity": "2",
+         "unit": "tbsp",
+         "pantry_id": "en-asian-urgent-7"
+        },
+        {
+         "name": "Water",
+         "quantity": "300",
+         "unit": "ml",
+         "pantry_id": null
+        },
+        {
+         "name": "Oil",
+         "quantity": "1",
+         "unit": "tbsp",
+         "pantry_id": null
+        },
+        {
+         "name": "Salt",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        },
+        {
+         "name": "Pepper",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Chicken thighs",
+        "Broccoli",
+        "Rice",
+        "Soy sauce",
+        "Ginger",
+        "Garlic",
+        "Spring onions"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Trim the broccoli into small florets; set aside.",
+        "Finely mince the garlic and grate the ginger.",
+        "Slice the spring onions, separating white and green parts.",
+        "Heat 1 tbsp oil in a deep skillet over medium heat; add the chicken thighs skin‑side down and sear 3 minutes until lightly browned.",
+        "Flip the chicken, add the minced garlic, grated ginger, and white spring onion parts; stir‑fry 1 minute until fragrant.",
+        "Stir in 3 tbsp soy sauce and 300 ml water; bring to a gentle boil.",
+        "Add the rice, broccoli florets, and a pinch of salt and pepper; stir to combine.",
+        "Cover and simmer on low heat for 20 minutes, or until the rice is tender and the liquid is absorbed; the chicken should reach 74 °C (juices run clear).",
+        "Remove the lid, sprinkle the green spring onion parts over the pilaf, and let rest 2 minutes before serving."
+       ],
+       "tips": [
+        "Cut the broccoli into bite‑size pieces so it cooks in the same time as the rice.",
+        "If you prefer a slightly sweeter glaze, add 1 tsp honey to the sauce."
+       ],
+       "image_prompt": "Professional food photography, glossy soy‑ginger braised chicken thighs atop a fluffy garlic‑broccoli rice pilaf, garnished with bright green spring onion slices, rustic wooden board, natural light"
+      },
+      {
+       "title": "Ginger‑Garlic Chicken Egg Drop Soup with Broccoli",
+       "description": "A light, comforting soup where silky strands of egg swirl in a fragrant ginger‑garlic broth, studded with tender chicken and broccoli florets.",
+       "difficulty": "easy",
+       "prep_time": 5,
+       "cook_time": 20,
+       "total_time": 25,
+       "servings": 2,
+       "meal_type": "dinner",
+       "cuisine": "asian",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Chicken thighs",
+         "quantity": "200",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-1"
+        },
+        {
+         "name": "Broccoli",
+         "quantity": "1/2",
+         "unit": "piece",
+         "pantry_id": "en-asian-urgent-2"
+        },
+        {
+         "name": "Eggs",
+         "quantity": "2",
+         "unit": "piece",
+         "pantry_id": "en-asian-urgent-8"
+        },
+        {
+         "name": "Ginger",
+         "quantity": "1",
+         "unit": "tsp",
+         "pantry_id": "en-asian-urgent-5"
+        },
+        {
+         "name": "Garlic",
+         "quantity": "2",
+         "unit": "clove",
+         "pantry_id": "en-asian-urgent-6"
+        },
+        {
+         "name": "Soy sauce",
+         "quantity": "1",
+         "unit": "tbsp",
+         "pantry_id": "en-asian-urgent-4"
+        },
+        {
+         "name": "Spring onions",
+         "quantity": "1",
+         "unit": "tbsp",
+         "pantry_id": "en-asian-urgent-7"
+        },
+        {
+         "name": "Water",
+         "quantity": "600",
+         "unit": "ml",
+         "pantry_id": null
+        },
+        {
+         "name": "Oil",
+         "quantity": "1",
+         "unit": "tsp",
+         "pantry_id": null
+        },
+        {
+         "name": "Salt",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        },
+        {
+         "name": "Pepper",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Chicken thighs",
+        "Broccoli",
+        "Eggs",
+        "Ginger",
+        "Garlic",
+        "Soy sauce",
+        "Spring onions"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Cut the chicken thighs into bite‑size pieces.",
+        "Separate the broccoli into small florets.",
+        "Finely mince the garlic and grate the ginger.",
+        "Slice the spring onions; keep green tops separate for garnish.",
+        "Heat 1 tsp oil in a pot over medium heat; add garlic and ginger, sauté 30 seconds until aromatic.",
+        "Add the chicken pieces and stir‑fry 2 minutes until lightly browned.",
+        "Pour in 600 ml water, bring to a boil, then reduce to a gentle simmer.",
+        "Continue simmering the chicken until it reaches an internal temperature of 74 °C (clear juices, no pink), about 5‑6 minutes.",
+        "Add the broccoli florets and simmer 5 minutes, until bright green and just tender.",
+        "Stir in 1 tbsp soy sauce, a pinch of salt and pepper.",
+        "Whisk the eggs in a bowl. Slowly drizzle the egg into the simmering broth while stirring gently with a fork to create silky ribbons.",
+        "Remove from heat, sprinkle the green spring onion tops, and serve immediately."
+       ],
+       "tips": [
+        "Keep the broth at a gentle simmer when adding the egg; a rolling boil will make the egg tough.",
+        "For extra depth, add a splash of sesame oil just before serving."
+       ],
+       "image_prompt": "Clear bowl of steaming ginger‑garlic chicken egg drop soup with bright green broccoli florets and delicate egg ribbons, topped with sliced spring onions, minimalist table setting, soft natural light"
+      },
+      {
+       "title": "Savory Chicken & Broccoli Rice Pancakes with Soy Dipping Sauce",
+       "description": "Crispy‑on‑the‑outside, fluffy‑inside rice pancakes packed with shredded chicken, broccoli, and spring onions, served with a quick soy‑ginger dip.",
+       "difficulty": "easy",
+       "prep_time": 10,
+       "cook_time": 15,
+       "total_time": 25,
+       "servings": 2,
+       "meal_type": "dinner",
+       "cuisine": "asian",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Chicken thighs",
+         "quantity": "300",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-1"
+        },
+        {
+         "name": "Broccoli",
+         "quantity": "1/2",
+         "unit": "piece",
+         "pantry_id": "en-asian-urgent-2"
+        },
+        {
+         "name": "Rice",
+         "quantity": "150",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-3"
+        },
+        {
+         "name": "Eggs",
+         "quantity": "2",
+         "unit": "piece",
+         "pantry_id": "en-asian-urgent-8"
+        },
+        {
+         "name": "Soy sauce",
+         "quantity": "2",
+         "unit": "tbsp",
+         "pantry_id": "en-asian-urgent-4"
+        },
+        {
+         "name": "Ginger",
+         "quantity": "1",
+         "unit": "tsp",
+         "pantry_id": "en-asian-urgent-5"
+        },
+        {
+         "name": "Garlic",
+         "quantity": "1",
+         "unit": "clove",
+         "pantry_id": "en-asian-urgent-6"
+        },
+        {
+         "name": "Spring onions",
+         "quantity": "2",
+         "unit": "tbsp",
+         "pantry_id": "en-asian-urgent-7"
+        },
+        {
+         "name": "Oil",
+         "quantity": "2",
+         "unit": "tbsp",
+         "pantry_id": null
+        },
+        {
+         "name": "Water",
+         "quantity": "200",
+         "unit": "ml",
+         "pantry_id": null
+        },
+        {
+         "name": "Salt",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        },
+        {
+         "name": "Pepper",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Chicken thighs",
+        "Broccoli",
+        "Rice",
+        "Eggs",
+        "Soy sauce",
+        "Ginger",
+        "Garlic",
+        "Spring onions"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Rinse the rice, then combine it with 200 ml water in a saucepan over medium heat; bring to a boil, cover, and simmer 12 minutes until water is absorbed.",
+        "Remove from heat and spread the cooked rice on a clean tray to cool quickly; place the tray in the refrigerator for 5 minutes until the rice is cold but still moist.",
+        "While the rice cools, finely chop the broccoli into very small pieces (or pulse in a food processor).",
+        "Trim any excess fat from the chicken thighs and cut the meat into strips; heat 1 tbsp oil in a skillet over medium heat, add the chicken and cook, stirring, until it reaches an internal temperature of 74 °C (clear juices, no pink), about 6 minutes.",
+        "Remove the chicken, let it rest 2 minutes, then shred into small strips.",
+        "Mince the garlic, grate the ginger, and slice the spring onions, separating white and green parts.",
+        "In a large bowl, combine the cooled rice, shredded chicken, chopped broccoli, garlic, ginger, white spring onion parts, and the 2 eggs. Season with a pinch of salt and pepper; mix until evenly incorporated.",
+        "Heat 1 tbsp oil in a non‑stick skillet over medium heat.",
+        "Spoon ¼ cup of the mixture into the skillet, flatten gently with the back of a spoon to form a pancake about 1 cm thick.",
+        "Cook 3‑4 minutes on medium heat until the bottom is golden brown and crisp; flip and cook another 3 minutes until the other side is golden and the centre is hot (the chicken inside should stay at least 74 °C).",
+        "Transfer the pancake to a plate and repeat with remaining batter, adding more oil as needed.",
+        "For the dipping sauce, mix 2 tbsp soy sauce, ½ tsp grated ginger, and a drizzle of oil in a small bowl.",
+        "Serve the hot pancakes with the soy‑ginger dipping sauce and garnish with the green spring onion tops."
+       ],
+       "tips": [
+        "Cool the cooked rice quickly and refrigerate before mixing; it helps the pancakes hold together.",
+        "Press the pancakes gently while cooking to ensure even crispness."
+       ],
+       "image_prompt": "Golden-brown savory chicken and broccoli rice pancakes stacked on a wooden board, side bowl of dark soy‑ginger dipping sauce, sliced green spring onions scattered, bright kitchen lighting"
+      }
+     ],
+     "safety": {
+      "checked": true,
+      "first": [
+       {
+        "title": "Ginger‑Garlic Chicken Egg Drop Soup with Broccoli",
+        "issues": [
+         {
+          "code": "core_temperature",
+          "ingredient": "Chicken thighs",
+          "message": "« Chicken thighs » : écrire la température à cœur (volaille : 74 °C à cœur et jus clair, plus aucune trace rose)."
+         }
+        ]
+       },
+       {
+        "title": "Savory Chicken & Broccoli Rice Pancakes with Soy Dipping Sauce",
+        "issues": [
+         {
+          "code": "core_temperature",
+          "ingredient": "Chicken thighs",
+          "message": "« Chicken thighs » : écrire la température à cœur (volaille : 74 °C à cœur et jus clair, plus aucune trace rose)."
+         },
+         {
+          "code": "rice_cooling",
+          "ingredient": "Rice",
+          "message": "« Rice » refroidi : l'étaler pour le refroidir vite et le mettre au réfrigérateur (jamais laissé tiède à température ambiante)."
+         }
+        ]
+       }
+      ],
+      "corrected": [
+       "Ginger‑Garlic Chicken Egg Drop Soup with Broccoli",
+       "Savory Chicken & Broccoli Rice Pancakes with Soy Dipping Sauce"
+      ],
+      "dropped": []
+     },
+     "attempts": [
+      {
+       "provider": "groq",
+       "started_at_ms": 1,
+       "ms": 7884,
+       "ok": true,
+       "usage": {
+        "queue_time": 0.222453977,
+        "prompt_tokens": 2626,
+        "prompt_time": 0.839596275,
+        "completion_tokens": 2897,
+        "completion_time": 6.779759328,
+        "total_tokens": 5523,
+        "total_time": 7.619355603,
+        "prompt_tokens_details": {
+         "cached_tokens": 256
+        },
+        "completion_tokens_details": {
+         "reasoning_tokens": 426
+        },
+        "rate_limits": {
+         "requests_per_day": "500000",
+         "remaining_requests": "183970",
+         "tokens_per_minute": "250000",
+         "remaining_tokens": "244190"
+        }
+       }
+      },
+      {
+       "provider": "groq",
+       "started_at_ms": 7893,
+       "ms": 5318,
+       "ok": true,
+       "usage": {
+        "queue_time": 0.020987284,
+        "prompt_tokens": 3899,
+        "prompt_time": 0.526340736,
+        "completion_tokens": 1996,
+        "completion_time": 4.7196027449999995,
+        "total_tokens": 5895,
+        "total_time": 5.245943481,
+        "prompt_tokens_details": {
+         "cached_tokens": 256
+        },
+        "completion_tokens_details": {
+         "reasoning_tokens": 140
+        },
+        "rate_limits": {
+         "requests_per_day": "500000",
+         "remaining_requests": "184014",
+         "tokens_per_minute": "250000",
+         "remaining_tokens": "242890"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "examples": [
+      {
+       "name": "Nasi ayam (riz au poulet hainanais)",
+       "region": "Asie du Sud-Est"
+      },
+      {
+       "name": "Bhindi masala (gombos sautés)",
+       "region": "Inde et Asie du Sud"
+      },
+      {
+       "name": "Gongbao jiding (poulet aux cacahuètes)",
+       "region": "Asie de l'Est"
+      },
+      {
+       "name": "Sayur lodeh (légumes au lait de coco)",
+       "region": "Asie du Sud-Est"
+      },
+      {
+       "name": "Dal bhat (riz, lentilles et accompagnements)",
+       "region": "Inde et Asie du Sud"
+      }
+     ],
+     "recipes": [
+      {
+       "title": "Soy‑Ginger Glazed Chicken Thighs with Steamed Broccoli and Fluffy Rice",
+       "description": "Tender chicken thighs glazed in a sweet‑savory soy‑ginger sauce, served with crisp‑steamed broccoli and perfectly cooked rice – a classic East‑Asian dinner done in under 40 minutes.",
+       "difficulty": "easy",
+       "prep_time": 10,
+       "cook_time": 25,
+       "total_time": 35,
+       "servings": 2,
+       "meal_type": "dinner",
+       "cuisine": "asian",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Chicken thighs",
+         "quantity": "500",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-1"
+        },
+        {
+         "name": "Broccoli",
+         "quantity": "1",
+         "unit": "piece",
+         "pantry_id": "en-asian-urgent-2"
+        },
+        {
+         "name": "Rice",
+         "quantity": "200",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-3"
+        },
+        {
+         "name": "Soy sauce",
+         "quantity": "3",
+         "unit": "tbsp",
+         "pantry_id": "en-asian-urgent-4"
+        },
+        {
+         "name": "Ginger",
+         "quantity": "1",
+         "unit": "tbsp",
+         "pantry_id": "en-asian-urgent-5"
+        },
+        {
+         "name": "Garlic",
+         "quantity": "2",
+         "unit": "clove",
+         "pantry_id": "en-asian-urgent-6"
+        },
+        {
+         "name": "Spring onions",
+         "quantity": "2",
+         "unit": "stalk",
+         "pantry_id": "en-asian-urgent-7"
+        },
+        {
+         "name": "Water",
+         "quantity": "400",
+         "unit": "ml",
+         "pantry_id": null
+        },
+        {
+         "name": "Salt",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        },
+        {
+         "name": "Pepper",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Chicken thighs",
+        "Broccoli",
+        "Rice",
+        "Soy sauce",
+        "Ginger",
+        "Garlic",
+        "Spring onions"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Rinse the 200 g of rice under cold water until the water runs clear; drain.",
+        "In a medium saucepan, combine the rinsed rice with 400 ml water and a pinch of salt. Bring to a boil over medium heat, then reduce to low, cover, and simmer 12 minutes until water is absorbed. Remove from heat and let stand covered 5 minutes; fluff with a fork.",
+        "While the rice cooks, finely grate the ginger piece and mince the 2 garlic cloves.",
+        "Pat the chicken thighs dry, then season both sides with a pinch of pepper.",
+        "Heat a non‑stick skillet over medium‑high heat. Add the chicken thighs skin‑side down and sear 4 minutes until golden.",
+        "Flip the thighs, add the grated ginger, minced garlic, and 3 tbsp soy sauce. Reduce heat to medium, cover, and cook 12 minutes, turning once, until the internal temperature reaches 74 °C (juices run clear).",
+        "While the chicken finishes, cut the broccoli into florets. Steam the florets in a steamer basket over simmering water for 5 minutes, until bright green and just tender.",
+        "Slice the spring onions thinly.",
+        "Plate the fluffy rice, top with the glazed chicken thighs, arrange the steamed broccoli on the side, and sprinkle sliced spring onions over everything.",
+        "Serve immediately, letting diners drizzle any remaining pan sauce over the rice."
+       ],
+       "tips": [
+        "If you like a slightly sweeter glaze, add 1 tsp honey or brown sugar to the soy‑ginger mixture.",
+        "To keep the chicken extra moist, baste it with its own sauce once halfway through cooking."
+       ],
+       "image_prompt": "Professional food photography, glossy soy‑ginger glazed chicken thighs on a white plate beside bright green broccoli florets and a mound of fluffy white rice, natural light, minimal garnish"
+      },
+      {
+       "title": "Korean‑Style Chicken‑Broccoli Bibimbap with Fried Egg",
+       "description": "A quick bibimbap bowl featuring marinated chicken, sautéed broccoli, and a sunny‑side‑up egg, all tossed with a spicy‑sweet gochujang‑soy dressing.",
+       "difficulty": "easy",
+       "prep_time": 12,
+       "cook_time": 20,
+       "total_time": 32,
+       "servings": 2,
+       "meal_type": "dinner",
+       "cuisine": "asian",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Chicken thighs",
+         "quantity": "300",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-1"
+        },
+        {
+         "name": "Broccoli",
+         "quantity": "1",
+         "unit": "piece",
+         "pantry_id": "en-asian-urgent-2"
+        },
+        {
+         "name": "Rice",
+         "quantity": "180",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-3"
+        },
+        {
+         "name": "Soy sauce",
+         "quantity": "2",
+         "unit": "tbsp",
+         "pantry_id": "en-asian-urgent-4"
+        },
+        {
+         "name": "Ginger",
+         "quantity": "1",
+         "unit": "tsp",
+         "pantry_id": "en-asian-urgent-5"
+        },
+        {
+         "name": "Garlic",
+         "quantity": "1",
+         "unit": "clove",
+         "pantry_id": "en-asian-urgent-6"
+        },
+        {
+         "name": "Eggs",
+         "quantity": "2",
+         "unit": "piece",
+         "pantry_id": "en-asian-urgent-8"
+        },
+        {
+         "name": "Spring onions",
+         "quantity": "2",
+         "unit": "stalk",
+         "pantry_id": "en-asian-urgent-7"
+        },
+        {
+         "name": "Gochujang (Korean chili paste)",
+         "quantity": "1",
+         "unit": "tbsp",
+         "pantry_id": null
+        },
+        {
+         "name": "Sesame oil",
+         "quantity": "1",
+         "unit": "tsp",
+         "pantry_id": null
+        },
+        {
+         "name": "Water",
+         "quantity": "360",
+         "unit": "ml",
+         "pantry_id": null
+        },
+        {
+         "name": "Salt",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        },
+        {
+         "name": "Pepper",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Chicken thighs",
+        "Broccoli",
+        "Rice",
+        "Soy sauce",
+        "Ginger",
+        "Garlic",
+        "Eggs",
+        "Spring onions"
+       ],
+       "missing_ingredients": [
+        "Gochujang (Korean chili paste)"
+       ],
+       "instructions": [
+        "Rinse the 180 g of rice, drain, and place in a small pot with 360 ml water and a pinch of salt. Bring to a boil over medium heat, then lower to a gentle simmer, cover, and cook 12 minutes. Remove from heat, keep covered 5 minutes, then fluff.",
+        "Slice the chicken thighs into bite‑size strips. In a bowl combine 2 tbsp soy sauce, 1 tsp grated ginger, 1 minced garlic clove, and 1 tsp sesame oil. Add the chicken strips, toss, and let marinate 5 minutes.",
+        "While the rice cooks, cut the broccoli into small florets. Heat a wok or large skillet over medium‑high heat, add a splash of oil, and stir‑fry the broccoli for 4 minutes until just tender. Remove and set aside.",
+        "In the same wok, add the marinated chicken strips. Stir‑fry 6‑7 minutes, stirring frequently, until the pieces are cooked through and reach 74 °C (no pink).",
+        "Mix 1 tbsp gochujang with 1 tbsp soy sauce and a drizzle of water to thin; pour into the wok, toss the chicken for 1 minute to coat.",
+        "Heat a non‑stick pan over medium heat, add a little oil, crack 2 eggs and fry sunny‑side‑up until the whites are set but the yolk remains runny (about 2 minutes).",
+        "Divide the fluffy rice into two bowls. Top each with equal portions of the gochujang‑glazed chicken, sautéed broccoli, and a fried egg. Garnish with sliced spring onions.",
+        "Before eating, mix everything together so the sauce, yolk, and rice combine."
+       ],
+       "tips": [
+        "If you prefer less heat, reduce gochujang to ½ tbsp or omit it entirely.",
+        "For extra crunch, add a handful of toasted sesame seeds just before serving."
+       ],
+       "image_prompt": "Vibrant Korean bibimbap bowl with sliced chicken, green broccoli, a bright yellow fried egg on top, drizzle of red gochujang sauce, white bowl, natural light"
+      },
+      {
+       "title": "Japanese‑Inspired Chicken‑Egg Okonomiyaki with Broccoli",
+       "description": "Savory Japanese pancakes made with shredded chicken, broccoli, and egg, pan‑fried to a golden crisp and served with a simple soy‑ginger dipping sauce.",
+       "difficulty": "easy",
+       "prep_time": 10,
+       "cook_time": 18,
+       "total_time": 28,
+       "servings": 2,
+       "meal_type": "dinner",
+       "cuisine": "asian",
+       "dietary_tags": [],
+       "ingredients_used": [
+        {
+         "name": "Chicken thighs",
+         "quantity": "200",
+         "unit": "g",
+         "pantry_id": "en-asian-urgent-1"
+        },
+        {
+         "name": "Broccoli",
+         "quantity": "1",
+         "unit": "piece",
+         "pantry_id": "en-asian-urgent-2"
+        },
+        {
+         "name": "Eggs",
+         "quantity": "2",
+         "unit": "piece",
+         "pantry_id": "en-asian-urgent-8"
+        },
+        {
+         "name": "Flour (all‑purpose)",
+         "quantity": "100",
+         "unit": "g",
+         "pantry_id": null
+        },
+        {
+         "name": "Water",
+         "quantity": "80",
+         "unit": "ml",
+         "pantry_id": null
+        },
+        {
+         "name": "Soy sauce",
+         "quantity": "2",
+         "unit": "tbsp",
+         "pantry_id": "en-asian-urgent-4"
+        },
+        {
+         "name": "Ginger",
+         "quantity": "1",
+         "unit": "tsp",
+         "pantry_id": "en-asian-urgent-5"
+        },
+        {
+         "name": "Garlic",
+         "quantity": "1",
+         "unit": "clove",
+         "pantry_id": "en-asian-urgent-6"
+        },
+        {
+         "name": "Spring onions",
+         "quantity": "2",
+         "unit": "stalk",
+         "pantry_id": "en-asian-urgent-7"
+        },
+        {
+         "name": "Vegetable oil",
+         "quantity": "2",
+         "unit": "tbsp",
+         "pantry_id": null
+        },
+        {
+         "name": "Salt",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        },
+        {
+         "name": "Pepper",
+         "quantity": "1",
+         "unit": "pinch",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Chicken thighs",
+        "Broccoli",
+        "Eggs",
+        "Soy sauce",
+        "Ginger",
+        "Garlic",
+        "Spring onions"
+       ],
+       "missing_ingredients": [
+        "Flour (all‑purpose)"
+       ],
+       "instructions": [
+        "Finely dice the chicken thighs (200 g).",
+        "Place the diced chicken in a bowl, add 1 minced garlic clove, 1 tsp grated ginger, and a pinch of pepper. Mix and set aside to marinate 5 minutes.",
+        "Cut the broccoli into very small florets or grate it to obtain about 100 g of broccoli pieces.",
+        "In a separate large mixing bowl, combine 100 g flour, 80 ml water, a pinch of salt, and 2 beaten eggs. Stir until a smooth batter forms.",
+        "Fold the marinated chicken, the broccoli pieces, and the sliced spring onions (2 stalks, thinly sliced) into the batter, mixing gently to distribute evenly.",
+        "Heat a non‑stick skillet over medium heat and add 1 tbsp vegetable oil, swirling to coat.",
+        "Spoon half of the batter into the skillet, spreading to form a 10‑cm‑diameter pancake about 1 cm thick.",
+        "Cook for 4 minutes on medium heat until the edges turn golden and the bottom is crisp. Flip carefully and cook another 4 minutes, pressing lightly with a spatula, until the chicken reaches 74 °C (no pink) and the pancake is golden throughout.",
+        "Repeat with the remaining batter, adding the remaining 1 tbsp oil.",
+        "For the dipping sauce, mix 2 tbsp soy sauce with 1 tsp grated ginger and a splash of water; stir.",
+        "Serve the okonomiyaki hot, drizzled with the soy‑ginger sauce and garnished with extra sliced spring onions."
+       ],
+       "tips": [
+        "Press the pancake gently while flipping to ensure even cooking and a uniform crisp.",
+        "If you have leftover cooked rice, you can add 50 g to the batter for extra texture."
+       ],
+       "image_prompt": "Golden Japanese okonomiyaki pancakes on a black plate, topped with a drizzle of soy‑ginger sauce, green broccoli bits, and a sprinkle of sliced spring onions, soft lighting"
+      }
+     ],
+     "safety": {
+      "checked": true,
+      "first": [],
+      "corrected": [],
+      "dropped": []
+     },
+     "attempts": [
+      {
+       "provider": "groq",
+       "started_at_ms": 2,
+       "ms": 7491,
+       "ok": true,
+       "usage": {
+        "queue_time": 0.207602162,
+        "prompt_tokens": 2659,
+        "prompt_time": 0.338005802,
+        "completion_tokens": 2906,
+        "completion_time": 6.905911413,
+        "total_tokens": 5565,
+        "total_time": 7.243917215,
+        "prompt_tokens_details": {
+         "cached_tokens": 256
+        },
+        "completion_tokens_details": {
+         "reasoning_tokens": 173
+        },
+        "rate_limits": {
+         "requests_per_day": "500000",
+         "remaining_requests": "184062",
+         "tokens_per_minute": "250000",
+         "remaining_tokens": "244157"
+        }
+       }
+      }
+     ]
+    }
+   ],
+   "judge": {
+    "comment": "L'application propose une variété limitée en recyclant systématiquement les mêmes ingrédients de base (poulet, brocoli, riz) sous des formes techniques très proches. Bien que les intitulés changent pour évoquer différentes cuisines asiatiques, la répétitivité des saveurs et des textures risque de lasser rapidement l'utilisateur.",
+    "recipes": [
+     {
+      "generation": 0,
+      "index": 0,
+      "group": 1,
+      "library_dish": "",
+      "relation": "new"
+     },
+     {
+      "generation": 0,
+      "index": 1,
+      "group": 2,
+      "library_dish": "Arroz caldo / Lugaw",
+      "relation": "variant"
+     },
+     {
+      "generation": 0,
+      "index": 2,
+      "group": 3,
+      "library_dish": "Chaofan",
+      "relation": "variant"
+     },
+     {
+      "generation": 1,
+      "index": 0,
+      "group": 2,
+      "library_dish": "Baizhou",
+      "relation": "variant"
+     },
+     {
+      "generation": 1,
+      "index": 1,
+      "group": 1,
+      "library_dish": "Baiqie ji",
+      "relation": "variant"
+     },
+     {
+      "generation": 2,
+      "index": 0,
+      "group": 4,
+      "library_dish": "Hongshao rou",
+      "relation": "variant"
+     },
+     {
+      "generation": 2,
+      "index": 1,
+      "group": 2,
+      "library_dish": "Arroz caldo / Lugaw",
+      "relation": "variant"
+     },
+     {
+      "generation": 2,
+      "index": 2,
+      "group": 5,
+      "library_dish": "Okonomiyaki",
+      "relation": "variant"
+     },
+     {
+      "generation": 3,
+      "index": 0,
+      "group": 1,
+      "library_dish": "Baiqie ji",
+      "relation": "copy"
+     },
+     {
+      "generation": 3,
+      "index": 1,
+      "group": 6,
+      "library_dish": "Bibimbap",
+      "relation": "variant"
+     },
+     {
+      "generation": 3,
+      "index": 2,
+      "group": 5,
+      "library_dish": "Okonomiyaki",
+      "relation": "variant"
+     }
+    ]
+   },
+   "metrics": {
+    "recipes": 11,
+    "distinct_dishes": 6,
+    "copies": 1,
+    "variants": 9,
+    "new": 1,
+    "repeated_titles": 0,
+    "library_names_in_titles": 2,
+    "examples_in_titles": 0
+   }
+  },
+  {
+   "id": "es-latino-vegetariano",
+   "condition": "library",
+   "generations": [
+    {
+     "examples": [
+      {
+       "name": "Curry channa and aloo",
+       "region": "Caraïbes"
+      },
+      {
+       "name": "Frijoles de la olla",
+       "region": "Mexique et Amérique centrale"
+      },
+      {
+       "name": "Arroz e feijão",
+       "region": "Amérique du Sud"
+      },
+      {
+       "name": "Pikliz",
+       "region": "Caraïbes"
+      },
+      {
+       "name": "Chiles rellenos",
+       "region": "Mexique et Amérique centrale"
+      }
+     ],
+     "recipes": [
+      {
+       "title": "Tacos de frijol negro y aguacate",
+       "description": "Tacos crujientes rellenos de frijoles negros, maíz, tomate y crema de aguacate, con toque de lima y cebolla morada.",
+       "difficulty": "easy",
+       "prep_time": 10,
+       "cook_time": 15,
+       "total_time": 25,
+       "servings": 2,
+       "meal_type": "lunch",
+       "cuisine": "latin",
+       "dietary_tags": [
+        "vegetarian"
+       ],
+       "ingredients_used": [
+        {
+         "name": "Frijoles negros",
+         "quantity": "1",
+         "unit": "lata",
+         "pantry_id": "es-latino-vegetariano-1"
+        },
+        {
+         "name": "Maíz",
+         "quantity": "1",
+         "unit": "lata",
+         "pantry_id": "es-latino-vegetariano-2"
+        },
+        {
+         "name": "Tomates",
+         "quantity": "2",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-4"
+        },
+        {
+         "name": "Cebolla morada",
+         "quantity": "1/2",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-9"
+        },
+        {
+         "name": "Aguacates",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-3"
+        },
+        {
+         "name": "Limas",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-10"
+        },
+        {
+         "name": "Tortillas de maíz",
+         "quantity": "4",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-8"
+        },
+        {
+         "name": "Queso fresco",
+         "quantity": "50",
+         "unit": "g",
+         "pantry_id": "es-latino-vegetariano-7"
+        },
+        {
+         "name": "aceite",
+         "quantity": "1",
+         "unit": "cda",
+         "pantry_id": null
+        },
+        {
+         "name": "sal",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        },
+        {
+         "name": "pimienta",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Frijoles negros",
+        "Maíz",
+        "Tomates",
+        "Cebolla morada",
+        "Aguacates",
+        "Limas",
+        "Tortillas de maíz",
+        "Queso fresco"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Escurre y enjuaga los frijoles negros y el maíz de sus latas.",
+        "Pica finamente la cebolla morada y los tomates en cubos pequeños.",
+        "En una sartén a fuego medio, calienta la 1 cda de aceite y sofríe la cebolla 3 minutos, hasta que esté translúcida.",
+        "Añade los frijoles y el maíz, cocina 5 minutos, revolviendo, hasta que estén calientes. Salpimienta al gusto.",
+        "Mientras tanto, corta el aguacate por la mitad, quita el hueso y saca la pulpa. Machaca con el jugo de 1 lima, una pizca de sal y pimienta para obtener una crema.",
+        "Calienta las tortillas en otra sartén a fuego medio 30 segundos por lado, hasta que estén flexibles y ligeramente doradas.",
+        "Monta los tacos: coloca una cucharada de la mezcla de frijoles y maíz, añade tomate picado, un poco de crema de aguacate y desmenuza queso fresco por encima.",
+        "Sirve con gajos de la lima restante."
+       ],
+       "tips": [
+        "Puedes añadir unas hojas de cilantro fresco si las tienes a mano.",
+        "Para un toque picante, incorpora una pizca de chile en polvo al sofrito."
+       ],
+       "image_prompt": "Professional food photography, Mexican black bean tacos with fresh avocado crema, crumbled queso fresco, bright red tomato cubes, lime wedges, rustic wooden board, natural light"
+      },
+      {
+       "title": "Arroz con frijoles y huevo estrellado al estilo caribeño",
+       "description": "Arroz suelto mezclado con frijoles negros, maíz y huevo frito, aromatizado con lima y cebolla morada.",
+       "difficulty": "easy",
+       "prep_time": 5,
+       "cook_time": 30,
+       "total_time": 35,
+       "servings": 2,
+       "meal_type": "lunch",
+       "cuisine": "latin",
+       "dietary_tags": [
+        "vegetarian"
+       ],
+       "ingredients_used": [
+        {
+         "name": "Arroz",
+         "quantity": "200",
+         "unit": "g",
+         "pantry_id": "es-latino-vegetariano-5"
+        },
+        {
+         "name": "Frijoles negros",
+         "quantity": "1",
+         "unit": "lata",
+         "pantry_id": "es-latino-vegetariano-1"
+        },
+        {
+         "name": "Maíz",
+         "quantity": "1",
+         "unit": "lata",
+         "pantry_id": "es-latino-vegetariano-2"
+        },
+        {
+         "name": "Cebolla morada",
+         "quantity": "1/2",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-9"
+        },
+        {
+         "name": "Huevos",
+         "quantity": "2",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-6"
+        },
+        {
+         "name": "Limas",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-10"
+        },
+        {
+         "name": "aceite",
+         "quantity": "2",
+         "unit": "cda",
+         "pantry_id": null
+        },
+        {
+         "name": "sal",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        },
+        {
+         "name": "pimienta",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Arroz",
+        "Frijoles negros",
+        "Maíz",
+        "Cebolla morada",
+        "Huevos",
+        "Limas"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Lava el arroz bajo agua corriente hasta que el agua salga clara.",
+        "En una olla con 400 ml de agua, lleva a ebullición, añade 1 pizca de sal y el arroz. Reduce a fuego bajo, tapa y cocina 18 minutos, hasta que el agua se absorba y el arroz esté tierno.",
+        "Mientras el arroz se cocina, escurre y enjuaga los frijoles negros y el maíz.",
+        "Pica finamente la cebolla morada.",
+        "En una sartén grande a fuego medio, calienta 1 cda de aceite y sofríe la cebolla 3 minutos, hasta que esté dorada.",
+        "Añade los frijoles y el maíz, cocina 5 minutos, mezclando bien. Salpimienta al gusto.",
+        "Incorpora el arroz cocido a la sartén, mezcla 2 minutos para que se integren los sabores.",
+        "En otra sartén a fuego medio‑alto, calienta 1 cda de aceite y fríe los huevos 2 minutos por cada lado (huevo estrellado), hasta que la clara esté firme y la yema ligeramente líquida.",
+        "Rocía el plato con el jugo de la lima y sirve los huevos sobre el arroz con frijoles.",
+        "Añade una pizca extra de sal y pimienta si lo deseas."
+       ],
+       "tips": [
+        "Para un arroz más aromático, puedes añadir una hoja de laurel al agua de cocción.",
+        "Si prefieres la yema más cocida, deja el huevo un minuto extra."
+       ],
+       "image_prompt": "Bright Caribbean style plate of rice and black beans with corn, topped with a sunny-side-up egg, lime wedge, and chopped red onion, rustic ceramic bowl, natural daylight"
+      },
+      {
+       "title": "Ensalada tibia de quinoa improvisada con aguacate y queso fresco",
+       "description": "Aunque la quinoa no está en el garde‑manger, la usamos como sustituto del arroz para variar la base; la receta se centra en el aguacate urgente y combina maíz, frijoles y queso fresco en una ensalada ligera ideal para el almuerzo.",
+       "difficulty": "easy",
+       "prep_time": 10,
+       "cook_time": 15,
+       "total_time": 25,
+       "servings": 2,
+       "meal_type": "lunch",
+       "cuisine": "latin",
+       "dietary_tags": [
+        "vegetarian"
+       ],
+       "ingredients_used": [
+        {
+         "name": "quinoa",
+         "quantity": "150",
+         "unit": "g",
+         "pantry_id": null
+        },
+        {
+         "name": "Frijoles negros",
+         "quantity": "1",
+         "unit": "lata",
+         "pantry_id": "es-latino-vegetariano-1"
+        },
+        {
+         "name": "Maíz",
+         "quantity": "1",
+         "unit": "lata",
+         "pantry_id": "es-latino-vegetariano-2"
+        },
+        {
+         "name": "Tomates",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-4"
+        },
+        {
+         "name": "Aguacates",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-3"
+        },
+        {
+         "name": "Queso fresco",
+         "quantity": "60",
+         "unit": "g",
+         "pantry_id": "es-latino-vegetariano-7"
+        },
+        {
+         "name": "Limas",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-10"
+        },
+        {
+         "name": "aceite",
+         "quantity": "1",
+         "unit": "cda",
+         "pantry_id": null
+        },
+        {
+         "name": "sal",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        },
+        {
+         "name": "pimienta",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Frijoles negros",
+        "Maíz",
+        "Tomates",
+        "Aguacates",
+        "Queso fresco",
+        "Limas"
+       ],
+       "missing_ingredients": [
+        "quinoa"
+       ],
+       "instructions": [
+        "Enjuaga la quinoa bajo agua corriente y colócala en una olla con 300 ml de agua.",
+        "Lleva a ebullición, reduce a fuego bajo, tapa y cocina 12 minutos, hasta que el agua se absorba y la quinoa esté esponjosa.",
+        "Escurre y enjuaga los frijoles negros y el maíz de sus latas.",
+        "Corta el tomate en cubos pequeños y el aguacate en gajos.",
+        "En un bol grande, mezcla la quinoa caliente, los frijoles, el maíz y el tomate.",
+        "Añade 1 cda de aceite, el jugo de 1 lima, 1 pizca de sal y pimienta. Revuelve bien para que el aderezo cubra todo.",
+        "Incorpora el aguacate y el queso fresco desmenuzado, mezcla suavemente para no romper el aguacate.",
+        "Sirve la ensalada tibia en platos y decora con una rodaja de lima."
+       ],
+       "tips": [
+        "Si deseas más proteína, añade un huevo duro picado.",
+        "Puedes sustituir la quinoa por arroz integral si lo prefieres."
+       ],
+       "suggestion": "Ideal también como cena ligera.",
+       "image_prompt": "Colorful bowl of warm quinoa salad with black beans, corn, diced tomato, avocado slices, crumbled fresh cheese, lime drizzle, bright kitchen setting"
+      }
+     ],
+     "safety": {
+      "checked": true,
+      "first": [],
+      "corrected": [],
+      "dropped": []
+     },
+     "attempts": [
+      {
+       "provider": "groq",
+       "started_at_ms": 3,
+       "ms": 6524,
+       "ok": true,
+       "usage": {
+        "queue_time": 0.147025895,
+        "prompt_tokens": 2682,
+        "prompt_time": 0.138379693,
+        "completion_tokens": 2916,
+        "completion_time": 6.18678384,
+        "total_tokens": 5598,
+        "total_time": 6.325163533,
+        "completion_tokens_details": {
+         "reasoning_tokens": 110
+        },
+        "rate_limits": {
+         "requests_per_day": "500000",
+         "remaining_requests": "184197",
+         "tokens_per_minute": "250000",
+         "remaining_tokens": "244134"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "examples": [
+      {
+       "name": "Callaloo (jamaïcain)",
+       "region": "Caraïbes"
+      },
+      {
+       "name": "Sopa de frijoles",
+       "region": "Mexique et Amérique centrale"
+      },
+      {
+       "name": "Arroz e feijão",
+       "region": "Amérique du Sud"
+      },
+      {
+       "name": "Yuca con mojo",
+       "region": "Caraïbes"
+      },
+      {
+       "name": "Rajas con crema",
+       "region": "Mexique et Amérique centrale"
+      }
+     ],
+     "recipes": [
+      {
+       "title": "Sopa reconfortante de frijoles negros con huevo pochado",
+       "description": "Una sopa cremosa de frijoles negros al estilo centroamericano, coronada con un huevo pochado y trozos de aguacate fresco.",
+       "difficulty": "easy",
+       "prep_time": 10,
+       "cook_time": 25,
+       "total_time": 35,
+       "servings": 2,
+       "meal_type": "lunch",
+       "cuisine": "latin",
+       "dietary_tags": [
+        "vegetarian"
+       ],
+       "ingredients_used": [
+        {
+         "name": "Frijoles negros",
+         "quantity": "1",
+         "unit": "lata",
+         "pantry_id": "es-latino-vegetariano-1"
+        },
+        {
+         "name": "Tomates",
+         "quantity": "2",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-4"
+        },
+        {
+         "name": "Cebolla morada",
+         "quantity": "1/2",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-9"
+        },
+        {
+         "name": "Limas",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-10"
+        },
+        {
+         "name": "Huevos",
+         "quantity": "2",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-6"
+        },
+        {
+         "name": "Aguacates",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-3"
+        },
+        {
+         "name": "aceite vegetal",
+         "quantity": "1",
+         "unit": "cda",
+         "pantry_id": null
+        },
+        {
+         "name": "sal",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        },
+        {
+         "name": "pimienta",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Frijoles negros",
+        "Tomates",
+        "Cebolla morada",
+        "Limas",
+        "Huevos",
+        "Aguacates"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Pica finamente 1/2 cebolla morada.",
+        "En una olla mediana, calienta 1 cda de aceite vegetal a fuego medio y sofríe la cebolla 4 minutos, hasta que esté translúcida.",
+        "Añade los 2 tomates picados y cocina 3 minutos más, revolviendo.",
+        "Agrega la lata de frijoles negros (incluido su líquido) y 400 ml de agua. Lleva a ebullición, luego reduce a fuego bajo y cocina 15 minutos, hasta que los sabores se integren.",
+        "Mientras la sopa hierve, prepara el huevo pochado: lleva a fuego suave una cacerola con 500 ml de agua y una pizca de sal. Cuando el agua esté a punto de hervir, rompe un huevo en una taza y deslízalo suavemente en el agua. Cocina 3 minutos, hasta que la clara esté firme y la yema ligeramente líquida. Retira con una espumadera.",
+        "Retira la sopa del fuego y licúa 1/2 taza de la sopa con una batidora de mano para lograr una textura cremosa; vuelve a mezclar con el resto de la olla.",
+        "Añade una pizca de sal, pimienta y el jugo de 1/2 lima. Revuelve.",
+        "Sirve la sopa en tazones, coloca un huevo pochado encima y corona con cubos de 1/2 aguacate.",
+        "Decora con un chorrito de jugo de lima restante y una pizca de cebolla morada picada."
+       ],
+       "tips": [
+        "Si prefieres una sopa más espesa, aumenta la cantidad licuada.",
+        "Puedes agregar una hoja de cilantro fresco al final para más aroma."
+       ],
+       "image_prompt": "Professional food photography, creamy black bean soup in a rustic bowl, topped with a poached egg and avocado slices, garnished with red onion and lime wedges, natural light"
+      },
+      {
+       "title": "Quesadillas de maíz rellenas de queso fresco y pico de aguacate",
+       "description": "Tortillas de maíz doradas y crujientes, rellenas de queso fresco derretido y una salsa fresca de aguacate, tomate y cebolla morada.",
+       "difficulty": "easy",
+       "prep_time": 10,
+       "cook_time": 12,
+       "total_time": 22,
+       "servings": 4,
+       "meal_type": "lunch",
+       "cuisine": "latin",
+       "dietary_tags": [
+        "vegetarian"
+       ],
+       "ingredients_used": [
+        {
+         "name": "Tortillas de maíz",
+         "quantity": "8",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-8"
+        },
+        {
+         "name": "Queso fresco",
+         "quantity": "150",
+         "unit": "g",
+         "pantry_id": "es-latino-vegetariano-7"
+        },
+        {
+         "name": "Aguacates",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-3"
+        },
+        {
+         "name": "Tomates",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-4"
+        },
+        {
+         "name": "Cebolla morada",
+         "quantity": "1/4",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-9"
+        },
+        {
+         "name": "Limas",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-10"
+        },
+        {
+         "name": "aceite vegetal",
+         "quantity": "2",
+         "unit": "cda",
+         "pantry_id": null
+        },
+        {
+         "name": "sal",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        },
+        {
+         "name": "pimienta",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Tortillas de maíz",
+        "Queso fresco",
+        "Aguacates",
+        "Tomates",
+        "Cebolla morada",
+        "Limas"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Pica finamente 1/4 de cebolla morada y el tomate en cubos pequeños.",
+        "En un bol, aplasta el aguacate con un tenedor, agrega el tomate y la cebolla picada, el jugo de 1/2 lima, una pizca de sal y pimienta. Mezcla hasta obtener una salsa rústica.",
+        "Desmenuza el queso fresco en trozos de 2 cm.",
+        "Calienta una sartén grande a fuego medio y agrega 1 cda de aceite vegetal.",
+        "Coloca una tortilla en la sartén, reparte 30 g de queso fresco sobre la mitad y dobla la tortilla formando una media luna.",
+        "Cocina 2 minutos, presionando ligeramente, hasta que el queso se derrita y la tortilla esté dorada; voltea y cocina 1 minuto más.",
+        "Repite el proceso con las tortillas restantes, usando la segunda cda de aceite si es necesario.",
+        "Sirve las quesadillas calientes acompañadas de la salsa de aguacate al lado y un gajo de lima para exprimir."
+       ],
+       "tips": [
+        "Para una textura más crujiente, presiona las quesadillas con una espátula mientras se cocinan.",
+        "Puedes añadir una pizca de chile en polvo a la salsa si te gusta el picante."
+       ],
+       "image_prompt": "Close-up food photography of golden corn tortillas folded with melted fresh cheese, topped with a green avocado-tomato salsa, lime wedge on the side, bright kitchen lighting"
+      },
+      {
+       "title": "Bowl de arroz con maíz, frijoles negros y huevo revuelto al estilo caribeño",
+       "description": "Arroz esponjoso combinado con maíz dulce, frijoles negros y huevo revuelto, terminado con cubos de aguacate y un toque de lima.",
+       "difficulty": "easy",
+       "prep_time": 8,
+       "cook_time": 20,
+       "total_time": 28,
+       "servings": 2,
+       "meal_type": "lunch",
+       "cuisine": "latin",
+       "dietary_tags": [
+        "vegetarian"
+       ],
+       "ingredients_used": [
+        {
+         "name": "Arroz",
+         "quantity": "200",
+         "unit": "g",
+         "pantry_id": "es-latino-vegetariano-5"
+        },
+        {
+         "name": "Maíz",
+         "quantity": "1",
+         "unit": "lata",
+         "pantry_id": "es-latino-vegetariano-2"
+        },
+        {
+         "name": "Frijoles negros",
+         "quantity": "1/2",
+         "unit": "lata",
+         "pantry_id": "es-latino-vegetariano-1"
+        },
+        {
+         "name": "Huevos",
+         "quantity": "2",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-6"
+        },
+        {
+         "name": "Aguacates",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-3"
+        },
+        {
+         "name": "Cebolla morada",
+         "quantity": "1/4",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-9"
+        },
+        {
+         "name": "Limas",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-10"
+        },
+        {
+         "name": "aceite vegetal",
+         "quantity": "2",
+         "unit": "cda",
+         "pantry_id": null
+        },
+        {
+         "name": "sal",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        },
+        {
+         "name": "pimienta",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Arroz",
+        "Maíz",
+        "Frijoles negros",
+        "Huevos",
+        "Aguacates",
+        "Cebolla morada",
+        "Limas"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Enjuaga el arroz bajo agua corriente hasta que el agua salga clara.",
+        "En una olla mediana, agrega el arroz y 400 ml de agua. Lleva a ebullición a fuego medio, luego cubre y reduce a fuego bajo. Cocina 15 minutos, hasta que el agua se absorba y el arroz esté tierno. Retira del fuego y deja reposar 2 minutos.",
+        "Mientras el arroz se cocina, abre la lata de maíz, escúrrelo y reserva.",
+        "Escurre y enjuaga 1/2 lata de frijoles negros; reserva.",
+        "Pica finamente 1/4 de cebolla morada.",
+        "En una sartén grande, calienta 1 cda de aceite a fuego medio. Añade la cebolla y sofríe 3 minutos, hasta que esté dorada.",
+        "Agrega los frijoles negros y el maíz, sazona con una pizca de sal y pimienta, y cocina 4 minutos, revolviendo, hasta que estén bien calientes.",
+        "Bate los 2 huevos con una pizca de sal y pimienta. Empuja la mezcla de frijoles y maíz a un lado de la sartén, agrega la segunda cda de aceite y vierte los huevos batidos. Revuelve suavemente 2 minutos, hasta que queden revueltos pero aún jugosos.",
+        "Distribuye el arroz cocido en 2 bowls, cubre con la mezcla de frijoles, maíz y huevo.",
+        "Corta el aguacate en cubos y colócalos encima del bowl.",
+        "Exprime el jugo de 1/2 lima sobre cada bowl y sirve inmediatamente."
+       ],
+       "tips": [
+        "Para un toque extra de frescura, añade cilantro picado al final.",
+        "Si te gusta el picante, incorpora una rodaja fina de chile jalapeño al sofreír la cebolla."
+       ],
+       "image_prompt": "Vibrant food bowl with fluffy white rice, black beans, yellow corn, scrambled eggs, avocado cubes, and lime wedges, bright colors, top-down view, natural light"
+      }
+     ],
+     "safety": {
+      "checked": true,
+      "first": [],
+      "corrected": [],
+      "dropped": []
+     },
+     "attempts": [
+      {
+       "provider": "groq",
+       "started_at_ms": 2,
+       "ms": 8421,
+       "ok": true,
+       "usage": {
+        "queue_time": 0.020516721,
+        "prompt_tokens": 2755,
+        "prompt_time": 0.182445594,
+        "completion_tokens": 3099,
+        "completion_time": 8.174429036,
+        "total_tokens": 5854,
+        "total_time": 8.35687463,
+        "prompt_tokens_details": {
+         "cached_tokens": 256
+        },
+        "completion_tokens_details": {
+         "reasoning_tokens": 187
+        },
+        "rate_limits": {
+         "requests_per_day": "500000",
+         "remaining_requests": "184252",
+         "tokens_per_minute": "250000",
+         "remaining_tokens": "244006"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "examples": [
+      {
+       "name": "Chiles rellenos",
+       "region": "Mexique et Amérique centrale"
+      },
+      {
+       "name": "Frijoles negros",
+       "region": "Caraïbes"
+      },
+      {
+       "name": "Arroz e feijão",
+       "region": "Amérique du Sud"
+      },
+      {
+       "name": "Sopa de frijoles",
+       "region": "Mexique et Amérique centrale"
+      },
+      {
+       "name": "Diri ak pwa (riz collé aux haricots)",
+       "region": "Caraïbes"
+      }
+     ],
+     "recipes": [
+      {
+       "title": "Tostadas crujientes de frijol negro con maíz, queso fresco y aguacate",
+       "description": "Tostadas de tortillas de maíz cubiertas con frijoles negros refritos, maíz dulce, queso fresco desmenuzado y una cremosa salsa de aguacate y lima, perfectas para un almuerzo rápido y anti‑gaspi.",
+       "difficulty": "easy",
+       "prep_time": 10,
+       "cook_time": 15,
+       "total_time": 25,
+       "servings": 2,
+       "meal_type": "lunch",
+       "cuisine": "latin",
+       "dietary_tags": [
+        "vegetarian"
+       ],
+       "ingredients_used": [
+        {
+         "name": "Tortillas de maíz",
+         "quantity": "4",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-8"
+        },
+        {
+         "name": "Frijoles negros",
+         "quantity": "1",
+         "unit": "lata",
+         "pantry_id": "es-latino-vegetariano-1"
+        },
+        {
+         "name": "Maíz",
+         "quantity": "1",
+         "unit": "lata",
+         "pantry_id": "es-latino-vegetariano-2"
+        },
+        {
+         "name": "Queso fresco",
+         "quantity": "100",
+         "unit": "g",
+         "pantry_id": "es-latino-vegetariano-7"
+        },
+        {
+         "name": "Aguacates",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-3"
+        },
+        {
+         "name": "Limas",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-10"
+        },
+        {
+         "name": "Cebolla morada",
+         "quantity": "1/2",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-9"
+        },
+        {
+         "name": "aceite vegetal",
+         "quantity": "2",
+         "unit": "cda",
+         "pantry_id": null
+        },
+        {
+         "name": "sal",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        },
+        {
+         "name": "pimienta",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Tortillas de maíz",
+        "Frijoles negros",
+        "Maíz",
+        "Queso fresco",
+        "Aguacates",
+        "Limas",
+        "Cebolla morada"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Calienta una sartén a fuego medio y tuesta las 4 tortillas durante 1‑2 minutos por cada lado, hasta que estén doradas y crujientes; reserva.",
+        "Escurre y enjuaga los frijoles negros de la lata. En la misma sartén, agrega 1 cda de aceite vegetal y cocina los frijoles a fuego medio‑bajo 5 minutos, machacándolos ligeramente con una cuchara de madera; sazona con 1 pizca de sal y 1 pizca de pimienta.",
+        "Escurre el maíz y añádelo a los frijoles, cocina 2 minutos más, mezclando bien.",
+        "Pica finamente la mitad de la cebolla morada (1/2 pieza) y añádela a la mezcla de frijol‑maíz; cocina 1 minuto más para que se suavice.",
+        "En un bol pequeño, machaca el aguacate (1 pieza) con el jugo de 1 lima, una pizca de sal y pimienta hasta obtener una salsa cremosa.",
+        "Para montar, extiende una capa generosa de la mezcla de frijol‑maíz sobre cada tortilla crujiente, espolvorea 50 g de queso fresco desmenuzado, agrega unas cucharadas de salsa de aguacate y termina con tiras finas de la cebolla restante como garnish.",
+        "Sirve inmediatamente, acompañado de gajos de lima extra si lo deseas."
+       ],
+       "tips": [
+        "Usa una prensa de tortillas o una sartén muy caliente para que queden bien crujientes.",
+        "Si el aguacate está muy maduro, añádele un chorrito de agua para aligerar la salsa."
+       ],
+       "image_prompt": "Professional food photography, crispy corn tortillas topped with black bean and corn mixture, crumbled fresh cheese, creamy avocado-lime sauce, bright red onion ribbons, vibrant colors, rustic wooden board, natural light"
+      },
+      {
+       "title": "Arroz frito a la caribeña con huevo estrellado, tomate y aguacate",
+       "description": "Arroz blanco salteado con tomate, cebolla morada y maíz, coronado con un huevo estrellado y servido con rodajas de aguacate y un toque de lima.",
+       "difficulty": "easy",
+       "prep_time": 8,
+       "cook_time": 20,
+       "total_time": 28,
+       "servings": 2,
+       "meal_type": "lunch",
+       "cuisine": "latin",
+       "dietary_tags": [
+        "vegetarian"
+       ],
+       "ingredients_used": [
+        {
+         "name": "Arroz",
+         "quantity": "200",
+         "unit": "g",
+         "pantry_id": "es-latino-vegetariano-5"
+        },
+        {
+         "name": "Tomates",
+         "quantity": "2",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-4"
+        },
+        {
+         "name": "Cebolla morada",
+         "quantity": "1/2",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-9"
+        },
+        {
+         "name": "Maíz",
+         "quantity": "1",
+         "unit": "lata",
+         "pantry_id": "es-latino-vegetariano-2"
+        },
+        {
+         "name": "Huevos",
+         "quantity": "2",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-6"
+        },
+        {
+         "name": "Aguacates",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-3"
+        },
+        {
+         "name": "Limas",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-10"
+        },
+        {
+         "name": "aceite vegetal",
+         "quantity": "3",
+         "unit": "cda",
+         "pantry_id": null
+        },
+        {
+         "name": "sal",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        },
+        {
+         "name": "pimienta",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Arroz",
+        "Tomates",
+        "Cebolla morada",
+        "Maíz",
+        "Huevos",
+        "Aguacates",
+        "Limas"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "En una olla con 400 ml de agua, lleva a ebullición una pizca de sal; agrega el arroz (200 g) y cocina a fuego medio‑bajo 12‑15 minutos, hasta que esté tierno y el agua se haya absorbido. Extiende el arroz en una bandeja para que se enfríe rápidamente; reserva.",
+        "Mientras el arroz se cocina, pica los tomates en cubos pequeños y la cebolla morada en juliana fina.",
+        "Escurre el maíz y reserva.",
+        "Calienta 2 cda de aceite vegetal en una sartén grande a fuego medio. Añade la cebolla y sofríe 3 minutos, hasta que esté translúcida.",
+        "Agrega los tomates y cocina 2 minutos más, hasta que suelten su jugo.",
+        "Incopora el maíz y el arroz frío; remueve bien y saltea 5 minutos, dejando que el arroz se dore ligeramente. Sazona con 1 pizca de sal y 1 pizca de pimienta.",
+        "En otra sartén, calienta 1 cda de aceite a fuego medio‑alto y rompe los 2 huevos, cocinándolos 2‑3 minutos hasta que la clara esté firme y la yema aún líquida (huevo estrellado).",
+        "Sirve el arroz frito en platos, coloca un huevo estrellado encima de cada porción, y adorna con rodajas de aguacate (1 pieza) y un chorrito de jugo de lima (1 pieza).",
+        "Disfruta caliente."
+       ],
+       "tips": [
+        "Para que el arroz quede más suelto, usa arroz del día anterior o refrigéralo unos minutos antes de freír.",
+        "Si prefieres la yema más cocida, tapa la sartén con el huevo durante el último minuto."
+       ],
+       "image_prompt": "Vibrant Caribbean-style fried rice on a white plate, topped with a sunny-side-up egg, sliced avocado, red onion ribbons, bright red tomato cubes, lime wedge, colorful and appetizing, natural daylight"
+      },
+      {
+       "title": "Tamales de maíz y frijol negro al vapor con salsa de aguacate",
+       "description": "Pequeños tamales hechos con masa de maíz, rellenos de puré de frijoles negros y maíz, cocidos al vapor y acompañados de una fresca salsa de aguacate y lima.",
+       "difficulty": "easy",
+       "prep_time": 15,
+       "cook_time": 25,
+       "total_time": 40,
+       "servings": 4,
+       "meal_type": "lunch",
+       "cuisine": "latin",
+       "dietary_tags": [
+        "vegetarian"
+       ],
+       "ingredients_used": [
+        {
+         "name": "Arroz",
+         "quantity": "100",
+         "unit": "g",
+         "pantry_id": "es-latino-vegetariano-5"
+        },
+        {
+         "name": "Frijoles negros",
+         "quantity": "1",
+         "unit": "lata",
+         "pantry_id": "es-latino-vegetariano-1"
+        },
+        {
+         "name": "Maíz",
+         "quantity": "1",
+         "unit": "lata",
+         "pantry_id": "es-latino-vegetariano-2"
+        },
+        {
+         "name": "Aguacates",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-3"
+        },
+        {
+         "name": "Limas",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-10"
+        },
+        {
+         "name": "Cebolla morada",
+         "quantity": "1/4",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-9"
+        },
+        {
+         "name": "aceite vegetal",
+         "quantity": "2",
+         "unit": "cda",
+         "pantry_id": null
+        },
+        {
+         "name": "sal",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        },
+        {
+         "name": "pimienta",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        },
+        {
+         "name": "hojas de maíz para envolver",
+         "quantity": "4",
+         "unit": "pieza",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Arroz",
+        "Frijoles negros",
+        "Maíz",
+        "Aguacates",
+        "Limas",
+        "Cebolla morada"
+       ],
+       "missing_ingredients": [
+        "hojas de maíz para envolver"
+       ],
+       "instructions": [
+        "Enjuaga el arroz (100 g) y cocínalo en 200 ml de agua a fuego medio‑bajo 12 minutos, hasta que esté muy suave; reserva.",
+        "Escurre los frijoles negros y el maíz, reserva el líquido de los frijoles.",
+        "En una licuadora o procesador, combina los frijoles, el maíz, 2 cda de aceite, la mitad de la cebolla morada picada (1/8 pieza) y 1 pizca de sal; procesa hasta obtener un puré grueso.",
+        "Mezcla el puré de frijol‑maíz con el arroz cocido hasta formar una masa homogénea. Ajusta con una pizca de pimienta si lo deseas.",
+        "Corta las hojas de maíz en rectángulos de 12 cm, pásalas rápidamente por agua caliente para que se flexibilicen.",
+        "Con una cucharita, coloca 2‑3 cucharadas de masa en el centro de cada hoja, forma un pequeño paquete y dóblalo cerrando los extremos; asegura con un palillo de madera si es necesario.",
+        "Llena una vaporera con agua, lleva a ebullición y coloca los tamales dentro. Cocina al vapor 20‑22 minutos, hasta que la masa se sienta firme al tacto.",
+        "Mientras se cocinan los tamales, prepara la salsa de aguacate: machaca el aguacate (1 pieza) con el jugo de 1 lima, una pizca de sal y la cebolla morada restante picada finamente; mezcla hasta obtener una salsa cremosa.",
+        "Sirve los tamales calientes acompañados de la salsa de aguacate y, si gustas, unas rodajas de lima extra."
+       ],
+       "tips": [
+        "Si no tienes hojas de maíz, puedes usar papel encerado para envolver los tamales.",
+        "No sobrecocines los tamales; la masa debe mantenerse suave y no resecarse."
+       ],
+       "image_prompt": "Steamed corn tamales on a rustic plate, topped with a bright green avocado-lime sauce, steam rising, vibrant colors, traditional Latin American presentation, natural light"
+      }
+     ],
+     "safety": {
+      "checked": true,
+      "first": [],
+      "corrected": [],
+      "dropped": []
+     },
+     "attempts": [
+      {
+       "provider": "groq",
+       "started_at_ms": 3,
+       "ms": 7542,
+       "ok": true,
+       "usage": {
+        "queue_time": 0.208564581,
+        "prompt_tokens": 2854,
+        "prompt_time": 0.121522791,
+        "completion_tokens": 3436,
+        "completion_time": 7.168203423,
+        "total_tokens": 6290,
+        "total_time": 7.289726214,
+        "completion_tokens_details": {
+         "reasoning_tokens": 259
+        },
+        "rate_limits": {
+         "requests_per_day": "500000",
+         "remaining_requests": "184318",
+         "tokens_per_minute": "250000",
+         "remaining_tokens": "243935"
+        }
+       }
+      }
+     ]
+    },
+    {
+     "examples": [
+      {
+       "name": "Tarta de verdura (pascualina)",
+       "region": "Amérique du Sud"
+      },
+      {
+       "name": "Chilaquiles",
+       "region": "Mexique et Amérique centrale"
+      },
+      {
+       "name": "Tostones",
+       "region": "Caraïbes"
+      },
+      {
+       "name": "Menestra",
+       "region": "Amérique du Sud"
+      },
+      {
+       "name": "Chiles rellenos",
+       "region": "Mexique et Amérique centrale"
+      }
+     ],
+     "recipes": [
+      {
+       "title": "Huevos Rancheros con Salsa de Aguacate",
+       "description": "Clásico plato mexicano de huevos estrellados sobre tortillas crujientes, bañados con una salsa fresca de tomate y aguacate, perfecto para un almuerzo rápido y nutritivo.",
+       "difficulty": "easy",
+       "prep_time": 10,
+       "cook_time": 15,
+       "total_time": 25,
+       "servings": 2,
+       "meal_type": "lunch",
+       "cuisine": "latin",
+       "dietary_tags": [
+        "vegetarian"
+       ],
+       "ingredients_used": [
+        {
+         "name": "Tortillas de maíz",
+         "quantity": "4",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-8"
+        },
+        {
+         "name": "Huevos",
+         "quantity": "4",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-6"
+        },
+        {
+         "name": "Tomates",
+         "quantity": "2",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-4"
+        },
+        {
+         "name": "Aguacates",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-3"
+        },
+        {
+         "name": "Cebolla morada",
+         "quantity": "1/2",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-9"
+        },
+        {
+         "name": "Limas",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-10"
+        },
+        {
+         "name": "aceite vegetal",
+         "quantity": "2",
+         "unit": "cda",
+         "pantry_id": null
+        },
+        {
+         "name": "sal",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        },
+        {
+         "name": "pimienta",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Tortillas de maíz",
+        "Huevos",
+        "Tomates",
+        "Aguacates",
+        "Cebolla morada",
+        "Limas"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Calienta una sartén a fuego medio y añade 1 cda de aceite vegetal.",
+        "Fríe las 4 tortillas de maíz 2 minutos por cada lado, hasta que estén crujientes y ligeramente doradas; retira y reserva sobre papel absorbente.",
+        "En la misma sartén, agrega otra 1 cda de aceite y cocina los 4 huevos estrellados 3 minutos a fuego medio, hasta que la clara esté firme y la yema aún líquida; sazona con 1 pizca de sal y pimienta.",
+        "Mientras se cocinan los huevos, corta los 2 tomates en cubos pequeños y pica finamente 1/2 cebolla morada.",
+        "En un bol, machaca el aguacate con el jugo de 1 lima, añade los tomates, la cebolla y 1 pizca de sal; mezcla hasta obtener una salsa rústica.",
+        "Sirve cada tortilla con un huevo estrellado encima y cubre con la salsa de aguacate.",
+        "Decora con una rodaja de lima y sirve inmediatamente."
+       ],
+       "tips": [
+        "Para una tortilla aún más crujiente, fríela dos veces: primero 30 segundos, escúrrela y luego vuelve a freír hasta dorar.",
+        "Si prefieres la yema más cocida, tapa la sartén durante los últimos 2 minutos de cocción del huevo."
+       ],
+       "image_prompt": "Professional food photography, sunny kitchen, two corn tortillas topped with sunny-side-up eggs, vibrant avocado-tomato salsa, lime wedge, rustic wooden plate, natural light"
+      },
+      {
+       "title": "Pastel Salado de Maíz y Queso Fresco",
+       "description": "Tortilla gruesa y esponjosa de maíz con queso fresco fundido, aromatizada con cebolla y lima, ideal para servir como plato principal o acompañamiento.",
+       "difficulty": "easy",
+       "prep_time": 10,
+       "cook_time": 20,
+       "total_time": 30,
+       "servings": 3,
+       "meal_type": "lunch",
+       "cuisine": "latin",
+       "dietary_tags": [
+        "vegetarian"
+       ],
+       "ingredients_used": [
+        {
+         "name": "Maíz",
+         "quantity": "1",
+         "unit": "lata",
+         "pantry_id": "es-latino-vegetariano-2"
+        },
+        {
+         "name": "Queso fresco",
+         "quantity": "150",
+         "unit": "g",
+         "pantry_id": "es-latino-vegetariano-7"
+        },
+        {
+         "name": "Huevos",
+         "quantity": "2",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-6"
+        },
+        {
+         "name": "Cebolla morada",
+         "quantity": "1/4",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-9"
+        },
+        {
+         "name": "Aguacates",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-3"
+        },
+        {
+         "name": "Limas",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-10"
+        },
+        {
+         "name": "aceite de oliva",
+         "quantity": "2",
+         "unit": "cda",
+         "pantry_id": null
+        },
+        {
+         "name": "sal",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        },
+        {
+         "name": "pimienta",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Maíz",
+        "Queso fresco",
+        "Huevos",
+        "Cebolla morada",
+        "Aguacates",
+        "Limas"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Precalienta el horno a 190°C.",
+        "Escurre el maíz enlatado y enjuágalo bajo agua fría; reserva.",
+        "Pica finamente la cebolla morada y sofríela en 1 cda de aceite de oliva a fuego medio durante 3 minutos, hasta que esté translúcida.",
+        "En un bol grande, bate los 2 huevos, añade el maíz escurrido, la cebolla sofrita, el queso fresco desmenuzado, 1 pizca de sal y pimienta; mezcla bien.",
+        "Vierte la mezcla en un molde para hornear de 20 cm, previamente engrasado con 1 cda de aceite de oliva.",
+        "Hornea 15‑18 minutos, hasta que la superficie esté dorada y al insertar un palillo este salga limpio.",
+        "Mientras el pastel se hornea, corta el aguacate en cubos y exprime el jugo de 1 lima; mezcla suavemente para crear un guacamole rápido.",
+        "Sirve el pastel tibio acompañado del guacamole de aguacate y una rodaja de lima."
+       ],
+       "tips": [
+        "Puedes agregar una cucharada de harina de maíz (masa harina) para una textura más firme si lo deseas.",
+        "Para un toque picante, incorpora una pizca de chile en polvo a la masa antes de hornear."
+       ],
+       "image_prompt": "High‑resolution food photography, golden corn and cheese cake slice on a rustic plate, topped with creamy avocado cubes, lime wedge, bright kitchen background"
+      },
+      {
+       "title": "Sopa Reconfortante de Frijoles Negros con Lima",
+       "description": "Sopa cremosa de frijoles negros con huevo pochado, coronada con rodajas de aguacate y un toque de lima, ideal para reconfortar en cualquier día.",
+       "difficulty": "easy",
+       "prep_time": 10,
+       "cook_time": 20,
+       "total_time": 30,
+       "servings": 2,
+       "meal_type": "lunch",
+       "cuisine": "latin",
+       "dietary_tags": [
+        "vegetarian"
+       ],
+       "ingredients_used": [
+        {
+         "name": "Frijoles negros",
+         "quantity": "1",
+         "unit": "lata",
+         "pantry_id": "es-latino-vegetariano-1"
+        },
+        {
+         "name": "Tomates",
+         "quantity": "2",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-4"
+        },
+        {
+         "name": "Cebolla morada",
+         "quantity": "1/2",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-9"
+        },
+        {
+         "name": "Aguacates",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-3"
+        },
+        {
+         "name": "Huevos",
+         "quantity": "2",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-6"
+        },
+        {
+         "name": "Limas",
+         "quantity": "1",
+         "unit": "pieza",
+         "pantry_id": "es-latino-vegetariano-10"
+        },
+        {
+         "name": "aceite vegetal",
+         "quantity": "2",
+         "unit": "cda",
+         "pantry_id": null
+        },
+        {
+         "name": "sal",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        },
+        {
+         "name": "pimienta",
+         "quantity": "1",
+         "unit": "pizca",
+         "pantry_id": null
+        }
+       ],
+       "ingredients_from_list": [
+        "Frijoles negros",
+        "Tomates",
+        "Cebolla morada",
+        "Aguacates",
+        "Huevos",
+        "Limas"
+       ],
+       "missing_ingredients": [],
+       "instructions": [
+        "Escurre y enjuaga los frijoles negros enlatados; reserva el líquido para ajustar la consistencia si es necesario.",
+        "Pica finamente la cebolla morada y los tomates en cubos pequeños.",
+        "Calienta 2 cda de aceite vegetal en una olla a fuego medio y sofríe la cebolla 3 minutos, hasta que esté transparente.",
+        "Agrega los tomates picados y cocina 4 minutos más, hasta que suelten su jugo.",
+        "Incorpora los frijoles negros y 400 ml de agua (aprox. 2 tazas); lleva a ebullición, luego reduce a fuego medio‑bajo y cocina 10 minutos, removiendo ocasionalmente. Si la sopa queda muy espesa, añade un poco del líquido reservado de los frijoles.",
+        "Mientras la sopa hierve, pocha los 2 huevos: lleva a ebullición una olla pequeña con agua, reduce a fuego bajo, crea un remolino y desliza cada huevo delicadamente; cocina 3 minutos, la clara debe quedar firme y la yema ligeramente líquida.",
+        "Retira la olla del fuego, sazona la sopa con 1 pizca de sal, pimienta y el jugo de 1/2 lima; mezcla bien.",
+        "Sirve la sopa caliente, coloca un huevo pochado encima de cada plato, agrega cubos de aguacate y decora con una rodaja fina de lima."
+       ],
+       "tips": [
+        "Para una textura más cremosa, tritura una cuarta parte de los frijoles antes de añadir el agua.",
+        "Si deseas más picante, incorpora una pizca de chile seco triturado al sofrito."
+       ],
+       "image_prompt": "Warm bowl of black bean soup with a poached egg on top, avocado cubes, lime slice, rustic wooden table, soft natural lighting"
+      }
+     ],
+     "safety": {
+      "checked": true,
+      "first": [],
+      "corrected": [],
+      "dropped": []
+     },
+     "attempts": [
+      {
+       "provider": "groq",
+       "started_at_ms": 3,
+       "ms": 8072,
+       "ok": true,
+       "usage": {
+        "queue_time": 0.286201193,
+        "prompt_tokens": 2883,
+        "prompt_time": 0.874186664,
+        "completion_tokens": 2876,
+        "completion_time": 6.870572278,
+        "total_tokens": 5759,
+        "total_time": 7.744758942,
+        "prompt_tokens_details": {
+         "cached_tokens": 256
+        },
+        "completion_tokens_details": {
+         "reasoning_tokens": 148
+        },
+        "rate_limits": {
+         "requests_per_day": "500000",
+         "remaining_requests": "184379",
+         "tokens_per_minute": "250000",
+         "remaining_tokens": "243783"
+        }
+       }
+      }
+     ]
+    }
+   ],
+   "judge": {
+    "comment": "On observe une forte redondance dans les propositions, avec une rotation constante autour des mêmes ingrédients de base comme les haricots noirs, le maïs et l'avocat. Malgré quelques tentatives d'innovation, l'application peine à diversifier les techniques culinaires, se limitant à des variations mineures de plats mexicains et caribéens classiques.",
+    "recipes": [
+     {
+      "generation": 0,
+      "index": 0,
+      "group": 1,
+      "library_dish": "Tostadas",
+      "relation": "variant"
+     },
+     {
+      "generation": 0,
+      "index": 1,
+      "group": 2,
+      "library_dish": "Arroz e feijão",
+      "relation": "variant"
+     },
+     {
+      "generation": 0,
+      "index": 2,
+      "group": 3,
+      "library_dish": "",
+      "relation": "new"
+     },
+     {
+      "generation": 1,
+      "index": 0,
+      "group": 4,
+      "library_dish": "Sopa de frijoles",
+      "relation": "copy"
+     },
+     {
+      "generation": 1,
+      "index": 1,
+      "group": 1,
+      "library_dish": "Quesadillas",
+      "relation": "copy"
+     },
+     {
+      "generation": 1,
+      "index": 2,
+      "group": 2,
+      "library_dish": "Arroz e feijão",
+      "relation": "variant"
+     },
+     {
+      "generation": 2,
+      "index": 0,
+      "group": 1,
+      "library_dish": "Tostadas",
+      "relation": "copy"
+     },
+     {
+      "generation": 2,
+      "index": 1,
+      "group": 2,
+      "library_dish": "Arroz e feijão",
+      "relation": "variant"
+     },
+     {
+      "generation": 2,
+      "index": 2,
+      "group": 5,
+      "library_dish": "Tamales",
+      "relation": "variant"
+     },
+     {
+      "generation": 3,
+      "index": 0,
+      "group": 1,
+      "library_dish": "Huevos rancheros",
+      "relation": "copy"
+     },
+     {
+      "generation": 3,
+      "index": 1,
+      "group": 6,
+      "library_dish": "",
+      "relation": "new"
+     },
+     {
+      "generation": 3,
+      "index": 2,
+      "group": 4,
+      "library_dish": "Sopa de frijoles",
+      "relation": "copy"
+     }
+    ]
+   },
+   "metrics": {
+    "recipes": 12,
+    "distinct_dishes": 6,
+    "copies": 5,
+    "variants": 5,
+    "new": 2,
+    "repeated_titles": 0,
+    "library_names_in_titles": 7,
+    "examples_in_titles": 0
+   }
+  }
+ ]
+}

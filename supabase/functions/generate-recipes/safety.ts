@@ -147,7 +147,9 @@ const COOLING = ['refroidi', 'refroidir', 'tiedir', 'froid', 'cool', 'chill', 'c
 const FAST_COOLING = ['etal', 'rapidement', 'vite', 'refrigerateur', 'frigo', 'au frais', 'spread', 'quick', 'fridge', 'refrigerat', 'extiend', 'extend', 'rapid', 'nevera', 'refriger', 'heladera', 'chill'];
 
 // Cuisson à cœur : seuils reconnus (°C) et signes visibles
-const SIGNS_MEAT = ['jus clair', 'jus soit clair', 'jus qui s ecoule', 'plus rose', 'plus de rose', 'aucune trace rose', 'sans trace rose', 'ne soit plus ros', 'plus rosee', 'se detache de l os', 'se detache', 'ferme au toucher', 'tendre', 'fondant', 'effiloch',
+// Porté à ébullition : eau ou bouillon qui cuit ensuite un féculent ajouté (soupe de nouilles)
+const BOILING = ['ebullition', 'bouillir', 'bouillant', 'boil', 'hervir', 'hierva', 'hierve', 'hirviendo', 'ebullicion'];
+const SIGNS_MEAT = ['jus clair', 'trace rose', 'perde sa couleur rose', 'no pink remains', 'no trace of pink', 'lost its pink', 'pierda el color ros', 'pierde el color ros', 'perder el color ros', 'sin zonas ros', 'sin rosado', 'jus soit clair', 'jus qui s ecoule', 'plus rose', 'plus de rose', 'aucune trace rose', 'sans trace rose', 'ne soit plus ros', 'plus rosee', 'se detache de l os', 'se detache', 'ferme au toucher', 'tendre', 'fondant', 'effiloch',
   'clear juice', 'juices run clear', 'no longer pink', 'no pink', 'not pink', 'falls off the bone', 'pulls away from the bone', 'firm to the touch', 'tender', 'shred',
   'jugos claros', 'jugo claro', 'ya no este ros', 'ya no ros', 'sin rastro ros', 'sin partes rosad', 'ningun rastro ros', 'no quede ros', 'se desprend', 'se deshac', 'tierna', 'tierno', 'firme al tacto', 'deshebr', 'desmenu'];
 const SIGNS_FISH = ['opaque', 'se detache', 's effeuille', 'lamelle', 'a la fourchette', 'flake', 'with a fork', 'opaco', 'opaca', 'se desmenu', 'se deshac', 'se despeg', 'lamina', 'lasca', 'se separa', 'con un tenedor'];
@@ -231,7 +233,9 @@ export function safetyIssues(recipe: SafetyRecipe, pantry: SafetyPantryItem[]): 
     // Féculents crus : cuits dans un liquide dans les étapes (liquide dans l'étape, ou porté à ébullition juste avant)
     if (isStarch(name) && !cooked) {
       const inLiquid = steps.some((step, i) => mentions(step, name)
-        && (hasKeyword(step, LIQUID) || (hasKeyword(step, HEAT) && steps.slice(Math.max(0, i - 2), i).some((before) => hasKeyword(before, LIQUID)))));
+        && (hasKeyword(step, LIQUID) || (hasKeyword(step, HEAT) && (steps.slice(Math.max(0, i - 2), i).some((before) => hasKeyword(before, LIQUID))
+          // Eau ou bouillon porté à ébullition plus tôt (soupe) : les nouilles cuisent dedans
+          || steps.slice(0, i).some((before) => hasKeyword(before, BOILING))))));
       if (!inLiquid) {
         add('starch_not_cooked', name, `« ${name} » est cru : une étape doit le cuire (eau ou bouillon, durée et repère), avant de l'utiliser.`);
       }
@@ -240,7 +244,9 @@ export function safetyIssues(recipe: SafetyRecipe, pantry: SafetyPantryItem[]): 
 
     // Tubercules : cuits
     if (hasKeyword(name, TUBERS) && !cooked) {
-      if (!about.some((step) => hasKeyword(step, HEAT))) add('not_cooked', name, `« ${name} » est cru : une étape doit le cuire (durée et repère, ex. tendre à la pointe du couteau).`);
+      // Cuit dans une étape qui en parle ou plus loin (plantain râpé dans des galettes, puis frites)
+      const from = steps.findIndex((step) => mentions(step, name));
+      if (!(from >= 0 && steps.slice(from).some((step) => hasKeyword(step, HEAT)))) add('not_cooked', name, `« ${name} » est cru : une étape doit le cuire (durée et repère, ex. tendre à la pointe du couteau).`);
       continue;
     }
 
