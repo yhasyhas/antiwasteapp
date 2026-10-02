@@ -140,7 +140,7 @@ const SOAK = ['tremp', 'soak', 'remoj'];
 const PRESSURE = ['autocuiseur', 'cocotte minute', 'pressure cooker', 'instant pot', 'olla expres', 'olla a presion', 'olla de presion'];
 
 // Restes : réchauffés jusqu'à être fumants à cœur
-const REHEAT = ['fumant', 'brulant', 'a coeur', 'au coeur', 'jusqu au centre', 'au centre', 'steaming', 'piping hot', 'heated through', 'hot throughout', 'hot all the way', 'all the way through', 'through to the center', 'through to the centre',
+const REHEAT = ['fumant', 'temperature interne', 'internal temperature', 'temperatura interna', 'brulant', 'a coeur', 'au coeur', 'jusqu au centre', 'au centre', 'steaming', 'piping hot', 'heated through', 'hot throughout', 'hot all the way', 'all the way through', 'through to the center', 'through to the centre',
   'humeante', 'muy caliente', 'caliente por completo', 'completamente caliente', 'hasta el centro', 'en el centro', 'por dentro'];
 const COOKED_RICE = ['riz cuit', 'reste de riz', 'riz de la veille', 'cooked rice', 'leftover rice', 'day old rice', 'arroz cocido', 'arroz sobrante', 'sobras de arroz', 'arroz del dia anterior'];
 const COOLING = ['refroidi', 'refroidir', 'tiedir', 'froid', 'cool', 'chill', 'cold', 'enfri', 'frio', 'fria', 'templad'];

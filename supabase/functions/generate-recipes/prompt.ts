@@ -150,8 +150,13 @@ export function buildPrompts(options: {
   const examplesHint = (options.examplesHint || v5) && examples.length > 0
     ? "\n- D'une génération à l'autre, l'utilisateur doit découvrir des plats différents : appuie chaque recette sur un exemple différent (sa technique, ses associations de saveurs), adapté au garde-manger, sans le recopier."
     : '';
+  // v4.1 : le recul relevé en Asie du Sud-Est et au Maghreb venait de noms de plats repris sans leurs ingrédients
+  // essentiels (« Tom yum » sans galanga, « curry » sans pâte de curry) et d'associations étrangères à la cuisine
+  const namingRule = v41
+    ? "- Un nom de plat connu (tom yum, curry, baghrir, mafé…) seulement si la recette en a les ingrédients et la technique essentiels ; au besoin, ajoute 1 ou 2 aromates indispensables à acheter plutôt que de dénaturer le plat. Sinon, un titre qui décrit la recette (« Soupe aigre-piquante de crevettes à la citronnelle »).\n- Aucune association de saveurs étrangère à cette cuisine (pas de miel sur une omelette salée)."
+    : "- Le titre ne reprend le nom d'un plat que si la recette en a les ingrédients clés (pas de « mafé » sans arachide) ; sinon, un titre qui décrit la recette.";
   const inspiration = `- N'emprunte pas un plat d'une autre cuisine.
-- Le titre ne reprend le nom d'un plat que si la recette en a les ingrédients clés (pas de « mafé » sans arachide) ; sinon, un titre qui décrit la recette.${examples.length > 0 ? `
+${namingRule}${examples.length > 0 ? `
 - Quelques plats de cette cuisine, tirés au hasard, pour l'inspiration seulement : ne les recopie pas et ne t'y limite pas.
 ${examples.map(dishLine).join('\n')}${examplesHint}` : ''}`;
   const cuisineRule = choice
@@ -168,7 +173,7 @@ ${inspiration}`
       ? `Cuisine demandée : ${CUISINE_NAMES[options.cuisine]}.
 - Inspire-toi de l'esprit de cette cuisine (ingrédients, épices, techniques, associations) pour créer des recettes adaptées au garde-manger : un plat traditionnel adapté, une variante ou une création anti-gaspi, que quelqu'un qui cuisine cette cuisine au quotidien reconnaîtrait. Varie les pays et les régions.
 - N'emprunte pas un plat d'une autre cuisine.
-- Le titre ne reprend le nom d'un plat que si la recette en a les ingrédients clés (pas de « mafé » sans arachide) ; sinon, un titre qui décrit la recette.${examples.length > 0 ? `
+${namingRule}${examples.length > 0 ? `
 - Quelques plats de cette cuisine, tirés au hasard, pour l'inspiration seulement : ne les recopie pas et ne t'y limite pas.
 ${examples.map(dishLine).join('\n')}${examplesHint}` : `
 - Repères : ${CUISINE_DISHES[options.cuisine]}.`}`

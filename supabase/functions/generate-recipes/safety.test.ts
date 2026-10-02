@@ -77,6 +77,7 @@ Deno.test('safetyIssues : restes réchauffés à cœur, riz cuit refroidi vite',
   assertEquals(codes(recipe([['Tajine de poulet', 'tajine']], ['Réchauffe le tajine 5 minutes à la poêle.'])), ['leftover_reheat']);
   assertEquals(codes(recipe([['Tajine de poulet', 'tajine']], ['Réchauffe le tajine 5 minutes à la poêle, jusqu\'à ce qu\'il soit fumant à cœur.'])), []);
   assertEquals(codes(recipe([['Riz cuit', null]], ['Fais sauter le riz cuit 4 minutes.'])), ['leftover_reheat']);
+  assertEquals(codes(recipe([['Tajine de poulet', 'tajine']], ['Réchauffe le tajine 3 minutes, jusqu’à une température interne de 74 °C.'])), []);
   assertEquals(codes(recipe([['Riz', 'rice']], ['Cuis le riz 12 minutes dans 400 ml d\'eau.', 'Laisse refroidir le riz à température ambiante.'])), ['rice_cooling']);
   assertEquals(codes(recipe([['Riz', 'rice']], ['Rince le riz à l\'eau froide puis cuis-le 12 minutes dans 400 ml d\'eau.', 'Étale le riz sur une plaque pour le refroidir vite, puis mets-le au réfrigérateur.'])), []);
 });

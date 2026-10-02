@@ -1,0 +1,1684 @@
+{
+ "summary": {
+  "version": "v4.1",
+  "date": "2026-10-02T14:07:46.424Z",
+  "model": "openai/gpt-oss-120b",
+  "judge_model": "gemini-3.1-flash-lite",
+  "cases": 3,
+  "failed_cases": 0,
+  "recipes": 9,
+  "judge": {
+   "quantities": 4.444444444444445,
+   "cooking_cues": 4.888888888888889,
+   "order": 5,
+   "ingredients_used": 4.777777777777778,
+   "authenticity": 3.4444444444444446,
+   "safety": 5,
+   "diet": 5
+  },
+  "diversity_judge": 4,
+  "auto": {
+   "ingredients_in_steps": 0.9592592592592593,
+   "quantities_in_steps": 0.7222222222222222,
+   "timed_cooking": 0.6716931216931217,
+   "oven_temperature": 0.8888888888888888,
+   "reheat_cue": 1,
+   "uses_urgent": 0.7777777777777778,
+   "rules_respected": 1,
+   "units_language": 1,
+   "safety_rules": 1,
+   "no_heat_without_cooking": 1,
+   "no_celsius_without_meat": 1,
+   "diversity": 0.6770411868451083
+  },
+  "rejected_first": 0,
+  "median_ms": 5456,
+  "judge_mean": 4.650793650793651
+ },
+ "results": [
+  {
+   "id": "fr-r-afrique-ouest",
+   "note": "Région Afrique de l'Ouest, dîner, poisson à utiliser vite",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 5456,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [],
+    "corrected": [],
+    "dropped": []
+   },
+   "examples": [
+    {
+     "name": "Okra soup",
+     "region": "Afrique de l'Ouest"
+    },
+    {
+     "name": "Kenkey avec poisson frit",
+     "region": "Afrique de l'Ouest"
+    },
+    {
+     "name": "Djouka (fonio aux arachides)",
+     "region": "Afrique de l'Ouest"
+    },
+    {
+     "name": "Suya",
+     "region": "Afrique de l'Ouest"
+    },
+    {
+     "name": "Amiwo (pâte rouge)",
+     "region": "Afrique de l'Ouest"
+    }
+   ],
+   "diversity_auto": 0.718954248366013,
+   "diversity_judge": 4,
+   "diversity_comment": "Les recettes proposent des textures variées (braisé, frit, riz pilaf) et utilisent les ingrédients du garde-manger de manières distinctes, bien que l'authenticité des saveurs puisse être renforcée.",
+   "judge_model": "gemini-3.1-flash-lite",
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [],
+     "corrected": [],
+     "dropped": []
+    },
+    "examples": [
+     {
+      "name": "Okra soup",
+      "region": "Afrique de l'Ouest"
+     },
+     {
+      "name": "Kenkey avec poisson frit",
+      "region": "Afrique de l'Ouest"
+     },
+     {
+      "name": "Djouka (fonio aux arachides)",
+      "region": "Afrique de l'Ouest"
+     },
+     {
+      "name": "Suya",
+      "region": "Afrique de l'Ouest"
+     },
+     {
+      "name": "Amiwo (pâte rouge)",
+      "region": "Afrique de l'Ouest"
+     }
+    ],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "fr-r-afrique-ouest-1",
+      "name": "Filets de thiof",
+      "quantity": "600 g",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "fr-r-afrique-ouest-2",
+      "name": "Riz brisé",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "fr-r-afrique-ouest-3",
+      "name": "Oignons",
+      "quantity": "4",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "fr-r-afrique-ouest-4",
+      "name": "Tomates",
+      "quantity": "3",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "fr-r-afrique-ouest-5",
+      "name": "Concentré de tomate",
+      "quantity": "1 boîte",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "fr-r-afrique-ouest-6",
+      "name": "Chou",
+      "quantity": "1/2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "fr-r-afrique-ouest-7",
+      "name": "Manioc",
+      "quantity": "1",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p8",
+      "id": "fr-r-afrique-ouest-8",
+      "name": "Piment",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 5456,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 2,
+      "ms": 5443,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.21323295,
+       "prompt_tokens": 2520,
+       "prompt_time": 0.119720295,
+       "completion_tokens": 2401,
+       "completion_time": 5.063081866,
+       "total_tokens": 4921,
+       "total_time": 5.182802161,
+       "completion_tokens_details": {
+        "reasoning_tokens": 89
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "297432",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "245119"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Thiof braisé à la sauce tomate épicée et riz brisé",
+     "recipe": {
+      "title": "Thiof braisé à la sauce tomate épicée et riz brisé",
+      "description": "Filets de thiof (tilapia) cuits à la vapeur puis braisés dans une sauce tomate relevée, servis sur un lit de riz brisé parfumé.",
+      "difficulty": "medium",
+      "prep_time": 10,
+      "cook_time": 30,
+      "total_time": 40,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "afrique-ouest",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "Filets de thiof",
+        "quantity": "600",
+        "unit": "g",
+        "pantry_id": "fr-r-afrique-ouest-1"
+       },
+       {
+        "name": "Riz brisé",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "fr-r-afrique-ouest-2"
+       },
+       {
+        "name": "Oignons",
+        "quantity": "2",
+        "unit": "pièce",
+        "pantry_id": "fr-r-afrique-ouest-3"
+       },
+       {
+        "name": "Tomates",
+        "quantity": "2",
+        "unit": "pièce",
+        "pantry_id": "fr-r-afrique-ouest-4"
+       },
+       {
+        "name": "Concentré de tomate",
+        "quantity": "1",
+        "unit": "c. à soupe",
+        "pantry_id": "fr-r-afrique-ouest-5"
+       },
+       {
+        "name": "Piment",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-r-afrique-ouest-8"
+       },
+       {
+        "name": "Huile d'arachide",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "Sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "Poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Filets de thiof",
+       "Riz brisé",
+       "Oignons",
+       "Tomates",
+       "Concentré de tomate",
+       "Piment"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Rince le riz brisé à l'eau froide, puis fais-le cuire dans 600 ml d'eau à feu moyen pendant 12 minutes, jusqu'à absorption complète et grains tendres.",
+       "Émince les 2 oignons et hache les 2 tomates.",
+       "Dans une grande poêle, chauffe 2 c. à soupe d'huile d'arachide à feu moyen, ajoute les oignons et fais-les dorer 4 minutes, jusqu'à ce qu'ils soient translucides.",
+       "Ajoute les tomates hachées et le concentré de tomate, puis le piment finement coupé. Fais revenir 5 minutes, jusqu'à ce que le mélange épaississe et que les tomates se désagrègent.",
+       "Assaisonne avec 1 pincée de sel et de poivre.",
+       "Place les filets de thiof sur la sauce, couvre et laisse mijoter à feu doux 12 minutes, jusqu'à ce que le poisson atteigne 63 °C (chair opaque qui se détache).",
+       "Dispose le riz brisé cuit dans les assiettes, nappe de sauce et de poisson.",
+       "Serre immédiatement, bien chaud."
+      ],
+      "tips": [
+       "Pour plus de parfum, ajoute une feuille de laurier ou un petit morceau de gingembre en même temps que les oignons.",
+       "Si le sauce devient trop épaisse, ajoute un peu d'eau chaude."
+      ],
+      "image_prompt": "Professional food photography, grilled tilapia fillets in a rich red tomato sauce, steaming white broken rice, West African spices, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.75,
+      "timed_cooking": 0.8,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 3,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 4,
+      "authenticity": 2,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "L'étape 6 ne précise pas la quantité de poisson utilisée (600 g).",
+      "Le thiof n'est absolument pas du tilapia, c'est une erreur grave pour une recette d'Afrique de l'Ouest.",
+      "La recette manque de profondeur aromatique pour un plat traditionnel."
+     ],
+     "strengths": [
+      "Les temps de cuisson sont précis et cohérents.",
+      "La gestion de la température interne du poisson est un excellent point de sécurité."
+     ]
+    },
+    {
+     "title": "Manioc frit à la sauce pimentée et chou sauté",
+     "recipe": {
+      "title": "Manioc frit à la sauce pimentée et chou sauté",
+      "description": "Manioc coupé en bâtonnets, frit jusqu'à dorure, accompagné d'un sauté de chou légèrement acidulé et relevé de piment.",
+      "difficulty": "medium",
+      "prep_time": 15,
+      "cook_time": 30,
+      "total_time": 45,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "afrique-ouest",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "Manioc",
+        "quantity": "600",
+        "unit": "g",
+        "pantry_id": "fr-r-afrique-ouest-7"
+       },
+       {
+        "name": "Chou",
+        "quantity": "1/2",
+        "unit": "pièce",
+        "pantry_id": "fr-r-afrique-ouest-6"
+       },
+       {
+        "name": "Oignons",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-r-afrique-ouest-3"
+       },
+       {
+        "name": "Piment",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-r-afrique-ouest-8"
+       },
+       {
+        "name": "Huile d'arachide",
+        "quantity": "4",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "Sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "Poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Manioc",
+       "Chou",
+       "Oignons",
+       "Piment"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Épluche le manioc, coupe-le en bâtonnets d'environ 1 cm d'épaisseur.",
+       "Rince les bâtonnets à l'eau froide, puis sèche-les soigneusement avec un torchon propre.",
+       "Fais chauffer 4 c. à soupe d'huile d'arachide dans une friteuse ou une grande poêle à feu moyen‑vif.",
+       "Plonge les bâtonnets de manioc dans l'huile chaude et fais frire 8 minutes, jusqu'à ce qu'ils soient dorés et croustillants. Égoutte sur du papier absorbant.",
+       "Pendant ce temps, émince le chou finement et l'oignon en lamelles.",
+       "Dans une autre poêle, chauffe 1 c. à soupe d'huile d'arachide à feu moyen, ajoute l'oignon et fais-le suer 3 minutes, jusqu'à ce qu'il devienne translucide.",
+       "Ajoute le chou, le piment finement haché, sale et poivre. Fais sauter 6 minutes, en remuant, jusqu'à ce que le chou soit tendre mais encore légèrement croquant.",
+       "Serre le manioc frit avec le chou sauté, en disposant les deux composantes côte à côte sur l'assiette."
+      ],
+      "tips": [
+       "Pour éviter que le manioc ne devienne trop mou, assure-toi qu'il soit bien sec avant la friture.",
+       "Le piment peut être ajusté selon le goût : retire les graines pour une chaleur plus douce."
+      ],
+      "image_prompt": "Professional food photography, golden fried cassava sticks with sautéed cabbage, bright red chili sauce, West African street food style, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0,
+      "timed_cooking": 0.6,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 0,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 4,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 3,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "L'étape 1 ne précise pas la quantité de manioc (600 g).",
+      "Le manioc frit seul avec du chou est un accompagnement, pas un dîner complet et équilibré."
+     ],
+     "strengths": [
+      "La technique de friture est bien expliquée avec des repères visuels.",
+      "Le respect des étapes de préparation du manioc est rigoureux."
+     ]
+    },
+    {
+     "title": "Riz brisé aux légumes et bouillon de thiof",
+     "recipe": {
+      "title": "Riz brisé aux légumes et bouillon de thiof",
+      "description": "Riz brisé parfumé aux oignons, tomates et chou, cuit dans un bouillon léger de filets de thiof, idéal comme plat léger du soir.",
+      "difficulty": "medium",
+      "prep_time": 10,
+      "cook_time": 35,
+      "total_time": 45,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "afrique-ouest",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "Riz brisé",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "fr-r-afrique-ouest-2"
+       },
+       {
+        "name": "Filets de thiof",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "fr-r-afrique-ouest-1"
+       },
+       {
+        "name": "Oignons",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-r-afrique-ouest-3"
+       },
+       {
+        "name": "Tomates",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-r-afrique-ouest-4"
+       },
+       {
+        "name": "Chou",
+        "quantity": "1/4",
+        "unit": "pièce",
+        "pantry_id": "fr-r-afrique-ouest-6"
+       },
+       {
+        "name": "Piment",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-r-afrique-ouest-8"
+       },
+       {
+        "name": "Huile d'arachide",
+        "quantity": "1",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "Sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "Poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Riz brisé",
+       "Filets de thiof",
+       "Oignons",
+       "Tomates",
+       "Chou",
+       "Piment"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Coupe le filet de thiof en gros morceaux de 4 cm.",
+       "Dans une casserole, porte à ébullition 800 ml d'eau, ajoute les morceaux de thiof, puis baisse le feu à moyen. Laisse mijoter 8 minutes, jusqu'à ce que le poisson atteigne 63 °C (chair opaque). Retire le poisson, réserve le bouillon.",
+       "Émince l'oignon, hache la tomate en dés et coupe le chou en lanières fines.",
+       "Dans une grande poêle, chauffe 1 c. à soupe d'huile d'arachide à feu moyen, ajoute l'oignon et fais-le dorer 4 minutes, jusqu'à ce qu'il soit translucide.",
+       "Ajoute la tomate, le chou et le piment finement haché. Fais sauter 5 minutes, jusqu'à ce que les légumes soient légèrement tendres.",
+       "Incorpore le riz brisé, mélange bien avec les légumes, puis verse le bouillon de thiof chaud (environ 400 ml). Porte à nouveau à ébullition, puis couvre et laisse cuire à feu doux 15 minutes, jusqu'à absorption du liquide et riz tendre.",
+       "Émiette le poisson cuit réservé dans un bol, vérifie l'assaisonnement avec sel et poivre, puis incorpore-le délicatement au riz juste avant de servir.",
+       "Serre chaud, en veillant à ce que chaque portion contienne du poisson et du riz."
+      ],
+      "tips": [
+       "Si le riz absorbe tout le bouillon avant d'être tendre, ajoute un peu d'eau chaude.",
+       "Pour plus de fraîcheur, ajoute un filet de jus de citron vert au moment de dresser."
+      ],
+      "image_prompt": "Professional food photography, aromatic broken rice with shredded cabbage, tomato chunks, and a clear fish broth, West African dinner, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 0.8333333333333334,
+      "missing_in_steps": [
+       "Tomates"
+      ],
+      "quantities_in_steps": 0,
+      "timed_cooking": 0.8,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 3,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 4,
+      "authenticity": 3,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "L'étape 1 ne précise pas la quantité de thiof (300 g).",
+      "L'utilisation du concentré de tomate (disponible au garde-manger) est oubliée, ce qui rend le plat fade."
+     ],
+     "strengths": [
+      "La méthode de cuisson du riz par absorption dans le bouillon est techniquement correcte.",
+      "La gestion de la sécurité alimentaire sur le poisson est exemplaire."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "en-r-maghreb",
+   "note": "North Africa (Maghreb), breakfast",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 4577,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [],
+    "corrected": [],
+    "dropped": []
+   },
+   "examples": [
+    {
+     "name": "Asida",
+     "region": "Afrique du Nord (Maghreb)"
+    },
+    {
+     "name": "Lablabi",
+     "region": "Afrique du Nord (Maghreb)"
+    },
+    {
+     "name": "Bissara",
+     "region": "Afrique du Nord (Maghreb)"
+    },
+    {
+     "name": "Mhadjeb (mahjouba)",
+     "region": "Afrique du Nord (Maghreb)"
+    },
+    {
+     "name": "Chakchouka (shakshuka)",
+     "region": "Afrique du Nord (Maghreb)"
+    }
+   ],
+   "diversity_auto": 0.8095238095238095,
+   "diversity_judge": 4,
+   "diversity_comment": "La sélection offre une bonne variété entre un plat salé complet (Shakshuka), une alternative rapide (crêpe salée) et un plat sucré traditionnel (bouillie de semoule), couvrant bien les textures et les saveurs du petit-déjeuner maghrébin.",
+   "judge_model": "gemini-3.1-flash-lite",
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [],
+     "corrected": [],
+     "dropped": []
+    },
+    "examples": [
+     {
+      "name": "Asida",
+      "region": "Afrique du Nord (Maghreb)"
+     },
+     {
+      "name": "Lablabi",
+      "region": "Afrique du Nord (Maghreb)"
+     },
+     {
+      "name": "Bissara",
+      "region": "Afrique du Nord (Maghreb)"
+     },
+     {
+      "name": "Mhadjeb (mahjouba)",
+      "region": "Afrique du Nord (Maghreb)"
+     },
+     {
+      "name": "Chakchouka (shakshuka)",
+      "region": "Afrique du Nord (Maghreb)"
+     }
+    ],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "en-r-maghreb-3",
+      "name": "Tomatoes",
+      "quantity": "4",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "en-r-maghreb-1",
+      "name": "Eggs",
+      "quantity": "6",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "en-r-maghreb-2",
+      "name": "Fine semolina",
+      "quantity": "500 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "en-r-maghreb-4",
+      "name": "Peppers",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "en-r-maghreb-5",
+      "name": "Honey",
+      "quantity": "1 jar",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "en-r-maghreb-6",
+      "name": "Butter",
+      "quantity": "250 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 4577,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 1,
+      "ms": 4571,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.157991276,
+       "prompt_tokens": 2412,
+       "prompt_time": 0.116798589,
+       "completion_tokens": 2000,
+       "completion_time": 4.252870532,
+       "total_tokens": 4412,
+       "total_time": 4.369669121,
+       "completion_tokens_details": {
+        "reasoning_tokens": 130
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "297541",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "245187"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Spicy Tomato & Pepper Shakshuka",
+     "recipe": {
+      "title": "Spicy Tomato & Pepper Shakshuka",
+      "description": "A classic Maghreb breakfast of poached eggs in a fragrant tomato‑pepper sauce, brightened with a pinch of cumin.",
+      "difficulty": "easy",
+      "prep_time": 5,
+      "cook_time": 15,
+      "total_time": 20,
+      "servings": 2,
+      "meal_type": "breakfast",
+      "cuisine": "maghreb",
+      "dietary_tags": [
+       "vegetarian"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Tomatoes",
+        "quantity": "4",
+        "unit": "piece",
+        "pantry_id": "en-r-maghreb-3"
+       },
+       {
+        "name": "Peppers",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-r-maghreb-4"
+       },
+       {
+        "name": "Eggs",
+        "quantity": "4",
+        "unit": "piece",
+        "pantry_id": "en-r-maghreb-1"
+       },
+       {
+        "name": "Butter",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": "en-r-maghreb-6"
+       },
+       {
+        "name": "Cumin",
+        "quantity": "1/2",
+        "unit": "tsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Paprika",
+        "quantity": "1/2",
+        "unit": "tsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "Pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "Water",
+        "quantity": "1/4",
+        "unit": "cup",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Tomatoes",
+       "Peppers",
+       "Eggs",
+       "Butter"
+      ],
+      "missing_ingredients": [
+       "Cumin",
+       "Paprika"
+      ],
+      "instructions": [
+       "Dice the 4 tomatoes and the 2 peppers; set aside.",
+       "Melt 2 tbsp butter in a medium skillet over medium heat.",
+       "Add the diced peppers and sauté 3 minutes, until they start to soften.",
+       "Stir in the diced tomatoes, 1/2 tsp cumin, 1/2 tsp paprika, salt and pepper; cook 5 minutes, stirring occasionally, until the mixture thickens and the tomatoes break down.",
+       "Add 1/4 cup water and bring to a gentle simmer.",
+       "Make four small wells in the sauce and crack one egg into each well.",
+       "Cover the skillet and cook on low heat 6‑8 minutes, until the egg whites are set but the yolks remain runny (the whites should be opaque and firm).",
+       "Remove from heat and serve immediately, optionally garnished with fresh herbs."
+      ],
+      "tips": [
+       "If you prefer a milder sauce, reduce the amount of cumin or omit the paprika.",
+       "A splash of honey (1 tsp) can balance the acidity of the tomatoes for a subtle sweet note."
+      ],
+      "image_prompt": "Professional food photography, vibrant shakshuka in a rustic cast‑iron skillet, poached eggs nestled in bright red tomato‑pepper sauce, fresh herbs, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 0.8,
+      "missing_in_steps": [
+       "Eggs"
+      ],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.42857142857142855,
+      "oven_temperature": 0,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [],
+     "strengths": [
+      "Les quantités sont parfaitement intégrées à chaque étape, permettant une exécution sans erreur.",
+      "Les repères de cuisson (opacité des blancs, temps de mijotage) sont précis et professionnels.",
+      "La recette respecte scrupuleusement les standards de la Shakshuka maghrébine."
+     ]
+    },
+    {
+     "title": "Mhadjeb – Thin Semolina Flatbread with Tomato‑Pepper Filling",
+     "recipe": {
+      "title": "Mhadjeb – Thin Semolina Flatbread with Tomato‑Pepper Filling",
+      "description": "Crispy Algerian‑style semolina crepes stuffed with a quick tomato and pepper ragout, perfect for a light morning meal.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 10,
+      "total_time": 20,
+      "servings": 4,
+      "meal_type": "breakfast",
+      "cuisine": "maghreb",
+      "dietary_tags": [
+       "vegetarian"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Fine semolina",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "en-r-maghreb-2"
+       },
+       {
+        "name": "Tomatoes",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-r-maghreb-3"
+       },
+       {
+        "name": "Peppers",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-r-maghreb-4"
+       },
+       {
+        "name": "Butter",
+        "quantity": "3",
+        "unit": "tbsp",
+        "pantry_id": "en-r-maghreb-6"
+       },
+       {
+        "name": "Water",
+        "quantity": "120",
+        "unit": "ml",
+        "pantry_id": null
+       },
+       {
+        "name": "Salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "Paprika",
+        "quantity": "1/2",
+        "unit": "tsp",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Fine semolina",
+       "Tomatoes",
+       "Peppers",
+       "Butter"
+      ],
+      "missing_ingredients": [
+       "Paprika"
+      ],
+      "instructions": [
+       "In a bowl, whisk together 200 g fine semolina, 1 pinch salt and 120 ml water until a smooth, pourable batter forms.",
+       "Heat 1 tbsp butter in a non‑stick skillet over medium heat.",
+       "Pour a ladleful of batter, swirling to form a thin 8‑inch circle; cook 1‑2 minutes until the surface is set and the edges lift, then flip and cook another minute. Transfer to a plate and repeat to make 4 crepes, keeping them covered.",
+       "For the filling, finely chop 2 tomatoes and 1 pepper.",
+       "Melt the remaining 2 tbsp butter in the same skillet over medium heat; add the chopped vegetables, 1/2 tsp paprika, and a pinch of salt. Sauté 5 minutes, stirring, until the mixture is soft and slightly caramelised.",
+       "Place a spoonful of the hot filling on half of each crepe, fold the other half over, and press gently to seal.",
+       "Serve the folded mhadjeb warm, optionally drizzled with a tiny drizzle of honey (1 tsp) for a hint of sweetness."
+      ],
+      "tips": [
+       "If the batter feels too thick, add a splash more water; it should spread easily.",
+       "Use a lid to keep the cooked crepes soft while you finish the batch."
+      ],
+      "image_prompt": "Close‑up food photography of golden‑brown semolina flatbreads folded over a bright tomato‑pepper filling, butter brushed edges, rustic wooden board"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.75,
+      "timed_cooking": 0.6666666666666666,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 7,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 4,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 1,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "L'appellation 'Mhadjeb' est une erreur grave : la technique décrite est celle d'une crêpe liquide, alors que les Mhadjeb nécessitent une pâte pétrie, reposée et étirée à la main."
+     ],
+     "strengths": [
+      "Les quantités sont clairement rappelées à chaque étape de la préparation.",
+      "La gestion de la cuisson de la farce est cohérente et bien expliquée."
+     ]
+    },
+    {
+     "title": "Honey‑Butter Semolina Porridge (Sucre de Semoule)",
+     "recipe": {
+      "title": "Honey‑Butter Semolina Porridge (Sucre de Semoule)",
+      "description": "A sweet, comforting breakfast porridge made from fine semolina, butter and honey, echoing the traditional Maghreb dessert but ready in minutes.",
+      "difficulty": "easy",
+      "prep_time": 3,
+      "cook_time": 12,
+      "total_time": 15,
+      "servings": 2,
+      "meal_type": "breakfast",
+      "cuisine": "maghreb",
+      "dietary_tags": [
+       "vegetarian"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Fine semolina",
+        "quantity": "100",
+        "unit": "g",
+        "pantry_id": "en-r-maghreb-2"
+       },
+       {
+        "name": "Butter",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": "en-r-maghreb-6"
+       },
+       {
+        "name": "Honey",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": "en-r-maghreb-5"
+       },
+       {
+        "name": "Water",
+        "quantity": "250",
+        "unit": "ml",
+        "pantry_id": null
+       },
+       {
+        "name": "Salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Fine semolina",
+       "Butter",
+       "Honey"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Bring 250 ml water to a boil in a small saucepan over medium heat.",
+       "Add 1 pinch salt and 2 tbsp butter; stir until the butter melts completely.",
+       "Gradually whisk in 100 g fine semolina, preventing lumps.",
+       "Reduce heat to low and simmer, stirring continuously for 8‑10 minutes, until the mixture thickens to a smooth, spoon‑coating consistency.",
+       "Remove from heat and stir in 2 tbsp honey until fully incorporated.",
+       "Divide the porridge into two bowls, add an extra drizzle of honey on top if desired, and serve immediately."
+      ],
+      "tips": [
+       "For a richer flavor, use half water and half milk (or plant‑based milk).",
+       "A sprinkle of ground cinnamon or toasted sesame seeds adds a pleasant aroma."
+      ],
+      "suggestion": "Ideal also for a quick snack after a workout.",
+      "image_prompt": "Bright morning scene, bowl of creamy golden semolina porridge topped with a drizzle of honey and a pat of butter, soft light, rustic table"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.3333333333333333,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 0,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 6,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [],
+     "strengths": [
+      "La technique de cuisson de la semoule est parfaitement maîtrisée pour éviter les grumeaux.",
+      "Le repère de texture 'nappe la cuillère' est un excellent indicateur pour un cuisinier amateur.",
+      "Recette authentique, simple et parfaitement adaptée au garde-manger fourni."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "fr-r-asie-sud-est",
+   "note": "Asie du Sud-Est, déjeuner, crevettes et lait de coco",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 6479,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [],
+    "corrected": [],
+    "dropped": []
+   },
+   "examples": [
+    {
+     "name": "Cá kho tộ (poisson caramélisé)",
+     "region": "Asie du Sud-Est"
+    },
+    {
+     "name": "Sayur asem (soupe aigre de légumes)",
+     "region": "Asie du Sud-Est"
+    },
+    {
+     "name": "Pancit (bihon, canton)",
+     "region": "Asie du Sud-Est"
+    },
+    {
+     "name": "Nasi lemak (riz au lait de coco)",
+     "region": "Asie du Sud-Est"
+    },
+    {
+     "name": "Samlor korko (soupe de légumes au kroeung)",
+     "region": "Asie du Sud-Est"
+    }
+   ],
+   "diversity_auto": 0.5026455026455026,
+   "diversity_judge": 4,
+   "diversity_comment": "Les trois recettes proposent des textures et des méthodes de cuisson distinctes (soupe, sauté, curry), bien qu'elles utilisent une base d'ingrédients similaire imposée par le garde-manger.",
+   "judge_model": "gemini-3.1-flash-lite",
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [],
+     "corrected": [],
+     "dropped": []
+    },
+    "examples": [
+     {
+      "name": "Cá kho tộ (poisson caramélisé)",
+      "region": "Asie du Sud-Est"
+     },
+     {
+      "name": "Sayur asem (soupe aigre de légumes)",
+      "region": "Asie du Sud-Est"
+     },
+     {
+      "name": "Pancit (bihon, canton)",
+      "region": "Asie du Sud-Est"
+     },
+     {
+      "name": "Nasi lemak (riz au lait de coco)",
+      "region": "Asie du Sud-Est"
+     },
+     {
+      "name": "Samlor korko (soupe de légumes au kroeung)",
+      "region": "Asie du Sud-Est"
+     }
+    ],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "fr-r-asie-sud-est-1",
+      "name": "Crevettes crues",
+      "quantity": "400 g",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "fr-r-asie-sud-est-6",
+      "name": "Concombre",
+      "quantity": "1",
+      "daysLeft": 2,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "fr-r-asie-sud-est-2",
+      "name": "Lait de coco",
+      "quantity": "1 boîte",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "fr-r-asie-sud-est-3",
+      "name": "Nouilles de riz",
+      "quantity": "300 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "fr-r-asie-sud-est-4",
+      "name": "Citronnelle",
+      "quantity": "2 tiges",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "fr-r-asie-sud-est-5",
+      "name": "Citron vert",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "fr-r-asie-sud-est-7",
+      "name": "Sauce poisson",
+      "quantity": "1 bouteille",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 6479,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 2,
+      "ms": 6465,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.301475542,
+       "prompt_tokens": 2552,
+       "prompt_time": 0.117759084,
+       "completion_tokens": 2852,
+       "completion_time": 6.000405586,
+       "total_tokens": 5404,
+       "total_time": 6.11816467,
+       "completion_tokens_details": {
+        "reasoning_tokens": 384
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "297657",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "245363"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Soupe Tom Yum aux crevettes et citronnelle",
+     "recipe": {
+      "title": "Soupe Tom Yum aux crevettes et citronnelle",
+      "description": "Une soupe thaïlandaise épicée et acidulée, parfaite pour réchauffer le midi avec des crevettes fraîches, du lait de coco et le parfum de citronnelle.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 15,
+      "total_time": 25,
+      "servings": 2,
+      "meal_type": "lunch",
+      "cuisine": "asie-sud-est",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "Crevettes crues",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "fr-r-asie-sud-est-1"
+       },
+       {
+        "name": "Citronnelle",
+        "quantity": "2",
+        "unit": "tiges",
+        "pantry_id": "fr-r-asie-sud-est-4"
+       },
+       {
+        "name": "Lait de coco",
+        "quantity": "200",
+        "unit": "ml",
+        "pantry_id": "fr-r-asie-sud-est-2"
+       },
+       {
+        "name": "Citron vert",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-r-asie-sud-est-5"
+       },
+       {
+        "name": "Sauce poisson",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": "fr-r-asie-sud-est-7"
+       },
+       {
+        "name": "eau",
+        "quantity": "500",
+        "unit": "ml",
+        "pantry_id": null
+       },
+       {
+        "name": "piment rouge",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": null
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Crevettes crues",
+       "Citronnelle",
+       "Lait de coco",
+       "Citron vert",
+       "Sauce poisson"
+      ],
+      "missing_ingredients": [
+       "piment rouge"
+      ],
+      "instructions": [
+       "Écrase légèrement les 2 tiges de citronnelle avec le plat d'un couteau, puis coupe-les en morceaux de 3 cm.",
+       "Dans une casserole, porte les 500 ml d'eau à ébullition à feu moyen.",
+       "Ajoute les morceaux de citronnelle et le piment rouge entier, laisse infuser 3 minutes jusqu'à ce que l'eau soit parfumée.",
+       "Verse les 200 ml de lait de coco, mélange et porte à nouveau à légère ébullition (feu moyen, 2 minutes, le mélange doit légèrement mousseux).",
+       "Incorpore les 2 c. à soupe de sauce poisson et la pincée de sel, remue.",
+       "Ajoute les 300 g de crevettes crues, réparties uniformément, et fais cuire 3 minutes à feu moyen jusqu'à ce que la chair devienne opaque et se détache en lamelles (température interne 63 °C).",
+       "Retire la casserole du feu, presse le jus d'1/2 citron vert dans la soupe, remue rapidement.",
+       "Serre immédiatement, décorée de quelques rondelles de citron vert."
+      ],
+      "tips": [
+       "Pour plus de piquant, écrase le piment avant de le mettre dans le bouillon.",
+       "Si tu aimes les champignons, ajoute 100 g de champignons de paille en même temps que les crevettes."
+      ],
+      "image_prompt": "Professional food photography, steaming Tom Yum shrimp soup in a traditional Thai bowl, bright herbs, lemongrass stalks, lime wedges, vibrant colors, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 4,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "L'ajout de lait de coco transforme techniquement cette recette en 'Tom Kha' et non en 'Tom Yum', qui est traditionnellement un bouillon clair."
+     ],
+     "strengths": [
+      "Les temps de cuisson sont parfaitement maîtrisés pour éviter la surcuisson des crevettes.",
+      "L'utilisation de la température interne de 63°C est une excellente pratique de sécurité alimentaire."
+     ]
+    },
+    {
+     "title": "Pad Thaï aux nouilles de riz, crevettes et concombre",
+     "recipe": {
+      "title": "Pad Thaï aux nouilles de riz, crevettes et concombre",
+      "description": "Un sauté rapide de nouilles de riz agrémenté de crevettes, de citron vert et de morceaux croquants de concombre, le tout relevé de sauce poisson.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 20,
+      "total_time": 30,
+      "servings": 2,
+      "meal_type": "lunch",
+      "cuisine": "asie-sud-est",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "Nouilles de riz",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "fr-r-asie-sud-est-3"
+       },
+       {
+        "name": "Crevettes crues",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "fr-r-asie-sud-est-1"
+       },
+       {
+        "name": "Concombre",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-r-asie-sud-est-6"
+       },
+       {
+        "name": "Citron vert",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-r-asie-sud-est-5"
+       },
+       {
+        "name": "Sauce poisson",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": "fr-r-asie-sud-est-7"
+       },
+       {
+        "name": "huile végétale",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "ail",
+        "quantity": "2",
+        "unit": "gousses",
+        "pantry_id": null
+       },
+       {
+        "name": "piment rouge",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": null
+       },
+       {
+        "name": "sucre",
+        "quantity": "1",
+        "unit": "c. à café",
+        "pantry_id": null
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Nouilles de riz",
+       "Crevettes crues",
+       "Concombre",
+       "Citron vert",
+       "Sauce poisson"
+      ],
+      "missing_ingredients": [
+       "ail",
+       "piment rouge",
+       "sucre"
+      ],
+      "instructions": [
+       "Fais tremper les 200 g de nouilles de riz dans de l'eau tiède pendant 8 minutes, puis égoutte-les.",
+       "Épluche et hache finement les 2 gousses d'ail.",
+       "Coupe le concombre en fines demi-lunes d'environ 0,5 cm d'épaisseur.",
+       "Dans un wok, chauffe 2 c. à soupe d'huile végétale à feu moyen‑vif.",
+       "Ajoute l'ail haché et le piment rouge entier, fais revenir 30 secondes jusqu'à ce que l'ail devienne légèrement doré.",
+       "Incorpore les 200 g de crevettes crues, fais cuire 2 minutes à feu moyen‑vif jusqu'à ce qu'elles deviennent opaques (63 °C).",
+       "Ajoute les nouilles égouttées, la sauce poisson, le sucre et la pincée de sel, mélange rapidement 2 minutes en soulevant le wok, les nouilles doivent être bien enrobées et chaudes.",
+       "Retire du feu, presse le jus du 1/2 citron vert sur le plat, ajoute les lamelles de concombre et mélange une dernière fois.",
+       "Dresse dans des assiettes, garnis de quartiers de citron vert supplémentaires si désiré."
+      ],
+      "tips": [
+       "Pour plus de croquant, réserve quelques lamelles de concombre et ajoute-les juste avant de servir.",
+       "Si tu aimes le piquant, écrase le piment avant de le mettre dans le wok."
+      ],
+      "image_prompt": "Professional food photography, vibrant Pad Thai with shrimp, rice noodles, cucumber strips, lime wedges, bright wok, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.6666666666666666,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 3,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "L'ajout de concombre dans un Pad Thaï est atypique et risque de rendre le plat aqueux si les lamelles ne sont pas bien égouttées.",
+      "Il manque l'œuf, ingrédient structurel indispensable à tout Pad Thaï qui se respecte."
+     ],
+     "strengths": [
+      "La gestion du temps de trempage des nouilles de riz est précise et évite qu'elles ne deviennent collantes.",
+      "La séquence de cuisson au wok est logique et respecte les temps de saisie nécessaires."
+     ]
+    },
+    {
+     "title": "Curry de crevettes à la citronnelle et lait de coco, nouilles de riz en accompagnement",
+     "recipe": {
+      "title": "Curry de crevettes à la citronnelle et lait de coco, nouilles de riz en accompagnement",
+      "description": "Un curry crémeux aux arômes de citronnelle et citron vert, servi avec des nouilles de riz pour un repas complet et rassasiant.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 20,
+      "total_time": 30,
+      "servings": 2,
+      "meal_type": "lunch",
+      "cuisine": "asie-sud-est",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "Crevettes crues",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "fr-r-asie-sud-est-1"
+       },
+       {
+        "name": "Lait de coco",
+        "quantity": "400",
+        "unit": "ml",
+        "pantry_id": "fr-r-asie-sud-est-2"
+       },
+       {
+        "name": "Citronnelle",
+        "quantity": "2",
+        "unit": "tiges",
+        "pantry_id": "fr-r-asie-sud-est-4"
+       },
+       {
+        "name": "Citron vert",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-r-asie-sud-est-5"
+       },
+       {
+        "name": "Sauce poisson",
+        "quantity": "1",
+        "unit": "c. à soupe",
+        "pantry_id": "fr-r-asie-sud-est-7"
+       },
+       {
+        "name": "Nouilles de riz",
+        "quantity": "150",
+        "unit": "g",
+        "pantry_id": "fr-r-asie-sud-est-3"
+       },
+       {
+        "name": "huile végétale",
+        "quantity": "1",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "piment rouge",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": null
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Crevettes crues",
+       "Lait de coco",
+       "Citronnelle",
+       "Citron vert",
+       "Sauce poisson",
+       "Nouilles de riz"
+      ],
+      "missing_ingredients": [
+       "piment rouge"
+      ],
+      "instructions": [
+       "Coupe les 2 tiges de citronnelle en tronçons de 3 cm, puis écrase légèrement chaque morceau avec le plat du couteau.",
+       "Fais chauffer 1 c. à soupe d'huile végétale dans une casserole à feu moyen.",
+       "Ajoute la citronnelle écrasée et le piment rouge entier, fais revenir 1 minute jusqu'à ce que l'huile s'imprègne des arômes.",
+       "Verse les 400 ml de lait de coco, porte à légère ébullition (feu moyen, 3 minutes, le mélange doit frémir légèrement).",
+       "Ajoute 1 c. à soupe de sauce poisson et la pincée de sel, mélange.",
+       "Incorpore les 300 g de crevettes crues, fais cuire 4 minutes à feu moyen‑vif jusqu'à ce que la chair devienne opaque (63 °C).",
+       "Presse le jus du 1/2 citron vert dans la sauce, remue 30 secondes.",
+       "Pendant ce temps, porte une grande casserole d'eau à ébullition, ajoute les 150 g de nouilles de riz, cuits 4 minutes jusqu'à ce qu'elles soient tendres mais encore fermes, égoutte et rince à l'eau froide.",
+       "Répartis les nouilles dans deux bols, nappe de curry aux crevettes, décore de quelques rondelles de citron vert."
+      ],
+      "tips": [
+       "Pour un curry plus épais, laisse réduire 2 minutes supplémentaires avant d'ajouter les crevettes.",
+       "Tu peux ajouter des légumes verts (haricots longs, brocoli) en les faisant blanchir 2 minutes et les incorporer en même temps que les crevettes."
+      ],
+      "image_prompt": "Professional food photography, creamy Thai shrimp curry in a bowl, rice noodles on the side, lemongrass stalks, lime wedges, vibrant colors, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.75,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "Aucun problème majeur, la recette est techniquement solide et cohérente."
+     ],
+     "strengths": [
+      "La cuisson séparée des nouilles de riz garantit une texture parfaite, évitant l'effet 'pâteux' dans le curry.",
+      "L'ordre des étapes permet une infusion optimale des arômes de la citronnelle dans le lait de coco."
+     ]
+    }
+   ]
+  }
+ ]
+}
