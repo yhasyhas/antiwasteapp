@@ -48,6 +48,12 @@ const UNITS: Record<string, Record<UnitLanguage, [string, string]>> = {
   pinch: { fr: ['pincée', 'pincées'], en: ['pinch', 'pinches'], es: ['pizca', 'pizcas'] },
   block: { fr: ['bloc', 'blocs'], en: ['block', 'blocks'], es: ['bloque', 'bloques'] },
   loaf: { fr: ['miche', 'miches'], en: ['loaf', 'loaves'], es: ['barra', 'barras'] },
+  chunk: { fr: ['morceau', 'morceaux'], en: ['piece', 'pieces'], es: ['trozo', 'trozos'] },
+  glass: { fr: ['verre', 'verres'], en: ['glass', 'glasses'], es: ['vaso', 'vasos'] },
+  bowl: { fr: ['bol', 'bols'], en: ['bowl', 'bowls'], es: ['tazón', 'tazones'] },
+  sprig: { fr: ['brin', 'brins'], en: ['sprig', 'sprigs'], es: ['ramita', 'ramitas'] },
+  head: { fr: ['tête', 'têtes'], en: ['head', 'heads'], es: ['cabeza', 'cabezas'] },
+  handful: { fr: ['poignée', 'poignées'], en: ['handful', 'handfuls'], es: ['puñado', 'puñados'] },
 };
 // Autres façons courantes d'écrire ces unités
 const UNIT_ALIASES: Record<string, string> = {

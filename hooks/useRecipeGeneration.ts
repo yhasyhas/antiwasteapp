@@ -172,7 +172,10 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
         const saved = await saveRecipesToHistory(data.recipes);
         setRecipes(saved);
         // Moins de recettes que d'habitude : recettes écartées par le serveur, ou peu d'aliments
-        setResultNote(data.rejected > 0 ? t('generate.rejectedNote', { count: data.rejected })
+        // Recettes écartées : « tes critères » seulement si des critères ont été choisis (régimes, exclusions,
+        // sélection), sinon les contrôles de qualité du serveur
+        const criteria = filters.dietary.length > 0 || (filters.excluded?.length ?? 0) > 0 || selected.length > 0;
+        setResultNote(data.rejected > 0 ? t(criteria ? 'generate.rejectedNote' : 'generate.rejectedQualityNote', { count: data.rejected })
           : data.fewIngredients ? t('generate.fewIngredientsNote') : null);
         // Nouvelle génération seulement : images demandées en arrière-plan dès l'affichage des résultats,
         // elles apparaissent sur les cartes à leur arrivée (les autres listes n'en demandent jamais)

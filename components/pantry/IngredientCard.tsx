@@ -13,6 +13,7 @@ import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 import type { FoodKind } from '@/lib/expiry';
 import { displayQuantity } from '@/lib/quantity';
 import { showDialog } from '@/lib/dialog';
+import { storageTip } from '@/lib/storageTip';
 
 export interface PantryIngredient {
   id: string;
@@ -70,6 +71,9 @@ export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry
   const { t, language } = useLanguage();
   const swipeable = useRef<SwipeableMethods>(null);
   const isDish = ingredient.kind === 'dish';
+  // Conseil de conservation selon l'emplacement actuel, dans la langue de l'app
+  const tip = storageTip(ingredient, language);
+  const tipText = 'text' in tip ? tip.text : t(tip.key);
   const name = displayName ?? ingredient.name;
   const openFact = onOpenFact;
   // « ajouté par Awa » : seule la première lettre de la phrase passe en minuscule, le prénom garde sa majuscule
@@ -119,10 +123,10 @@ export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry
           <Text style={styles.name}>{name}</Text>
           {subtitle ? <WordClampText style={styles.subtitle}>{subtitle}</WordClampText> : null}
           {details ? <Text style={styles.details}>{details}</Text> : null}
-          {ingredient.storage_tip ? (
+          {tipText ? (
             <View style={styles.tip}>
               <Info size={sizes.iconSmall - 2} color={colors.textSecondary} />
-              <Text style={styles.tipText}>{ingredient.storage_tip}</Text>
+              <Text style={styles.tipText}>{tipText}</Text>
             </View>
           ) : null}
         </View>
