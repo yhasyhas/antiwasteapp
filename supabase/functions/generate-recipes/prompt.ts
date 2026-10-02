@@ -59,16 +59,11 @@ const UNITS: Record<string, string> = {
   es: 'g, kg, ml, l, cda, cdta, pieza, rebanada, diente, pizca, lata, manojo',
 };
 
-// v4 : noms du garde-manger traduits dans la langue de la recette, étiquettes dans cette langue
+// v4 : noms du garde-manger traduits dans la langue de la recette
 const TRANSLATED_NAME_EXAMPLE: Record<string, string> = {
   fr: '« œufs » pour « eggs » dans une recette en français',
   en: '"eggs" for « œufs », "milk" for « lait » in an English recipe',
   es: '« huevos » pour « œufs », « leche » pour « milk » dans une recette en espagnol',
-};
-const TAG_EXAMPLES: Record<string, string> = {
-  fr: 'ex. « végétarien », « riche en protéines », « rapide »',
-  en: 'ex. "vegetarian", "high-protein", "quick"',
-  es: 'ex. « vegetariano », « rico en proteínas », « rápido »',
 };
 
 // Plats typiques, y compris du matin, pour choisir un vrai plat de la cuisine demandée
@@ -220,16 +215,15 @@ INGRÉDIENTS :
 - Un ingrédient marqué [date dépassée] n'est jamais mis en avant ; s'il s'agit d'un produit frais (viande, poisson, produit laitier, plat cuisiné), ne l'utilise pas.
 - "pantry_id" : l'identifiant (p1, p2…) de l'ingrédient du garde-manger utilisé, ou "missing" pour tout ingrédient qui n'en vient pas (y compris sel, poivre, huile).
 ${v4 ? `- Pour un ingrédient du garde-manger, "name" est son nom en ${languageName}, traduit s'il est écrit dans une autre langue (${TRANSLATED_NAME_EXAMPLE[options.language] || TRANSLATED_NAME_EXAMPLE.en}) ; les étapes le nomment de la même façon.
-- Les identifiants (p1, p2…), "missing" et les repères de la liste ([URGENT], [reste de plat]…) servent seulement au champ "pantry_id" : jamais dans un texte (titre, description, étapes, astuces, suggestion).
-- "dietary_tags" : 0 à 3 étiquettes courtes, en ${languageName} (${TAG_EXAMPLES[options.language] || TAG_EXAMPLES.en}).` : `- Pour un ingrédient du garde-manger, "name" reprend son nom tel qu'il est écrit dans la liste.`}
+- Les identifiants (p1, p2…), "missing" et les repères de la liste ([URGENT], [reste de plat]…) servent seulement au champ "pantry_id" : jamais dans un texte (titre, description, étapes, astuces, suggestion).` : `- Pour un ingrédient du garde-manger, "name" reprend son nom tel qu'il est écrit dans la liste.`}
 - "name" : le nom de l'ingrédient seul, sans préparation ni précision (« ail » et non « ail, émincé ») ; la préparation va dans les étapes.
 - Chaque recette utilise au moins un ingrédient du garde-manger.${v41 ? `
 - Au plus ${MAX_PURCHASES} ingrédients à acheter par recette (hors sel, poivre, huile, eau), seulement les indispensables (règle vérifiée après coup) ; tout le reste vient du garde-manger.` : ''}${v2 ? `
 - Un ingrédient du garde-manger qui ne respecte pas un régime ou une exclusion n'est jamais utilisé : ignore-le (ex. la feta pour un repas vegan).
 - La liste contient tout ce que les étapes utilisent, même un accompagnement (« servir avec du riz » : le riz est dans la liste et cuit dans les étapes) ; pas d'ingrédient facultatif : les variantes vont dans les astuces.
 - "quantity" : le nombre seul (ex. "500", "2", "1/2") ; "unit" : l'unité abrégée, en ${languageName} (${UNITS[options.language] || UNITS.en}) ; sel et poivre : 1 ${options.language === 'en' ? 'pinch' : options.language === 'es' ? 'pizca' : 'pincée'}.` : `
-- "quantity" : le nombre seul (ex. "500", "2", "1/2") ; "unit" : l'unité abrégée (g, kg, ml, cl, l, c. à soupe, c. à café, pièce, tranche, gousse, pincée).`}${options.hasStrictDiet ? `
-- "diet_violations" : pour chaque ingrédient, les régimes sélectionnés qu'il ne respecte pas (liste vide s'il les respecte tous). Sois exact : le lait de coco est vegan, le beurre ne l'est pas.` : ''}${options.selection ? `
+- "quantity" : le nombre seul (ex. "500", "2", "1/2") ; "unit" : l'unité abrégée (g, kg, ml, cl, l, c. à soupe, c. à café, pièce, tranche, gousse, pincée).`}
+- "diet_violations" : pour chaque ingrédient, ceux des régimes vegan, vegetarian, gluten-free et dairy-free qu'il ne respecte pas (liste vide s'il les respecte tous). Sois exact : le lait de coco est vegan, le beurre ne l'est pas ; la farine de blé, le pain, les pâtes et la sauce soja contiennent du gluten ; le beurre, la crème et le fromage sont des produits laitiers. Liste aussi la farine, le beurre ou le lait d'une sauce (béchamel).${options.selection ? `
 
 SÉLECTION DE L'UTILISATEUR (règle stricte) :
 - Il veut cuisiner avec les seuls ingrédients listés dans le garde-manger, plus les basiques : sel, poivre, huile, eau (avec "pantry_id" = "missing").

@@ -94,3 +94,12 @@ Deno.test('safetyPass : échéance dépassée, les recettes déjà valides sont 
   assertEquals(result.report.dropped.map((d) => d.title), ['Poulet B']);
   assertEquals(Date.now() - t < 250, true);
 });
+
+Deno.test('safetyPass : four sans température non bloquant, mais température à cœur manquante bloquante', async () => {
+  // Poulet au four sans °C du four ni à cœur : la correction échoue, la recette est écartée (pas gardée comme défaut du four)
+  const step = 'Fais dorer le poulet 25 minutes au four, jusqu\'à ce que le jus soit clair.';
+  const fake = byRequest({ recipes: [], refusal: '' }, { recipes: [], refusal: '' });
+  const result = await safetyPass(recipesOf(raw('Poulet au four', step)), { ...options([fake]), replacementRequest });
+  assertEquals(result.report.first[0].issues.map((i) => i.code), ['core_temperature', 'oven_celsius']);
+  assertEquals([result.recipes.length, result.report.dropped.length], [0, 1]);
+});

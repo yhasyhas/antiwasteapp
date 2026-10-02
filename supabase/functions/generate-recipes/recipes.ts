@@ -157,6 +157,101 @@ export function isDietException(name: string, diet: StrictDiet): boolean {
   return DIET_EXCEPTIONS[diet].some((exception) => padded.includes(` ${exception} `));
 }
 
+// Contrôle du serveur, en plus des régimes signalés par le modèle : mots (trois langues, formes normalisées) qu'un
+// ingrédient ne peut pas contenir pour respecter le régime. Sert aux régimes choisis (recette écartée) et aux
+// étiquettes affichées (seules les étiquettes vérifiées sont gardées). Mots de 4 lettres ou moins : mot entier
+// (« ble » ne doit pas trouver « blend ») ; plus longs : début de mot (« saucisse » trouve « saucisses »).
+const MEAT_WORDS = ['poulet', 'poule', 'dinde', 'canard', 'pintade', 'volaille', 'boeuf', 'veau', 'agneau', 'mouton', 'porc', 'cochon', 'jambon', 'lard', 'lardon', 'bacon',
+  'saucisse', 'saucisson', 'chorizo', 'merguez', 'kefta', 'kofta', 'viande', 'steak', 'foie', 'abats', 'gibier', 'lapin', 'chevreau', 'cabri', 'fond de veau', 'fond de volaille',
+  'chicken', 'turkey', 'duck', 'beef', 'veal', 'lamb', 'mutton', 'pork', 'ham', 'sausage', 'meat', 'liver', 'rabbit', 'goat meat', 'ground beef', 'burger', 'meatball', 'pepperoni', 'salami',
+  'pollo', 'pavo', 'pato', 'carne', 'ternera', 'cordero', 'cerdo', 'jamon', 'tocino', 'salchicha', 'panceta', 'higado', 'conejo', 'cabrito',
+  'gelatine', 'gelatin', 'gelatina'];
+const FISH_WORDS = ['poisson', 'saumon', 'thon', 'cabillaud', 'colin', 'merlu', 'sardine', 'maquereau', 'dorade', 'daurade', 'truite', 'tilapia', 'morue', 'anchois', 'hareng',
+  'crevette', 'gambas', 'moule', 'calamar', 'poulpe', 'seiche', 'crabe', 'homard', 'huitre', 'saint jacques', 'surimi', 'nuoc mam', 'sauce poisson',
+  'fish', 'salmon', 'tuna', 'cod', 'hake', 'mackerel', 'trout', 'anchov', 'herring', 'shrimp', 'prawn', 'mussel', 'squid', 'octopus', 'crab', 'lobster', 'oyster', 'scallop', 'worcestershire', 'dashi', 'bonito',
+  'pescado', 'atun', 'bacalao', 'merluza', 'sardina', 'caballa', 'trucha', 'anchoa', 'arenque', 'camaron', 'gamba', 'langostino', 'mejillon', 'pulpo', 'cangrejo', 'langosta', 'ostra', 'salsa de pescado'];
+// Bouillons et cubes (noms d'ingrédients) : de viande, sauf « de légumes » écrit
+const STOCK_WORDS = ['bouillon', 'cube', 'maggi', 'kub', 'jumbo', 'stock', 'broth', 'caldo', 'consome', 'consomme', 'avecrem'];
+const VEGETABLE_STOCK = ['legume', 'vegetable', 'vegetal', 'verdura', 'champignon', 'mushroom', 'hongo', 'vegan', 'vegetarien', 'vegetarian', 'vegetariano'];
+const DAIRY_WORDS = ['lait', 'beurre', 'creme', 'fromage', 'yaourt', 'yogourt', 'kefir', 'ghee', 'parmesan', 'mozzarella', 'feta', 'ricotta', 'mascarpone', 'emmental', 'gruyere', 'comte', 'cheddar', 'chevre', 'brie', 'camembert', 'raclette', 'bechamel', 'petit suisse',
+  'milk', 'butter', 'cream', 'cheese', 'yogurt', 'yoghurt', 'whey', 'buttermilk', 'custard',
+  'leche', 'mantequilla', 'nata', 'crema', 'queso', 'yogur', 'requeson', 'suero'];
+const EGG_WORDS = ['oeuf', 'mayonnaise', 'egg', 'mayo', 'huevo', 'yema', 'mayonesa', 'meringue', 'merengue'];
+const HONEY_WORDS = ['miel', 'honey'];
+const GLUTEN_WORDS = ['ble', 'farine', 'pain', 'baguette', 'brioche', 'pates', 'pate feuillet', 'pate bris', 'pate sabl', 'pate a pizza', 'pate a crepe', 'semoule', 'couscous', 'boulgour', 'orge', 'seigle', 'epeautre', 'avoine',
+  'chapelure', 'biscotte', 'biscuit', 'gateau', 'crepe', 'bechamel', 'roux', 'seitan', 'sauce soja', 'biere', 'nouille', 'vermicelle', 'raviol', 'lasagne', 'tagliatelle', 'spaghetti', 'macaroni', 'penne', 'gnocchi', 'croissant', 'crouton', 'panure', 'pita', 'naan', 'chapati',
+  'wheat', 'flour', 'bread', 'bun', 'pasta', 'noodle', 'bulgur', 'barley', 'rye', 'spelt', 'oat', 'breadcrumb', 'cracker', 'cookie', 'cake', 'pastry', 'dough', 'soy sauce', 'beer', 'udon', 'ramen', 'soba', 'flour tortilla', 'wrap',
+  'trigo', 'harina', 'pan', 'fideo', 'cebada', 'centeno', 'avena', 'pan rallado', 'galleta', 'cerveza', 'salsa de soja', 'semola', 'bizcocho', 'masa',
+  'cube', 'maggi', 'kub', 'jumbo', 'stock cube', 'avecrem'];
+// Dans un titre ou une étape, des mots trop ambigus (« pan » : poêle en anglais ; « cut into cubes ») sont ignorés
+const TEXT_AMBIGUOUS = new Set(['pan', 'bun', 'masa', 'wrap', 'cube', 'kub', 'jumbo', 'cake', 'stock', 'ham', 'cod', 'crema']);
+// Précision qui rend un nom d'ingrédient compatible (« farine de riz », « lait d'avoine », « pâtes sans gluten »)
+const PLANT_MILKS = ['vegetal', 'vegan', 'plant based', 'coco', 'coconut', 'amande', 'almond', 'almendra', 'avoine', 'oat milk', 'avena', 'soja', 'soy', 'riz', 'rice milk', 'arroz', 'cajou', 'cashew', 'anacardo', 'cacahuete', 'arachide', 'peanut', 'mani', 'cacao', 'cocoa'];
+const FREE_OF: Record<StrictDiet, string[]> = {
+  'gluten-free': ['sans gluten', 'gluten free', 'sin gluten', 'riz', 'rice', 'arroz', 'sarrasin', 'buckwheat', 'pois chiche', 'chickpea', 'garbanzo', 'manioc', 'cassava', 'yuca', 'tapioca',
+    'farine de mais', 'semoule de mais', 'polenta', 'corn tortilla', 'tortilla de maiz', 'cornmeal', 'harina de maiz', 'farine d amande', 'almond flour', 'harina de almendra', 'farine de coco', 'coconut flour'],
+  'dairy-free': ['sans lactose', 'lactose free', 'sin lactosa', ...PLANT_MILKS],
+  vegan: PLANT_MILKS,
+  vegetarian: ['vegetarien', 'vegetarian', 'vegetariano', 'vegetal', 'vegan', 'soja', 'soy'],
+};
+// Mots à ne pas confondre avec un aliment interdit
+const NOT_FORBIDDEN = ['buttercup', 'butternut', 'cream of tartar', 'creme de tartre', 'beurre de cacahuete', 'beurre d arachide', 'beurre de karite', 'creme de coco', 'lait de coco', 'coconut milk', 'coconut cream', 'leche de coco', 'crema de coco'];
+const DIET_WORDS: Record<StrictDiet, string[]> = {
+  vegetarian: [...MEAT_WORDS, ...FISH_WORDS],
+  vegan: [...MEAT_WORDS, ...FISH_WORDS, ...DAIRY_WORDS, ...EGG_WORDS, ...HONEY_WORDS],
+  'gluten-free': GLUTEN_WORDS,
+  'dairy-free': DAIRY_WORDS,
+};
+
+const escape = (word: string) => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const wordsPattern = (words: string[]) => new RegExp(` (?:${words.map((w) => (w.length <= 4 ? `${escape(w)}(?:s|x|es)?(?= )` : escape(w))).join('|')})`);
+const NAME_PATTERNS = Object.fromEntries(STRICT_DIETS.map((diet) => [diet, wordsPattern(DIET_WORDS[diet])])) as Record<StrictDiet, RegExp>;
+const TEXT_PATTERNS = Object.fromEntries(STRICT_DIETS.map((diet) => [diet, wordsPattern(DIET_WORDS[diet].filter((w) => !TEXT_AMBIGUOUS.has(w)))])) as Record<StrictDiet, RegExp>;
+const FREE_PATTERNS = Object.fromEntries(STRICT_DIETS.map((diet) => [diet, wordsPattern(FREE_OF[diet])])) as Record<StrictDiet, RegExp>;
+const STOCK_PATTERN = wordsPattern(STOCK_WORDS);
+const VEGETABLE_STOCK_PATTERN = wordsPattern(VEGETABLE_STOCK);
+const withoutHarmless = (text: string, diet: StrictDiet) =>
+  [...NOT_FORBIDDEN, ...DIET_EXCEPTIONS[diet]].reduce((padded, phrase) => padded.replaceAll(` ${phrase} `, ' '), ` ${normalizeName(text)} `);
+
+// Nom d'ingrédient qui ne respecte pas le régime
+export function dietWordInName(name: string, diet: StrictDiet): boolean {
+  if (isDietException(name, diet)) return false;
+  const padded = withoutHarmless(name, diet);
+  if ((diet === 'vegetarian' || diet === 'vegan') && STOCK_PATTERN.test(padded) && !VEGETABLE_STOCK_PATTERN.test(padded)) return true;
+  return NAME_PATTERNS[diet].test(padded) && !FREE_PATTERNS[diet].test(padded);
+}
+
+// Titre ou étape qui nomme un aliment interdit par le régime (farine d'une béchamel absente de la liste)
+export function dietWordInText(text: string, diet: StrictDiet): boolean {
+  return TEXT_PATTERNS[diet].test(withoutHarmless(text, diet));
+}
+
+// Ingrédient qui ne respecte pas un régime : signalé par le modèle (hors exceptions) ou repéré par le serveur, par son
+// nom dans la recette ou dans le garde-manger
+export function ingredientBreaksDiet(ingredient: { name?: unknown; diet_violations?: unknown }, diet: StrictDiet, pantryName?: string): boolean {
+  const name = typeof ingredient.name === 'string' ? ingredient.name : '';
+  const flagged = Array.isArray(ingredient.diet_violations) && ingredient.diet_violations.includes(diet);
+  if (flagged && !isDietException(name, diet)) return true;
+  return dietWordInName(name, diet) || (pantryName !== undefined && dietWordInName(pantryName, diet));
+}
+
+// Étiquettes de régime vérifiées (« diet:vegan », « diet:gluten-free »…) : chaque ingrédient respecte le régime, et ni
+// le titre ni les étapes ne nomment un aliment interdit (béchamel, farine non listée). Vegan l'emporte sur végétarien.
+// Aucune étiquette nutritionnelle (« riche en protéines ») : rien ne permet de la vérifier.
+export const VERIFIED_DIET_PREFIX = 'diet:';
+export function verifiedDietTags(raw: any, pantry: Pantry): string[] {
+  const ingredients = Array.isArray(raw?.ingredients) ? raw.ingredients : [];
+  const texts = [String(raw?.title ?? ''), ...(Array.isArray(raw?.instructions) ? raw.instructions.map(String) : [])];
+  const respects = (diet: StrictDiet) => ingredients.length > 0
+    && !ingredients.some((ingredient: any) => ingredientBreaksDiet(ingredient, diet, pantry.aliasOf.get(ingredient?.pantry_id)?.name))
+    && !texts.some((text) => dietWordInText(text, diet));
+  return [
+    ...(respects('vegan') ? ['vegan'] : respects('vegetarian') ? ['vegetarian'] : []),
+    ...(respects('gluten-free') ? ['gluten-free'] : []),
+    ...(respects('dairy-free') ? ['dairy-free'] : []),
+  ].map((diet) => `${VERIFIED_DIET_PREFIX}${diet}`);
+}
+
 // ---------- Schéma de sortie ----------
 
 // ---------- Sélection d'ingrédients ----------
@@ -243,13 +338,12 @@ export function buildRecipeSchema(pantry: Pantry, diets: StrictDiet[], unitHint 
     unit: { type: 'string', description: unitHint },
     pantry_id: { type: 'string', enum: [...pantry.aliasOf.keys(), MISSING] },
   };
-  if (diets.length > 0) {
-    ingredientProperties.diet_violations = {
-      type: 'array',
-      items: { type: 'string', enum: diets },
-      description: 'Régimes sélectionnés que cet ingrédient ne respecte pas (liste vide s\'il les respecte tous)',
-    };
-  }
+  // Toujours, pour les quatre régimes : régimes choisis (recette écartée) et étiquettes vérifiées
+  ingredientProperties.diet_violations = {
+    type: 'array',
+    items: { type: 'string', enum: [...STRICT_DIETS] },
+    description: 'Régimes que cet ingrédient ne respecte pas (liste vide s\'il les respecte tous)',
+  };
 
   const recipe = {
     type: 'object',
@@ -261,7 +355,6 @@ export function buildRecipeSchema(pantry: Pantry, diets: StrictDiet[], unitHint 
       cook_time: { type: 'integer' },
       total_time: { type: 'integer' },
       servings: { type: 'integer' },
-      dietary_tags: { type: 'array', items: { type: 'string' } },
       ingredients: {
         type: 'array',
         items: {
@@ -277,7 +370,7 @@ export function buildRecipeSchema(pantry: Pantry, diets: StrictDiet[], unitHint 
       image_prompt: { type: 'string' },
     },
     required: [
-      'title', 'description', 'difficulty', 'prep_time', 'cook_time', 'total_time', 'servings', 'dietary_tags',
+      'title', 'description', 'difficulty', 'prep_time', 'cook_time', 'total_time', 'servings',
       'ingredients', 'instructions', 'tips', 'suggestion', 'image_prompt',
     ],
     additionalProperties: false,
@@ -356,14 +449,12 @@ export function recipeViolation(recipe: any, pantry: Pantry): string | null {
 }
 
 // Régimes non respectés par la recette, après les exceptions du serveur
-export function dietViolations(recipe: any, diets: StrictDiet[]): string[] {
+export function dietViolations(recipe: any, diets: StrictDiet[], pantry?: Pantry): string[] {
   const violations: string[] = [];
   for (const ingredient of recipe.ingredients || []) {
-    const flagged = Array.isArray(ingredient.diet_violations) ? ingredient.diet_violations : [];
+    const pantryName = pantry?.aliasOf.get(ingredient?.pantry_id)?.name;
     for (const diet of diets) {
-      if (flagged.includes(diet) && !isDietException(ingredient.name, diet)) {
-        violations.push(`${ingredient.name} (${diet})`);
-      }
+      if (ingredientBreaksDiet(ingredient, diet, pantryName)) violations.push(`${ingredient.name} (${diet})`);
     }
   }
   return violations;
@@ -408,7 +499,8 @@ export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; 
     servings: context.servings ?? (isCount(raw.servings) && raw.servings > 0 ? Math.round(raw.servings) : 2),
     meal_type: context.mealType,
     cuisine: context.cuisine,
-    dietary_tags: isStringArray(raw.dietary_tags) ? raw.dietary_tags : context.dietary,
+    // Étiquettes de régime vérifiées par le serveur seulement (« diet:vegan »…), aucune étiquette du modèle
+    dietary_tags: verifiedDietTags(raw, pantry),
     ingredients_used: ingredients,
     ingredients_from_list: unique(ingredients.filter((i) => i.pantry_id).map((i) => i.name)),
     // À acheter : sans les basiques (sel, poivre, huile, eau), toujours disponibles
@@ -477,7 +569,7 @@ export function parseRecipes(
     if (outsideSelection) {
       return invalid.push(`n°${index} "${raw.title}" utilise « ${outsideSelection} », hors de la sélection`);
     }
-    const diet = dietViolations(raw, diets);
+    const diet = dietViolations(raw, diets, pantry);
     if (diet.length > 0) return dietaryRejections.push(`"${raw.title}" : ${diet.join(', ')}`);
     recipes.push(toRecipe(raw, pantry, context));
   });

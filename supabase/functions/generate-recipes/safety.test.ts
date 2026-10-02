@@ -143,3 +143,13 @@ Deno.test('four : température en °C exigée, niveau de feu retiré des étapes
   // Sur la plaque : inchangé
   assertEquals(withoutOvenHeatLevel('Sear the steak in a skillet over medium-high heat.'), 'Sear the steak in a skillet over medium-high heat.');
 });
+
+Deno.test('four : la température du four ne remplace jamais la température à cœur de la viande ou du poisson', () => {
+  // 200 °C au four, jus clair, sans température à cœur : bloquant
+  assertEquals(frenchCodes([['poulet', 'chicken']], ['Bake the chicken 25 minutes at 200 °C, until the juices run clear.']), ['core_temperature']);
+  assertEquals(frenchCodes([['poisson', 'fish']], ['Enfourne le poisson 15 minutes à 180 °C, jusqu’à ce que la chair soit opaque.']), ['core_temperature']);
+  // Four sans température mais cuisson à cœur écrite : seul le défaut non bloquant du four reste
+  assertEquals(frenchCodes([['bœuf', 'beef']], ['Bake the beef 20 minutes, until 63 °C inside and tender.']), ['oven_celsius']);
+  // Four sans température et sans cuisson à cœur : la température à cœur reste exigée
+  assertEquals(frenchCodes([['poulet', 'chicken']], ['Bake the chicken 25 minutes, until the juices run clear.']), ['core_temperature', 'oven_celsius']);
+});

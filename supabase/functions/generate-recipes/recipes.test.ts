@@ -8,6 +8,8 @@ import {
   buildRecipeSchema,
   cleanExcluded,
   cleanServings,
+  dietWordInName,
+  dietWordInText,
   excludedUsed,
   hasInternalCodes,
   isBasic,
@@ -63,17 +65,14 @@ Deno.test('garde-manger : alias p1, p2… dans l\'ordre, noms simples acceptés,
   assertEquals(buildPantry(Array.from({ length: 80 }, (_, i) => `aliment ${i}`)).items.length, MAX_PANTRY_ITEMS);
 });
 
-Deno.test('schéma : alias et « missing » en liste fermée ; diet_violations seulement avec un régime strict', () => {
+Deno.test('schéma : alias et « missing » en liste fermée ; diet_violations pour les quatre régimes, toujours ; pas d\'étiquettes du modèle', () => {
   const schema: any = buildRecipeSchema(PANTRY, []);
   const ingredient = schema.properties.recipes.items.properties.ingredients.items;
   assertEquals(ingredient.properties.pantry_id.enum, ['p1', 'p2', 'p3', MISSING]);
-  assertEquals(ingredient.properties.diet_violations, undefined);
+  assertEquals(ingredient.properties.diet_violations.items.enum, ['vegan', 'vegetarian', 'gluten-free', 'dairy-free']);
+  assert(ingredient.required.includes('diet_violations'));
   assertEquals(ingredient.additionalProperties, false);
-
-  const vegan: any = buildRecipeSchema(PANTRY, strictDietsOf(['Vegan', 'Low-Carb']));
-  const veganIngredient = vegan.properties.recipes.items.properties.ingredients.items;
-  assertEquals(veganIngredient.properties.diet_violations.items.enum, ['vegan']);
-  assert(veganIngredient.required.includes('diet_violations'));
+  assertEquals(schema.properties.recipes.items.properties.dietary_tags, undefined);
 });
 
 Deno.test('correspondance des identifiants : alias → uuid ; nom écrit par le modèle (langue de la recette) ; missing → null', () => {
@@ -297,4 +296,55 @@ Deno.test('repères internes retirés des textes affichés : (p10), (buy), [URGE
   const [r] = result.value.recipes;
   assertEquals([r.tips[0], r.instructions[0]], ['Remplace la banane par une pomme.', 'Écrase la banane.']);
   assert(![r.title, r.description, ...r.instructions, ...r.tips].some(hasInternalCodes));
+});
+
+// ---------- Étiquettes de régime vérifiées ----------
+
+const tagsOf = (ingredients: unknown[], instructions: string[] = ['Mélange le tout.'], title = 'Plat') => {
+  const result = parse([recipe(ingredients, { title, instructions })]);
+  assert(result.ok);
+  return result.value.recipes[0].dietary_tags;
+};
+const free = (name: string, pantryId = MISSING) => ({ ...ing(name, pantryId), diet_violations: [] });
+
+Deno.test('étiquettes : béchamel jamais « sans gluten » ni « sans lactose », même sans farine listée ni signalement du modèle', () => {
+  // Farine et lait dans la liste, aucun régime signalé par le modèle
+  const listed = tagsOf([free('banane', 'p1'), free('farine de blé'), free('lait')], ['Fais une béchamel avec la farine et le lait.']);
+  assert(!listed.includes('diet:gluten-free') && !listed.includes('diet:dairy-free'));
+  // Béchamel seulement nommée dans le titre et les étapes (farine absente de la liste)
+  const hidden = tagsOf([free('Bananes mûres', 'p1'), free('aubergine')], ['Whisk in 2 tbsp flour, then the milk.'], 'Baked Aubergine with Creamy Béchamel');
+  assert(!hidden.includes('diet:gluten-free') && !hidden.includes('diet:dairy-free'));
+  assert(hidden.includes('diet:vegetarian'));
+});
+
+Deno.test('étiquettes : seulement les régimes vérifiés, sous la forme « diet:… » ; aucune étiquette nutritionnelle', () => {
+  // Fruits et lait d'amande : vegan (pas végétarien en plus), sans gluten, sans lactose ; lait d'avoine : pas sans
+  // gluten (avoine)
+  assertEquals(tagsOf([free('banane', 'p1'), free('lait d’amande')], ['Mixe la banane avec le lait d’amande.']), ['diet:vegan', 'diet:gluten-free', 'diet:dairy-free']);
+  assertEquals(tagsOf([free('banane', 'p1'), free('lait d’avoine')], ['Mixe la banane avec le lait d’avoine.']), ['diet:vegan', 'diet:dairy-free']);
+  // Œufs et beurre : végétarien seulement ; pain : pas sans gluten
+  assertEquals(tagsOf([free('banane', 'p1'), free('œufs'), free('beurre'), free('pain')], ['Fais dorer le pain au beurre.']), ['diet:vegetarian']);
+  // Steak et sauce soja : aucune étiquette de régime végétarien, pas sans gluten
+  assertEquals(tagsOf([free('banane', 'p1'), free('beef steak'), free('soy sauce')], ['Sear the steak.']), ['diet:dairy-free']);
+  // Étiquettes du modèle ignorées
+  const result = parse([recipe([free('banane', 'p1')], { dietary_tags: ['high-protein', 'gluten-free'] })]);
+  assert(result.ok);
+  assert(!result.value.recipes[0].dietary_tags.includes('high-protein'));
+  // Régime signalé par le modèle : pas d\'étiquette
+  assertEquals(tagsOf([free('banane', 'p1'), { ...ing('tofu fumé', MISSING), diet_violations: ['gluten-free'] }]).includes('diet:gluten-free'), false);
+});
+
+Deno.test('régimes choisis : ingrédient interdit repéré par le serveur même sans signalement du modèle', () => {
+  const vegetarian = parseRecipes(JSON.stringify({ recipes: [recipe([free('banane', 'p1'), free('lardons')])], refusal: '' }), PANTRY, ['vegetarian'], CONTEXT);
+  assert(vegetarian.ok);
+  assertEquals([vegetarian.value.recipes.length, vegetarian.value.dietaryRejections.length], [0, 1]);
+  const gluten = parseRecipes(JSON.stringify({ recipes: [recipe([free('banane', 'p1'), free('farine de riz'), free('pâtes sans gluten')]), recipe([free('banane', 'p1'), free('couscous')], { title: 'Couscous' })], refusal: '' }), PANTRY, ['gluten-free'], CONTEXT);
+  assert(gluten.ok);
+  assertEquals(gluten.value.recipes.map((r) => r.title), ['Smoothie']);
+  // Mots proches sans rapport : « butternut », « graines de pavot », « lait de coco »
+  assertEquals(dietWordInName('courge butternut', 'dairy-free'), false);
+  assertEquals(dietWordInName('graines de pavot', 'vegetarian'), false);
+  assertEquals(dietWordInName('lait de coco', 'vegan'), false);
+  assertEquals(dietWordInText('Blend the soup until smooth.', 'gluten-free'), false);
+  assertEquals(dietWordInText('Heat the oil in a pan.', 'gluten-free'), false);
 });
