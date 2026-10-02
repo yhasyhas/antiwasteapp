@@ -55,7 +55,8 @@ export const normalizeText = (text: unknown) =>
 const STOP = new Set(['de', 'du', 'des', 'la', 'le', 'les', 'en', 'au', 'aux', 'et', 'of', 'the', 'and', 'with', 'y', 'con', 'el', 'los', 'las', 'del', 'a', 'un', 'une',
   'reste', 'restes', 'leftover', 'leftovers', 'sobras', 'cuit', 'cuite', 'cuits', 'cuites', 'cooked', 'cocido', 'cocida', 'cocidos', 'cocidas', 'fresh', 'frais', 'fraiche', 'fresco', 'fresca',
   'boite', 'conserve', 'lata', 'can', 'canned', 'sec', 'seche', 'secs', 'dry', 'dried', 'seco', 'secos', 'gros', 'petit', 'petits', 'large', 'small', 'grand']);
-const stem = (word: string) => (word.length > 4 ? word.replace(/(es|s|x)$/, '') : word);
+// Singulier approximatif, commun aux deux formes : « ignames » et « igname » donnent « ignam »
+const stem = (word: string) => (word.length > 4 ? word.replace(/(s|x)$/, '').replace(/e$/, '') : word);
 const significantWords = (text: string) => normalizeText(text).split(' ').filter((w) => w.length >= 3 && !STOP.has(w)).map(stem);
 const wordsOf = (text: string) => new Set(normalizeText(text).split(' ').map(stem));
 

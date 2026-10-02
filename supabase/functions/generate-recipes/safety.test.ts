@@ -42,6 +42,11 @@ Deno.test('safetyIssues : viande crue, température à cœur au seuil et signe v
   assertEquals(codes(recipe([['Dorade', 'fish']], ['Pose la dorade dans un plat.', 'Enfourne 20 minutes à 200 °C, jusqu\'à ce que la chair soit opaque et atteigne 63 °C à cœur.'])), []);
 });
 
+Deno.test('safetyIssues : ingrédient au pluriel dans la liste, au singulier dans les étapes', () => {
+  assertEquals(codes(recipe([['Ignames', null]], ['Épluche l\'igname et fais-la bouillir 20 minutes, jusqu\'à ce qu\'elle soit tendre.'])), []);
+  assertEquals(codes(recipe([['Ignames', null]], ['Épluche l\'igname et coupe-la en dés.'])), ['not_cooked']);
+});
+
 Deno.test('safetyIssues : poisson cru seulement s\'il a été congelé avant', () => {
   assertEquals(codes(recipe([['Dorade', 'fish']], ['Coupe la dorade en dés et arrose de citron vert 15 minutes.'])), ['raw_fish']);
   assertEquals(codes(recipe([['Dorade', 'fish']], ['Utilise une dorade très fraîche, préalablement congelée 7 jours.', 'Coupe la dorade en dés et arrose de citron vert.'])), []);
