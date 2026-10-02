@@ -9,7 +9,7 @@ export type Cuisine = typeof CUISINES[number];
 
 // Versions du prompt : v1 est celle de l'app ; les suivantes sont des candidates, essayées par l'évaluation
 // (generate-recipes-eval) avant d'être adoptées
-export const PROMPT_VERSIONS = ['v1', 'v2', 'v3', 'v4', 'v5'] as const;
+export const PROMPT_VERSIONS = ['v1', 'v2', 'v3', 'v4', 'v5', 'v4.1'] as const;
 export type PromptVersion = typeof PROMPT_VERSIONS[number];
 
 // ---------- Prompt ----------
@@ -139,7 +139,9 @@ export function buildPrompts(options: {
   // v5 : v4, avec des types de plats propres à la cuisine demandée (pas de gratin ni de salade composée imposés
   // aux cuisines qui n'en font pas) et un exemple différent par recette (évaluation des régions)
   const v5 = options.version === 'v5';
-  const v4 = options.version === 'v4' || v5;
+  // v4.1 : v4, avec seulement la règle de la v5 sur les types de plats (décision du 02/10/2026)
+  const v41 = options.version === 'v4.1';
+  const v4 = options.version === 'v4' || v5 || v41;
   const v2 = options.version === 'v2' || v3 || v4;
   const examples = options.examples ?? [];
   const dietaryRules = options.dietary.map((diet) => DIETARY_RULES[diet.toLowerCase()]).filter(Boolean);
@@ -236,7 +238,7 @@ ${v4 ? SAFETY_RULES_V4 : SAFETY_RULES}
   const prompt = `Garde-manger (identifiant : nom) :
 ${options.pantryText}
 
-Crée exactement ${options.count} recette${options.count > 1 ? 's' : ''}${options.count > 1 ? (v5 && (options.cuisine !== 'any' || options.cuisineChoice) ? ' vraiment différentes : des types de plats différents, choisis parmi ceux qui sont courants dans la cuisine demandée (pas de gratin, de salade composée ni de tarte si elle n’en fait pas), jamais deux fois la même base' : v2 ? ' vraiment différentes : des plats de types différents (ex. un plat mijoté, un plat au four, une salade ou une soupe), jamais deux fois la même base (deux plats de pâtes à la tomate)' : ' vraiment différentes les unes des autres (plat, technique de cuisson, texture)') : ''}.
+Crée exactement ${options.count} recette${options.count > 1 ? 's' : ''}${options.count > 1 ? ((v5 || v41) && (options.cuisine !== 'any' || options.cuisineChoice) ? ' vraiment différentes : des types de plats différents, choisis parmi ceux qui sont courants dans la cuisine demandée (pas de gratin, de salade composée ni de tarte si elle n’en fait pas), jamais deux fois la même base' : v2 ? ' vraiment différentes : des plats de types différents (ex. un plat mijoté, un plat au four, une salade ou une soupe), jamais deux fois la même base (deux plats de pâtes à la tomate)' : ' vraiment différentes les unes des autres (plat, technique de cuisson, texture)') : ''}.
 - Difficulté : ${options.difficulty}
 - Temps total maximum : ${options.maxCookTime} minutes${options.avoidTitles && options.avoidTitles.length > 0 ? `
 - Déjà proposées, à ne pas refaire (autre plat, autre technique) : ${options.avoidTitles.map((title) => `« ${title} »`).join(', ')}` : ''}${v4 && options.recentTitles && options.recentTitles.length > 0 ? `

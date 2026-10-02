@@ -59,6 +59,15 @@ Deno.test('safetyIssues : fausses alertes relevées par l\'évaluation des régi
   assertEquals(codes(recipe([['Cordero picado', null]], ['Dora el cordero 6 minutos, hasta que pierda el color rosado y alcance 71 °C.'])), []);
 });
 
+Deno.test('safetyIssues : signes visibles formulés librement, lentilles cuites dans l\'eau versée avant', () => {
+  assertEquals(codes(recipe([['Agneau haché', null]], ['Mélange l\'agneau et les herbes, forme les köfte.', 'Cuis les köfte 4 minutes de chaque côté, jusqu\'à 71 °C à cœur (les jus doivent être clairs).'])), []);
+  assertEquals(codes(recipe([['Cordero picado', null]], ['Cocina el cordero 6 minutos, hasta que la carne pierda su color rosado y alcance 71 °C.'])), []);
+  assertEquals(codes(recipe([['Chicken thighs', null]], ['Simmer the chicken 12 minutes, until the internal temperature reaches 74 °C and the juices are clear.'])), []);
+  // Sans signe : toujours signalé
+  assertEquals(codes(recipe([['Cordero picado', null]], ['Cocina el cordero 6 minutos, hasta que esté bien cocido y alcance 71 °C.'])), ['doneness_sign']);
+  assertEquals(codes(recipe([['Lentejas rojas', null]], ['Agrega las lentejas rojas y revuelve 2 minutos.', 'Vierte 1,5 l de agua y lleva a ebullición.', 'Cuece 20 minutos, hasta que las lentejas estén tiernas.'])), []);
+});
+
 Deno.test('safetyIssues : poisson cru seulement s\'il a été congelé avant', () => {
   assertEquals(codes(recipe([['Dorade', 'fish']], ['Coupe la dorade en dés et arrose de citron vert 15 minutes.'])), ['raw_fish']);
   assertEquals(codes(recipe([['Dorade', 'fish']], ['Utilise une dorade très fraîche, préalablement congelée 7 jours.', 'Coupe la dorade en dés et arrose de citron vert.'])), []);

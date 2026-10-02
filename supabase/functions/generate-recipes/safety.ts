@@ -154,6 +154,11 @@ const SIGNS_MEAT = ['jus clair', 'trace rose', 'perde sa couleur rose', 'no pink
   'jugos claros', 'jugo claro', 'ya no este ros', 'ya no ros', 'sin rastro ros', 'sin partes rosad', 'ningun rastro ros', 'no quede ros', 'se desprend', 'se deshac', 'tierna', 'tierno', 'firme al tacto', 'deshebr', 'desmenu'];
 const SIGNS_FISH = ['opaque', 'se detache', 's effeuille', 'lamelle', 'a la fourchette', 'flake', 'with a fork', 'opaco', 'opaca', 'se desmenu', 'se deshac', 'se despeg', 'lamina', 'lasca', 'se separa', 'con un tenedor'];
 const SIGNS_SHELLFISH = ['rose', 'opaque', 'pink', 'opaco', 'opaca', 'rosad', 's ouvr', 'ouvert', 'open', 'se abr', 'abiert'];
+// Signes formulés librement : « les jus doivent être clairs », « hasta que pierda su color rosado », « juices are clear »
+const MEAT_SIGN_PATTERNS = [
+  /\b(jus|juice|juices|jugo|jugos)\b(\s+\S+){0,4}\s+(clair|claire|clear|claro|transparent|transparente)s?\b/,
+  /\b(plus|aucun|aucune|sans|perd|perde|no|not|sin|ningun|ninguna|lost|longer|pierd\w*|perder|lose|loses)\b(\s+\S+){0,4}\s+(rose|rosee|pink|pinkness|rosad\w*|rosa)s?\b/,
+];
 // Poisson cru (ceviche, tartare) : seulement s'il a été congelé avant (parasites)
 const FROZEN_BEFORE = ['congele', 'surgele', 'frozen', 'congelad'];
 
@@ -219,7 +224,7 @@ export function safetyIssues(recipe: SafetyRecipe, pantry: SafetyPantryItem[]): 
         const minutes = longestMinutes(aboutText);
         const pressure = hasKeyword(aboutText, PRESSURE);
         const ok = quick
-          ? minutes >= 15 && hasKeyword(aboutText, LIQUID)
+          ? minutes >= 15 && (hasKeyword(aboutText, LIQUID) || hasKeyword(allSteps, LIQUID))
           : hasKeyword(aboutText, SOAK) && (minutes >= 45 || (pressure && minutes >= 15));
         if (!ok) {
           add('dry_legumes', name, quick
@@ -268,7 +273,8 @@ export function safetyIssues(recipe: SafetyRecipe, pantry: SafetyPantryItem[]): 
       add('core_temperature', name, `« ${name} » : écrire la température à cœur (${PROTEIN_LABEL[protein]}).`);
     }
     const signs = protein === 'fish' ? SIGNS_FISH : protein === 'shellfish' ? SIGNS_SHELLFISH : SIGNS_MEAT;
-    if (!hasKeyword(allSteps, signs)) add('doneness_sign', name, `« ${name} » : ajouter un signe visible de cuisson (${PROTEIN_LABEL[protein]}).`);
+    const signed = hasKeyword(allSteps, signs) || (protein !== 'fish' && protein !== 'shellfish' && MEAT_SIGN_PATTERNS.some((pattern) => pattern.test(normalizeText(allSteps))));
+    if (!signed) add('doneness_sign', name, `« ${name} » : ajouter un signe visible de cuisson (${PROTEIN_LABEL[protein]}).`);
   }
 
   if (reheatNeeded && !hasKeyword(allSteps, REHEAT)) {

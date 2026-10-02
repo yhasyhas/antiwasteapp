@@ -19,7 +19,10 @@ import {
   strictDietsOf,
   urgentItems,
 } from './recipes.ts';
-import { buildPrompts, CUISINES, type Cuisine } from './prompt.ts';
+import { buildPrompts, CUISINES, type Cuisine, PROMPT_VERSIONS, type PromptVersion } from './prompt.ts';
+import { sampleDishes } from './library.ts';
+import { recentTitles } from './history.ts';
+import { safetyPass } from './safetyPass.ts';
 
 // Modèles configurables par secret : les fournisseurs retirent régulièrement des modèles
 const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') || '';
@@ -38,6 +41,15 @@ const PROVIDERS: AiProvider[] = orderProviders([
 
 // 3 recettes détaillées tiennent dans ~3 500 tokens ; le raisonnement de gpt-oss compte aussi
 const MAX_OUTPUT_TOKENS = 8000;
+
+// Version du prompt (évaluation de la phase 9 : scripts/recipe-eval), réglable par secret sans redéployer ;
+// v1 : l'ancienne version, sans contrôle de sécurité ni plats de référence
+const DEFAULT_PROMPT_VERSION: PromptVersion = 'v4.1';
+const requestedVersion = Deno.env.get('RECIPE_PROMPT_VERSION') || '';
+const PROMPT_VERSION: PromptVersion = (PROMPT_VERSIONS as readonly string[]).includes(requestedVersion) ? requestedVersion as PromptVersion : DEFAULT_PROMPT_VERSION;
+// v4 et suivantes : plats de référence, titres récents, contrôle de sécurité, unités dans la langue de la recette
+const V4_FAMILY = !['v1', 'v2', 'v3'].includes(PROMPT_VERSION);
+const UNIT_HINT = PROMPT_VERSION === 'v1' ? undefined : 'Unité abrégée, dans la langue de la recette';
 
 interface GenerateRecipeRequest {
   // { id, name, quantity } depuis la phase 3, + days_left, kind, priority depuis la phase 5 ; simples noms acceptés
@@ -190,6 +202,8 @@ Deno.serve(withCors(async (req: Request) => {
       return requestErrorResponse('quota_exceeded', language, dailyLimit(user, 'generations'));
     }
     quotaUserId = user.id;
+    // Titres des recettes récentes et des favoris (à ne pas reproposer), lus pendant la préparation du prompt
+    const recentPromise = V4_FAMILY ? recentTitles(user.id) : Promise.resolve([]);
 
     const dietary = Array.isArray(preferences.dietary) ? preferences.dietary : [];
     const diets = strictDietsOf(dietary);
@@ -217,8 +231,13 @@ Deno.serve(withCors(async (req: Request) => {
       otherPantry,
       excluded,
       servings,
+      version: PROMPT_VERSION,
+      // Quelques plats de référence tirés au hasard, seulement avec une cuisine précise
+      examples: V4_FAMILY ? sampleDishes(cuisine, { mealType: preferences.mealType, diets }) : [],
+      recentTitles: await recentPromise,
     };
     const { system, prompt } = buildPrompts(promptOptions);
+    const schema = buildRecipeSchema(pantry, diets, UNIT_HINT);
 
     const providers = debug === true && requestedOrder
       ? orderProviders(PROVIDERS, requestedOrder).filter((p) => requestedOrder.split(',').includes(p.name))
@@ -227,7 +246,7 @@ Deno.serve(withCors(async (req: Request) => {
     const result = await runWithFallback(providers, {
       system,
       prompt,
-      schema: buildRecipeSchema(pantry, diets),
+      schema,
       schemaName: 'recipes',
       temperature: 0.8,
       maxOutputTokens: MAX_OUTPUT_TOKENS,
@@ -259,7 +278,7 @@ Deno.serve(withCors(async (req: Request) => {
       const second = await runWithFallback(providers, {
         system: again.system,
         prompt: again.prompt,
-        schema: buildRecipeSchema(pantry, diets),
+        schema,
         schemaName: 'recipes',
         temperature: 0.8,
         maxOutputTokens: MAX_OUTPUT_TOKENS,
@@ -280,7 +299,31 @@ Deno.serve(withCors(async (req: Request) => {
       return failureResponse('dietary_refusal', language, debug === true ? { debug: { ...debugInfo.debug, dietary_rejections: dietaryRejections, invalid, refusal } } : debugInfo);
     }
 
-    console.log(`[generate-recipes] ${result.provider.name} (${result.provider.model}) : ${recipes.length}/${count} recette(s) en ${Date.now() - t0} ms, cuisine ${cuisine}, langue ${language}`);
+    // Contrôle de sécurité (v4 et suivantes, safety.ts) : une demande de correction pour les recettes en défaut,
+    // puis celles qui restent en défaut sont écartées ; aucune génération de plus comptée dans le quota
+    let safetyReport = null;
+    if (V4_FAMILY) {
+      const pass = await safetyPass(recipes, {
+        pantry, pantryText: promptOptions.pantryText, diets, context, providers, log, t0, label: 'generate-recipes:correction',
+        request: { system, prompt, schema, schemaName: 'recipes', temperature: 0.8, maxOutputTokens: MAX_OUTPUT_TOKENS },
+        ...(simulation?.providers && { simulate: simulation.providers }),
+      });
+      for (const hit of pass.report.correction?.quotaHits ?? []) {
+        reportInBackground(reportProviderQuota(hit.provider, 'generate-recipes', hit.details, simulation !== null));
+      }
+      recipes = pass.recipes;
+      safetyReport = { first: pass.report.first, corrected: pass.report.corrected, dropped: pass.report.dropped };
+      if (pass.report.first.length > 0) {
+        console.warn(`[generate-recipes] sécurité : ${pass.report.first.length} en défaut, ${pass.report.corrected.length} corrigée(s), ${pass.report.dropped.length} écartée(s) (${pass.report.dropped.map((d) => `${d.title} : ${d.issues.map((i) => i.code).join(', ')}`).join(' ; ')})`);
+      }
+      if (recipes.length === 0) {
+        // Toutes écartées (rare) : panne du point de vue de l'utilisateur, la génération n'est pas comptée
+        await refundQuota(user.id, 'generations');
+        return failureResponse('api_error', language, debug === true ? { debug: { ...debugInfo.debug, safety: safetyReport } } : debugInfo);
+      }
+    }
+
+    console.log(`[generate-recipes] ${result.provider.name} (${result.provider.model}) : ${recipes.length}/${count} recette(s) en ${Date.now() - t0} ms, prompt ${PROMPT_VERSION}, cuisine ${cuisine}, langue ${language}`);
     return jsonResponse({
       recipes,
       totalGenerated: recipes.length,
@@ -289,7 +332,7 @@ Deno.serve(withCors(async (req: Request) => {
       rejected: Math.max(0, count - recipes.length),
       fewIngredients: count < 3,
       provider: result.provider.name,
-      ...(debug === true && { debug: { ...debugInfo.debug, dietary_rejections: dietaryRejections, invalid } }),
+      ...(debug === true && { debug: { ...debugInfo.debug, dietary_rejections: dietaryRejections, invalid, version: PROMPT_VERSION, safety: safetyReport } }),
     }, 200);
   } catch (error) {
     console.error('Error generating recipes:', error);

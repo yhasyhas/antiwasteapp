@@ -37,10 +37,10 @@ import {
   strictDietsOf,
   urgentItems,
 } from '../generate-recipes/recipes.ts';
-import { buildCorrectionPrompt, buildPrompts, CUISINES, type Cuisine, PROMPT_VERSIONS, type PromptVersion } from '../generate-recipes/prompt.ts';
+import { buildPrompts, CUISINES, type Cuisine, PROMPT_VERSIONS, type PromptVersion } from '../generate-recipes/prompt.ts';
 import { sampleDishes } from '../generate-recipes/library.ts';
 import { resolveCuisine } from '../generate-recipes/cuisines.ts';
-import { type SafetyIssue, safetyIssues } from '../generate-recipes/safety.ts';
+import { type SafetyReport, safetyPass } from '../generate-recipes/safetyPass.ts';
 import { recentTitles } from '../generate-recipes/history.ts';
 import { JUDGE_SCHEMA, judgePrompt, VARIETY_SCHEMA, varietyPrompt } from './judge.ts';
 
@@ -52,7 +52,7 @@ const RECIPE_PROVIDERS = Deno.env.get('RECIPE_PROVIDERS') || 'groq,gemini';
 const MAX_OUTPUT_TOKENS = 8000;
 
 // v5 : v4 et ses ajustements (évaluation des régions et de la variété)
-const v4Family = (version: string) => version === 'v4' || version === 'v5';
+const v4Family = (version: string) => version === 'v4' || version === 'v5' || version === 'v4.1';
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
@@ -66,25 +66,6 @@ function providersFor(order: string | undefined, model?: string): AiProvider[] {
   ], order || RECIPE_PROVIDERS);
   // Ordre imposé : seulement les fournisseurs nommés (mesure d'un seul modèle)
   return order ? all.filter((provider) => order.split(',').includes(provider.name)) : all;
-}
-
-// Recette sous la forme envoyée par le modèle (alias du garde-manger), pour la demande de correction
-function rawRecipe(recipe: Recipe, pantry: Pantry) {
-  const aliasOf = new Map([...pantry.aliasOf.entries()].map(([alias, item]) => [item.id, alias]));
-  return {
-    title: recipe.title,
-    description: recipe.description,
-    difficulty: recipe.difficulty,
-    prep_time: recipe.prep_time,
-    cook_time: recipe.cook_time,
-    total_time: recipe.total_time,
-    servings: recipe.servings,
-    ingredients: recipe.ingredients_used.map((i) => ({ name: i.name, quantity: i.quantity, unit: i.unit, pantry_id: (i.pantry_id && aliasOf.get(i.pantry_id)) || MISSING })),
-    instructions: recipe.instructions,
-    tips: recipe.tips,
-    suggestion: recipe.suggestion ?? '',
-    image_prompt: recipe.image_prompt,
-  };
 }
 
 async function generate(body: any) {
@@ -110,7 +91,7 @@ async function generate(body: any) {
   const excluded = cleanExcluded(preferences.excluded);
   const servings = cleanServings(preferences.servings);
   const context = { mealType: preferences.mealType || 'dinner', cuisine: resolved.kind === 'regions' ? resolved.id : resolved.kind === 'other' ? 'other' : cuisine, difficulty, dietary, maxRecipes: count, mode, otherPantry, excluded, servings };
-  const v4 = version === 'v4' || version === 'v5';
+  const v4 = v4Family(version);
   // Plats de référence : seulement avec une cuisine précise ; library: false pour mesurer sans
   const examples = !v4 || body.library === false || resolved.kind === 'other' ? []
     : sampleDishes(cuisine, { mealType: context.mealType, diets, ...(resolved.kind === 'regions' && { regions: resolved.regions }),
@@ -171,39 +152,12 @@ async function generate(body: any) {
     }
   }
 
-  // Contrôle de sécurité (v4, ou safety: true) : une demande de correction pour les recettes en défaut, puis
-  // celles qui restent en défaut sont écartées
-  const safety = { checked: false, first: [] as { title: string; issues: SafetyIssue[] }[], corrected: [] as string[], dropped: [] as { title: string; issues: SafetyIssue[]; instructions: string[] }[] };
+  // Contrôle de sécurité (v4 et suivantes, ou safety: true) : même code que generate-recipes (safetyPass.ts)
+  let safety: Omit<SafetyReport, 'correction'> & { checked: boolean } = { checked: false, first: [], corrected: [], dropped: [] };
   if (body.safety ?? v4) {
-    safety.checked = true;
-    const checked = recipes.map((recipe) => ({ recipe, issues: safetyIssues(recipe, pantry.items) }));
-    const flawed = checked.filter((c) => c.issues.length > 0);
-    safety.first = flawed.map((c) => ({ title: c.recipe.title, issues: c.issues }));
-    if (flawed.length > 0) {
-      const correction = await runWithFallback(providers, {
-        ...request(prompts),
-        prompt: buildCorrectionPrompt(promptOptions.pantryText, flawed.map((c) => ({ recipe: rawRecipe(c.recipe, pantry), problems: c.issues.map((i) => i.message) }))),
-      }, (text) => parseRecipes(text, pantry, diets, { ...context, maxRecipes: flawed.length }), { label: 'generate-recipes-eval:correction', log, t0 });
-      const fixed = correction.ok ? correction.value.recipes : [];
-      const kept: Recipe[] = [];
-      let k = 0;
-      for (const c of checked) {
-        if (c.issues.length === 0) {
-          kept.push(c.recipe);
-          continue;
-        }
-        const candidate = fixed[k++];
-        const remaining = candidate ? safetyIssues(candidate, pantry.items) : c.issues;
-        if (candidate && remaining.length === 0) {
-          kept.push(candidate);
-          safety.corrected.push(candidate.title);
-        } else {
-          // Texte gardé pour relire les recettes écartées (fausse alerte ou vrai défaut)
-          safety.dropped.push({ title: c.recipe.title, issues: remaining, instructions: (candidate ?? c.recipe).instructions });
-        }
-      }
-      recipes = kept;
-    }
+    const pass = await safetyPass(recipes, { pantry, pantryText: promptOptions.pantryText, diets, context, providers, request: request(prompts), log, t0, label: 'generate-recipes-eval:correction' });
+    recipes = pass.recipes;
+    safety = { checked: true, first: pass.report.first, corrected: pass.report.corrected, dropped: pass.report.dropped };
   }
 
   return json({
