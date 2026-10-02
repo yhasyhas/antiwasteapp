@@ -7,7 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { toSaveCount, usePantryUrgency } from '@/hooks/usePantryUrgency';
 import { isBasic } from '@/lib/basics';
-import { dietLabel, difficultyLabel } from '@/lib/labels';
+import { difficultyLabel, verifiedDietLabels } from '@/lib/labels';
 import { failureTitle } from '@/lib/quotaReason';
 import { cachedTranslation, translateRecipe } from '@/lib/recipeTranslation';
 import { Badge } from '@/components/ui/Badge';
@@ -42,6 +42,8 @@ const normalize = (value: string) => value.trim().toLowerCase();
 // langue que l'app : « Traduire en … » (traduction gardée en base, générée une seule fois).
 export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFavorite, onToggleFavorite, onClose }: Props) {
   const { t, language } = useLanguage();
+  // Étiquettes de régime vérifiées par le serveur seulement (codes, traduits par l’app)
+  const dietLabels = verifiedDietLabels(t, original.dietary_tags);
   const safe = useSafeSpacing();
 
   // Traduction dans la langue de l'app : déjà faite (en base ou pendant la session), ou à la demande
@@ -138,10 +140,10 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
               <Text style={styles.times}>{t('home.prepAndCook', { prep: recipe.prep_time, cook: recipe.cook_time })}</Text>
             ) : null}
 
-            {recipe.dietary_tags.length > 0 && (
+            {dietLabels.length > 0 && (
               <View style={styles.tags}>
-                {recipe.dietary_tags.map((tag, index) => (
-                  <Badge key={index} label={dietLabel(t, tag)} tone="leftover" />
+                {dietLabels.map((label, index) => (
+                  <Badge key={index} label={label} tone="leftover" />
                 ))}
               </View>
             )}
