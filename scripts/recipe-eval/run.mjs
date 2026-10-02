@@ -36,7 +36,8 @@ const noLibrary = process.argv.includes('--no-library');
 // Nouveaux essais d'une génération refusée (limite par minute, modèle surchargé) ; 0 pour économiser un quota
 // quotidien en requêtes (Gemini : 20 par jour et par modèle dans l'offre gratuite)
 const RETRIES = Number(arg('retries', '3'));
-// Cas fixes : cases.json (13 situations) ou cases-regions.json (une par région, et « Autre cuisine », v4 seulement)
+// Cas fixes : cases.json (17 situations, dont 4 garde-manger en langues mélangées), cases-regions.json (une par région, et
+// « Autre cuisine », v4 seulement) ou cases-proteins.json (viande et poisson urgents)
 const CASES_FILE = arg('cases-file', 'cases.json');
 // Génération seule (notes du juge plus tard avec --rejudge)
 const noJudge = process.argv.includes('--no-judge');

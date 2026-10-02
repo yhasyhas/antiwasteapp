@@ -1,0 +1,2156 @@
+{
+ "summary": {
+  "version": "v4.1",
+  "date": "2026-10-02T22:25:31.130Z",
+  "model": "openai/gpt-oss-120b",
+  "judge_model": null,
+  "cases": 4,
+  "failed_cases": 0,
+  "recipes": 12,
+  "judge": {
+   "quantities": null,
+   "cooking_cues": null,
+   "order": null,
+   "ingredients_used": null,
+   "authenticity": null,
+   "safety": null,
+   "diet": null
+  },
+  "diversity_judge": null,
+  "auto": {
+   "ingredients_in_steps": 0.9791666666666666,
+   "quantities_in_steps": 0.5944444444444444,
+   "timed_cooking": 0.6148809523809524,
+   "oven_temperature": 1,
+   "reheat_cue": 1,
+   "uses_urgent": 0.75,
+   "rules_respected": 1,
+   "units_language": 1,
+   "safety_rules": 0.9166666666666666,
+   "no_heat_without_cooking": 1,
+   "no_celsius_without_meat": 1,
+   "diversity": 0.7580553705553705
+  },
+  "rejected_first": 0,
+  "median_ms": 9197,
+  "judge_mean": null
+ },
+ "results": [
+  {
+   "id": "es-mixte-noms-fr",
+   "note": "Langues mélangées : noms en français, receta en español ; pollo urgente y salmón",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 6029,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [],
+    "corrected": [],
+    "replaced": [],
+    "dropped": []
+   },
+   "examples": [],
+   "diversity_auto": 0.7045454545454546,
+   "diversity_judge": null,
+   "diversity_comment": null,
+   "judge_model": null,
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [],
+     "corrected": [],
+     "replaced": [],
+     "dropped": []
+    },
+    "examples": [],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "es-mixte-noms-fr-1",
+      "name": "cuisses de poulet",
+      "quantity": "4",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "es-mixte-noms-fr-2",
+      "name": "saumon",
+      "quantity": "2 pavés",
+      "daysLeft": 2,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "es-mixte-noms-fr-3",
+      "name": "riz",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "es-mixte-noms-fr-4",
+      "name": "oignons",
+      "quantity": "3",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "es-mixte-noms-fr-5",
+      "name": "poivrons",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "es-mixte-noms-fr-6",
+      "name": "tomates",
+      "quantity": "4",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "es-mixte-noms-fr-7",
+      "name": "ail",
+      "quantity": "1 tête",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p8",
+      "id": "es-mixte-noms-fr-8",
+      "name": "citron",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 6029,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 2,
+      "ms": 5996,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.224282596,
+       "prompt_tokens": 2280,
+       "prompt_time": 0.089551258,
+       "completion_tokens": 2700,
+       "completion_time": 5.630663738,
+       "total_tokens": 4980,
+       "total_time": 5.720214996,
+       "completion_tokens_details": {
+        "reasoning_tokens": 341
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "470077",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244131"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Pollo al horno con pimientos y limón",
+     "recipe": {
+      "title": "Pollo al horno con pimientos y limón",
+      "description": "Jugosas cuisses de pollo asadas al horno con pimientos, cebolla y un toque de limón, una cena ligera y sin grasa excesiva.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 35,
+      "total_time": 45,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "cuisses de pollo",
+        "quantity": "4",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-1"
+       },
+       {
+        "name": "pimientos",
+        "quantity": "2",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-5"
+       },
+       {
+        "name": "cebollas",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-4"
+       },
+       {
+        "name": "ajo",
+        "quantity": "2",
+        "unit": "diente",
+        "pantry_id": "es-mixte-noms-fr-7"
+       },
+       {
+        "name": "limón",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-8"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta negra",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "cuisses de pollo",
+       "pimientos",
+       "cebollas",
+       "ajo",
+       "limón"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Precalienta el horno a 200°C.",
+       "En un bol, mezcla 2 cda de aceite de oliva con el jugo del limón, la sal y la pimienta.",
+       "Añade las cuisses de pollo y úntalas bien con la marinada.",
+       "Corta los pimientos en tiras y la cebolla en aros; pica los dientes de ajo.",
+       "Coloca el pollo en una bandeja para hornear y reparte los pimientos, la cebolla y el ajo alrededor.",
+       "Hornea 30 minutos, hasta que la piel esté dorada y el interior alcance 74°C (jugos claros).",
+       "Deja reposar 5 minutos antes de servir."
+      ],
+      "tips": [
+       "Puedes agregar unas ramitas de tomillo o romero si tienes en casa.",
+       "Sirve con una ensalada verde para una comida completa."
+      ],
+      "image_prompt": "Professional food photography, roasted chicken thighs with colorful bell peppers and lemon slices, rustic baking tray, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.25,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 7,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Salmón a la plancha con arroz pilaf de limón",
+     "recipe": {
+      "title": "Salmón a la plancha con arroz pilaf de limón",
+      "description": "Filetes de salmón frescos, cocinados a la plancha y acompañados de un aromático arroz pilaf con cebolla, ajo y limón.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 25,
+      "total_time": 35,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "salmón",
+        "quantity": "2",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-2"
+       },
+       {
+        "name": "arroz",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "es-mixte-noms-fr-3"
+       },
+       {
+        "name": "cebolla",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-4"
+       },
+       {
+        "name": "ajo",
+        "quantity": "1",
+        "unit": "diente",
+        "pantry_id": "es-mixte-noms-fr-7"
+       },
+       {
+        "name": "limón",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-8"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta negra",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "salmón",
+       "arroz",
+       "cebolla",
+       "ajo",
+       "limón"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Enjuaga el arroz bajo agua corriente y escúrrelo.",
+       "En una olla mediana, calienta 1 cda de aceite a fuego medio, añade la cebolla picada y el ajo picado; sofríe 3 minutos hasta que la cebolla esté translúcida.",
+       "Agrega el arroz y remueve 1 minuto para tostar ligeramente.",
+       "Vierte 400 ml de agua, una pizca de sal y la ralladura de medio limón; lleva a ebullición.",
+       "Reduce el fuego a bajo, tapa y cocina 15 minutos, hasta que el agua se absorba y el arroz esté tierno.",
+       "Mientras el arroz se cocina, seca los filetes de salmón con papel de cocina, sazona con sal, pimienta y el jugo del otro medio limón.",
+       "Calienta 1 cda de aceite en una sartén antiadherente a fuego medio‑alto; coloca el salmón con la piel hacia abajo y cocina 4‑5 minutos hasta que la piel esté crujiente.",
+       "Voltea y cocina 3‑4 minutos más, hasta que el centro alcance 63°C (opaco).",
+       "Sirve el salmón sobre una cama de arroz pilaf y decora con unas rodajas finas de limón."
+      ],
+      "tips": [
+       "Si prefieres, puedes usar caldo de verduras en lugar de agua para más sabor.",
+       "No sobrecargues la sartén; cocina los filetes en tandas si es necesario."
+      ],
+      "image_prompt": "Professional food photography, pan-seared salmon fillets on a bed of lemon scented rice pilaf, bright plate, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0,
+      "timed_cooking": 0.8,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Sopa ligera de tomate y arroz",
+     "recipe": {
+      "title": "Sopa ligera de tomate y arroz",
+      "description": "Una sopa reconfortante de tomates frescos con arroz, ideal para una cena ligera y rápida.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 30,
+      "total_time": 40,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:vegan",
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "tomates",
+        "quantity": "4",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-6"
+       },
+       {
+        "name": "arroz",
+        "quantity": "100",
+        "unit": "g",
+        "pantry_id": "es-mixte-noms-fr-3"
+       },
+       {
+        "name": "cebolla",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-4"
+       },
+       {
+        "name": "ajo",
+        "quantity": "2",
+        "unit": "diente",
+        "pantry_id": "es-mixte-noms-fr-7"
+       },
+       {
+        "name": "limón",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-8"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "1",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta negra",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "agua",
+        "quantity": "800",
+        "unit": "ml",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "tomates",
+       "arroz",
+       "cebolla",
+       "ajo",
+       "limón"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Pela y corta los tomates en cubos medianos.",
+       "Pica la cebolla y los ajos finamente.",
+       "En una olla grande, calienta 1 cda de aceite a fuego medio, agrega la cebolla y el ajo; sofríe 4 minutos hasta que la cebolla esté transparente.",
+       "Añade los tomates picados y cocina 5 minutos, removiendo, hasta que empiecen a deshacerse.",
+       "Vierte 800 ml de agua, lleva a ebullición y baja a fuego medio.",
+       "Incorpora el arroz y una pizca de sal; cocina 15 minutos, removiendo ocasionalmente, hasta que el arroz esté tierno.",
+       "Exprime el jugo del limón y añádelo a la sopa; ajusta con pimienta y, si es necesario, más sal.",
+       "Retira del fuego y sirve caliente."
+      ],
+      "tips": [
+       "Para una textura más cremosa, puedes licuar la mitad de la sopa antes de añadir el arroz.",
+       "Añade unas hojas de albahaca fresca al final si tienes a mano."
+      ],
+      "suggestion": "Ideal también como entrante en una cena de verano.",
+      "image_prompt": "Professional food photography, bowl of bright red tomato rice soup, steam rising, rustic wooden table, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.3333333333333333,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 0,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    }
+   ]
+  },
+  {
+   "id": "es-mixte-noms-en",
+   "note": "Langues mélangées : noms en anglais, receta en español ; cerdo urgente y gambas",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 9657,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [
+     {
+      "title": "Salteado rápido de camarones con arroz y verduras",
+      "issues": [
+       {
+        "code": "doneness_sign",
+        "ingredient": "camarones",
+        "message": "« camarones » : ajouter un signe visible de cuisson (fruits de mer : chair opaque (crevettes roses et opaques, moules ouvertes))."
+       }
+      ]
+     }
+    ],
+    "corrected": [],
+    "replaced": [
+     "Paella fácil de cerdo y camarones"
+    ],
+    "dropped": [
+     {
+      "title": "Salteado rápido de camarones con arroz y verduras",
+      "issues": [
+       {
+        "code": "doneness_sign",
+        "ingredient": "camarones",
+        "message": "« camarones » : ajouter un signe visible de cuisson (fruits de mer : chair opaque (crevettes roses et opaques, moules ouvertes))."
+       }
+      ],
+      "instructions": [
+       "Enjuaga el arroz bajo agua fría y cocínalo en 400 ml de agua a fuego medio durante 15 minutos, hasta que absorba el líquido y esté tierno.",
+       "Mientras el arroz se cocina, corta la cebolla en juliana y el pimiento en tiras finas.",
+       "Pela y pica los ajos.",
+       "Calienta 1 cda de aceite vegetal en una sartén grande a fuego medio‑alto.",
+       "Añade la cebolla y el pimiento; saltea 3 minutos, hasta que empiecen a ablandarse.",
+       "Incorpora el ajo picado y saltea 1 minuto más.",
+       "Agrega los camarones y cocina 2‑3 minutos, removiendo, hasta que cambien a color rosa y alcancen 63 °C en el centro.",
+       "Vierte 2 cda de salsa de soja y 1 pizca de sal; mezcla bien.",
+       "Cuando el arroz esté listo, escúrrelo si queda exceso de agua y añádelo a la sartén. Saltea 2 minutos más, mezclando todo.",
+       "Sirve caliente."
+      ]
+     }
+    ]
+   },
+   "examples": [],
+   "diversity_auto": 0.6601546601546602,
+   "diversity_judge": null,
+   "diversity_comment": null,
+   "judge_model": null,
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [
+      {
+       "title": "Salteado rápido de camarones con arroz y verduras",
+       "issues": [
+        {
+         "code": "doneness_sign",
+         "ingredient": "camarones",
+         "message": "« camarones » : ajouter un signe visible de cuisson (fruits de mer : chair opaque (crevettes roses et opaques, moules ouvertes))."
+        }
+       ]
+      }
+     ],
+     "corrected": [],
+     "replaced": [
+      "Paella fácil de cerdo y camarones"
+     ],
+     "dropped": [
+      {
+       "title": "Salteado rápido de camarones con arroz y verduras",
+       "issues": [
+        {
+         "code": "doneness_sign",
+         "ingredient": "camarones",
+         "message": "« camarones » : ajouter un signe visible de cuisson (fruits de mer : chair opaque (crevettes roses et opaques, moules ouvertes))."
+        }
+       ],
+       "instructions": [
+        "Enjuaga el arroz bajo agua fría y cocínalo en 400 ml de agua a fuego medio durante 15 minutos, hasta que absorba el líquido y esté tierno.",
+        "Mientras el arroz se cocina, corta la cebolla en juliana y el pimiento en tiras finas.",
+        "Pela y pica los ajos.",
+        "Calienta 1 cda de aceite vegetal en una sartén grande a fuego medio‑alto.",
+        "Añade la cebolla y el pimiento; saltea 3 minutos, hasta que empiecen a ablandarse.",
+        "Incorpora el ajo picado y saltea 1 minuto más.",
+        "Agrega los camarones y cocina 2‑3 minutos, removiendo, hasta que cambien a color rosa y alcancen 63 °C en el centro.",
+        "Vierte 2 cda de salsa de soja y 1 pizca de sal; mezcla bien.",
+        "Cuando el arroz esté listo, escúrrelo si queda exceso de agua y añádelo a la sartén. Saltea 2 minutos más, mezclando todo.",
+        "Sirve caliente."
+       ]
+      }
+     ]
+    },
+    "examples": [],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "es-mixte-noms-en-1",
+      "name": "pork chops",
+      "quantity": "4",
+      "daysLeft": 0,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "es-mixte-noms-en-2",
+      "name": "shrimp",
+      "quantity": "300 g",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "es-mixte-noms-en-3",
+      "name": "potatoes",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "es-mixte-noms-en-4",
+      "name": "onion",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "es-mixte-noms-en-5",
+      "name": "bell peppers",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "es-mixte-noms-en-6",
+      "name": "rice",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "es-mixte-noms-en-7",
+      "name": "garlic",
+      "quantity": "1 head",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 9657,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 1,
+      "ms": 6474,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.211463133,
+       "prompt_tokens": 2272,
+       "prompt_time": 0.094179036,
+       "completion_tokens": 2844,
+       "completion_time": 6.1257529139999995,
+       "total_tokens": 5116,
+       "total_time": 6.21993195,
+       "completion_tokens_details": {
+        "reasoning_tokens": 398
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "470142",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244166"
+       }
+      }
+     },
+     {
+      "provider": "groq",
+      "started_at_ms": 6490,
+      "ms": 2401,
+      "ok": false,
+      "details": "Groq 400: {\"error\":{\"message\":\"Generated JSON does not match the expected schema. Please adjust your prompt. See 'failed_generation' for more details. Error: jsonschema: '/recipes/0/ingredients/5/diet_violations/0' does not validate with /properties/recipes/items/properties/ingredients/items/propert"
+     },
+     {
+      "provider": "groq",
+      "started_at_ms": 6490,
+      "ms": 3161,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.207291423,
+       "prompt_tokens": 2286,
+       "prompt_time": 0.121566247,
+       "completion_tokens": 1338,
+       "completion_time": 2.801972325,
+       "total_tokens": 3624,
+       "total_time": 2.923538572,
+       "completion_tokens_details": {
+        "reasoning_tokens": 193
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "470178",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244596"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Chuletas de cerdo al horno con papas y pimientos",
+     "recipe": {
+      "title": "Chuletas de cerdo al horno con papas y pimientos",
+      "description": "Un plato reconfortante de chuletas de cerdo jugosas acompañadas de papas doradas y pimientos asados, listo en una hora.",
+      "difficulty": "easy",
+      "prep_time": 15,
+      "cook_time": 35,
+      "total_time": 50,
+      "servings": 4,
+      "meal_type": "lunch",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "chuletas de cerdo",
+        "quantity": "4",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-en-1"
+       },
+       {
+        "name": "papas",
+        "quantity": "800",
+        "unit": "g",
+        "pantry_id": "es-mixte-noms-en-3"
+       },
+       {
+        "name": "pimientos",
+        "quantity": "2",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-en-5"
+       },
+       {
+        "name": "cebolla",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-en-4"
+       },
+       {
+        "name": "ajo",
+        "quantity": "3",
+        "unit": "diente",
+        "pantry_id": "es-mixte-noms-en-7"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "chuletas de cerdo",
+       "papas",
+       "pimientos",
+       "cebolla",
+       "ajo"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Precalienta el horno a 200 °C.",
+       "Corta las papas en cubos de 2 cm y los pimientos en tiras.",
+       "Pela y pica finamente la cebolla y los dientes de ajo.",
+       "En una bandeja grande, coloca las chuletas, las papas, los pimientos, la cebolla y el ajo.",
+       "Rocía todo con 2 cda de aceite de oliva y espolvorea 1 pizca de sal y 1 pizca de pimienta. Mezcla bien para que se impregnen.",
+       "Hornea durante 35 minutos, hasta que las chuletas alcancen 74 °C en el centro y las papas estén doradas y tiernas.",
+       "Retira del horno, deja reposar 5 minutos y sirve caliente."
+      ],
+      "tips": [
+       "Para que la piel de las chuletas quede crujiente, sécalas bien con papel de cocina antes de sazonar.",
+       "Puedes añadir una ramita de romero al final de la cocción para aromatizar."
+      ],
+      "image_prompt": "Professional food photography, roasted pork chops with golden potatoes and colorful bell peppers, rustic oven dish, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.75,
+      "timed_cooking": 0.6666666666666666,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 7,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Paella fácil de cerdo y camarones",
+     "recipe": {
+      "title": "Paella fácil de cerdo y camarones",
+      "description": "Una paella rápida y completa con chuletas de cerdo, camarones, arroz, pimientos y cebolla. Ideal para el almuerzo, equilibrado y se puede preparar con antelación.",
+      "difficulty": "easy",
+      "prep_time": 15,
+      "cook_time": 35,
+      "total_time": 50,
+      "servings": 4,
+      "meal_type": "lunch",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "chuletas de cerdo",
+        "quantity": "4",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-en-1"
+       },
+       {
+        "name": "camarones",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "es-mixte-noms-en-2"
+       },
+       {
+        "name": "arroz",
+        "quantity": "400",
+        "unit": "g",
+        "pantry_id": "es-mixte-noms-en-6"
+       },
+       {
+        "name": "cebolla",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-en-4"
+       },
+       {
+        "name": "pimientos",
+        "quantity": "2",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-en-5"
+       },
+       {
+        "name": "ajo",
+        "quantity": "3",
+        "unit": "diente",
+        "pantry_id": "es-mixte-noms-en-7"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "3",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "pimentón dulce",
+        "quantity": "1",
+        "unit": "cdta",
+        "pantry_id": null
+       },
+       {
+        "name": "limón",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "chuletas de cerdo",
+       "camarones",
+       "arroz",
+       "cebolla",
+       "pimientos",
+       "ajo"
+      ],
+      "missing_ingredients": [
+       "pimentón dulce",
+       "limón"
+      ],
+      "instructions": [
+       "Corta las 4 chuletas de cerdo en cubos de 2 cm y sazónalas con 1 pizca de sal y 1 pizca de pimienta.",
+       "Pela y pica finamente los 3 dientes de ajo.",
+       "Pica la cebolla en cubos pequeños y los pimientos en tiras.",
+       "En una paellera o sartén grande, calienta 2 cda de aceite de oliva a fuego medio.",
+       "Añade los cubos de cerdo y dóralos 5 minutos, hasta que estén bien sellados.",
+       "Incorpora el ajo picado y la cebolla; cocina 3 minutos, hasta que la cebolla esté translúcida.",
+       "Agrega los pimientos y cocina 2 minutos más.",
+       "Añade el arroz (400 g) y el pimentón dulce; revuelve 1 minuto para que el arroz se impregne.",
+       "Vierte 800 ml de agua, lleva a ebullición, reduce a fuego medio-bajo y cocina 12 minutos, sin remover, hasta que el arroz absorba la mayor parte del líquido.",
+       "Mientras tanto, limpia los camarones y sécalos.",
+       "Cuando el arroz esté casi listo, coloca los camarones encima del arroz, cubre la paellera y cocina 5 minutos a fuego medio, hasta que los camarones cambien a color rosa opaco y alcancen 63 °C en el centro.",
+       "Retira del fuego, cubre la paellera con un paño limpio y deja reposar 3 minutos.",
+       "Exprime el jugo del limón sobre la paella, ajusta la sal y pimienta si es necesario, y sirve caliente."
+      ],
+      "tips": [
+       "Para evitar que el arroz se pegue, no lo remuevas durante la cocción.",
+       "Si prefieres una paella más colorida, añade guisantes congelados en el paso 9 (no cuentan como compra).",
+       "Puedes usar caldo de pescado o de pollo en lugar de agua para más sabor, siempre que sea bajo en sodio."
+      ],
+      "image_prompt": "Professional food photography, colorful paella with pork chops, shrimp, red bell peppers, golden rice, rustic pan, natural light, garnish of lemon wedges"
+     },
+     "checks": {
+      "safety_rules": 0,
+      "safety_issues": [
+       "doneness_hint : chuletas de cerdo"
+      ],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.8,
+      "timed_cooking": 0.8333333333333334,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 13,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Sopa reconfortante de cerdo y verduras",
+     "recipe": {
+      "title": "Sopa reconfortante de cerdo y verduras",
+      "description": "Una sopa nutritiva con trozos de cerdo, papas, y arroz, perfecta para los días fríos y fácil de preparar en menos de una hora.",
+      "difficulty": "easy",
+      "prep_time": 15,
+      "cook_time": 30,
+      "total_time": 45,
+      "servings": 4,
+      "meal_type": "lunch",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "chuletas de cerdo",
+        "quantity": "2",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-en-1"
+       },
+       {
+        "name": "papas",
+        "quantity": "400",
+        "unit": "g",
+        "pantry_id": "es-mixte-noms-en-3"
+       },
+       {
+        "name": "cebolla",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-en-4"
+       },
+       {
+        "name": "ajo",
+        "quantity": "2",
+        "unit": "diente",
+        "pantry_id": "es-mixte-noms-en-7"
+       },
+       {
+        "name": "arroz",
+        "quantity": "100",
+        "unit": "g",
+        "pantry_id": "es-mixte-noms-en-6"
+       },
+       {
+        "name": "caldo de pollo",
+        "quantity": "1",
+        "unit": "l",
+        "pantry_id": null
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "1",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "chuletas de cerdo",
+       "papas",
+       "cebolla",
+       "ajo",
+       "arroz"
+      ],
+      "missing_ingredients": [
+       "caldo de pollo"
+      ],
+      "instructions": [
+       "Corta las chuletas de cerdo en cubos de 2 cm.",
+       "Pela y corta las papas en cubos de 1 cm.",
+       "Pela y pica finamente la cebolla y los ajos.",
+       "Calienta 1 cda de aceite de oliva en una olla grande a fuego medio.",
+       "Añade la cebolla y el ajo; sofríe 4 minutos, hasta que estén translúcidos.",
+       "Incorpora los cubos de cerdo y dora 5 minutos, removiendo, hasta que la superficie esté dorada y la carne alcance 63 °C.",
+       "Agrega las papas, el arroz y vierte 1 l de caldo de pollo.",
+       "Lleva a ebullición, reduce a fuego medio‑bajo y cocina 20 minutos, hasta que las papas estén tiernas y el arroz se haya hinchado.",
+       "Ajusta con 1 pizca de sal y 1 pizca de pimienta.",
+       "Sirve caliente, acompañada de pan crujiente si lo deseas."
+      ],
+      "tips": [
+       "Para una versión más ligera, usa caldo de verduras en lugar de caldo de pollo.",
+       "Puedes añadir una hoja de laurel al caldo al inicio para más aroma."
+      ],
+      "image_prompt": "Professional food photography, hearty pork and vegetable soup in a rustic bowl, steam rising, wooden table, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.5,
+      "timed_cooking": 0.75,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 10,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    }
+   ]
+  },
+  {
+   "id": "en-mixte-noms-es",
+   "note": "Langues mélangées : noms en espagnol, recipe in English ; viande hachée urgente et merlu",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 5945,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [],
+    "corrected": [],
+    "replaced": [],
+    "dropped": []
+   },
+   "examples": [],
+   "diversity_auto": 0.9444444444444444,
+   "diversity_judge": null,
+   "diversity_comment": null,
+   "judge_model": null,
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [],
+     "corrected": [],
+     "replaced": [],
+     "dropped": []
+    },
+    "examples": [],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "en-mixte-noms-es-1",
+      "name": "carne picada",
+      "quantity": "500 g",
+      "daysLeft": 0,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "en-mixte-noms-es-2",
+      "name": "merluza",
+      "quantity": "2 filetes",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "en-mixte-noms-es-3",
+      "name": "patatas",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "en-mixte-noms-es-4",
+      "name": "cebolla",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "en-mixte-noms-es-5",
+      "name": "zanahorias",
+      "quantity": "3",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "en-mixte-noms-es-6",
+      "name": "arroz",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "en-mixte-noms-es-7",
+      "name": "huevos",
+      "quantity": "6",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 5945,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 2,
+      "ms": 5919,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.052647653,
+       "prompt_tokens": 2257,
+       "prompt_time": 0.019494875,
+       "completion_tokens": 2522,
+       "completion_time": 5.806020976,
+       "total_tokens": 4779,
+       "total_time": 5.8255158510000005,
+       "prompt_tokens_details": {
+        "cached_tokens": 2048
+       },
+       "completion_tokens_details": {
+        "reasoning_tokens": 95
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "470224",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244625"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Spicy Ground Beef and Potato Skillet",
+     "recipe": {
+      "title": "Spicy Ground Beef and Potato Skillet",
+      "description": "A quick one‑pan dinner featuring urgent ground beef, tender potatoes, and sweet carrots, seasoned lightly for a comforting, easy meal.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 25,
+      "total_time": 35,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "ground beef",
+        "quantity": "500",
+        "unit": "g",
+        "pantry_id": "en-mixte-noms-es-1"
+       },
+       {
+        "name": "potatoes",
+        "quantity": "500",
+        "unit": "g",
+        "pantry_id": "en-mixte-noms-es-3"
+       },
+       {
+        "name": "carrot",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-mixte-noms-es-5"
+       },
+       {
+        "name": "onion",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-mixte-noms-es-4"
+       },
+       {
+        "name": "olive oil",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "black pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "paprika",
+        "quantity": "1",
+        "unit": "tsp",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "ground beef",
+       "potatoes",
+       "carrot",
+       "onion"
+      ],
+      "missing_ingredients": [
+       "paprika"
+      ],
+      "instructions": [
+       "Dice the 500 g potatoes into 1‑cm cubes.",
+       "Peel and slice the 2 carrots into thin rounds.",
+       "Finely chop the 1 onion.",
+       "Heat 2 tbsp olive oil in a large skillet over medium heat.",
+       "Add the onion and sauté 3 minutes, until translucent.",
+       "Add the ground beef and cook 6 minutes, breaking it up, until browned and no pink remains (internal temperature 71 °C).",
+       "Stir in the potatoes and carrots, season with 1 pinch salt, 1 pinch black pepper, and 1 tsp paprika.",
+       "Cover and cook on medium heat 15 minutes, stirring halfway, until potatoes are fork‑tender and carrots are soft.",
+       "Taste and adjust seasoning if needed, then serve hot."
+      ],
+      "tips": [
+       "For extra freshness, add a handful of chopped parsley just before serving.",
+       "If you prefer a slightly crispier texture, uncover the skillet for the last 3 minutes."
+      ],
+      "image_prompt": "Professional food photography, golden‑brown ground beef and potato skillet, rustic cast‑iron pan, steam rising, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.75,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Baked Herb‑Crusted Merluza with Lemon Rice",
+     "recipe": {
+      "title": "Baked Herb‑Crusted Merluza with Lemon Rice",
+      "description": "Oven‑baked merluza fillets coated in herbs, served over fluffy lemon‑infused rice – a light, digestible dinner ready in under an hour.",
+      "difficulty": "easy",
+      "prep_time": 15,
+      "cook_time": 30,
+      "total_time": 45,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "merluza fillet",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-mixte-noms-es-2"
+       },
+       {
+        "name": "rice",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "en-mixte-noms-es-6"
+       },
+       {
+        "name": "lemon",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": null
+       },
+       {
+        "name": "olive oil",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "dried thyme",
+        "quantity": "1",
+        "unit": "tsp",
+        "pantry_id": null
+       },
+       {
+        "name": "salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "black pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "merluza fillet",
+       "rice"
+      ],
+      "missing_ingredients": [
+       "lemon",
+       "dried thyme"
+      ],
+      "instructions": [
+       "Preheat the oven to 200 °C.",
+       "Rinse the 200 g rice under cold water, then place in a saucepan with 400 ml water, 1 pinch salt, and the zest of 1 lemon.",
+       "Bring to a boil, then reduce to low heat, cover, and simmer 12 minutes, until water is absorbed and rice is tender.",
+       "While rice cooks, pat the 2 merluza fillets dry with paper towels.",
+       "Mix 2 tbsp olive oil, 1 tsp dried thyme, 1 pinch salt, and 1 pinch black pepper in a shallow dish.",
+       "Brush both sides of each fillet with the herb‑oil mixture.",
+       "Place fillets on a baking tray lined with parchment paper.",
+       "Bake 12 minutes, until the fish reaches an internal temperature of 63 °C and flakes easily with a fork.",
+       "Fluff the cooked rice, stir in the juice of half the lemon, and adjust seasoning.",
+       "Plate the lemon rice and top with the baked merluza fillets, garnish with a thin lemon slice if desired."
+      ],
+      "tips": [
+       "For extra aroma, add a few fresh parsley leaves over the fish just before serving.",
+       "If you lack parchment paper, lightly oil the baking tray to prevent sticking."
+      ],
+      "image_prompt": "Bright culinary photo of baked white fish fillet on a lemon‑scented rice bed, crisp herb crust, soft steam, natural daylight"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.4,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 10,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Hearty Carrot‑Egg Soup",
+     "recipe": {
+      "title": "Hearty Carrot‑Egg Soup",
+      "description": "A soothing, protein‑rich soup made with fresh carrots, onions, and eggs, perfect for a light evening meal.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 25,
+      "total_time": 35,
+      "servings": 3,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "carrot",
+        "quantity": "3",
+        "unit": "piece",
+        "pantry_id": "en-mixte-noms-es-5"
+       },
+       {
+        "name": "onion",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-mixte-noms-es-4"
+       },
+       {
+        "name": "egg",
+        "quantity": "3",
+        "unit": "piece",
+        "pantry_id": "en-mixte-noms-es-7"
+       },
+       {
+        "name": "water",
+        "quantity": "800",
+        "unit": "ml",
+        "pantry_id": null
+       },
+       {
+        "name": "olive oil",
+        "quantity": "1",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "black pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "fresh dill",
+        "quantity": "1",
+        "unit": "tbsp",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "carrot",
+       "onion",
+       "egg"
+      ],
+      "missing_ingredients": [
+       "fresh dill"
+      ],
+      "instructions": [
+       "Peel and grate the 3 carrots.",
+       "Finely chop the 1 onion.",
+       "Heat 1 tbsp olive oil in a pot over medium heat.",
+       "Add the onion and sauté 4 minutes, until soft and translucent.",
+       "Stir in the grated carrots and cook 3 minutes, until they begin to soften.",
+       "Pour in 800 ml water, add 1 pinch salt and 1 pinch black pepper.",
+       "Bring to a gentle boil, then reduce to low heat and simmer 12 minutes, until carrots are fully tender.",
+       "While the broth simmers, beat the 3 eggs in a bowl.",
+       "Gradually drizzle the beaten eggs into the simmering soup, stirring constantly to create thin ribbons.",
+       "Cook 1 more minute, then remove from heat.",
+       "Ladle soup into bowls and sprinkle each serving with 1 tbsp fresh dill."
+      ],
+      "tips": [
+       "For a richer texture, replace half the water with low‑sodium chicken broth (if not vegetarian).",
+       "If you prefer a smoother soup, blend half of the carrot mixture before adding the eggs."
+      ],
+      "image_prompt": "Warm bowl of carrot‑egg soup, creamy orange broth with delicate egg ribbons, fresh dill garnish, soft lighting"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 0.75,
+      "missing_in_steps": [
+       "egg"
+      ],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.42857142857142855,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 0,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 11,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    }
+   ]
+  },
+  {
+   "id": "fr-mixte-noms-en-es",
+   "note": "Langues mélangées : noms en anglais et en espagnol, recette en français ; poulet urgent et thon frais",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 9197,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [
+     {
+      "title": "Poulet mijoté aux pommes de terre et tomates",
+      "issues": [
+       {
+        "code": "core_temperature",
+        "ingredient": "cuisses de poulet",
+        "message": "« cuisses de poulet » : écrire la température à cœur (volaille : 74 °C à cœur et jus clair, plus aucune trace rose)."
+       }
+      ]
+     }
+    ],
+    "corrected": [
+     "Poulet mijoté aux pommes de terre et tomates"
+    ],
+    "replaced": [],
+    "dropped": []
+   },
+   "examples": [],
+   "diversity_auto": 0.7230769230769232,
+   "diversity_judge": null,
+   "diversity_comment": null,
+   "judge_model": null,
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [
+      {
+       "title": "Poulet mijoté aux pommes de terre et tomates",
+       "issues": [
+        {
+         "code": "core_temperature",
+         "ingredient": "cuisses de poulet",
+         "message": "« cuisses de poulet » : écrire la température à cœur (volaille : 74 °C à cœur et jus clair, plus aucune trace rose)."
+        }
+       ]
+      }
+     ],
+     "corrected": [
+      "Poulet mijoté aux pommes de terre et tomates"
+     ],
+     "replaced": [],
+     "dropped": []
+    },
+    "examples": [],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "fr-mixte-noms-en-es-1",
+      "name": "chicken thighs",
+      "quantity": "4",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "fr-mixte-noms-en-es-2",
+      "name": "atún fresco",
+      "quantity": "2 filetes",
+      "daysLeft": 2,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "fr-mixte-noms-en-es-3",
+      "name": "papas",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "fr-mixte-noms-en-es-4",
+      "name": "onions",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "fr-mixte-noms-en-es-5",
+      "name": "tomatoes",
+      "quantity": "4",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "fr-mixte-noms-en-es-6",
+      "name": "pasta",
+      "quantity": "500 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "fr-mixte-noms-en-es-7",
+      "name": "queso",
+      "quantity": "200 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 9197,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 1,
+      "ms": 6123,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.225268256,
+       "prompt_tokens": 2259,
+       "prompt_time": 0.107933548,
+       "completion_tokens": 2744,
+       "completion_time": 5.749198168,
+       "total_tokens": 5003,
+       "total_time": 5.857131716,
+       "completion_tokens_details": {
+        "reasoning_tokens": 360
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "470287",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244205"
+       }
+      }
+     },
+     {
+      "provider": "groq",
+      "started_at_ms": 6141,
+      "ms": 2200,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.049803737,
+       "prompt_tokens": 2869,
+       "prompt_time": 0.127974994,
+       "completion_tokens": 928,
+       "completion_time": 1.987965992,
+       "total_tokens": 3797,
+       "total_time": 2.115940986,
+       "prompt_tokens_details": {
+        "cached_tokens": 2048
+       },
+       "completion_tokens_details": {
+        "reasoning_tokens": 53
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "470321",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244013"
+       }
+      }
+     },
+     {
+      "provider": "groq",
+      "started_at_ms": 6141,
+      "ms": 3050,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.104689624,
+       "prompt_tokens": 2271,
+       "prompt_time": 0.094570304,
+       "completion_tokens": 1348,
+       "completion_time": 2.821474157,
+       "total_tokens": 3619,
+       "total_time": 2.9160444610000003,
+       "completion_tokens_details": {
+        "reasoning_tokens": 228
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "470321",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "238579"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Poulet mijoté aux pommes de terre et tomates",
+     "recipe": {
+      "title": "Poulet mijoté aux pommes de terre et tomates",
+      "description": "Un plat réconfortant où les cuisses de poulet fondent dans une sauce tomate parfumée, accompagné de pommes de terre fondantes.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 40,
+      "total_time": 50,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "cuisses de poulet",
+        "quantity": "4",
+        "unit": "pièces",
+        "pantry_id": "fr-mixte-noms-en-es-1"
+       },
+       {
+        "name": "pommes de terre",
+        "quantity": "600",
+        "unit": "g",
+        "pantry_id": "fr-mixte-noms-en-es-3"
+       },
+       {
+        "name": "oignons",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-mixte-noms-en-es-4"
+       },
+       {
+        "name": "tomates",
+        "quantity": "4",
+        "unit": "pièces",
+        "pantry_id": "fr-mixte-noms-en-es-5"
+       },
+       {
+        "name": "fromage",
+        "quantity": "50",
+        "unit": "g",
+        "pantry_id": "fr-mixte-noms-en-es-7"
+       },
+       {
+        "name": "huile d'olive",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "cuisses de poulet",
+       "pommes de terre",
+       "oignons",
+       "tomates",
+       "fromage"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Émince l'oignon.",
+       "Dans une grande cocotte, fais chauffer 2 c. à soupe d'huile d'olive à feu moyen, puis ajoute les cuisses de poulet et fais-les dorer 5 minutes de chaque côté, jusqu'à ce qu'elles soient bien colorées.",
+       "Retire le poulet et réserve‑le.",
+       "Ajoute l'oignon émincé dans la cocotte et fais-le suer 3 minutes, jusqu'à ce qu'il devienne translucide.",
+       "Coupe les tomates en quartiers et les pommes de terre en dés d'environ 2 cm.",
+       "Remets le poulet dans la cocotte, ajoute les tomates et les dés de pommes de terre.",
+       "Sale, poivre, puis verse 250 ml d'eau (ou bouillon si disponible).",
+       "Couvre et laisse mijoter à feu doux pendant 35 minutes, jusqu'à ce que les pommes de terre soient tendres.",
+       "Vérifie la cuisson du poulet: la température interne doit atteindre 74 °C (jauge à cœur) et le jus doit être clair, sans trace de rose.",
+       "Saupoudre le fromage râpé sur le dessus, couvre 2 minutes supplémentaires à feu doux pour le faire fondre légèrement.",
+       "Serre chaud."
+      ],
+      "tips": [
+       "Pour vérifier la cuisson du poulet, la chair doit se détacher facilement et le jus doit être clair.",
+       "Ajoute une branche de thym ou du laurier si tu en as sous la main."
+      ],
+      "image_prompt": "Professional food photography, golden-brown chicken thighs braised with tender potatoes and juicy tomatoes in a rustic cast iron pot, steam rising, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.75,
+      "timed_cooking": 0.5,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 11,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Tuna grillé à la méditerranéenne",
+     "recipe": {
+      "title": "Tuna grillé à la méditerranéenne",
+      "description": "Filets de thon frais rapidement saisis, servis avec une salade de tomates, oignons rouges et fromage émietté.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 12,
+      "total_time": 22,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "filets de thon frais",
+        "quantity": "2",
+        "unit": "pièces",
+        "pantry_id": "fr-mixte-noms-en-es-2"
+       },
+       {
+        "name": "tomates",
+        "quantity": "2",
+        "unit": "pièces",
+        "pantry_id": "fr-mixte-noms-en-es-5"
+       },
+       {
+        "name": "oignons",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-mixte-noms-en-es-4"
+       },
+       {
+        "name": "fromage",
+        "quantity": "30",
+        "unit": "g",
+        "pantry_id": "fr-mixte-noms-en-es-7"
+       },
+       {
+        "name": "huile d'olive",
+        "quantity": "1",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "filets de thon frais",
+       "tomates",
+       "oignons",
+       "fromage"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Rince les filets de thon, sèche-les avec du papier absorbant.",
+       "Assaisonne chaque filet avec 1 pincée de sel et de poivre.",
+       "Dans une poêle antiadhésive, chauffe 1 c. à soupe d'huile d'olive à feu moyen-vif.",
+       "Dépose les filets de thon et fais-les cuire 3 minutes de chaque côté, jusqu'à ce que la chair devienne opaque et se détache facilement (température à cœur 63 °C).",
+       "Pendant ce temps, coupe les tomates en quartiers et l'oignon en rondelles fines.",
+       "Dispose les légumes dans une assiette, arrose d'un filet d'huile d'olive, sale et poivre.",
+       "Emiette le fromage sur le dessus.",
+       "Place les filets de thon cuits sur le lit de salade, sers immédiatement."
+      ],
+      "tips": [
+       "Ne surcuis pas le thon; il reste tendre et juteux à 3 minutes par face.",
+       "Si tu aimes les herbes, ajoute du persil haché ou du basilic."
+      ],
+      "image_prompt": "Close-up photography of seared tuna steaks on a white plate, surrounded by fresh tomato wedges, thin onion rings, and crumbled cheese, drizzled with olive oil, bright natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0,
+      "timed_cooking": 0.3333333333333333,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Gratin de pâtes aux tomates, oignons et fromage",
+     "recipe": {
+      "title": "Gratin de pâtes aux tomates, oignons et fromage",
+      "description": "Un gratin simple et savoureux, parfait pour un dîner léger, avec des pâtes al dente, une sauce tomate maison et une croûte dorée de fromage.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 30,
+      "total_time": 40,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:vegetarian"
+      ],
+      "ingredients_used": [
+       {
+        "name": "pâtes",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "fr-mixte-noms-en-es-6"
+       },
+       {
+        "name": "tomates",
+        "quantity": "3",
+        "unit": "pièces",
+        "pantry_id": "fr-mixte-noms-en-es-5"
+       },
+       {
+        "name": "oignons",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-mixte-noms-en-es-4"
+       },
+       {
+        "name": "fromage",
+        "quantity": "100",
+        "unit": "g",
+        "pantry_id": "fr-mixte-noms-en-es-7"
+       },
+       {
+        "name": "huile d'olive",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "pâtes",
+       "tomates",
+       "oignons",
+       "fromage"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Porte à ébullition une grande casserole d'eau salée, ajoute les pâtes et cuis-les 8 minutes, al dente (elles seront encore fermes après le passage au four).",
+       "Égoutte les pâtes et réserve.",
+       "Pendant ce temps, émince l'oignon et coupe les tomates en petits dés.",
+       "Dans une poêle, chauffe 2 c. à soupe d'huile d'olive à feu moyen, ajoute l'oignon et fais-le suer 4 minutes, jusqu'à ce qu'il soit translucide.",
+       "Ajoute les dés de tomates, sale, poivre, et laisse mijoter 8 minutes, jusqu'à obtenir une sauce légèrement réduite.",
+       "Préchauffe le four à 180 °C.",
+       "Dans un plat à gratin, mélange les pâtes cuites avec la sauce tomate, puis émiette 50 g de fromage sur le dessus.",
+       "Enfourne 15 minutes à 180 °C, jusqu'à ce que le fromage soit fondu et doré.",
+       "Sors le gratin, saupoudre le reste du fromage (50 g) en éclats pour plus de croquant, sers chaud."
+      ],
+      "tips": [
+       "Pour une version plus légère, utilise moitié fromage, moitié chapelure sans gluten.",
+       "Si tu as des herbes sèches, ajoute une pincée d'origan ou de basilic à la sauce."
+      ],
+      "image_prompt": "Oven-baked pasta gratin in a white baking dish, bubbling cheese on top, red tomato sauce visible, golden crust, rustic kitchen background, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0,
+      "timed_cooking": 0.6666666666666666,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 0,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    }
+   ]
+  }
+ ]
+}
