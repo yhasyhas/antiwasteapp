@@ -89,7 +89,7 @@ Modèle sans valeurs : `.env.example`. Toutes ces valeurs sont **publiques par n
 | `GEMINI_MODEL` | Nom du modèle Gemini (configuration, pas un secret) | — |
 | `GROQ_API_KEY` | Groq : secours du scan et de la génération | console.groq.com → API Keys |
 | `GROQ_MODEL`, `GROQ_VISION_MODEL` | Noms des modèles Groq (configuration) | — |
-| `RECIPE_PROMPT_VERSION` | Version du prompt de `generate-recipes` (configuration, pas un secret ; facultatif). Absent : la version par défaut du code (v4.1 depuis la phase 9) ; `v1` : retour à l'ancienne version sans contrôle de sécurité, sans redéployer | — |
+| `RECIPE_PROMPT_VERSION` | Version du prompt de `generate-recipes` (configuration, pas un secret ; facultatif). Réglée à `v4.1` depuis le 02/10/2026 ; absente : la version par défaut du code (v4.1 depuis la phase 9) ; `v4` : sans la limite d'achats ni la règle des types de plats ; `v1` : retour à l'ancienne version sans contrôle de sécurité, sans redéployer | — |
 | `CLOUDFLARE_ACCOUNT_ID` | Compte Cloudflare pour Workers AI (images des recettes) | dash.cloudflare.com (identifiant, pas un secret) |
 | `CLOUDFLARE_API_TOKEN` | Jeton Workers AI (génération d'images) | dash.cloudflare.com → My Profile → API Tokens ; droits : Workers AI seulement (à vérifier en phase 14) |
 | `CRON_SECRET` | En-tête `x-cron-secret` de l'appel planifié de `daily-digest` | Voir ci-dessous (deux endroits à changer ensemble) |
