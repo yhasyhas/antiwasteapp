@@ -1,0 +1,85 @@
+[
+  {
+    "id": "en-steak-mixte",
+    "note": "Garde-manger réel du 02/10 (noms en français et en anglais), recette en anglais, steak à utiliser vite, sans préférence : 3 recettes attendues",
+    "preferences": { "language": "en", "cuisine": "any", "mealType": "dinner", "difficulty": "easy", "maxCookTime": 60 },
+    "ingredients": [
+      { "name": "beef steak", "quantity": "4", "days_left": 1 },
+      { "name": "aubergine", "quantity": "1", "days_left": 2 },
+      { "name": "lait", "quantity": "1 l", "days_left": 2 },
+      { "name": "poivron", "quantity": "3", "days_left": 4 },
+      { "name": "milk", "quantity": "1 bottle, 1 glass", "days_left": 5 },
+      { "name": "rosemary", "quantity": "1 sprig", "days_left": 7 },
+      { "name": "pomme de terre", "quantity": "2", "days_left": 17 },
+      { "name": "œufs", "quantity": "4", "days_left": 27 },
+      { "name": "cooked rice", "quantity": "1 bowl", "kind": "dish" },
+      { "name": "yaourt grec", "quantity": "880 g" },
+      { "name": "poisson", "quantity": "2" },
+      { "name": "baguette", "quantity": "2" },
+      { "name": "poulet", "quantity": "1 morceau" },
+      { "name": "bœuf", "quantity": "2 morceaux" },
+      { "name": "citrouille", "quantity": "1" }
+    ]
+  },
+  {
+    "id": "en-selection-viandes",
+    "note": "Sélection réelle du 02/10 (riz cuit, baguette, bœuf, poulet, potiron), noms en français, recette en anglais",
+    "preferences": { "language": "en", "cuisine": "any", "mealType": "dinner", "difficulty": "easy", "maxCookTime": 60 },
+    "selection": true,
+    "other_pantry": ["beef steak", "aubergine", "lait", "poivron", "rosemary", "pomme de terre", "œufs", "yaourt grec", "poisson"],
+    "ingredients": [
+      { "name": "cooked rice", "quantity": "1 bowl", "kind": "dish" },
+      { "name": "baguette", "quantity": "2" },
+      { "name": "bœuf", "quantity": "2 morceaux" },
+      { "name": "poulet", "quantity": "1 morceau" },
+      { "name": "citrouille", "quantity": "1" }
+    ]
+  },
+  {
+    "id": "fr-poisson-urgent",
+    "note": "Poisson entier à utiliser aujourd'hui, garde-manger complet, sans préférence",
+    "preferences": { "language": "fr", "cuisine": "any", "mealType": "dinner", "difficulty": "easy", "maxCookTime": 60 },
+    "ingredients": [
+      { "name": "Dorades", "quantity": "2", "days_left": 0 },
+      { "name": "Courgettes", "quantity": "2", "days_left": 3 },
+      { "name": "Tomates", "quantity": "4" },
+      { "name": "Citron", "quantity": "2" },
+      { "name": "Riz", "quantity": "1 kg" },
+      { "name": "Oignons", "quantity": "3" },
+      { "name": "Ail", "quantity": "1 tête" },
+      { "name": "Pommes de terre", "quantity": "1 kg" },
+      { "name": "Persil", "quantity": "1 botte", "days_left": 2 },
+      { "name": "Œufs", "quantity": "6" }
+    ]
+  },
+  {
+    "id": "es-cerdo-pollo-urgentes",
+    "note": "Cerdo y pollo crudos a usar pronto, despensa completa",
+    "preferences": { "language": "es", "cuisine": "any", "mealType": "lunch", "difficulty": "easy", "maxCookTime": 60 },
+    "ingredients": [
+      { "name": "Chuletas de cerdo", "quantity": "4", "days_left": 1 },
+      { "name": "Pechugas de pollo", "quantity": "2", "days_left": 2 },
+      { "name": "Patatas", "quantity": "1 kg" },
+      { "name": "Cebollas", "quantity": "3" },
+      { "name": "Pimientos", "quantity": "2" },
+      { "name": "Arroz", "quantity": "1 kg" },
+      { "name": "Tomates", "quantity": "4" },
+      { "name": "Ajo", "quantity": "1 cabeza" },
+      { "name": "Limones", "quantity": "2" }
+    ]
+  },
+  {
+    "id": "fr-hache-anglais",
+    "note": "Viande hachée à utiliser aujourd'hui, garde-manger aux noms anglais, recette en français",
+    "preferences": { "language": "fr", "cuisine": "any", "mealType": "dinner", "difficulty": "easy", "maxCookTime": 45 },
+    "ingredients": [
+      { "name": "ground beef", "quantity": "500 g", "days_left": 0 },
+      { "name": "pasta", "quantity": "500 g" },
+      { "name": "tomatoes", "quantity": "5" },
+      { "name": "onion", "quantity": "2" },
+      { "name": "carrots", "quantity": "3" },
+      { "name": "cheese", "quantity": "1 block" },
+      { "name": "milk", "quantity": "1 l" }
+    ]
+  }
+]

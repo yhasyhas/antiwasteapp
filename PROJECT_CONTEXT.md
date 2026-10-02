@@ -256,10 +256,12 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Tests : `supabase/tests/phase8_pantry.sql`.
 
 ### Phase 9 — recettes (branche `phase-9`, en cours)
-- Prompt de `generate-recipes` dans `supabase/functions/generate-recipes/prompt.ts` (`buildPrompts`, versions `PROMPT_VERSIONS` : v1 utilisée par l'app ; v2 à v5 candidates, v4 recommandée).
+- Prompt de `generate-recipes` dans `supabase/functions/generate-recipes/prompt.ts` (`buildPrompts`, versions `PROMPT_VERSIONS`) ; v4.1 déployée le 02/10/2026 (`RECIPE_PROMPT_VERSION`, retour possible à v4 ou v1 sans redéployer).
 - Contrôle de sécurité après la génération : `generate-recipes/safety.ts` (recette renvoyée pour correction, puis écartée) ; bibliothèque de plats : `generate-recipes/library/` et `library.ts` ; découpage des cuisines : `cuisines.ts` ; titres récents : `history.ts`. Branchés seulement sur la copie d'évaluation ; `generate-recipes` (app) inchangée.
+- Après la génération (`safetyPass.ts`) : correction et recettes de remplacement demandées en parallèle, échéance de 45 s (`GENERATION_BUDGET_MS`) qui sert les recettes déjà valides ; défauts non bloquants (four sans °C, signe visible pour bœuf, porc, poisson à la température à cœur). Noms des aliments écrits dans la langue de la recette ; repères internes et niveau de feu au four retirés des textes (`recipes.ts`).
+- App : conseils de conservation selon l'emplacement et la langue (`lib/storageTip.ts`) ; message des recettes écartées selon les critères choisis.
 - Migration en attente (non appliquée) : `supabase/migrations-pending/` (`cuisine_requests`).
-- Évaluation rejouable : `scripts/recipe-eval` (cas fixes `cases.json` et `cases-regions.json`, `run.mjs`, `checks.mjs`, `compare.mjs`, `summary.mjs`, `variety.mjs`, résultats dans `results/`) et la copie `generate-recipes-eval` (génération et juge, clé secrète seulement).
+- Évaluation rejouable : `scripts/recipe-eval` (cas fixes `cases.json`, `cases-regions.json` et `cases-proteins.json`, `run.mjs`, `checks.mjs`, `compare.mjs`, `summary.mjs`, `variety.mjs`, résultats dans `results/`) et la copie `generate-recipes-eval` (génération et juge, clé secrète seulement).
 
 ## 5. État actuel et problèmes connus
 

@@ -1,7 +1,8 @@
 // Vérifications automatiques des recettes (sans modèle) : mêmes résultats à chaque lancement pour les mêmes
 // recettes. Chaque mesure est une part entre 0 et 1 (1 : parfait).
 
-import { celsiusWithoutMeat, heatWithoutCooking, safetyIssues } from '../../supabase/functions/generate-recipes/safety.ts';
+import { celsiusWithoutMeat, heatWithoutCooking, safetyIssues, withoutOvenHeatLevel } from '../../supabase/functions/generate-recipes/safety.ts';
+import { hasInternalCodes } from '../../supabase/functions/generate-recipes/recipes.ts';
 
 const BASICS = ['sel', 'poivre', 'huile', 'eau', 'salt', 'pepper', 'oil', 'water', 'sal', 'pimienta', 'aceite', 'agua'];
 // Mots trop généraux pour reconnaître un ingrédient dans les étapes
@@ -100,6 +101,9 @@ export function checkRecipe(recipe, situation, pantry) {
     safety_issues: safety.map((issue) => `${issue.code} : ${issue.ingredient}`),
     no_heat_without_cooking: heatWithoutCooking(recipe).length === 0 ? 1 : 0,
     no_celsius_without_meat: celsiusWithoutMeat(recipe) ? 0 : 1,
+    // Repères internes (p10, buy, [URGENT]) dans un texte affiché, niveau de feu dans une étape au four
+    no_internal_codes: [recipe.title, recipe.description, ...steps, ...(recipe.tips ?? []), recipe.suggestion ?? '', ...(recipe.ingredients_used ?? []).map((i) => i.name)].some((text) => hasInternalCodes(String(text ?? ''))) ? 0 : 1,
+    no_oven_heat_level: steps.some((step) => withoutOvenHeatLevel(step) !== step) ? 0 : 1,
     ingredients_in_steps: ingredients.length ? 1 - missingInSteps.length / ingredients.length : 1,
     missing_in_steps: missingInSteps,
     quantities_in_steps: measurable.length ? quantitiesInSteps / measurable.length : 1,
