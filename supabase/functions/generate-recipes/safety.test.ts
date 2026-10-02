@@ -26,6 +26,8 @@ Deno.test('safetyIssues : légumineuses sèches sans trempage, sauf conserve pr�
   assertEquals(codes(recipe([['Pois chiches', 'chickpeas']], ['Ajoute les pois chiches et cuis 10 minutes à feu moyen.'])), ['dry_legumes']);
   assertEquals(codes(recipe([['Pois chiches', 'chickpeas']], ['Égoutte et rince les 400 g de pois chiches en conserve.', 'Ajoute-les et cuis 10 minutes.'])), []);
   assertEquals(codes(recipe([['Pois chiches', 'chickpeas']], ['La veille, fais tremper les pois chiches.', 'Cuis les pois chiches 1 h 30 à feu doux dans 2 l d\'eau.'])), []);
+  // Le temps de trempage n'est pas une cuisson : 4 h de trempage puis 20 minutes, insuffisant
+  assertEquals(codes(recipe([['Pois chiches', 'chickpeas']], ['Fais tremper les pois chiches 4 h.', 'Cuis les pois chiches 20 minutes dans 1 l d’eau.'])), ['dry_legumes']);
   assertEquals(codes(recipe([['Lentilles corail', null]], ['Cuis les lentilles corail 20 minutes dans 600 ml d\'eau.'])), []);
   // Haricots verts : pas des légumineuses sèches
   assertEquals(codes(recipe([['Haricots verts', null]], ['Fais blanchir les haricots verts 4 minutes.'])), []);

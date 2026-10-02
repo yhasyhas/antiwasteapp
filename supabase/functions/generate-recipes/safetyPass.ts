@@ -1,5 +1,5 @@
-// Contrôle de sécurité après la génération (v4 et suivantes), partagé par generate-recipes et generate-recipes-eval :
-// les recettes en défaut (safety.ts) sont renvoyées au modèle en une seule demande de correction ; une recette
+// Contrôle après la génération (v4 et suivantes), partagé par generate-recipes et generate-recipes-eval : les recettes
+// en défaut (sécurité : safety.ts ; v4.1 : trop d'ingrédients à acheter) sont renvoyées au modèle en une seule demande de correction ; une recette
 // corrigée qui respecte les règles remplace l'originale, les autres sont écartées.
 
 import { type AiProvider, type AiRequest, type AttemptLog, type FallbackResult, runWithFallback, type SimulatedFailure } from '../_shared/ai.ts';
@@ -47,9 +47,12 @@ export async function safetyPass(recipes: Recipe[], options: {
   t0: number;
   label: string;
   simulate?: Record<string, SimulatedFailure>;
+  // Ingrédients à acheter par recette, hors basiques (v4.1 : 3) ; absent : pas de limite
+  maxPurchases?: number;
 }): Promise<{ recipes: Recipe[]; report: SafetyReport }> {
   const report: SafetyReport = { first: [], corrected: [], dropped: [], correction: null };
-  const checked = recipes.map((recipe) => ({ recipe, issues: safetyIssues(recipe, options.pantry.items) }));
+  const issuesOf = (recipe: Recipe) => [...safetyIssues(recipe, options.pantry.items), ...purchaseIssues(recipe, options.maxPurchases)];
+  const checked = recipes.map((recipe) => ({ recipe, issues: issuesOf(recipe) }));
   const flawed = checked.filter((c) => c.issues.length > 0);
   report.first = flawed.map((c) => ({ title: c.recipe.title, issues: c.issues }));
   if (flawed.length === 0) return { recipes, report };
@@ -71,7 +74,7 @@ export async function safetyPass(recipes: Recipe[], options: {
     }
     // Les recettes corrigées reviennent dans le même ordre
     const candidate = fixed[k++];
-    const remaining = candidate ? safetyIssues(candidate, options.pantry.items) : c.issues;
+    const remaining = candidate ? issuesOf(candidate) : c.issues;
     if (candidate && remaining.length === 0) {
       kept.push(candidate);
       report.corrected.push(candidate.title);
@@ -80,4 +83,14 @@ export async function safetyPass(recipes: Recipe[], options: {
     }
   }
   return { recipes: kept, report };
+}
+
+// Trop d'ingrédients à acheter (missing_ingredients : sans sel, poivre, huile, eau)
+export function purchaseIssues(recipe: Recipe, max: number | undefined): SafetyIssue[] {
+  if (max === undefined || recipe.missing_ingredients.length <= max) return [];
+  return [{
+    code: 'too_many_purchases',
+    ingredient: recipe.missing_ingredients.join(', '),
+    message: `La recette demande ${recipe.missing_ingredients.length} ingrédients à acheter (${recipe.missing_ingredients.join(', ')}) : au plus ${max}, hors sel, poivre, huile et eau. Remplace les autres par des ingrédients du garde-manger, ou retire-les si la recette s'en passe.`,
+  }];
 }

@@ -102,6 +102,10 @@ const SAFETY_RULES_V4 = `SÉCURITÉ ALIMENTAIRE (règle stricte, vérifiée apr�
 - Reste de plat et riz déjà cuit : réchauffés une seule fois, jusqu'à être fumants à cœur, et servis aussitôt ; jamais laissés tièdes.
 - Riz cuit pour la recette et servi froid ou sauté ensuite : étalé pour refroidir vite, puis mis au réfrigérateur.`;
 
+// Ingrédients à acheter par recette, hors basiques (sel, poivre, huile, eau) : au plus 3 (v4.1, contrôlé par
+// safetyPass.ts) ; la sélection d'ingrédients garde sa consigne plus stricte (au plus 2)
+export const MAX_PURCHASES = 3;
+
 export function buildPrompts(options: {
   pantryText: string;
   count: number;
@@ -205,7 +209,8 @@ INGRÉDIENTS :
 - "pantry_id" : l'identifiant (p1, p2…) de l'ingrédient du garde-manger utilisé, ou "missing" pour tout ingrédient qui n'en vient pas (y compris sel, poivre, huile).
 - Pour un ingrédient du garde-manger, "name" reprend son nom tel qu'il est écrit dans la liste.
 - "name" : le nom de l'ingrédient seul, sans préparation ni précision (« ail » et non « ail, émincé ») ; la préparation va dans les étapes.
-- Chaque recette utilise au moins un ingrédient du garde-manger.${v2 ? `
+- Chaque recette utilise au moins un ingrédient du garde-manger.${v41 ? `
+- Au plus ${MAX_PURCHASES} ingrédients à acheter par recette (hors sel, poivre, huile, eau), seulement les indispensables (règle vérifiée après coup) ; tout le reste vient du garde-manger.` : ''}${v2 ? `
 - Un ingrédient du garde-manger qui ne respecte pas un régime ou une exclusion n'est jamais utilisé : ignore-le (ex. la feta pour un repas vegan).
 - La liste contient tout ce que les étapes utilisent, même un accompagnement (« servir avec du riz » : le riz est dans la liste et cuit dans les étapes) ; pas d'ingrédient facultatif : les variantes vont dans les astuces.
 - "quantity" : le nombre seul (ex. "500", "2", "1/2") ; "unit" : l'unité abrégée, en ${languageName} (${UNITS[options.language] || UNITS.en}) ; sel et poivre : 1 ${options.language === 'en' ? 'pinch' : options.language === 'es' ? 'pizca' : 'pincée'}.` : `
@@ -261,7 +266,7 @@ export function buildCorrectionPrompt(pantryText: string, flawed: { recipe: unkn
   return `Garde-manger (identifiant : nom) :
 ${pantryText}
 
-Ces recettes ne respectent pas les règles de sécurité alimentaire. Corrige chacune : garde le même plat, les mêmes ingrédients (ajoute seulement ce qui manque, par exemple « en conserve ») et la même langue, et réécris les étapes concernées. Renvoie exactement ${flawed.length} recette${flawed.length > 1 ? 's' : ''} complète${flawed.length > 1 ? 's' : ''}, dans le même ordre ; "refusal" est une chaîne vide.
+Ces recettes ne respectent pas les règles (sécurité alimentaire, ingrédients à acheter). Corrige chacune : garde le même plat, les mêmes ingrédients (ajoute seulement ce qui manque, par exemple « en conserve », et retire ou remplace seulement ce qu’un problème désigne) et la même langue, et réécris les étapes concernées. Renvoie exactement ${flawed.length} recette${flawed.length > 1 ? 's' : ''} complète${flawed.length > 1 ? 's' : ''}, dans le même ordre ; "refusal" est une chaîne vide.
 
 ${flawed.map((item, i) => `RECETTE ${i + 1}
 Problèmes :

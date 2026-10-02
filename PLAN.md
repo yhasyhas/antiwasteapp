@@ -313,6 +313,8 @@ Suite de la phase 7, sur la branche `phase-7-finalisation`.
 - [ ] Anti-répétition : titres des recettes récentes et de « Mes recettes » transmis au modèle (`generate-recipes/history.ts`)
 - [x] Variété mesurée sur plusieurs générations, avec et sans bibliothèque (`scripts/recipe-eval/variety.mjs`) : la bibliothèque ne doit jamais la réduire
 - [x] Comparaison de modèles plus puissants (coût par recette), sans adoption : décision en phase 11 (Gemini Pro : coût estimé, en attente de ton accord, sur un projet Google séparé)
+- [ ] Limite d'achats : au plus 3 ingrédients à acheter par recette, hors sel, poivre, huile, eau, avec ou sans sélection (consigne de la v4.1 et contrôle du serveur, recette corrigée puis écartée)
+- [ ] Évaluation : 3 garde-manger par région dans les cas fixes, une fois la bibliothèque relue
 - [ ] Mode cuisine étape par étape avec minuteurs (si garder l'écran allumé demande un module natif, cette partie va en phase 12)
 
 **Terminé quand** : l'évaluation rejouable donne un meilleur résultat après l'amélioration du prompt, et une recette peut être suivie étape par étape avec ses minuteurs.
@@ -329,6 +331,7 @@ Suite de la phase 7, sur la branche `phase-7-finalisation`.
 - [ ] Accessibilité : grandes tailles de texte, lecteurs d'écran, contrastes
 - [ ] Option « Pas d'images en données mobiles »
 - [ ] « Mes basiques » : liste modifiable dans les Préférences (préremplie avec sel, poivre, huile, eau), considérée comme toujours disponible par la génération, jamais ajoutée à « À acheter » ni aux courses
+- [ ] Les épices déclarées dans « Mes basiques » ne comptent pas comme achats (limite de 3 ingrédients à acheter par recette)
 
 **Terminé quand** : un nouvel utilisateur est guidé jusqu'à son premier scan, voit son impact du mois, et l'app reste utilisable avec les plus grandes tailles de texte et un lecteur d'écran.
 
@@ -614,4 +617,5 @@ Ancienne phase 8.
 | 02/10/2026 | La page de relecture de la bibliothèque (artefact Claude) est hébergée sur un compte Claude qui va être fermé | La référence durable est `docs/bibliotheque-plats.md`, générée depuis `generate-recipes/library/` par `node scripts/library-doc.mjs` |
 | 02/10/2026 | v4 + contrôle de sécurité adoptés avec gpt-oss-120b (décision de l'utilisateur). v4.1 (v4 + types de plats propres à la cuisine demandée, exemples tirés au hasard) : 13 cas de base, juge 4,73 / 4,75 contre 4,75 / 4,78 pour la v4 (écart dans le bruit entre deux séries) ; 16 cas par région, authenticité 3,98 contre 3,84, nettement mieux pour l'Afrique de l'Ouest (3,2 → 4,0), de l'Est (2,5 → 3,8), l'océan Indien (3,3 → 4,2), les Caraïbes (3,0 → 4,0), moins bien pour l'Asie du Sud-Est (4,3 → 2,8) ; noms de plats de la bibliothèque dans les titres : 15 % (v4), 30 % (v4.1), 30 % (v5). Recettes écartées : 6 sur 170, dont 5 fausses alertes du contrôle, corrigées (signes formulés librement, lentilles) | v4.1 branchée dans `generate-recipes` (par défaut, `RECIPE_PROMPT_VERSION` pour revenir à v4 ou v1 sans redéployer), déploiement après la validation de la phase 8 |
 | 02/10/2026 | v4.1 retenue. Recul en Asie du Sud-Est et au Maghreb : pas les types de plats, mais des noms de plats repris sans leurs ingrédients essentiels (« Tom yum » sans galanga, « curry » sans pâte de curry, « mhadjeb » éloigné de l'original) et des associations étrangères à la cuisine (miel sur une omelette). Règle des noms renforcée dans la v4.1 ; deux séries : Asie du Sud-Est 2,8 → 3,5 (v4 : 4,3), Maghreb 3,3 → 4,0 (v4 : 3,8), Afrique de l'Ouest 4,0 → 3,3 (v4 : 3,2), cas de base 4,74 (v4 : 4,75-4,78). Un seul garde-manger par région (6 recettes) : écart de ± 0,7 d'une série à l'autre | Avant de juger une région isolée : plusieurs garde-manger par région dans les cas fixes |
+| 02/10/2026 | Limite d'achats (v4.1) : au plus 3 ingrédients à acheter par recette hors sel, poivre, huile, eau, consigne et contrôle du serveur. Cas de base : 100 % des recettes à 3 achats au plus (86-97 % avant), 1,1 achat en moyenne, 37/37 recettes servies, juge 4,71 (4,73-4,75 avant) ; 4 recettes corrigées pour trop d'achats. Asie du Sud : 2,5 achats en moyenne (4,3 avant, jusqu'à 7). Contrôle : le temps de trempage n'est plus pris pour une cuisson (pois chiches trempés 4 h puis cuits 20 minutes) | La sélection garde sa consigne plus stricte (au plus 2) ; les épices de « Mes basiques » ne compteront pas (phase 10) |
 | | *(résultat du test Gemini vs Clarifai)* | |

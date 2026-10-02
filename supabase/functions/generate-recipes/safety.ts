@@ -37,7 +37,9 @@ export type SafetyCode =
   | 'doneness_sign'
   | 'raw_fish'
   | 'leftover_reheat'
-  | 'rice_cooling';
+  | 'rice_cooling'
+  // Pas une règle sanitaire : trop d'ingrédients à acheter (safetyPass.ts, même correction)
+  | 'too_many_purchases';
 
 export interface SafetyIssue {
   code: SafetyCode;
@@ -221,7 +223,8 @@ export function safetyIssues(recipe: SafetyRecipe, pantry: SafetyPantryItem[]): 
       const canned = cooked || hasKeyword(aboutText, CANNED);
       if (!canned) {
         const quick = hasKeyword(name, QUICK_LEGUMES);
-        const minutes = longestMinutes(aboutText);
+        // Durée de cuisson : sans les étapes de trempage (« trempe 4 h » n'est pas une cuisson)
+        const minutes = longestMinutes(about.filter((step) => !hasKeyword(step, SOAK)).join(' '));
         const pressure = hasKeyword(aboutText, PRESSURE);
         const ok = quick
           ? minutes >= 15 && (hasKeyword(aboutText, LIQUID) || hasKeyword(allSteps, LIQUID))

@@ -1,0 +1,704 @@
+{
+ "summary": {
+  "version": "v4.1",
+  "date": "2026-10-02T14:35:46.272Z",
+  "model": "openai/gpt-oss-120b",
+  "judge_model": "gemini-3.1-flash-lite",
+  "cases": 1,
+  "failed_cases": 0,
+  "recipes": 3,
+  "judge": {
+   "quantities": 3.3333333333333335,
+   "cooking_cues": 4.333333333333333,
+   "order": 4,
+   "ingredients_used": 2.3333333333333335,
+   "authenticity": 3.6666666666666665,
+   "safety": 4.666666666666667,
+   "diet": 5
+  },
+  "diversity_judge": 5,
+  "auto": {
+   "ingredients_in_steps": 1,
+   "quantities_in_steps": 0.6777777777777777,
+   "timed_cooking": 0.7777777777777778,
+   "oven_temperature": 1,
+   "reheat_cue": 1,
+   "uses_urgent": 0.6666666666666666,
+   "rules_respected": 1,
+   "units_language": 1,
+   "safety_rules": 1,
+   "no_heat_without_cooking": 1,
+   "no_celsius_without_meat": 1,
+   "diversity": 0.7797619047619048
+  },
+  "rejected_first": 0,
+  "median_ms": 14805,
+  "judge_mean": 3.904761904761905
+ },
+ "results": [
+  {
+   "id": "en-r-asie-sud",
+   "note": "India and South Asia, vegan dinner",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 14805,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [
+     {
+      "title": "Spicy Cauliflower & Chickpea Curry",
+      "issues": [
+       {
+        "code": "too_many_purchases",
+        "ingredient": "Onion, Garlic cloves, Ginger, Coconut milk",
+        "message": "La recette demande 4 ingrédients à acheter (Onion, Garlic cloves, Ginger, Coconut milk) : au plus 3, hors sel, poivre, huile et eau. Remplace les autres par des ingrédients du garde-manger, ou retire-les si la recette s'en passe."
+       }
+      ]
+     },
+     {
+      "title": "Crispy Spiced Potato & Tomato Biryani",
+      "issues": [
+       {
+        "code": "too_many_purchases",
+        "ingredient": "Cumin seeds, Turmeric powder, Green chilies, Fresh cilantro",
+        "message": "La recette demande 4 ingrédients à acheter (Cumin seeds, Turmeric powder, Green chilies, Fresh cilantro) : au plus 3, hors sel, poivre, huile et eau. Remplace les autres par des ingrédients du garde-manger, ou retire-les si la recette s'en passe."
+       }
+      ]
+     }
+    ],
+    "corrected": [
+     "Spicy Cauliflower & Chickpea Curry",
+     "Crispy Spiced Potato & Tomato Biryani"
+    ],
+    "dropped": []
+   },
+   "examples": [
+    {
+     "name": "Dosa (crêpe fermentée)",
+     "region": "Inde et Asie du Sud"
+    },
+    {
+     "name": "Gotu kola sambol (salade de centella)",
+     "region": "Inde et Asie du Sud"
+    },
+    {
+     "name": "Dal bhat (riz, lentilles et accompagnements)",
+     "region": "Inde et Asie du Sud"
+    },
+    {
+     "name": "Appa (hoppers, crêpes en bol)",
+     "region": "Inde et Asie du Sud"
+    },
+    {
+     "name": "Parippu (curry de lentilles au coco)",
+     "region": "Inde et Asie du Sud"
+    }
+   ],
+   "diversity_auto": 0.7797619047619048,
+   "diversity_judge": 5,
+   "diversity_comment": "La sélection propose trois approches très distinctes : un curry classique, un plat de riz sauté (biryani simplifié) et une technique de pâte farcie (momos), offrant une variété de textures et de méthodes de cuisson très satisfaisante.",
+   "judge_model": "gemini-3.1-flash-lite",
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [
+      {
+       "title": "Spicy Cauliflower & Chickpea Curry",
+       "issues": [
+        {
+         "code": "too_many_purchases",
+         "ingredient": "Onion, Garlic cloves, Ginger, Coconut milk",
+         "message": "La recette demande 4 ingrédients à acheter (Onion, Garlic cloves, Ginger, Coconut milk) : au plus 3, hors sel, poivre, huile et eau. Remplace les autres par des ingrédients du garde-manger, ou retire-les si la recette s'en passe."
+        }
+       ]
+      },
+      {
+       "title": "Crispy Spiced Potato & Tomato Biryani",
+       "issues": [
+        {
+         "code": "too_many_purchases",
+         "ingredient": "Cumin seeds, Turmeric powder, Green chilies, Fresh cilantro",
+         "message": "La recette demande 4 ingrédients à acheter (Cumin seeds, Turmeric powder, Green chilies, Fresh cilantro) : au plus 3, hors sel, poivre, huile et eau. Remplace les autres par des ingrédients du garde-manger, ou retire-les si la recette s'en passe."
+        }
+       ]
+      }
+     ],
+     "corrected": [
+      "Spicy Cauliflower & Chickpea Curry",
+      "Crispy Spiced Potato & Tomato Biryani"
+     ],
+     "dropped": []
+    },
+    "examples": [
+     {
+      "name": "Dosa (crêpe fermentée)",
+      "region": "Inde et Asie du Sud"
+     },
+     {
+      "name": "Gotu kola sambol (salade de centella)",
+      "region": "Inde et Asie du Sud"
+     },
+     {
+      "name": "Dal bhat (riz, lentilles et accompagnements)",
+      "region": "Inde et Asie du Sud"
+     },
+     {
+      "name": "Appa (hoppers, crêpes en bol)",
+      "region": "Inde et Asie du Sud"
+     },
+     {
+      "name": "Parippu (curry de lentilles au coco)",
+      "region": "Inde et Asie du Sud"
+     }
+    ],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "en-r-asie-sud-1",
+      "name": "Cauliflower",
+      "quantity": "1",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "en-r-asie-sud-2",
+      "name": "Potatoes",
+      "quantity": "5",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "en-r-asie-sud-3",
+      "name": "Dried chickpeas",
+      "quantity": "500 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "en-r-asie-sud-4",
+      "name": "Basmati rice",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "en-r-asie-sud-5",
+      "name": "Tomatoes",
+      "quantity": "3",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "en-r-asie-sud-6",
+      "name": "Yogurt",
+      "quantity": "500 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "en-r-asie-sud-7",
+      "name": "Garam masala",
+      "quantity": "1 jar",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 14805,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 3,
+      "ms": 8341,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.020649508,
+       "prompt_tokens": 2748,
+       "prompt_time": 0.280280417,
+       "completion_tokens": 3103,
+       "completion_time": 7.984911698,
+       "total_tokens": 5851,
+       "total_time": 8.265192115,
+       "prompt_tokens_details": {
+        "cached_tokens": 256
+       },
+       "completion_tokens_details": {
+        "reasoning_tokens": 145
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "307317",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244673"
+       }
+      }
+     },
+     {
+      "provider": "groq",
+      "started_at_ms": 8357,
+      "ms": 6443,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.023507655,
+       "prompt_tokens": 4116,
+       "prompt_time": 1.28009192,
+       "completion_tokens": 2186,
+       "completion_time": 5.100346727,
+       "total_tokens": 6302,
+       "total_time": 6.380438647,
+       "prompt_tokens_details": {
+        "cached_tokens": 256
+       },
+       "completion_tokens_details": {
+        "reasoning_tokens": 323
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "307364",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "242604"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Spicy Cauliflower & Chickpea Curry",
+     "recipe": {
+      "title": "Spicy Cauliflower & Chickpea Curry",
+      "description": "A hearty vegan curry featuring urgent cauliflower, protein‑rich chickpeas, and warm garam masala, served with fluffy basmati rice.",
+      "difficulty": "medium",
+      "prep_time": 10,
+      "cook_time": 30,
+      "total_time": 40,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "asie-sud",
+      "dietary_tags": [
+       "vegan"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Cauliflower",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-r-asie-sud-1"
+       },
+       {
+        "name": "Dried chickpeas",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "en-r-asie-sud-3"
+       },
+       {
+        "name": "Tomatoes",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-r-asie-sud-5"
+       },
+       {
+        "name": "Garam masala",
+        "quantity": "2",
+        "unit": "tsp",
+        "pantry_id": "en-r-asie-sud-7"
+       },
+       {
+        "name": "Onion",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": null
+       },
+       {
+        "name": "Garlic cloves",
+        "quantity": "3",
+        "unit": "clove",
+        "pantry_id": null
+       },
+       {
+        "name": "Coconut milk",
+        "quantity": "400",
+        "unit": "ml",
+        "pantry_id": null
+       },
+       {
+        "name": "Salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "Vegetable oil",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Cauliflower",
+       "Dried chickpeas",
+       "Tomatoes",
+       "Garam masala"
+      ],
+      "missing_ingredients": [
+       "Onion",
+       "Garlic cloves",
+       "Coconut milk"
+      ],
+      "instructions": [
+       "Rinse the dried chickpeas, place them in a bowl, cover with water and soak for at least 4 hours (or overnight).",
+       "Drain and rinse the soaked chickpeas, then add to a pot with 600 ml fresh water. Bring to a boil, then simmer on low heat for 35 minutes, until tender; set aside.",
+       "While the chickpeas cook, cut the cauliflower into florets and roughly chop the tomatoes.",
+       "Heat 2 tbsp vegetable oil in a large pan over medium heat. Add the chopped onion and sauté 5 minutes, until translucent.",
+       "Add the minced garlic (3 cloves) and fry 1 minute, until fragrant.",
+       "Stir in the cauliflower florets, tomatoes, and 2 tsp garam masala; cook 4 minutes, stirring occasionally, until the cauliflower begins to brown at the edges.",
+       "Pour in the coconut milk, bring to a gentle boil, then reduce to a simmer. Add the cooked chickpeas, season with 1 pinch salt, and cook 10 minutes, until the cauliflower is tender and the sauce thickens.",
+       "Serve hot with basmati rice."
+      ],
+      "tips": [
+       "If you run short on time, use canned chickpeas (drained and rinsed) – they count as a pantry ingredient you’ll need to buy.",
+       "Adjust spiciness with a pinch of red chili powder or fresh green chilies (optional)."
+      ],
+      "image_prompt": "Professional food photography, vibrant cauliflower and chickpea curry in a copper pot, steam rising, garnished with fresh cilantro, side of fluffy basmati rice, warm natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.6,
+      "timed_cooking": 0.8333333333333334,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 3,
+      "cooking_cues": 4,
+      "order": 4,
+      "ingredients_used": 2,
+      "authenticity": 4,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "L'étape 8 mentionne de servir avec du riz basmati sans préciser la quantité à cuire ni la méthode de cuisson.",
+      "La recette utilise des ingrédients absents du garde-manger (oignon, ail, lait de coco) sans justification d'achat.",
+      "La quantité de riz n'est pas définie dans les ingrédients."
+     ],
+     "strengths": [
+      "La gestion du temps de trempage et de cuisson des pois chiches est cohérente.",
+      "Les repères de cuisson (translucide, doré, tendre) sont bien intégrés."
+     ]
+    },
+    {
+     "title": "Crispy Spiced Potato & Tomato Biryani",
+     "recipe": {
+      "title": "Crispy Spiced Potato & Tomato Biryani",
+      "description": "A fragrant one‑pot biryani using potatoes, fresh tomatoes, and basmati rice, seasoned with garam masala and aromatic spices.",
+      "difficulty": "medium",
+      "prep_time": 15,
+      "cook_time": 35,
+      "total_time": 50,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "asie-sud",
+      "dietary_tags": [
+       "vegan"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Potatoes",
+        "quantity": "4",
+        "unit": "piece",
+        "pantry_id": "en-r-asie-sud-2"
+       },
+       {
+        "name": "Basmati rice",
+        "quantity": "250",
+        "unit": "g",
+        "pantry_id": "en-r-asie-sud-4"
+       },
+       {
+        "name": "Tomatoes",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-r-asie-sud-5"
+       },
+       {
+        "name": "Garam masala",
+        "quantity": "1.5",
+        "unit": "tsp",
+        "pantry_id": "en-r-asie-sud-7"
+       },
+       {
+        "name": "Cumin seeds",
+        "quantity": "1",
+        "unit": "tsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Turmeric powder",
+        "quantity": "0.5",
+        "unit": "tsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Fresh cilantro",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "Vegetable oil",
+        "quantity": "3",
+        "unit": "tbsp",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Potatoes",
+       "Basmati rice",
+       "Tomatoes",
+       "Garam masala"
+      ],
+      "missing_ingredients": [
+       "Cumin seeds",
+       "Turmeric powder",
+       "Fresh cilantro"
+      ],
+      "instructions": [
+       "Rinse the basmati rice under cold water until the water runs clear; soak for 15 minutes, then drain.",
+       "Peel the potatoes and cut them into 1‑cm cubes. Roughly chop the tomatoes.",
+       "Heat 2 tbsp vegetable oil in a heavy‑bottomed pot over medium heat. Add 1 tsp cumin seeds; fry 30 seconds until they sizzle.",
+       "Add the potato cubes, sprinkle with a pinch of salt, and sauté 8 minutes, stirring occasionally, until the potatoes turn golden and start to crisp.",
+       "Stir in the chopped tomatoes, 0.5 tsp turmeric, and 1.5 tsp garam masala; cook 4 minutes, until the tomatoes soften.",
+       "Add the drained rice, gently mix to coat the grains with the spices, then pour in 500 ml water. Bring to a boil over medium‑high heat.",
+       "Reduce the heat to low, cover the pot, and simmer 15 minutes, until the rice is cooked and the liquid is absorbed.",
+       "Turn off the heat, let the biryani rest, covered, for 5 minutes. Fluff with a fork and garnish with fresh cilantro.",
+       "Serve immediately."
+      ],
+      "tips": [
+       "For extra crunch, reserve a handful of fried potato cubes and sprinkle them on top just before serving.",
+       "If you prefer a milder flavor, reduce the amount of garam masala or omit the turmeric."
+      ],
+      "image_prompt": "Close‑up food photography of golden crispy potatoes and tomato biryani in a deep pan, speckled with garam masala, steam curling, rustic wooden table"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.8333333333333334,
+      "timed_cooking": 0.8333333333333334,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 0,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 4,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 3,
+      "authenticity": 4,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "La recette utilise des ingrédients non listés dans le garde-manger (cumin, curcuma, coriandre fraîche).",
+      "La quantité de riz est précisée dans les ingrédients mais la méthode de cuisson est un peu sommaire pour un biryani."
+     ],
+     "strengths": [
+      "L'ordre des étapes est logique et permet une exécution fluide.",
+      "Les repères de cuisson sont excellents (riz rincé jusqu'à eau claire, pommes de terre dorées)."
+     ]
+    },
+    {
+     "title": "Cauliflower & Tomato Steamed Dumplings (Momo) with Chickpea Filling",
+     "recipe": {
+      "title": "Cauliflower & Tomato Steamed Dumplings (Momo) with Chickpea Filling",
+      "description": "Light, steamed dumplings inspired by Nepali‑Indian street food, using urgent cauliflower and chickpeas for a protein‑packed filling, served with a tangy tomato‑garam masala dipping sauce.",
+      "difficulty": "medium",
+      "prep_time": 20,
+      "cook_time": 25,
+      "total_time": 45,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "asie-sud",
+      "dietary_tags": [
+       "vegan",
+       "Indian"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Cauliflower",
+        "quantity": "0.5",
+        "unit": "piece",
+        "pantry_id": "en-r-asie-sud-1"
+       },
+       {
+        "name": "Dried chickpeas",
+        "quantity": "150",
+        "unit": "g",
+        "pantry_id": "en-r-asie-sud-3"
+       },
+       {
+        "name": "Tomatoes",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-r-asie-sud-5"
+       },
+       {
+        "name": "Garam masala",
+        "quantity": "1",
+        "unit": "tsp",
+        "pantry_id": "en-r-asie-sud-7"
+       },
+       {
+        "name": "All‑purpose flour",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": null
+       },
+       {
+        "name": "Water (for dough)",
+        "quantity": "80",
+        "unit": "ml",
+        "pantry_id": null
+       },
+       {
+        "name": "Green onion",
+        "quantity": "2",
+        "unit": "stalks",
+        "pantry_id": null
+       },
+       {
+        "name": "Garlic cloves",
+        "quantity": "2",
+        "unit": "clove",
+        "pantry_id": null
+       },
+       {
+        "name": "Salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "Vegetable oil",
+        "quantity": "1",
+        "unit": "tbsp",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Cauliflower",
+       "Dried chickpeas",
+       "Tomatoes",
+       "Garam masala"
+      ],
+      "missing_ingredients": [
+       "All‑purpose flour",
+       "Green onion",
+       "Garlic cloves"
+      ],
+      "instructions": [
+       "Rinse the dried chickpeas, soak them in water for 4 hours, then drain.",
+       "Place the soaked chickpeas in a pot, cover with fresh water and bring to a boil. Reduce to a simmer and cook 20 minutes, until just tender. Drain and let cool.",
+       "Finely grate the cauliflower (use the urgent half‑head) and squeeze out excess moisture with a clean kitchen towel.",
+       "Finely chop the green onion, mince the garlic, and dice the tomato.",
+       "In a bowl combine the cooked chickpeas, grated cauliflower, green onion, garlic, tomato, 1 tsp garam masala, and a pinch of salt. Mix well; the mixture should be moist but hold together.",
+       "To make the dough, whisk 200 g all‑purpose flour with 80 ml water and a pinch of salt until a smooth, non‑sticky dough forms. Knead for 2 minutes, then let rest 5 minutes.",
+       "Divide the dough into 12 equal balls. On a lightly floured surface, roll each ball into a 8‑cm circle, thinner in the center.",
+       "Place 1 tbsp of filling in the center of each wrapper, fold over, and pleat the edges to seal tightly.",
+       "Arrange the dumplings in a steamer basket, ensuring they do not touch. Steam over boiling water for 12 minutes, until the dough becomes translucent and the filling is hot.",
+       "For the dipping sauce, blend the remaining tomato with 1 tsp garam masala, a pinch of salt, and 1 tbsp vegetable oil until smooth. Serve the sauce alongside the hot momos."
+      ],
+      "tips": [
+       "If you have leftover cooked rice, you can add 2 tbsp to the filling for extra body.",
+       "To keep the dumplings from sticking, line the steamer with parchment paper punched with holes."
+      ],
+      "image_prompt": "Artistic shot of steamed cauliflower‑chickpea momos on a bamboo steamer, with a small bowl of bright tomato‑garam masala sauce, soft steam, rustic setting"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.6,
+      "timed_cooking": 0.6666666666666666,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 10,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 3,
+      "cooking_cues": 4,
+      "order": 3,
+      "ingredients_used": 2,
+      "authenticity": 3,
+      "safety": 4,
+      "diet": 5
+     },
+     "issues": [
+      "La recette utilise de la farine et des oignons verts non présents dans le garde-manger.",
+      "L'étape 2 demande de cuire les pois chiches 20 minutes, ce qui est insuffisant pour des pois chiches secs après seulement 4h de trempage.",
+      "La sauce à base de tomate crue mixée manque de cuisson pour être réellement appétissante."
+     ],
+     "strengths": [
+      "La technique de façonnage des dumplings est bien expliquée.",
+      "L'utilisation du chou-fleur râpé est une excellente idée anti-gaspi."
+     ]
+    }
+   ]
+  }
+ ]
+}

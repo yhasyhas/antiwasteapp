@@ -19,7 +19,7 @@ import {
   strictDietsOf,
   urgentItems,
 } from './recipes.ts';
-import { buildPrompts, CUISINES, type Cuisine, PROMPT_VERSIONS, type PromptVersion } from './prompt.ts';
+import { buildPrompts, CUISINES, type Cuisine, MAX_PURCHASES, PROMPT_VERSIONS, type PromptVersion } from './prompt.ts';
 import { sampleDishes } from './library.ts';
 import { recentTitles } from './history.ts';
 import { safetyPass } from './safetyPass.ts';
@@ -305,6 +305,7 @@ Deno.serve(withCors(async (req: Request) => {
     if (V4_FAMILY) {
       const pass = await safetyPass(recipes, {
         pantry, pantryText: promptOptions.pantryText, diets, context, providers, log, t0, label: 'generate-recipes:correction',
+        ...(PROMPT_VERSION === 'v4.1' && { maxPurchases: MAX_PURCHASES }),
         request: { system, prompt, schema, schemaName: 'recipes', temperature: 0.8, maxOutputTokens: MAX_OUTPUT_TOKENS },
         ...(simulation?.providers && { simulate: simulation.providers }),
       });

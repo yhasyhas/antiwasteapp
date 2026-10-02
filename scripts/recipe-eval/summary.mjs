@@ -63,6 +63,10 @@ const stats = series.map((s) => {
     celsius_no_meat: mean(recipes.map((r) => (celsiusWithoutMeat(r.recipe) ? 0 : 1))),
     rules: mean(recipes.map((r) => r.checks.rules_respected)),
     urgent: mean(recipes.map((r) => r.checks.uses_urgent)),
+    // Ingrédients à acheter (hors sel, poivre, huile, eau) : moyenne, part des recettes à 3 au plus, maximum
+    purchases: mean(recipes.map((r) => r.recipe.missing_ingredients.length)),
+    purchases_ok: mean(recipes.map((r) => (r.recipe.missing_ingredients.length <= 3 ? 1 : 0))),
+    purchases_max: Math.max(0, ...recipes.map((r) => r.recipe.missing_ingredients.length)),
     recipes: recipes.length,
     requested: entries.reduce((n, e) => n + e.requested, 0),
     median_s: times.length ? times[Math.floor(times.length / 2)] / 1000 : null,
@@ -87,6 +91,8 @@ line('Pas de feu dans une étape sans cuisson', (s) => pc(s.heat_no_cook));
 line('Pas de °C à cœur hors viande et poisson', (s) => pc(s.celsius_no_meat));
 line('Régimes, exclusions, sélection', (s) => pc(s.rules));
 line('Aliment urgent utilisé', (s) => pc(s.urgent));
+line('Ingrédients à acheter par recette (moyenne / max)', (s) => `${s.purchases.toFixed(1)} / ${s.purchases_max}`);
+line('Recettes avec 3 achats au plus', (s) => pc(s.purchases_ok));
 line('Recettes servies / demandées', (s) => `${s.recipes} / ${s.requested}`);
 line('Temps médian d\'une génération', (s) => (s.median_s === null ? '—' : `${s.median_s.toFixed(1)} s`));
 line('Tokens par génération', (s) => String(Math.round(s.tokens_per_generation)));

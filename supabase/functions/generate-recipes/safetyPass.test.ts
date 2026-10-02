@@ -24,6 +24,17 @@ const provider = (answer: unknown) => {
 const SAFE = 'Fais dorer le poulet 25 minutes à feu moyen, jusqu\'à ce que le jus soit clair (74 °C à cœur).';
 const options = (providers: AiProvider[]) => ({ pantry, pantryText: '- p1 : Cuisses de poulet', diets: [], context, providers, request: { prompt: '', schema: {}, schemaName: 'recipes', temperature: 0, maxOutputTokens: 100 }, log: [], t0: Date.now(), label: 'test' });
 
+Deno.test('safetyPass : plus de 3 ingrédients à acheter (hors basiques), corrigée puis gardée', async () => {
+  const buying = (title: string, extra: string[]) => ({ ...raw(title, SAFE), ingredients: [...raw(title, SAFE).ingredients, ...['sel', 'huile', ...extra].map((name) => ({ name, quantity: '1', unit: 'pièce', pantry_id: 'missing' }))] });
+  const fake = provider({ recipes: [buying('Poulet aux épices', ['cumin', 'gingembre'])], refusal: '' });
+  const result = await safetyPass(recipesOf(buying('Poulet aux épices', ['cumin', 'gingembre', 'coriandre', 'citron'])), { ...options([fake]), maxPurchases: 3 });
+  assertEquals(result.report.first[0].issues.map((i) => i.code), ['too_many_purchases']);
+  assertEquals(result.recipes[0].missing_ingredients, ['cumin', 'gingembre']);
+  // Sans limite (v4) : rien à corriger
+  const free = await safetyPass(recipesOf(buying('Poulet aux épices', ['cumin', 'gingembre', 'coriandre', 'citron'])), options([provider({})]));
+  assertEquals(free.report.first.length, 0);
+});
+
 Deno.test('safetyPass : rien à corriger, aucun appel', async () => {
   const fake = provider({});
   const result = await safetyPass(recipesOf(raw('Poulet doré', SAFE)), options([fake]));
