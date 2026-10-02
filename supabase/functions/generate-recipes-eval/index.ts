@@ -51,6 +51,9 @@ const GEMINI_RECIPE_MODEL = Deno.env.get('GEMINI_RECIPE_MODEL') || Deno.env.get(
 const RECIPE_PROVIDERS = Deno.env.get('RECIPE_PROVIDERS') || 'groq,gemini';
 const MAX_OUTPUT_TOKENS = 8000;
 
+// v5 : v4 et ses ajustements (évaluation des régions et de la variété)
+const v4Family = (version: string) => version === 'v4' || version === 'v5';
+
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
 function providersFor(order: string | undefined, model?: string): AiProvider[] {
@@ -101,16 +104,19 @@ async function generate(body: any) {
   const cuisine: Cuisine = legacyCuisine ? preferences.cuisine : 'any';
   // Découpage de la phase 9 (v4) : région, famille ou « Autre cuisine… » (cuisineOther) ; les 7 valeurs actuelles
   // de l'app gardent leur traitement
-  const resolved = legacyCuisine || version !== 'v4' ? { kind: 'any' as const } : resolveCuisine(preferences.cuisine, preferences.cuisineOther);
+  const resolved = legacyCuisine || !v4Family(version) ? { kind: 'any' as const } : resolveCuisine(preferences.cuisine, preferences.cuisineOther);
   const difficulty = preferences.difficulty || 'easy';
   const count = recipeCount(pantry.items.length);
   const excluded = cleanExcluded(preferences.excluded);
   const servings = cleanServings(preferences.servings);
   const context = { mealType: preferences.mealType || 'dinner', cuisine: resolved.kind === 'regions' ? resolved.id : resolved.kind === 'other' ? 'other' : cuisine, difficulty, dietary, maxRecipes: count, mode, otherPantry, excluded, servings };
-  const v4 = version === 'v4';
+  const v4 = version === 'v4' || version === 'v5';
   // Plats de référence : seulement avec une cuisine précise ; library: false pour mesurer sans
   const examples = !v4 || body.library === false || resolved.kind === 'other' ? []
-    : sampleDishes(cuisine, { mealType: context.mealType, diets, ...(resolved.kind === 'regions' && { regions: resolved.regions }) });
+    : sampleDishes(cuisine, { mealType: context.mealType, diets, ...(resolved.kind === 'regions' && { regions: resolved.regions }),
+      // library: 'pantry' : la moitié des exemples partage un ingrédient avec le garde-manger, et chaque recette
+      // s'appuie sur un exemple différent (variante mesurée par variety.mjs)
+      ...((body.library === 'pantry' || (version === 'v5' && body.library !== true)) && { pantry: pantry.items.map((item) => item.name) }) });
   const promptOptions = {
     pantryText: pantryForPrompt(pantry),
     count,
@@ -130,6 +136,7 @@ async function generate(body: any) {
     servings,
     version,
     examples,
+    examplesHint: body.library === 'pantry',
     ...(resolved.kind === 'regions' && { cuisineChoice: { label: resolved.prompt } }),
     ...(resolved.kind === 'other' && { cuisineChoice: { other: resolved.text } }),
     recentTitles: Array.isArray(body.recent_titles) ? body.recent_titles.filter((t: unknown) => typeof t === 'string').slice(0, 30) : [],
@@ -166,7 +173,7 @@ async function generate(body: any) {
 
   // Contrôle de sécurité (v4, ou safety: true) : une demande de correction pour les recettes en défaut, puis
   // celles qui restent en défaut sont écartées
-  const safety = { checked: false, first: [] as { title: string; issues: SafetyIssue[] }[], corrected: [] as string[], dropped: [] as { title: string; issues: SafetyIssue[] }[] };
+  const safety = { checked: false, first: [] as { title: string; issues: SafetyIssue[] }[], corrected: [] as string[], dropped: [] as { title: string; issues: SafetyIssue[]; instructions: string[] }[] };
   if (body.safety ?? v4) {
     safety.checked = true;
     const checked = recipes.map((recipe) => ({ recipe, issues: safetyIssues(recipe, pantry.items) }));
@@ -191,7 +198,8 @@ async function generate(body: any) {
           kept.push(candidate);
           safety.corrected.push(candidate.title);
         } else {
-          safety.dropped.push({ title: c.recipe.title, issues: remaining });
+          // Texte gardé pour relire les recettes écartées (fausse alerte ou vrai défaut)
+          safety.dropped.push({ title: c.recipe.title, issues: remaining, instructions: (candidate ?? c.recipe).instructions });
         }
       }
       recipes = kept;

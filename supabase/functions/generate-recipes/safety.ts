@@ -114,7 +114,9 @@ const isStarch = (name: string) => {
 const TUBERS = ['pomme de terre', 'pommes de terre', 'patate', 'potato', 'papa ', 'papas', 'patata', 'manioc', 'cassava', 'yuca', 'igname', 'yam', 'taro', 'macabo', 'plantain', 'platano macho', 'platano verde'];
 
 const POULTRY = ['poulet', 'poule', 'dinde', 'canard', 'pintade', 'volaille', 'chicken', 'turkey', 'duck', 'hen', 'pollo', 'pavo', 'pato', 'gallina'];
-const MINCED = ['hache', 'kefta', 'kofta', 'merguez', 'saucisse', 'chipolata', 'boulette', 'minced', 'mince', 'ground beef', 'ground pork', 'ground meat', 'ground turkey', 'ground chicken', 'ground lamb', 'sausage', 'burger', 'meatball', 'molida', 'picada', 'salchicha', 'albondiga'];
+// Viande hachée par nature, ou « haché » à côté d'une viande (« persil haché », « cúrcuma molida » : pas de la viande)
+const MINCED = ['kefta', 'kofta', 'merguez', 'saucisse', 'chipolata', 'boulette', 'sausage', 'burger', 'meatball', 'salchicha', 'albondiga'];
+const MINCED_MARK = ['hache', 'minced', 'mince', 'ground', 'molid', 'picad'];
 const PORK = ['porc', 'cochon', 'echine', 'pork', 'cerdo', 'puerco', 'chuleta', 'lomo de cerdo'];
 const RED_MEAT = ['boeuf', 'veau', 'agneau', 'mouton', 'cabri', 'viande', 'steak', 'entrecote', 'beef', 'veal', 'lamb', 'mutton', 'goat', 'meat', 'res ', 'ternera', 'cordero', 'carnero', 'cabrito', 'carne', 'vacuno'];
 const FISH = ['poisson', 'saumon', 'cabillaud', 'colin', 'merlu', 'lieu', 'thon', 'maquereau', 'sardine', 'dorade', 'daurade', 'bar ', 'loup', 'tilapia', 'truite', 'sole ', 'capitaine', 'thiof', 'merou', 'morue', 'filet de poisson',
@@ -167,7 +169,8 @@ const PROTEIN_LABEL: Record<Protein, string> = {
 function proteinOf(name: string): Protein | null {
   if (hasKeyword(name, NOT_RAW_MEAT)) return null;
   // Ordre : la viande hachée avant la famille (« bœuf haché » : 71 °C)
-  if (hasKeyword(name, MINCED)) return 'minced';
+  const meat = hasKeyword(name, POULTRY) || hasKeyword(name, PORK) || hasKeyword(name, RED_MEAT);
+  if (hasKeyword(name, MINCED) || (meat && hasKeyword(name, MINCED_MARK))) return 'minced';
   if (hasKeyword(name, POULTRY)) return 'poultry';
   if (hasKeyword(name, PORK)) return 'pork';
   if (hasKeyword(name, SHELLFISH)) return 'shellfish';

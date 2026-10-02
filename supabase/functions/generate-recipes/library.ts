@@ -68,7 +68,7 @@ export interface SampledDish extends Dish {
 // de préférence compatibles avec un régime végétarien ou vegan (sinon, les autres servent quand même
 // d'inspiration : le prompt demande d'adapter). Aucun plat avec « Peu importe » (cuisine libre).
 // regions : régions précises (découpage de la phase 9, cuisines.ts) à la place de la cuisine de l'app
-export function sampleDishes(cuisine: string, options: { mealType: string; diets?: string[]; count?: number; random?: () => number; regions?: string[] }): SampledDish[] {
+export function sampleDishes(cuisine: string, options: { mealType: string; diets?: string[]; count?: number; random?: () => number; regions?: string[]; pantry?: string[] }): SampledDish[] {
   const random = options.random ?? Math.random;
   const count = options.count ?? 5;
   const regions = options.regions ? REGIONS.filter((r) => options.regions!.includes(r.id)) : REGIONS.filter((r) => r.cuisine === cuisine);
@@ -81,9 +81,22 @@ export function sampleDishes(cuisine: string, options: { mealType: string; diets
     const preferred = base.filter(dietOk);
     return { region: r.name, dishes: [...(preferred.length >= 2 ? preferred : base)] };
   });
+  const picked: SampledDish[] = [];
+  // Garde-manger donné : environ la moitié des exemples partage un ingrédient avec lui (sinon le modèle ignore des
+  // exemples qu'il ne peut pas cuisiner), le reste est tiré au hasard comme d'habitude
+  if (options.pantry && options.pantry.length > 0) {
+    const pantryWords = new Set(options.pantry.flatMap(ingredientWords));
+    const matching = shuffle(pools.flatMap((pool) => pool.dishes.filter((dish) => dish.ingredients.some((i) => ingredientWords(i).some((w) => pantryWords.has(w))))
+      .map((dish) => ({ pool, dish }))), random);
+    for (const { pool, dish } of matching) {
+      if (picked.length >= Math.ceil(count / 2)) break;
+      if (picked.some((p) => p.region === pool.region) && matching.some((m) => !picked.some((p) => p.region === m.pool.region))) continue;
+      pool.dishes.splice(pool.dishes.indexOf(dish), 1);
+      picked.push({ ...dish, region: pool.region });
+    }
+  }
   // Tour à tour dans les régions, dans un ordre tiré au hasard, un plat au hasard à chaque fois
   const order = shuffle(pools, random);
-  const picked: SampledDish[] = [];
   for (let round = 0; picked.length < count && order.some((pool) => pool.dishes.length > 0); round++) {
     for (const pool of order) {
       if (picked.length >= count || pool.dishes.length === 0) continue;
@@ -105,3 +118,23 @@ function shuffle<T>(items: T[], random: () => number): T[] {
 
 // Une ligne par plat dans le prompt : « - Mafé (Sénégal, Mali) : pâte d'arachide, poulet, tomate ; mijoter »
 export const dishLine = (dish: Dish) => `- ${dish.name} (${dish.country}) : ${dish.ingredients.join(', ')} ; ${dish.techniques.join(', ')}`;
+
+// Mots d'un ingrédient, ramenés au français pour les aliments de base (la bibliothèque est en français, le
+// garde-manger dans la langue de l'utilisateur)
+const BASE_WORDS: Record<string, string> = {
+  chicken: 'poulet', pollo: 'poulet', rice: 'riz', arroz: 'riz', egg: 'oeuf', eggs: 'oeuf', huevo: 'oeuf', huevos: 'oeuf', oeufs: 'oeuf',
+  beans: 'haricot', bean: 'haricot', frijoles: 'haricot', frijol: 'haricot', haricots: 'haricot', corn: 'mais', maiz: 'mais',
+  tomato: 'tomate', tomatoes: 'tomate', tomates: 'tomate', potato: 'pomme', potatoes: 'pomme', papa: 'pomme', papas: 'pomme', patata: 'pomme', patatas: 'pomme',
+  fish: 'poisson', pescado: 'poisson', beef: 'boeuf', res: 'boeuf', peanut: 'arachide', peanuts: 'arachide', mani: 'arachide', cacahuete: 'arachide',
+  lentil: 'lentille', lentils: 'lentille', lentejas: 'lentille', lentilles: 'lentille', chickpeas: 'chiche', chickpea: 'chiche', garbanzos: 'chiche', chiches: 'chiche',
+  coconut: 'coco', plantain: 'plantain', plantains: 'plantain', platano: 'plantain', cabbage: 'chou', col: 'chou', onion: 'oignon', onions: 'oignon', cebolla: 'oignon', oignons: 'oignon',
+  spinach: 'epinard', espinacas: 'epinard', epinards: 'epinard', eggplant: 'aubergine', berenjena: 'aubergine', aubergines: 'aubergine', lamb: 'agneau', cordero: 'agneau',
+  pork: 'porc', cerdo: 'porc', shrimp: 'crevette', prawns: 'crevette', gambas: 'crevette', camarones: 'crevette', crevettes: 'crevette', noodles: 'nouille', fideos: 'nouille', nouilles: 'nouille',
+  avocado: 'avocat', aguacate: 'avocat', cheese: 'fromage', queso: 'fromage', broccoli: 'brocoli', carrot: 'carotte', carrots: 'carotte', zanahoria: 'carotte', zanahorias: 'carotte', carottes: 'carotte',
+  bread: 'pain', pan: 'pain', tortillas: 'tortilla', semolina: 'semoule', yogurt: 'yaourt', yogur: 'yaourt', milk: 'lait', leche: 'lait', cassava: 'manioc', yuca: 'manioc',
+};
+const IGNORED = new Set(['de', 'du', 'des', 'la', 'le', 'les', 'ou', 'et', 'en', 'au', 'aux', 'of', 'and', 'the', 'y', 'con', 'el', 'sec', 'secs', 'frais', 'fresh', 'huile', 'sel', 'eau']);
+function ingredientWords(text: string): string[] {
+  return text.toLowerCase().replace(/œ/g, 'oe').normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(/[^a-z]+/)
+    .filter((w) => w.length >= 3 && !IGNORED.has(w)).map((w) => BASE_WORDS[w] ?? w.replace(/s$/, ''));
+}

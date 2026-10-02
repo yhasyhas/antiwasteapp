@@ -36,6 +36,9 @@ Deno.test('safetyIssues : viande crue, température à cœur au seuil et signe v
   assertEquals(codes(recipe([['Cuisses de poulet', 'chicken']], ['Fais dorer le poulet 25 minutes à feu moyen, jusqu\'à ce que le jus soit clair (74 °C à cœur).'])), []);
   // Porc sous le seuil
   assertEquals(codes(recipe([['Filet de porc', null]], ['Saisis le porc 8 minutes, jusqu\'à 60 °C à cœur et un jus clair.'])), ['core_temperature']);
+  // « haché » ou « molida » sans viande : pas de la viande hachée ; avec une viande : 71 °C
+  assertEquals(codes(recipe([['Cúrcuma molida', null], ['Persil haché', null]], ['Añade la cúrcuma y el perejil.'])), []);
+  assertEquals(codes(recipe([['Agneau haché', null]], ['Fais revenir l\'agneau 8 minutes, jusqu\'à 65 °C à cœur et plus rosé au centre.'])), ['core_temperature']);
   // Bouillon de poulet : pas de la viande crue
   assertEquals(codes(recipe([['Bouillon de poulet', null]], ['Verse le bouillon de poulet et laisse mijoter 10 minutes.'])), []);
   // Cuisson au four dans une étape qui ne nomme pas la viande

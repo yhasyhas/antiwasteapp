@@ -1,0 +1,1663 @@
+{
+ "summary": {
+  "version": "v4",
+  "date": "2026-10-02T07:26:53.572Z",
+  "model": "gemini-3.8-flash",
+  "judge_model": "gemini-3.1-flash-lite",
+  "cases": 9,
+  "failed_cases": 6,
+  "recipes": 8,
+  "judge": {
+   "quantities": 4.75,
+   "cooking_cues": 5,
+   "order": 5,
+   "ingredients_used": 5,
+   "authenticity": 4.875,
+   "safety": 5,
+   "diet": 5
+  },
+  "diversity_judge": 4.666666666666667,
+  "auto": {
+   "ingredients_in_steps": 1,
+   "quantities_in_steps": 1,
+   "timed_cooking": 0.84375,
+   "oven_temperature": 1,
+   "reheat_cue": 1,
+   "uses_urgent": 1,
+   "rules_respected": 1,
+   "units_language": 1,
+   "safety_rules": 1,
+   "no_heat_without_cooking": 1,
+   "no_celsius_without_meat": 1,
+   "diversity": 0.7467142182054464
+  },
+  "rejected_first": 0,
+  "median_ms": 11537,
+  "judge_mean": 4.946428571428571
+ },
+ "results": [
+  {
+   "id": "fr-afrique-complet",
+   "error": {
+    "error": "provider_error",
+    "failure": "Gemini 503: {\"error\":{\"message\":\"gemini-3.8-flash is currently experiencing high demand, spikes in demand are usually temporary. Please try again later.\",\"code\":\"service_unavailable\"}}",
+    "attempts": [
+     {
+      "provider": "gemini",
+      "started_at_ms": 1,
+      "ms": 5241,
+      "ok": false,
+      "details": "Gemini 503: {\"error\":{\"message\":\"gemini-3.8-flash is currently experiencing high demand, spikes in demand are usually temporary. Please try again later.\",\"code\":\"service_unavailable\"}}"
+     }
+    ]
+   }
+  },
+  {
+   "id": "fr-maghreb-deux",
+   "note": "2 aliments seulement, cuisine du Maghreb",
+   "provider": "gemini",
+   "model": "gemini-3.8-flash",
+   "ms": 13278,
+   "requested": 2,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [],
+    "corrected": [],
+    "dropped": []
+   },
+   "examples": [
+    {
+     "name": "Lablabi",
+     "region": "Maghreb"
+    },
+    {
+     "name": "Pastilla au poulet",
+     "region": "Maghreb"
+    },
+    {
+     "name": "Zaalouk",
+     "region": "Maghreb"
+    },
+    {
+     "name": "Mbakbka",
+     "region": "Maghreb"
+    },
+    {
+     "name": "Djelbana (ragoût de petits pois)",
+     "region": "Maghreb"
+    }
+   ],
+   "diversity_auto": 0.875,
+   "diversity_judge": 4,
+   "diversity_comment": "Les deux recettes utilisent les mêmes ingrédients de base (carottes, pois chiches) mais proposent des textures et des modes de consommation radicalement différents : une soupe réconfortante contre une salade composée tiède. C'est une excellente utilisation du garde-manger.",
+   "judge_model": "gemini-3.1-flash-lite",
+   "generation": {
+    "version": "v4",
+    "requested": 2,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [],
+     "corrected": [],
+     "dropped": []
+    },
+    "examples": [
+     {
+      "name": "Lablabi",
+      "region": "Maghreb"
+     },
+     {
+      "name": "Pastilla au poulet",
+      "region": "Maghreb"
+     },
+     {
+      "name": "Zaalouk",
+      "region": "Maghreb"
+     },
+     {
+      "name": "Mbakbka",
+      "region": "Maghreb"
+     },
+     {
+      "name": "Djelbana (ragoût de petits pois)",
+      "region": "Maghreb"
+     }
+    ],
+    "provider": "gemini",
+    "model": "gemini-3.8-flash",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "fr-maghreb-deux-2",
+      "name": "Carottes",
+      "quantity": "500 g",
+      "daysLeft": 2,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "fr-maghreb-deux-1",
+      "name": "Pois chiches en conserve",
+      "quantity": "1 boîte",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 13278,
+    "attempts": [
+     {
+      "provider": "gemini",
+      "started_at_ms": 2,
+      "ms": 13266,
+      "ok": true,
+      "usage": {
+       "total_tokens": 4520,
+       "total_input_tokens": 1952,
+       "input_tokens_by_modality": [
+        {
+         "modality": "text",
+         "tokens": 1952
+        }
+       ],
+       "total_cached_tokens": 0,
+       "total_output_tokens": 2568,
+       "total_tool_use_tokens": 0,
+       "total_thought_tokens": 0,
+       "raw_prompt_token": 2674,
+       "model_invocation_token_counts": [
+        {
+         "prompt_tokens_details": [
+          {
+           "modality": "text",
+           "tokens": 2674
+          }
+         ],
+         "candidates_tokens_details": [
+          {
+           "modality": "text",
+           "tokens": 2584
+          }
+         ]
+        }
+       ],
+       "non_grounding_model_invocation_token_counts": [
+        {
+         "prompt_tokens_details": [
+          {
+           "modality": "text",
+           "tokens": 2674
+          }
+         ],
+         "candidates_tokens_details": [
+          {
+           "modality": "text",
+           "tokens": 2584
+          }
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Chorba algérienne aux carottes et pois chiches",
+     "recipe": {
+      "title": "Chorba algérienne aux carottes et pois chiches",
+      "description": "Une soupe-repas parfumée et réconfortante de la cuisine algérienne, idéale pour un midi léger mais rassasiant, associant légumes fondants, pois chiches et petites pâtes dans un bouillon tomaté.",
+      "difficulty": "easy",
+      "prep_time": 15,
+      "cook_time": 25,
+      "total_time": 40,
+      "servings": 2,
+      "meal_type": "lunch",
+      "cuisine": "maghreb",
+      "dietary_tags": [
+       "végétarien"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Carottes",
+        "quantity": "250",
+        "unit": "g",
+        "pantry_id": "fr-maghreb-deux-2"
+       },
+       {
+        "name": "Pois chiches en conserve",
+        "quantity": "1/2",
+        "unit": "boîte",
+        "pantry_id": "fr-maghreb-deux-1"
+       },
+       {
+        "name": "oignon",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": null
+       },
+       {
+        "name": "ail",
+        "quantity": "2",
+        "unit": "gousse",
+        "pantry_id": null
+       },
+       {
+        "name": "concentré de tomate",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "huile d'olive",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "langues d'oiseau (orzo)",
+        "quantity": "70",
+        "unit": "g",
+        "pantry_id": null
+       },
+       {
+        "name": "ras el hanout",
+        "quantity": "1",
+        "unit": "c. à café",
+        "pantry_id": null
+       },
+       {
+        "name": "coriandre fraîche",
+        "quantity": "4",
+        "unit": "tige",
+        "pantry_id": null
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "poivre noir",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Carottes",
+       "Pois chiches en conserve"
+      ],
+      "missing_ingredients": [
+       "oignon",
+       "ail",
+       "concentré de tomate",
+       "langues d'oiseau (orzo)",
+       "ras el hanout",
+       "coriandre fraîche"
+      ],
+      "instructions": [
+       "Pèle et émince finement 1 oignon. Épluche et hache 2 gousses d'ail. Épluche les 250 g de carottes et coupe-les en petits dés d'environ 1 cm. Égoutte et rince les 1/2 boîte de pois chiches en conserve. Ciselez les 4 tiges de coriandre fraîche.",
+       "Dans une marmite, fais chauffer 2 c. à soupe d'huile d'olive à feu moyen. Ajoute l'oignon émincé, l'ail haché et 1 c. à café de ras el hanout. Fais revenir pendant 4 minutes jusqu'à ce que l'oignon devienne translucide et dégage un arôme parfumé.",
+       "Incorpore les 2 c. à soupe de concentré de tomate et mélange pendant 1 minute à feu moyen pour faire blondir le concentré.",
+       "Ajoute les 250 g de carottes en dés, les 1/2 boîte de pois chiches en conserve égouttés, 1 pincée de sel, 1 pincée de poivre noir et verse 750 ml d'eau. Porte à ébullition à feu vif, puis couvre et laisse frémir à feu doux pendant 12 minutes, jusqu'à ce que les dés de carotte soient tendres sous la pointe d'un couteau.",
+       "Verse les 70 g de langues d'oiseau (orzo) en pluie dans le bouillon fumant. Laisse cuire à feu doux sans couvrir pendant 8 minutes en remuant régulièrement pour éviter que les pâtes n'attachent, jusqu'à ce qu'elles soient bien tendres et gonflées.",
+       "Retire du feu, parsème avec la coriandre fraîche ciselée et sers bien chaud dans deux bols profonds."
+      ],
+      "tips": [
+       "Tu peux ajouter un filet de jus de citron frais juste au moment de servir pour apporter du peps.",
+       "Cette soupe se conserve 2 jours au réfrigérateur et gagne même en goût le lendemain en réchauffant à feu doux avec un trait d'eau."
+      ],
+      "image_prompt": "Traditional Algerian chorba soup served in an authentic patterned ceramic bowl, featuring diced tender carrots, chickpeas, and orzo pasta in a fragrant red tomato broth, garnished with fresh chopped coriander, natural sunlight, top view food photography"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 6,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 4,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "L'utilisation de '1/2 boîte' à l'étape 1 et 4 manque de précision professionnelle, le poids net égoutté aurait été préférable pour une constance du résultat."
+     ],
+     "strengths": [
+      "La progression logique des étapes respecte parfaitement les temps de cuisson des différents ingrédients.",
+      "Les repères de cuisson (translucide, tendre sous la pointe du couteau) sont précis et adaptés aux amateurs.",
+      "L'équilibre des saveurs est typique et respecte les codes de la chorba algérienne."
+     ]
+    },
+    {
+     "title": "Salade tiède marocaine de carottes mchermla et pois chiches rôtis",
+     "recipe": {
+      "title": "Salade tiède marocaine de carottes mchermla et pois chiches rôtis",
+      "description": "Une assiette complète et rapide inspirée de la chermoula marocaine : des carottes fondantes et épicées associées à des pois chiches dorés à la poêle et du couscous moelleux.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 20,
+      "total_time": 30,
+      "servings": 2,
+      "meal_type": "lunch",
+      "cuisine": "maghreb",
+      "dietary_tags": [
+       "végétarien",
+       "végétalien"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Carottes",
+        "quantity": "250",
+        "unit": "g",
+        "pantry_id": "fr-maghreb-deux-2"
+       },
+       {
+        "name": "Pois chiches en conserve",
+        "quantity": "1/2",
+        "unit": "boîte",
+        "pantry_id": "fr-maghreb-deux-1"
+       },
+       {
+        "name": "semoule de blé moyenne (couscous)",
+        "quantity": "120",
+        "unit": "g",
+        "pantry_id": null
+       },
+       {
+        "name": "ail",
+        "quantity": "2",
+        "unit": "gousse",
+        "pantry_id": null
+       },
+       {
+        "name": "huile d'olive",
+        "quantity": "3",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "cumin en poudre",
+        "quantity": "1",
+        "unit": "c. à café",
+        "pantry_id": null
+       },
+       {
+        "name": "paprika doux",
+        "quantity": "1",
+        "unit": "c. à café",
+        "pantry_id": null
+       },
+       {
+        "name": "jus de citron",
+        "quantity": "1",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "persil plat",
+        "quantity": "4",
+        "unit": "tige",
+        "pantry_id": null
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "poivre noir",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Carottes",
+       "Pois chiches en conserve"
+      ],
+      "missing_ingredients": [
+       "semoule de blé moyenne (couscous)",
+       "ail",
+       "cumin en poudre",
+       "paprika doux",
+       "jus de citron",
+       "persil plat"
+      ],
+      "instructions": [
+       "Verse les 120 g de semoule de blé moyenne dans un bol résistant à la chaleur avec 1 pincée de sel. Fais bouillir 120 ml d'eau et verse-la sur la semoule. Couvre avec une assiette et laisse gonfler pendant 5 minutes hors du feu, puis égrène à la fourchette.",
+       "Épluche les 250 g de carottes et coupe-les en rondelles d'environ 5 mm d'épaisseur. Épluche et hache 2 gousses d'ail. Égoutte et rince les 1/2 boîte de pois chiches en conserve, puis éponge-les délicatement avec un torchon propre. Émince les 4 tiges de persil plat.",
+       "Dans une casserole, dépose les rondelles de carottes, couvre d'eau froide à hauteur et ajoute 1 pincée de sel. Porte à ébullition à feu vif, puis cuis à feu moyen pendant 10 minutes jusqu'à ce que les carottes soient tendres sous la lame d'un couteau. Égoutte-les complètement.",
+       "Dans une grande poêle, fais chauffer 2 c. à soupe d'huile d'olive à feu moyen. Ajoute l'ail haché, 1 c. à café de cumin en poudre, 1 c. à café de paprika doux et 1 pincée de poivre noir. Remue pendant 30 secondes pour libérer les arômes des épices.",
+       "Ajoute les rondelles de carottes égouttées dans la poêle et fais-les revenir à feu doux pendant 4 minutes en les enrobant bien d'épices jusqu'à ce qu'elles absorbent la sauce mchermla. Verse 1 c. à soupe de jus de citron, mélange et réserve sur une assiette.",
+       "Dans la même poêle encore chaude, verse 1 c. à soupe d'huile d'olive restante et fais dorer les 1/2 boîte de pois chiches en conserve à feu moyen-vif pendant 5 minutes, en remuant souvent, jusqu'à ce qu'ils soient légèrement croustillants et dorés en surface.",
+       "Dresse dans deux assiettes : dispose la semoule égrenée au centre, ajoute les carottes mchermla tièdes et les pois chiches dorés, puis parsème avec le persil plat ciselé."
+      ],
+      "tips": [
+       "Pour une touche piquante traditionnelle, ajoute une pointe de couteau de harissa lors de la cuisson de l'ail et des épices.",
+       "Ce plat s'emporte parfaitement au travail dans une boîte hermétique pour le déjeuner et se déguste tiède ou à température ambiante."
+      ],
+      "image_prompt": "Warm Moroccan carrot mchermla salad served with golden pan-roasted chickpeas over fluffy couscous, garnished with fresh flat-leaf parsley and lemon, rustic presentation in an earthenware tagine plate, soft Mediterranean lighting"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.8333333333333334,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 7,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 4,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "Comme pour la recette précédente, '1/2 boîte' est une mesure imprécise qui peut varier selon le format de la conserve achetée."
+     ],
+     "strengths": [
+      "La technique de la chermoula est bien appliquée et respecte la tradition marocaine.",
+      "La gestion des textures, notamment le séchage des pois chiches avant la poêle, est un excellent conseil technique pour obtenir du croustillant.",
+      "L'ordre de préparation permet une gestion optimale du temps de cuisson de la semoule."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "en-asian-urgent",
+   "error": {
+    "error": "provider_error",
+    "failure": "Gemini 503: {\"error\":{\"message\":\"gemini-3.8-flash is currently experiencing high demand, spikes in demand are usually temporary. Please try again later.\",\"code\":\"service_unavailable\"}}",
+    "attempts": [
+     {
+      "provider": "gemini",
+      "started_at_ms": 1,
+      "ms": 4161,
+      "ok": false,
+      "details": "Gemini 503: {\"error\":{\"message\":\"gemini-3.8-flash is currently experiencing high demand, spikes in demand are usually temporary. Please try again later.\",\"code\":\"service_unavailable\"}}"
+     }
+    ]
+   }
+  },
+  {
+   "id": "es-latino-vegetariano",
+   "error": {
+    "error": "provider_error",
+    "failure": "Gemini 503: {\"error\":{\"message\":\"gemini-3.8-flash is currently experiencing high demand, spikes in demand are usually temporary. Please try again later.\",\"code\":\"service_unavailable\"}}",
+    "attempts": [
+     {
+      "provider": "gemini",
+      "started_at_ms": 1,
+      "ms": 49835,
+      "ok": false,
+      "details": "Gemini 503: {\"error\":{\"message\":\"gemini-3.8-flash is currently experiencing high demand, spikes in demand are usually temporary. Please try again later.\",\"code\":\"service_unavailable\"}}"
+     }
+    ]
+   }
+  },
+  {
+   "id": "fr-restes",
+   "error": {
+    "error": "provider_error",
+    "failure": "Gemini 503: {\"error\":{\"message\":\"gemini-3.8-flash is currently experiencing high demand, spikes in demand are usually temporary. Please try again later.\",\"code\":\"service_unavailable\"}}",
+    "attempts": [
+     {
+      "provider": "gemini",
+      "started_at_ms": 2,
+      "ms": 2621,
+      "ok": false,
+      "details": "Gemini 503: {\"error\":{\"message\":\"gemini-3.8-flash is currently experiencing high demand, spikes in demand are usually temporary. Please try again later.\",\"code\":\"service_unavailable\"}}"
+     }
+    ]
+   }
+  },
+  {
+   "id": "en-med-vegan",
+   "error": {
+    "error": "provider_error",
+    "failure": "Gemini 503: {\"error\":{\"message\":\"gemini-3.8-flash is currently experiencing high demand, spikes in demand are usually temporary. Please try again later.\",\"code\":\"service_unavailable\"}}",
+    "attempts": [
+     {
+      "provider": "gemini",
+      "started_at_ms": 1,
+      "ms": 2855,
+      "ok": false,
+      "details": "Gemini 503: {\"error\":{\"message\":\"gemini-3.8-flash is currently experiencing high demand, spikes in demand are usually temporary. Please try again later.\",\"code\":\"service_unavailable\"}}"
+     }
+    ]
+   }
+  },
+  {
+   "id": "es-sin-gluten-lactosa",
+   "note": "Español, sin gluten y sin lactosa, salmón",
+   "provider": "gemini",
+   "model": "gemini-3.8-flash",
+   "ms": 10526,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [],
+    "corrected": [],
+    "dropped": []
+   },
+   "examples": [],
+   "diversity_auto": 0.6407407407407408,
+   "diversity_judge": 5,
+   "diversity_comment": "Les trois recettes proposent des techniques de cuisson radicalement différentes (four, sauté, velouté), offrant une excellente variété pour un même panier d'ingrédients.",
+   "judge_model": "gemini-3.1-flash-lite",
+   "generation": {
+    "version": "v4",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [],
+     "corrected": [],
+     "dropped": []
+    },
+    "examples": [],
+    "provider": "gemini",
+    "model": "gemini-3.8-flash",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "es-sin-gluten-lactosa-1",
+      "name": "Salmón",
+      "quantity": "2 lomos",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "es-sin-gluten-lactosa-3",
+      "name": "Judías verdes",
+      "quantity": "300 g",
+      "daysLeft": 2,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "es-sin-gluten-lactosa-2",
+      "name": "Patatas",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "es-sin-gluten-lactosa-4",
+      "name": "Arroz",
+      "quantity": "500 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "es-sin-gluten-lactosa-5",
+      "name": "Limón",
+      "quantity": "1",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "es-sin-gluten-lactosa-6",
+      "name": "Pasta de trigo",
+      "quantity": "500 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "es-sin-gluten-lactosa-7",
+      "name": "Mantequilla",
+      "quantity": "250 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 10526,
+    "attempts": [
+     {
+      "provider": "gemini",
+      "started_at_ms": 2,
+      "ms": 10515,
+      "ok": true,
+      "usage": {
+       "total_tokens": 4481,
+       "total_input_tokens": 1777,
+       "input_tokens_by_modality": [
+        {
+         "modality": "text",
+         "tokens": 1777
+        }
+       ],
+       "total_cached_tokens": 0,
+       "total_output_tokens": 2704,
+       "total_tool_use_tokens": 0,
+       "total_thought_tokens": 0,
+       "raw_prompt_token": 2613,
+       "model_invocation_token_counts": [
+        {
+         "prompt_tokens_details": [
+          {
+           "modality": "text",
+           "tokens": 2613
+          }
+         ],
+         "candidates_tokens_details": [
+          {
+           "modality": "text",
+           "tokens": 2721
+          }
+         ]
+        }
+       ],
+       "non_grounding_model_invocation_token_counts": [
+        {
+         "prompt_tokens_details": [
+          {
+           "modality": "text",
+           "tokens": 2613
+          }
+         ],
+         "candidates_tokens_details": [
+          {
+           "modality": "text",
+           "tokens": 2721
+          }
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Salmón al horno con judías verdes y patatas al limón",
+     "recipe": {
+      "title": "Salmón al horno con judías verdes y patatas al limón",
+      "description": "Una cena ligera, nutritiva y al horno para aprovechar el salmón y las judías verdes rápidamente, con un toque fresco de limón.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 25,
+      "total_time": 35,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "sin gluten",
+       "sin lactosa",
+       "pescado",
+       "cena ligera"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Salmón",
+        "quantity": "2",
+        "unit": "pieza",
+        "pantry_id": "es-sin-gluten-lactosa-1"
+       },
+       {
+        "name": "Judías verdes",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-3"
+       },
+       {
+        "name": "Patatas",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-2"
+       },
+       {
+        "name": "Limón",
+        "quantity": "1/2",
+        "unit": "pieza",
+        "pantry_id": "es-sin-gluten-lactosa-5"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta negra",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Salmón",
+       "Judías verdes",
+       "Patatas",
+       "Limón"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Precalienta el horno a 200 °C.",
+       "Pela y corta los 300 g de patatas en rodajas finas de medio centímetro, despunta los 200 g de judías verdes y corta la 1/2 pieza de limón en rodajas finas.",
+       "Coloca las rodajas de patata y las judías verdes en una bandeja de horno, añade 1 cda de aceite de oliva y 1 pizca de sal, y hornea a 200 °C durante 12 minutos, hasta que las patatas comiencen a ablandarse y dorarse ligeramente.",
+       "Saca la bandeja, coloca encima las 2 piezas de Salmón junto con las rodajas de limón, y rocía el pescado con 1 cda de aceite de oliva y 1 pizca de pimienta negra.",
+       "Vuelve a introducir la bandeja en el horno a 200 °C durante 12 minutos, hasta que el pescado alcance 63 °C en su interior, con la carne completamente opaca que se desmenuza en láminas al presionarla ligeramente con un tenedor.",
+       "Sirve de inmediato en dos platos llanos acompañando cada lomo de salmón con las judías y las patatas horneadas."
+      ],
+      "tips": [
+       "Cortar las patatas muy finas garantiza que se cocinen al mismo tiempo que las verduras y el pescado.",
+       "Puedes añadir hierbas provenzales secas antes de hornear si quieres más aroma."
+      ],
+      "image_prompt": "Professional food photography, baked salmon fillets with tender green beans and golden sliced potatoes on a rustic baking sheet, lemon slices, soft warm lighting, steam rising"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.5,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 6,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [],
+     "strengths": [
+      "La gestion des temps de cuisson est excellente, permettant une cuisson homogène des légumes et du poisson.",
+      "Les repères de température interne (63°C) et visuels sont parfaitement conformes aux normes de sécurité alimentaire."
+     ]
+    },
+    {
+     "title": "Salteado ligero de arroz con salmón y judías verdes",
+     "recipe": {
+      "title": "Salteado ligero de arroz con salmón y judías verdes",
+      "description": "Un plato completo estilo wok, ideal para una cena digestiva y rápida aprovechando los ingredientes más urgentes de la despensa.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 20,
+      "total_time": 30,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "sin gluten",
+       "sin lactosa",
+       "pescado"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Salmón",
+        "quantity": "2",
+        "unit": "pieza",
+        "pantry_id": "es-sin-gluten-lactosa-1"
+       },
+       {
+        "name": "Judías verdes",
+        "quantity": "100",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-3"
+       },
+       {
+        "name": "Arroz",
+        "quantity": "150",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-4"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta negra",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Salmón",
+       "Judías verdes",
+       "Arroz"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Pon a hervir abundante agua con 1 pizca de sal en una cacerola a fuego vivo. Cuando hierva a borbotones, añade los 150 g de Arroz y cuece a fuego medio durante 14 minutos, hasta que los granos estén tiernos pero firmes al morder, luego cuela y reserva.",
+       "Limpia los 100 g de Judías verdes y córtalas en bastones pequeños de unos 3 centímetros.",
+       "Corta las 2 piezas de Salmón en dados medianos de unos 2 centímetros.",
+       "Calienta 1 cda de aceite de oliva en una sartén grande a fuego medio y saltea los bastones de Judías verdes durante 4 minutos, hasta que tomen un color verde brillante y estén tiernas pero crujientes.",
+       "Incorpora a la sartén los dados de Salmón, añade 1 cda de aceite de oliva y 1 pizca de pimienta negra, y cocina a fuego medio durante 4 minutos removiendo con cuidado, hasta que el pescado alcance 63 °C en su interior y su carne esté opaca por todas partes.",
+       "Añade el arroz cocido a la sartén y remueve todo junto a fuego medio durante 2 minutos hasta integrar bien los ingredientes y servir bien caliente."
+      ],
+      "tips": [
+       "Si te sobra arroz hervido de otra ocasión, puedes usarlo directamente para reducir aún más el tiempo.",
+       "Unas gotas de zumo de limón al final realzan los sabores del salteado."
+      ],
+      "image_prompt": "Top-down food photography of a colorful stir-fry with salmon cubes, green beans, and fluffy white rice in a dark ceramic bowl, minimalist presentation, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 6,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [],
+     "strengths": [
+      "La technique de cuisson du riz est précise et garantit une texture optimale.",
+      "L'ordre des étapes respecte parfaitement la logique de préparation pour éviter toute contamination croisée."
+     ]
+    },
+    {
+     "title": "Crema reconfortante de judías verdes y patata con láminas de salmón",
+     "recipe": {
+      "title": "Crema reconfortante de judías verdes y patata con láminas de salmón",
+      "description": "Una sopa crema sedosa y ligera, 100% libre de lácteos y gluten, rematada con salmón a la plancha para una cena suave.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 22,
+      "total_time": 32,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "sin gluten",
+       "sin lactosa",
+       "sopa"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Salmón",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-sin-gluten-lactosa-1"
+       },
+       {
+        "name": "Judías verdes",
+        "quantity": "250",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-3"
+       },
+       {
+        "name": "Patatas",
+        "quantity": "250",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-2"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta negra",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Salmón",
+       "Judías verdes",
+       "Patatas"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Pela los 250 g de Patatas y córtalas en dados medianos; lava y despunta los 250 g de Judías verdes troceándolas en pedazos de unos 4 centímetros.",
+       "Coloca las patatas y las judías verdes en una olla con 500 ml de agua y 1 pizca de sal, tapa y cocina a fuego medio durante 16 minutos, hasta que la patata se deshaga fácilmente al pincharla con un cuchillo.",
+       "Retira parte del agua de cocción dejando solo un poco en el fondo, añade 1 cda de aceite de oliva y tritura todo con la batidora de mano durante 2 minutos hasta obtener una crema suave y homogénea sin grumos.",
+       "Calienta 1 cda de aceite de oliva en una sartén antiadherente a fuego medio-alto y cocina la 1 pieza de Salmón con 1 pizca de pimienta negra durante 3 minutos por cada lado, hasta que alcance 63 °C en el centro y la carne quede opaca y se separe fácilmente en lascas.",
+       "Desmenuza el salmón cocinado en lascas grandes.",
+       "Sirve la crema caliente en dos cuencos hondos y reparte las lascas de salmón por encima para disfrutar de inmediato."
+      ],
+      "tips": [
+       "Guarda el caldo sobrante de la cocción por si prefieres una textura de crema más ligera.",
+       "No dudes en añadir un toque de limón a las lascas de salmón para aportar una nota ácida."
+      ],
+      "image_prompt": "Artisan food photography, vibrant green potato and green bean velvety soup served in a rustic stoneware bowl, topped with flaked grilled salmon and olive oil drizzle, soft ambient light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.6666666666666666,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 6,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [],
+     "strengths": [
+      "L'utilisation des ingrédients est très cohérente pour obtenir une texture veloutée sans aucun produit laitier.",
+      "La cuisson du saumon à la poêle est bien maîtrisée avec des repères de sécurité clairs."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "en-african-breakfast",
+   "error": {
+    "error": "provider_error",
+    "failure": "Gemini 503: {\"error\":{\"message\":\"gemini-3.8-flash is currently experiencing high demand, spikes in demand are usually temporary. Please try again later.\",\"code\":\"service_unavailable\"}}",
+    "attempts": [
+     {
+      "provider": "gemini",
+      "started_at_ms": 1,
+      "ms": 5921,
+      "ok": false,
+      "details": "Gemini 503: {\"error\":{\"message\":\"gemini-3.8-flash is currently experiencing high demand, spikes in demand are usually temporary. Please try again later.\",\"code\":\"service_unavailable\"}}"
+     }
+    ]
+   }
+  },
+  {
+   "id": "en-french-exclusions",
+   "note": "English, French cuisine, low-carb preference, mushrooms excluded, 4 people",
+   "provider": "gemini",
+   "model": "gemini-3.8-flash",
+   "ms": 11537,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [],
+    "corrected": [],
+    "dropped": []
+   },
+   "examples": [
+    {
+     "name": "Piperade",
+     "region": "France"
+    },
+    {
+     "name": "Endives au jambon",
+     "region": "France"
+    },
+    {
+     "name": "Daube provençale",
+     "region": "France"
+    },
+    {
+     "name": "Pot-au-feu",
+     "region": "France"
+    },
+    {
+     "name": "Salade lyonnaise",
+     "region": "France"
+    }
+   ],
+   "diversity_auto": 0.7244019138755982,
+   "diversity_judge": 5,
+   "diversity_comment": "La sélection propose trois approches culinaires distinctes : une cuisson à la poêle avec sauce crémeuse, un gratin au four, et une salade tiède. Les textures et les méthodes de préparation sont suffisamment variées pour offrir une expérience complète.",
+   "judge_model": "gemini-3.1-flash-lite",
+   "generation": {
+    "version": "v4",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [],
+     "corrected": [],
+     "dropped": []
+    },
+    "examples": [
+     {
+      "name": "Piperade",
+      "region": "France"
+     },
+     {
+      "name": "Endives au jambon",
+      "region": "France"
+     },
+     {
+      "name": "Daube provençale",
+      "region": "France"
+     },
+     {
+      "name": "Pot-au-feu",
+      "region": "France"
+     },
+     {
+      "name": "Salade lyonnaise",
+      "region": "France"
+     }
+    ],
+    "provider": "gemini",
+    "model": "gemini-3.8-flash",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "en-french-exclusions-1",
+      "name": "Pork tenderloin",
+      "quantity": "600 g",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "en-french-exclusions-3",
+      "name": "Mushrooms",
+      "quantity": "250 g",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "en-french-exclusions-2",
+      "name": "Leeks",
+      "quantity": "3",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "en-french-exclusions-4",
+      "name": "Cream",
+      "quantity": "20 cl",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "en-french-exclusions-5",
+      "name": "Gruyère",
+      "quantity": "150 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "en-french-exclusions-6",
+      "name": "Green beans",
+      "quantity": "400 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "en-french-exclusions-7",
+      "name": "Shallots",
+      "quantity": "3",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p8",
+      "id": "en-french-exclusions-8",
+      "name": "Dijon mustard",
+      "quantity": "1 jar",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 11537,
+    "attempts": [
+     {
+      "provider": "gemini",
+      "started_at_ms": 1,
+      "ms": 11530,
+      "ok": true,
+      "usage": {
+       "total_tokens": 4961,
+       "total_input_tokens": 2157,
+       "input_tokens_by_modality": [
+        {
+         "modality": "text",
+         "tokens": 2157
+        }
+       ],
+       "total_cached_tokens": 0,
+       "total_output_tokens": 2804,
+       "total_tool_use_tokens": 0,
+       "total_thought_tokens": 0,
+       "raw_prompt_token": 2903,
+       "model_invocation_token_counts": [
+        {
+         "prompt_tokens_details": [
+          {
+           "modality": "text",
+           "tokens": 2903
+          }
+         ],
+         "candidates_tokens_details": [
+          {
+           "modality": "text",
+           "tokens": 2821
+          }
+         ]
+        }
+       ],
+       "non_grounding_model_invocation_token_counts": [
+        {
+         "prompt_tokens_details": [
+          {
+           "modality": "text",
+           "tokens": 2903
+          }
+         ],
+         "candidates_tokens_details": [
+          {
+           "modality": "text",
+           "tokens": 2821
+          }
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Filet Mignon à la Moutarde et Fondue de Poireaux",
+     "recipe": {
+      "title": "Filet Mignon à la Moutarde et Fondue de Poireaux",
+      "description": "A classic French bistro dinner featuring tender pork tenderloin medallions seared and finished in a creamy Dijon mustard pan sauce, served over delicately melted leeks.",
+      "difficulty": "medium",
+      "prep_time": 15,
+      "cook_time": 25,
+      "total_time": 40,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "french",
+      "dietary_tags": [
+       "low-carb",
+       "gluten-free",
+       "keto-friendly"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Pork tenderloin",
+        "quantity": "600",
+        "unit": "g",
+        "pantry_id": "en-french-exclusions-1"
+       },
+       {
+        "name": "Leeks",
+        "quantity": "3",
+        "unit": "piece",
+        "pantry_id": "en-french-exclusions-2"
+       },
+       {
+        "name": "Shallots",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-french-exclusions-7"
+       },
+       {
+        "name": "Dijon mustard",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": "en-french-exclusions-8"
+       },
+       {
+        "name": "Cream",
+        "quantity": "100",
+        "unit": "ml",
+        "pantry_id": "en-french-exclusions-4"
+       },
+       {
+        "name": "Olive oil",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "Black pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Pork tenderloin",
+       "Leeks",
+       "Shallots",
+       "Dijon mustard",
+       "Cream"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Trim the dark green tops and roots off the 3 Leeks, wash thoroughly under cold water to remove all grit, and slice the whites and light greens into thin rounds.",
+       "Peel and finely mince the 2 Shallots.",
+       "Heat 1 tbsp Olive oil in a wide skillet over medium heat, add the sliced 3 Leeks, 1 pinch of Salt, and cook for 12 minutes, stirring occasionally, until the leeks are tender, translucent, and slightly collapsed. Transfer to a bowl and keep covered.",
+       "Slice the 600 g Pork tenderloin into thick medallions (about 3 cm each) and season both sides with 1 pinch of Black pepper.",
+       "In the same skillet, heat 1 tbsp Olive oil over medium heat. Sear the pork medallions for 4 minutes per side until nicely browned on the exterior, and cooked to a safe core temperature of 63 °C with running juices that are completely clear. Remove the pork medallions from the pan and let them rest on a warm plate for 3 minutes.",
+       "Add the 2 minced Shallots to the skillet and cook over low heat for 2 minutes until translucent.",
+       "Whisk in 2 tbsp Dijon mustard and 100 ml Cream, scraping up browned bits from the pan bottom, and simmer over low heat for 2 minutes until the sauce slightly thickens and coats the back of a spoon.",
+       "Divide the warm leek fondue among 4 plates, top with the rested pork medallions, and spoon the warm Dijon cream sauce generously over the meat."
+      ],
+      "tips": [
+       "Resting the pork tenderloin medallions for 3 minutes allows the juices to redistribute, guaranteeing succulent meat without overcooking.",
+       "A splash of dry white wine to deglaze the pan before adding cream adds extra depth if you keep wine in your kitchen."
+      ],
+      "image_prompt": "Overhead food photography of French pan-seared pork tenderloin medallions coated in silky Dijon cream sauce on a bed of braised leek fondue, served on dark ceramic plates, warm bistro ambient lighting."
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [],
+     "strengths": [
+      "La gestion des températures de cuisson est exemplaire et garantit la sécurité alimentaire.",
+      "La technique de la fondue de poireaux est respectée, offrant une texture parfaite pour accompagner le porc.",
+      "L'ordre des étapes permet une exécution fluide sans temps mort."
+     ]
+    },
+    {
+     "title": "Gratin de Haricots Verts au Filet de Porc et Gruyère",
+     "recipe": {
+      "title": "Gratin de Haricots Verts au Filet de Porc et Gruyère",
+      "description": "A lightened French gratin combining tender green beans, minced shallots, and seared pork tenderloin chunks baked beneath a bubbling crust of aged Gruyère.",
+      "difficulty": "medium",
+      "prep_time": 15,
+      "cook_time": 30,
+      "total_time": 45,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "french",
+      "dietary_tags": [
+       "low-carb",
+       "gluten-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Pork tenderloin",
+        "quantity": "600",
+        "unit": "g",
+        "pantry_id": "en-french-exclusions-1"
+       },
+       {
+        "name": "Green beans",
+        "quantity": "400",
+        "unit": "g",
+        "pantry_id": "en-french-exclusions-6"
+       },
+       {
+        "name": "Gruyère",
+        "quantity": "150",
+        "unit": "g",
+        "pantry_id": "en-french-exclusions-5"
+       },
+       {
+        "name": "Shallots",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-french-exclusions-7"
+       },
+       {
+        "name": "Cream",
+        "quantity": "100",
+        "unit": "ml",
+        "pantry_id": "en-french-exclusions-4"
+       },
+       {
+        "name": "Olive oil",
+        "quantity": "1",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "Black pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Pork tenderloin",
+       "Green beans",
+       "Gruyère",
+       "Shallots",
+       "Cream"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Preheat the oven to 200 °C.",
+       "Trim the ends off the 400 g Green beans. Bring a pot of salted water to a boil, plunge in the green beans, and boil over medium heat for 6 minutes until tender-crisp and bright green. Drain thoroughly.",
+       "Grate the 150 g Gruyère into a bowl. Finely dice the 1 Shallots.",
+       "Cut the 600 g Pork tenderloin into bite-sized 2 cm cubes.",
+       "Heat 1 tbsp Olive oil in a skillet over medium heat, add the pork cubes and diced shallot, and cook for 6 minutes, stirring frequently, until the meat is lightly browned on all sides, reaching a core temperature of 63 °C with clear juices. Remove from heat and allow to rest for 3 minutes.",
+       "In a baking dish, toss together the drained green beans, cooked pork, 1 pinch of Salt, 1 pinch of Black pepper, and 100 ml Cream until evenly coated.",
+       "Sprinkle the 150 g grated Gruyère evenly across the surface.",
+       "Bake in the oven at 200 °C for 15 minutes, until the cheese is completely melted, bubbling vigorously, and deep golden brown around the edges."
+      ],
+      "tips": [
+       "Make sure to drain the blanched green beans very well on a clean cloth or colander to keep the gratin creamy rather than watery.",
+       "For an extra crisp topping, finish under the oven broiler for the final 2 minutes."
+      ],
+      "image_prompt": "Golden brown French gratin dish with bubbly melted Gruyere cheese, green beans, and pork tenderloin pieces visible beneath the browned crust, rustic wooden background, professional food photography."
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.75,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 4,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "L'étape 6 manque de précision sur la répartition du mélange dans le plat à gratin."
+     ],
+     "strengths": [
+      "Le respect strict de la température de cuisson du porc avant le passage au four évite le dessèchement.",
+      "La gestion du blanchiment des haricots verts est techniquement correcte pour conserver leur couleur.",
+      "L'utilisation du Gruyère est cohérente avec le profil de saveurs recherché."
+     ]
+    },
+    {
+     "title": "Salade Tiède de Haricots Verts, Porc Rôti et Vinaigrette Dijonnaise",
+     "recipe": {
+      "title": "Salade Tiède de Haricots Verts, Porc Rôti et Vinaigrette Dijonnaise",
+      "description": "Inspired by French bistro warm salads, this dish showcases flash-sautéed green beans and tender pork strips tossed with crisp shallots and a robust Dijon dressing.",
+      "difficulty": "medium",
+      "prep_time": 15,
+      "cook_time": 20,
+      "total_time": 35,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "french",
+      "dietary_tags": [
+       "low-carb",
+       "dairy-free",
+       "gluten-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Pork tenderloin",
+        "quantity": "600",
+        "unit": "g",
+        "pantry_id": "en-french-exclusions-1"
+       },
+       {
+        "name": "Green beans",
+        "quantity": "400",
+        "unit": "g",
+        "pantry_id": "en-french-exclusions-6"
+       },
+       {
+        "name": "Shallots",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-french-exclusions-7"
+       },
+       {
+        "name": "Dijon mustard",
+        "quantity": "1",
+        "unit": "tbsp",
+        "pantry_id": "en-french-exclusions-8"
+       },
+       {
+        "name": "Red wine vinegar",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Olive oil",
+        "quantity": "3",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "Black pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Pork tenderloin",
+       "Green beans",
+       "Shallots",
+       "Dijon mustard"
+      ],
+      "missing_ingredients": [
+       "Red wine vinegar"
+      ],
+      "instructions": [
+       "Trim the ends of the 400 g Green beans. Peel and slice the 2 Shallots into thin rings.",
+       "In a small mixing bowl, whisk together 1 tbsp Dijon mustard, 2 tbsp Red wine vinegar, 2 tbsp Olive oil, 1 pinch of Salt, and 1 pinch of Black pepper until an emulsified vinaigrette forms. Stir in half of the sliced shallots and let macerate.",
+       "Slice the 600 g Pork tenderloin into thin strips (about 1 cm thick).",
+       "Bring a saucepan of water to a boil over medium heat, add the 400 g Green beans, and cook for 5 minutes until tender yet firm to the bite. Drain thoroughly.",
+       "Heat 1 tbsp Olive oil in a large skillet over medium heat. Add the remaining sliced shallots and the pork strips, cooking for 5 minutes while stirring constantly until the pork is cooked through to an internal temperature of 63 °C, showing no pink color and releasing clear juices. Turn off the heat and let the meat rest in the skillet for 3 minutes.",
+       "Add the warm, drained green beans into the skillet with the pork.",
+       "Pour the prepared Dijon vinaigrette over the warm pork and green beans, tossing well for 1 minute until evenly glazed and combined.",
+       "Divide the warm salad among 4 dinner plates and serve immediately."
+      ],
+      "tips": [
+       "Tossing the green beans and pork while they are still warm ensures they absorb all the punchy flavors of the Dijon vinaigrette.",
+       "Slice the pork against the grain so each strip remains meltingly tender after quick searing."
+      ],
+      "image_prompt": "Warm French bistro warm salad featuring trimmed bright green beans, golden browned pork tenderloin strips, shallot rings, and glossy Dijon mustard vinaigrette in modern shallow white bowls, bright natural lighting."
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 5,
+      "cooking_cues": 5,
+      "order": 5,
+      "ingredients_used": 5,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [],
+     "strengths": [
+      "La technique de la vinaigrette émulsionnée est bien expliquée et apporte une acidité nécessaire.",
+      "Le repos de la viande après cuisson est bien intégré, assurant une tendreté optimale.",
+      "La recette est parfaitement adaptée à un repas léger tout en respectant les contraintes low-carb."
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -59,7 +59,7 @@ for (const situation of cases) {
       first = false;
       const recentTitles = run.generations.flatMap((gen) => gen.recipes.map((r) => r.title)).reverse();
       const result = await retrying({
-        action: 'generate', prompt_version: version, providers, ...(model && { model }), library: condition === 'library', recent_titles: recentTitles,
+        action: 'generate', prompt_version: version, providers, ...(model && { model }), library: condition === 'library-pantry' ? 'pantry' : condition === 'library', recent_titles: recentTitles,
         ingredients: situation.ingredients.map((item, i) => ({ id: `${situation.id}-${i + 1}`, kind: 'ingredient', ...item })),
         preferences: situation.preferences, mode: situation.mode, selection: situation.selection, other_pantry: situation.other_pantry,
       }, /per minute|TPM|RPM|503|high demand|overloaded/);
@@ -103,6 +103,6 @@ console.log('\n| Garde-manger | Bibliothèque | Plats distincts / recettes | Cop
 console.log('|---|---|---|---|---|---|---|---|');
 for (const run of runs) {
   const m = run.metrics;
-  console.log(`| ${run.id} | ${run.condition === 'library' ? 'avec' : 'sans'} | ${m.distinct_dishes ?? '—'} / ${m.recipes} | ${m.copies} | ${m.variants} | ${m.new} | ${m.library_names_in_titles} | ${m.examples_in_titles} |`);
+  console.log(`| ${run.id} | ${{ library: 'avec', 'library-pantry': 'avec, liée au garde-manger', 'no-library': 'sans' }[run.condition] ?? run.condition} | ${m.distinct_dishes ?? '—'} / ${m.recipes} | ${m.copies} | ${m.variants} | ${m.new} | ${m.library_names_in_titles} | ${m.examples_in_titles} |`);
 }
 console.log('Résultat complet :', path.relative(process.cwd(), file));
