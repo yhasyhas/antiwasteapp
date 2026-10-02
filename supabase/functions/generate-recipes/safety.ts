@@ -159,7 +159,7 @@ const SIGNS_MEAT = ['jus clair', 'trace rose', 'perde sa couleur rose', 'no pink
   'clear juice', 'juices run clear', 'no longer pink', 'no pink', 'not pink', 'falls off the bone', 'pulls away from the bone', 'firm to the touch', 'tender', 'shred',
   'jugos claros', 'jugo claro', 'ya no este ros', 'ya no ros', 'sin rastro ros', 'sin partes rosad', 'ningun rastro ros', 'no quede ros', 'se desprend', 'se deshac', 'tierna', 'tierno', 'firme al tacto', 'deshebr', 'desmenu'];
 const SIGNS_FISH = ['opaque', 'se detache', 's effeuille', 'lamelle', 'a la fourchette', 'flake', 'with a fork', 'opaco', 'opaca', 'se desmenu', 'se deshac', 'se despeg', 'lamina', 'lasca', 'se separa', 'con un tenedor'];
-const SIGNS_SHELLFISH = ['rose', 'opaque', 'pink', 'opaco', 'opaca', 'rosad', 's ouvr', 'ouvert', 'open', 'se abr', 'abiert'];
+const SIGNS_SHELLFISH = ['rose', 'opaque', 'pink', 'opaco', 'opaca', 'rosa', 'rosad', 's ouvr', 'ouvert', 'open', 'se abr', 'abiert'];
 // Signes formulés librement : « les jus doivent être clairs », « hasta que pierda su color rosado », « juices are clear »
 const MEAT_SIGN_PATTERNS = [
   /\b(jus|juice|juices|jugo|jugos)\b(\s+\S+){0,4}\s+(clair|claire|clear|claro|transparent|transparente)s?\b/,

@@ -182,9 +182,10 @@ const GLUTEN_WORDS = ['ble', 'farine', 'pain', 'baguette', 'brioche', 'pates', '
   'chapelure', 'biscotte', 'biscuit', 'gateau', 'crepe', 'bechamel', 'roux', 'seitan', 'sauce soja', 'biere', 'nouille', 'vermicelle', 'raviol', 'lasagne', 'tagliatelle', 'spaghetti', 'macaroni', 'penne', 'gnocchi', 'croissant', 'crouton', 'panure', 'pita', 'naan', 'chapati',
   'wheat', 'flour', 'bread', 'bun', 'pasta', 'noodle', 'bulgur', 'barley', 'rye', 'spelt', 'oat', 'breadcrumb', 'cracker', 'cookie', 'cake', 'pastry', 'dough', 'soy sauce', 'beer', 'udon', 'ramen', 'soba', 'flour tortilla', 'wrap',
   'trigo', 'harina', 'pan', 'fideo', 'cebada', 'centeno', 'avena', 'pan rallado', 'galleta', 'cerveza', 'salsa de soja', 'semola', 'bizcocho', 'masa',
-  'cube', 'maggi', 'kub', 'jumbo', 'stock cube', 'avecrem'];
+  // Bouillons, cubes et miso : souvent avec du blé ou de l'orge, par prudence
+  'cube', 'maggi', 'kub', 'jumbo', 'stock', 'avecrem', 'bouillon', 'fond de', 'broth', 'caldo', 'consome', 'consomme', 'miso'];
 // Dans un titre ou une étape, des mots trop ambigus (« pan » : poêle en anglais ; « cut into cubes ») sont ignorés
-const TEXT_AMBIGUOUS = new Set(['pan', 'bun', 'masa', 'wrap', 'cube', 'kub', 'jumbo', 'cake', 'stock', 'ham', 'cod', 'crema']);
+const TEXT_AMBIGUOUS = new Set(['pan', 'bun', 'masa', 'wrap', 'cube', 'kub', 'jumbo', 'cake', 'stock', 'ham', 'cod', 'crema', 'fond de']);
 // Précision qui rend un nom d'ingrédient compatible (« farine de riz », « lait d'avoine », « pâtes sans gluten »)
 const PLANT_MILKS = ['vegetal', 'vegan', 'plant based', 'coco', 'coconut', 'amande', 'almond', 'almendra', 'avoine', 'oat milk', 'avena', 'soja', 'soy', 'riz', 'rice milk', 'arroz', 'cajou', 'cashew', 'anacardo', 'cacahuete', 'arachide', 'peanut', 'mani', 'cacao', 'cocoa'];
 const FREE_OF: Record<StrictDiet, string[]> = {

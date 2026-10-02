@@ -153,3 +153,7 @@ Deno.test('four : la température du four ne remplace jamais la température à 
   // Four sans température et sans cuisson à cœur : la température à cœur reste exigée
   assertEquals(frenchCodes([['poulet', 'chicken']], ['Bake the chicken 25 minutes, until the juices run clear.']), ['core_temperature', 'oven_celsius']);
 });
+
+Deno.test('safetyIssues : crevettes « hasta que cambien a color rosa » : signe visible reconnu (évaluation du 02/10)', () => {
+  assertEquals(codes(recipe([['Camarones', null]], ['Agrega los camarones y cocina 2-3 minutos, hasta que cambien a color rosa.'])), []);
+});

@@ -348,3 +348,12 @@ Deno.test('régimes choisis : ingrédient interdit repéré par le serveur même
   assertEquals(dietWordInText('Blend the soup until smooth.', 'gluten-free'), false);
   assertEquals(dietWordInText('Heat the oil in a pan.', 'gluten-free'), false);
 });
+
+Deno.test('étiquettes : bouillon ou miso, jamais « sans gluten » (souvent du blé ou de l’orge) ; bouillon de légumes : végétarien', () => {
+  const soup = tagsOf([free('banane', 'p1'), free('caldo de pollo'), free('arroz')], ['Lleva el caldo a ebullición y añade el arroz.']);
+  assert(!soup.includes('diet:gluten-free') && !soup.includes('diet:vegetarian'));
+  const veg = tagsOf([free('banane', 'p1'), free('bouillon de légumes')], ['Verse le bouillon.']);
+  assertEquals(veg, ['diet:vegan', 'diet:dairy-free']);
+  // « au fond de la casserole » n'est pas un fond de veau
+  assertEquals(dietWordInText('Gratte les sucs au fond de la casserole.', 'vegetarian'), false);
+});
