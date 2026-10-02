@@ -5,8 +5,9 @@ import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 import { Touchable } from './Touchable';
 
 // expired / soon / ok : états de péremption ; leftover : « Reste » (citron vert doux) ;
-// soft : vert doux (difficulté, catégorie) ; neutral : sans date ; outline : pastille bordée (durée)
-export type BadgeTone = 'expired' | 'soon' | 'ok' | 'leftover' | 'soft' | 'neutral' | 'outline';
+// soft : vert doux (difficulté, catégorie) ; neutral : sans date ; outline : pastille bordée (durée) ;
+// frozen : au congélateur (bleu frais)
+export type BadgeTone = 'expired' | 'soon' | 'ok' | 'leftover' | 'soft' | 'neutral' | 'outline' | 'frozen';
 
 const TONES: Record<BadgeTone, { background: string; text: string; border: string }> = {
   expired: { background: colors.expired.background, text: colors.expired.text, border: colors.expired.background },
@@ -16,6 +17,7 @@ const TONES: Record<BadgeTone, { background: string; text: string; border: strin
   soft: { background: colors.primarySoft, text: colors.primary, border: colors.primarySoft },
   neutral: { background: colors.primarySoft, text: colors.textSecondary, border: colors.primarySoft },
   outline: { background: colors.background, text: colors.text, border: colors.border },
+  frozen: { background: colors.foodFamilies.cold.background, text: colors.foodFamilies.cold.icon, border: colors.foodFamilies.cold.background },
 };
 
 interface Props {

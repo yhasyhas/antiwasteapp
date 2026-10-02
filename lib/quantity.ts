@@ -21,6 +21,39 @@ const VOLUME: Record<string, number> = {
 // Unités qui comptent des pièces (« 4 », « 4 pièces », « 2 x »)
 const COUNT = new Set(['', 'x', 'piece', 'pc', 'pcs', 'unite', 'unit', 'unidad', 'unidade', 'pieza']);
 
+// Unités courantes, affichées dans la langue de l'app (« 2 tranches » → « 2 slices ») : singulier et pluriel par
+// langue. Lues dans les trois langues ; une même unité garde la même dimension quelle que soit la langue.
+type UnitLanguage = 'fr' | 'en' | 'es';
+const UNITS: Record<string, Record<UnitLanguage, [string, string]>> = {
+  piece: { fr: ['pièce', 'pièces'], en: ['piece', 'pieces'], es: ['pieza', 'piezas'] },
+  slice: { fr: ['tranche', 'tranches'], en: ['slice', 'slices'], es: ['rebanada', 'rebanadas'] },
+  pot: { fr: ['pot', 'pots'], en: ['pot', 'pots'], es: ['tarrina', 'tarrinas'] },
+  jar: { fr: ['bocal', 'bocaux'], en: ['jar', 'jars'], es: ['tarro', 'tarros'] },
+  sachet: { fr: ['sachet', 'sachets'], en: ['packet', 'packets'], es: ['sobre', 'sobres'] },
+  bag: { fr: ['sac', 'sacs'], en: ['bag', 'bags'], es: ['bolsa', 'bolsas'] },
+  tray: { fr: ['barquette', 'barquettes'], en: ['tray', 'trays'], es: ['bandeja', 'bandejas'] },
+  pack: { fr: ['paquet', 'paquets'], en: ['pack', 'packs'], es: ['paquete', 'paquetes'] },
+  box: { fr: ['boîte', 'boîtes'], en: ['box', 'boxes'], es: ['caja', 'cajas'] },
+  can: { fr: ['conserve', 'conserves'], en: ['can', 'cans'], es: ['lata', 'latas'] },
+  bottle: { fr: ['bouteille', 'bouteilles'], en: ['bottle', 'bottles'], es: ['botella', 'botellas'] },
+  carton: { fr: ['brique', 'briques'], en: ['carton', 'cartons'], es: ['brik', 'briks'] },
+  bunch: { fr: ['botte', 'bottes'], en: ['bunch', 'bunches'], es: ['manojo', 'manojos'] },
+  portion: { fr: ['portion', 'portions'], en: ['portion', 'portions'], es: ['porción', 'porciones'] },
+  tube: { fr: ['tube', 'tubes'], en: ['tube', 'tubes'], es: ['tubo', 'tubos'] },
+  clove: { fr: ['gousse', 'gousses'], en: ['clove', 'cloves'], es: ['diente', 'dientes'] },
+  fillet: { fr: ['filet', 'filets'], en: ['fillet', 'fillets'], es: ['filete', 'filetes'] },
+  steak: { fr: ['pavé', 'pavés'], en: ['steak', 'steaks'], es: ['lomo', 'lomos'] },
+  dozen: { fr: ['douzaine', 'douzaines'], en: ['dozen', 'dozen'], es: ['docena', 'docenas'] },
+  cup: { fr: ['tasse', 'tasses'], en: ['cup', 'cups'], es: ['taza', 'tazas'] },
+  pinch: { fr: ['pincée', 'pincées'], en: ['pinch', 'pinches'], es: ['pizca', 'pizcas'] },
+  block: { fr: ['bloc', 'blocs'], en: ['block', 'blocks'], es: ['bloque', 'bloques'] },
+  loaf: { fr: ['miche', 'miches'], en: ['loaf', 'loaves'], es: ['barra', 'barras'] },
+};
+// Autres façons courantes d'écrire ces unités
+const UNIT_ALIASES: Record<string, string> = {
+  bote: 'jar', botes: 'jar', tin: 'can', tins: 'can', plaquette: 'block', plaquettes: 'block', unite: 'piece', unites: 'piece', unidad: 'piece', unidades: 'piece',
+};
+
 const FRACTIONS: Record<string, number> = { '½': 0.5, '¼': 0.25, '¾': 0.75, '⅓': 1 / 3, '⅔': 2 / 3 };
 
 const normalize = (value: string) => value
@@ -29,6 +62,24 @@ const normalize = (value: string) => value
   .replace(/œ/g, 'oe')
   .replace(/\.$/, '')
   .trim();
+
+// Unité courante écrite dans l'une des trois langues → son identifiant (« tranches », « slice » → « slice »)
+const UNIT_KEYS = new Map<string, string>();
+for (const [key, forms] of Object.entries(UNITS)) {
+  for (const [one, many] of Object.values(forms)) {
+    for (const form of [one, many]) if (!UNIT_KEYS.has(normalize(form))) UNIT_KEYS.set(normalize(form), key);
+  }
+}
+for (const [alias, key] of Object.entries(UNIT_ALIASES)) UNIT_KEYS.set(alias, key);
+const unitKey = (unit: string) => UNIT_KEYS.get(normalize(unit)) ?? null;
+
+// Unité courante dans la langue de l'app, accordée (« 1 tranche », « 2 slices ») ; null pour une autre unité
+export function translateUnit(unit: string, value: number, language: string): string | null {
+  const key = unitKey(unit);
+  if (!key) return null;
+  const forms = UNITS[key][(language in UNITS[key] ? language : 'fr') as UnitLanguage];
+  return value > 1 ? forms[1] : forms[0];
+}
 
 // Singulier approximatif (« pièces » → « piece », « œufs » → « oeuf », « tomates » → « tomate »)
 const singular = (word: string) => word.replace(/[sx]$/, '');
@@ -67,8 +118,11 @@ export function parseQuantity(text: string | null | undefined, itemName = ''): Q
   } else if (key in VOLUME || word in VOLUME) {
     dimension = 'volume';
     factor = VOLUME[key] ?? VOLUME[word];
-  } else if (COUNT.has(key) || COUNT.has(word) || (word.length > 1 && singular(normalize(itemName)).includes(word))) {
+  } else if (COUNT.has(key) || COUNT.has(word) || unitKey(unit) === 'piece' || (word.length > 1 && singular(normalize(itemName)).includes(word))) {
     dimension = 'count';
+  } else if (unitKey(unit)) {
+    // Même unité dans n'importe quelle langue (« 2 tranches » et « 1 slice »)
+    dimension = `word:${unitKey(unit)}`;
   } else {
     dimension = `word:${key.split(/\s+/).map(singular).join(' ')}`;
   }
@@ -128,9 +182,9 @@ export function displayQuantity(text: string | null | undefined, language: strin
   if (!Number.isFinite(value)) return text;
   const unit = match[2];
   const measure = normalize(unit) in MASS || normalize(unit) in VOLUME;
-  // Mot quelconque sans décimale : texte d'origine (pas d'accord imposé à « 3 tomate ») ; nombre seul : unité
-  // par défaut (« 6 » → « 6 pièces »)
-  if (!measure && unit !== '' && !/[.,]/.test(match[1])) return text;
+  // Mot quelconque sans décimale : texte d'origine (pas d'accord imposé à « 3 tomate ») ; unité courante :
+  // traduite (« 2 tranches » → « 2 slices ») ; nombre seul : unité par défaut (« 6 » → « 6 pièces »)
+  if (!measure && unit !== '' && !unitKey(unit) && !/[.,]/.test(match[1])) return text;
   return formatQuantity(value, unit, language);
 }
 
@@ -141,11 +195,11 @@ function formatNumber(value: number, language: string): string {
 }
 
 // Unité par défaut d'une quantité sans unité (« 1 pièce », « 6 pièces »)
-const PIECE: Record<string, [string, string]> = { fr: ['pièce', 'pièces'], en: ['piece', 'pieces'], es: ['pieza', 'piezas'] };
+const PIECE = UNITS.piece as Record<string, [string, string]>;
 
 // Nombre → texte (virgule décimale en français et en espagnol), suivi de l'unité du garde-manger, convertie
 // dans l'unité la plus naturelle quand c'est simple (0,25 kg → 250 g) ; litre écrit « L » (« 1 L », « 1,5 L ») ;
-// sans unité, « pièce » (« 1 pièce », « 6 pièces »)
+// sans unité, « pièce » (« 1 pièce », « 6 pièces ») ; unités courantes traduites (« 2 tranches » → « 2 slices »)
 export function formatQuantity(rawValue: number, rawUnit: string, language: string): string {
   const natural = naturalQuantity(rawValue, rawUnit);
   const value = natural.value;
@@ -155,6 +209,9 @@ export function formatQuantity(rawValue: number, rawUnit: string, language: stri
   }
   const unit = normalize(natural.unit) === 'l' ? 'L' : natural.unit;
   const text = formatNumber(value, language);
+  // Unité courante : dans la langue de l'app (« 2 slices »)
+  const translated = translateUnit(unit, value, language);
+  if (translated) return `${text} ${translated}`;
   // « 1 œuf », « 1 tranche » : unité au singulier (sauf les unités de mesure : « 1 l », « 1 kg ») ; au-delà de 1,
   // un mot simple prend un « s » en français et en espagnol (« 3 paquets », « 2 paquetes »)
   const measure = normalize(unit) in MASS || normalize(unit) in VOLUME;

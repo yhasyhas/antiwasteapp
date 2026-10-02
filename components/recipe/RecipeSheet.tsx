@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Image } from 'expo-image';
 import { ChevronLeft, Clock, Flame, Heart, Languages, Sparkles, Users } from 'lucide-react-native';
@@ -21,6 +21,7 @@ import { colors, motion, radius, sizes, spacing, typography } from '@/constants/
 import { CookedButton } from './CookedButton';
 import { AddMissingButton } from './AddMissingButton';
 import { translatedRecipe, type Recipe, type RecipeText } from './types';
+import { showDialog } from '@/lib/dialog';
 
 interface Props {
   recipe: Recipe;
@@ -65,7 +66,7 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
       setShowOriginal(false);
       return;
     }
-    Alert.alert(
+    showDialog(
       failureTitle(t, result.reason, t('recipe.translateTitle')),
       result.reason === 'user_quota' ? t('recipe.translateQuota') : result.reason === 'provider_quota' ? t('recipe.translateBusy') : t('recipe.translateError'),
     );
@@ -234,7 +235,7 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
         {toast || recipe.ingredients_used.some((item) => item.pantry_id) ? (
           <View style={[styles.bottomBar, safe.bottom(spacing.md)]}>
             <Toast message={toast} actionLabel={t('common.view')} onAction={openShoppingList} inset={false} />
-            <CookedButton ingredientsUsed={recipe.ingredients_used} />
+            <CookedButton ingredientsUsed={recipe.ingredients_used} recipeId={recipe.id} recipeTitle={recipe.title} />
           </View>
         ) : null}
       </View>

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Check, ShoppingCart } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { addMissingToShoppingList, loadShoppingList } from '@/lib/shopping';
 import { Button } from '@/components/ui/Button';
 import { spacing } from '@/constants/theme';
+import { showDialog } from '@/lib/dialog';
 
 interface Props {
   names: string[];
@@ -48,7 +49,7 @@ export function AddMissingButton({ names, quantities, recipeId, recipeTitle, onA
       onAdded(count > 0 ? t('shopping.addedToast', { count }) : t('shopping.alreadyOnList'));
     } catch (error) {
       console.warn('[courses] ajout impossible :', error);
-      Alert.alert(t('errors.writeTitle'), t('errors.writeText'));
+      showDialog(t('errors.writeTitle'), t('errors.writeText'));
     } finally {
       setAdding(false);
     }

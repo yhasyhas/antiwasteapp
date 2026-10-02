@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { Check, Plus, X } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
@@ -20,6 +20,8 @@ import { notifyPantryChanged } from '@/lib/pantryEvents';
 import { linkPantryFoodKeys } from '@/lib/foodNames';
 import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
 import { ExpiryPicker } from '@/components/expiry/ExpiryPicker';
+import { LocationChoice } from '@/components/pantry/LocationChoice';
+import { defaultDateKind, defaultLocation, frozenExpiry, type DateKind, type StorageLocation } from '@/lib/storage';
 import { BarcodeNotice } from './BarcodeNotice';
 import { ExistingFoodChoice, type AddChoice } from '@/components/pantry/ExistingFoodChoice';
 import { QuantityField } from '@/components/pantry/QuantityField';
@@ -28,6 +30,7 @@ import { addPantryItems, defaultChoice, existingFor, loadPantry, PantryConflictE
 import { capitalizeFirst } from '@/lib/foodNames';
 import { displayQuantity } from '@/lib/quantity';
 import type { LotGroup } from '@/lib/pantryLots';
+import { showDialog } from '@/lib/dialog';
 
 interface ManualIngredient {
   name: string;
@@ -41,6 +44,10 @@ interface ManualIngredient {
   product?: ProductInfo | null;
   // Déjà dans le garde-manger : ajouté aux existants, séparément, ou pas du tout
   choice: AddChoice;
+  location: StorageLocation;
+  date_kind: DateKind;
+  // Date proposée par l'app (non changée par l'utilisateur)
+  expiry_estimated: boolean;
 }
 
 // Saisie préremplie après un scan de code-barres : produit trouvé dans Open Food Facts, ou code seul
@@ -88,6 +95,8 @@ export function ManualAddModal({ visible, onClose, prefill, onNothingAdded }: Pr
   const [isLeftover, setIsLeftover] = useState(false);
   const [newExpiry, setNewExpiry] = useState(() => expiryFromShelfLife(undefined));
   const [expiryChanged, setExpiryChanged] = useState(false);
+  // Emplacement choisi (null : proposé selon l'aliment)
+  const [newLocation, setNewLocation] = useState<StorageLocation | null>(null);
   // Code-barres de l'ingrédient en cours de saisie
   const [pending, setPending] = useState<{ barcode: string; found: boolean; category: string | null; product: ProductInfo | null } | null>(null);
 
@@ -104,6 +113,16 @@ export function ManualAddModal({ visible, onClose, prefill, onNothingAdded }: Pr
     setExpiryChanged(false);
     setPending({ barcode: prefill.barcode, found: prefill.found, category: prefill.category, product: prefill.product });
   }, [prefill?.key]);
+
+  const newKind: FoodKind = isLeftover ? 'dish' : 'ingredient';
+  const location = newLocation ?? defaultLocation(pending?.category, newKind, null);
+  // Au congélateur : date de congélation estimée, tant que l'utilisateur n'a pas choisi la date
+  const changeLocation = (value: StorageLocation) => {
+    setNewLocation(value);
+    if (expiryChanged) return;
+    if (value === 'freezer') setNewExpiry(frozenExpiry(pending?.category, newKind));
+    else if (location === 'freezer') setNewExpiry(pending ? expiryForPackagedProduct(pending.category) : expiryFromShelfLife(undefined, newKind));
+  };
 
   const toggleLeftover = (value: boolean) => {
     setIsLeftover(value);
@@ -123,6 +142,9 @@ export function ManualAddModal({ visible, onClose, prefill, onNothingAdded }: Pr
       quantity: newIngredientQuantity.trim(),
       kind: (isLeftover ? 'dish' : 'ingredient') as FoodKind,
       expires_at: newExpiry,
+      location,
+      date_kind: location === 'freezer' ? 'best_before' as const : defaultDateKind(pending?.category, newKind),
+      expiry_estimated: !expiryChanged,
       ...(pending && { barcode: pending.barcode, category: pending.category, product: pending.product }),
     };
     setManualIngredients([...manualIngredients, { ...ingredient, choice: defaultChoice(groups, ingredient, language) }]);
@@ -132,6 +154,7 @@ export function ManualAddModal({ visible, onClose, prefill, onNothingAdded }: Pr
     setIsLeftover(false);
     setNewExpiry(expiryFromShelfLife(undefined));
     setExpiryChanged(false);
+    setNewLocation(null);
   };
 
   const removeManualIngredient = (index: number) => {
@@ -175,7 +198,7 @@ export function ManualAddModal({ visible, onClose, prefill, onNothingAdded }: Pr
     if (error instanceof PantryConflictError) {
       // Un membre du foyer vient de changer un lot : garde-manger relu, choix à vérifier
       loadPantry().then((rows) => rows && setGroups(pantryGroups(rows)));
-      Alert.alert(t('existing.conflictTitle'), t('existing.conflictText'));
+      showDialog(t('existing.conflictTitle'), t('existing.conflictText'));
     } else if (error) {
       alertWriteError(t, 'saving manual ingredients', error);
     } else {
@@ -186,7 +209,7 @@ export function ManualAddModal({ visible, onClose, prefill, onNothingAdded }: Pr
       linkPantryFoodKeys();
       // Premier ajout d'une date : proposition des rappels avant le message de confirmation
       await maybeAskNotificationPermission();
-      Alert.alert(
+      showDialog(
         t('manual.successTitle'),
         t('scan.addedToPantry', { count: toSave.length }),
         [
@@ -233,6 +256,11 @@ export function ManualAddModal({ visible, onClose, prefill, onNothingAdded }: Pr
         </View>
 
         <View>
+          <Text style={styles.label}>{t('storage.location')}</Text>
+          <LocationChoice value={location} onChange={changeLocation} />
+        </View>
+
+        <View>
           <Text style={styles.label}>{t('expiry.label')}</Text>
           <ExpiryPicker value={newExpiry} onChange={changeExpiry} />
         </View>
@@ -253,7 +281,7 @@ export function ManualAddModal({ visible, onClose, prefill, onNothingAdded }: Pr
                       {ingredient.quantity ? <Text style={styles.itemQuantity}>{displayQuantity(ingredient.quantity, language)}</Text> : null}
                     </View>
                     {ingredient.kind === 'dish' && <Badge label={t('pantry.leftover')} tone="leftover" />}
-                    <ExpiryBadge expiresAt={ingredient.expires_at} />
+                    <ExpiryBadge expiresAt={ingredient.expires_at} dateKind={ingredient.date_kind} location={ingredient.location} />
                     <Touchable onPress={() => removeManualIngredient(index)} style={styles.remove} accessibilityRole="button" accessibilityLabel={t('common.delete')}>
                       <X size={sizes.icon} color={colors.expired.text} />
                     </Touchable>

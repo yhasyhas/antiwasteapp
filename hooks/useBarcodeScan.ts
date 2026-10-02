@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react';
-import { Alert } from 'react-native';
+
 import { useLanguage } from '@/contexts/LanguageContext';
 import { lookupBarcode, type OffProduct } from '@/lib/openFoodFacts';
 import { displayQuantity } from '@/lib/quantity';
 import type { ManualPrefill } from '@/components/scan/ManualAddModal';
+import { showDialog } from '@/lib/dialog';
 
 // Scan de code-barres (codes lus par ScannerCamera) : un seul code à la fois (la caméra en signale plusieurs
 // par seconde), recherche dans Open Food Facts, puis ajout manuel prérempli : produit trouvé, ou code seul
@@ -50,7 +51,7 @@ export function useBarcodeScan(onResult: (prefill: ManualPrefill) => void) {
     };
     if (failed) {
       // Hors connexion : l'ajout manuel reste possible, avec le code
-      Alert.alert(t('barcode.lookupFailedTitle'), t('barcode.lookupFailedText'), [
+      showDialog(t('barcode.lookupFailedTitle'), t('barcode.lookupFailedText'), [
         { text: t('common.ok'), onPress: () => onResult(prefill) },
       ], { cancelable: false });
     } else {

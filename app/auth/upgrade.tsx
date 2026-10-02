@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -10,6 +10,7 @@ import { KeyboardAvoider, useKeyboardScroll } from '@/components/ui/KeyboardAvoi
 import { Button } from '@/components/ui/Button';
 import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { colors, spacing, typography } from '@/constants/theme';
+import { showDialog } from '@/lib/dialog';
 
 // Essai sans compte → vrai compte : adresse et mot de passe ajoutés au compte anonyme. L'identifiant ne
 // change pas : garde-manger, foyer, recettes et favoris sont conservés.
@@ -33,7 +34,7 @@ export default function UpgradeAccountScreen() {
     const { error: upgradeError } = await upgradeAccount(email.trim(), password);
     setLoading(false);
     if (upgradeError) return setError(authErrorMessage(t, upgradeError));
-    Alert.alert(t('upgrade.doneTitle'), t('upgrade.doneText'), [{ text: t('common.ok'), onPress: () => router.back() }]);
+    showDialog(t('upgrade.doneTitle'), t('upgrade.doneText'), [{ text: t('common.ok'), onPress: () => router.back() }]);
   };
 
   return (

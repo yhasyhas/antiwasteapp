@@ -94,52 +94,81 @@ function errorResponse(code: string, language: string, status: number, details?:
   return jsonResponse(errorBody(code, language, details), status);
 }
 
+// Exemples écrits dans la langue demandée : des exemples en français faisaient répondre en français une app
+// réglée en anglais (« Lait », « Poisson »)
+const EXAMPLES: Record<string, { names: string; receipt: string; quantities: string; dishes: string; tip: string }> = {
+  fr: {
+    names: '"tomate", "lait", "poulet"',
+    receipt: '"TOM GRAPPE 1KG" → "tomate", "LAIT DEMI-ECR" → "lait"',
+    quantities: '"3", "500 g", "1 l", "2 tranches", "1 botte", "4 pots"',
+    dishes: '"gratin de pâtes", "reste de poulet rôti", "soupe"',
+    tip: '« Au frigo, dans une boîte fermée »',
+  },
+  en: {
+    names: '"tomato", "milk", "chicken"',
+    receipt: '"TOM GRAPPE 1KG" → "tomato", "LAIT DEMI-ECR" → "milk"',
+    quantities: '"3", "500 g", "1 l", "2 slices", "1 bunch", "4 pots"',
+    dishes: '"pasta bake", "leftover roast chicken", "soup"',
+    tip: '"In the fridge, in a closed container"',
+  },
+  es: {
+    names: '"tomate", "leche", "pollo"',
+    receipt: '"TOM GRAPPE 1KG" → "tomate", "LAIT DEMI-ECR" → "leche"',
+    quantities: '"3", "500 g", "1 l", "2 rebanadas", "1 manojo", "4 tarrinas"',
+    dishes: '"gratinado de pasta", "sobras de pollo asado", "sopa"',
+    tip: '"En la nevera, en un recipiente cerrado"',
+  },
+};
+
 // Les codes de catégorie sont en anglais : on précise leur sens pour éviter les confusions
 // (ex. un modèle qui range les légumes dans "legume" à cause du mot français « légume »)
 const CATEGORY_GUIDE = `un de ces codes : fruit (fruits frais), vegetable (légumes, y compris tomates, pommes de terre, salades), meat (viande, charcuterie), fish (poisson, fruits de mer), dairy (lait, fromage, yaourt, beurre, crème), egg (œufs), grain (pâtes, riz, céréales, farine), legume (légumineuses : lentilles, pois chiches, haricots secs), bakery (pain, viennoiseries, biscuits), condiment (sauces, huile, vinaigre, confiture), spice (épices, herbes séchées), beverage (boissons, y compris jus de fruits), snack (gâteaux apéritif, chocolat, confiseries), frozen (surgelés), other.`;
 
 // Court pour limiter les tokens de sortie (temps de réponse, limite de Groq). La durée est dans
 // shelf_life_days, le conseil dit seulement où et comment ranger l'aliment.
-const STORAGE_TIP_GUIDE = (languageName: string) =>
-  `conseil de conservation court en ${languageName} (10 mots au plus), adapté à l'aliment tel qu'il est sur la photo : où et comment le ranger, sans durée (ex. « Au frigo, dans une boîte fermée »).`;
+const STORAGE_TIP_GUIDE = (languageName: string, example: string) =>
+  `conseil de conservation court en ${languageName} (10 mots au plus), adapté à l'aliment tel qu'il est sur la photo : où et comment le ranger, sans durée (ex. ${example}).`;
 
 const SHELF_LIFE_GUIDE = `nombre de jours pendant lesquels l'aliment reste bon à partir d'aujourd'hui, dans de bonnes conditions de conservation, selon l'aliment et son état (ex. salade 4, lait ouvert 3, yaourt 15, pâtes sèches 365). Plat cuisiné ou reste ("kind" = "dish") : 2 ou 3.`;
 
 function buildPrompt(language: string, mode: AnalyzeMode): string {
   const languageName = LANGUAGE_NAMES[language] || LANGUAGE_NAMES['en'];
+  const ex = EXAMPLES[language] || EXAMPLES['en'];
+  const outputLanguage = `
+- Langue de la réponse : "name", l'unité de "quantity" et "storage_tip" sont écrits en ${languageName}, quelle que soit la langue de la photo, du ticket ou de ces consignes.`;
 
   if (mode === 'receipt') {
     return `Tu analyses la photo d'un ticket de caisse prise par un utilisateur d'une application anti-gaspi.
 
 Liste uniquement les produits alimentaires achetés.
-- "name" : nom courant et générique en ${languageName}, en décodant les libellés abrégés (ex. "TOM GRAPPE 1KG" → "tomate", "LAIT DEMI-ECR" → "lait"), sans marque.
-- "quantity" : quantité d'après le ticket, avec son unité (ex. "1 kg", "6", "1 l") ; chaîne vide si elle n'est pas indiquée.
+- "name" : nom courant et générique en ${languageName}, en décodant les libellés abrégés (ex. ${ex.receipt}), sans marque.
+- "quantity" : quantité d'après le ticket, avec son unité en ${languageName} (ex. "1 kg", "6", "1 l") ; chaîne vide si elle n'est pas indiquée.
 - "category" : ${CATEGORY_GUIDE}
 - "confidence" : entre 0 et 1, selon la lisibilité de la ligne et ta certitude sur le produit.
 - "kind" : "ingredient".
-- "storage_tip" : ${STORAGE_TIP_GUIDE(languageName)}
+- "storage_tip" : ${STORAGE_TIP_GUIDE(languageName, ex.tip)}
 - "shelf_life_days" : ${SHELF_LIFE_GUIDE} Produit neuf, non ouvert.
 - "food_key" : ${FOOD_KEY_GUIDE}.
 - Un même produit n'apparaît qu'une fois : additionne les quantités.
 - Ignore les produits non alimentaires (hygiène, entretien…), les totaux, remises, moyens de paiement et TVA.
-- Si l'image n'est pas un ticket lisible, renvoie une liste vide.`;
+- Si l'image n'est pas un ticket lisible, renvoie une liste vide.${outputLanguage}`;
   }
 
   return `Tu analyses une photo prise par un utilisateur d'une application anti-gaspi (frigo, placard, plan de travail, courses).
 
 Liste les aliments et ingrédients de cuisine visibles.
-- "name" : nom courant et générique en ${languageName} (ex. "tomate", "lait", "poulet"), sans marque ni emballage.
-- "quantity" : quantité estimée avec son unité (ex. "3", "500 g", "1 l", "1 botte") ; chaîne vide si impossible à estimer.
+- "name" : nom courant et générique en ${languageName} (ex. ${ex.names}), sans marque ni emballage.
+- "quantity" : quantité estimée avec son unité en ${languageName} (ex. ${ex.quantities}) ; chaîne vide si impossible à estimer.
 - "category" : ${CATEGORY_GUIDE}
 - "confidence" : entre 0 et 1, ta certitude que l'aliment est bien présent.
-- "kind" : "dish" pour un plat cuisiné ou un reste de repas (ex. "gratin de pâtes", "reste de poulet rôti", "soupe"), dont "name" est alors le nom du plat ; "ingredient" pour tout le reste.
-- "storage_tip" : ${STORAGE_TIP_GUIDE(languageName)}
+- "kind" : "dish" pour un plat cuisiné ou un reste de repas (ex. ${ex.dishes}), dont "name" est alors le nom du plat ; "ingredient" pour tout le reste.
+- "storage_tip" : ${STORAGE_TIP_GUIDE(languageName, ex.tip)}
 - "shelf_life_days" : ${SHELF_LIFE_GUIDE}
 - "food_key" : ${FOOD_KEY_GUIDE}.
 - Un même aliment n'apparaît qu'une fois : additionne les quantités.
 - 20 aliments au plus, les plus visibles d'abord.
 - Ignore ce qui n'est pas comestible (ustensiles, meubles, emballages vides).
-- S'il n'y a aucun aliment, renvoie une liste vide.`;
+- S'il n'y a aucun aliment, renvoie une liste vide.${outputLanguage}`;
 }
 
 // Fournisseur principal, puis secours (ordre fixe pour le scan : Gemini lit mieux les photos chargées)

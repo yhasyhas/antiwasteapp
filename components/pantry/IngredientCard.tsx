@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import ReanimatedSwipeable, { type SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { Info, Trash2 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -12,6 +12,7 @@ import { FoodIcon } from './FoodIcon';
 import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 import type { FoodKind } from '@/lib/expiry';
 import { displayQuantity } from '@/lib/quantity';
+import { showDialog } from '@/lib/dialog';
 
 export interface PantryIngredient {
   id: string;
@@ -35,6 +36,14 @@ export interface PantryIngredient {
   nova_group?: number | null;
   nutriscore_grade?: string | null;
   off_categories?: string[] | null;
+  // Rangement (phase 8) : vides pour un lot rétabli d'avant la phase 8 (valeurs par défaut de lib/storage.ts)
+  location?: string | null;
+  date_kind?: string | null;
+  opened_at?: string | null;
+  frozen_at?: string | null;
+  thawed_at?: string | null;
+  // Date estimée par l'app (scan photo, valeur proposée, congélation…), pas lue sur l'emballage
+  expiry_estimated?: boolean | null;
 }
 
 interface Props {
@@ -68,7 +77,7 @@ export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry
 
   // Appui long : toutes les actions de l'aliment
   const showActions = () => {
-    Alert.alert(name, undefined, [
+    showDialog(name, undefined, [
       ...(openFact ? [{ text: isDish ? t('pantry.viewDetails') : t('pantry.viewFact'), onPress: openFact }] : []),
       { text: t('expiry.edit'), onPress: onEditExpiry },
       { text: t('common.delete'), style: 'destructive' as const, onPress: onDelete },
@@ -118,7 +127,7 @@ export function IngredientCard({ ingredient, displayName, onDelete, onEditExpiry
           ) : null}
         </View>
         <View style={styles.badges}>
-          <ExpiryBadge expiresAt={ingredient.expires_at} onPress={onEditExpiry} />
+          <ExpiryBadge expiresAt={ingredient.expires_at} dateKind={ingredient.date_kind} location={ingredient.location} onPress={onEditExpiry} />
           {isDish ? <Badge label={t('pantry.leftover')} tone="leftover" /> : null}
         </View>
       </Card>

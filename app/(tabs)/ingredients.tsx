@@ -19,9 +19,10 @@ import { supabase } from '@/lib/supabase';
 import { IngredientCard, type PantryIngredient } from '@/components/pantry/IngredientCard';
 import { ExpiryEditModal } from '@/components/pantry/ExpiryEditModal';
 import { FoodFactSheet } from '@/components/pantry/FoodFactSheet';
-import { PantryLotsSection } from '@/components/pantry/PantryLotsSection';
+import { PantryLotsSection, type LotNotice, type LotPatch } from '@/components/pantry/PantryLotsSection';
 import { RecentlyRemoved } from '@/components/pantry/RecentlyRemoved';
-import { expiryStatus, sortByUrgency } from '@/lib/expiry';
+import { formatDate, sortByUrgency, todayISO } from '@/lib/expiry';
+import { canFreeze, defaultLocation, freezeFamily, frozenExpiry, isUrgentLot, LOCATIONS, openedExpiry, refreezeRule, thawedExpiry, type StorageLocation } from '@/lib/storage';
 import { maybeAskNotificationPermission } from '@/lib/notifications';
 import { notifyPantryChanged, onPantryChanged } from '@/lib/pantryEvents';
 import { loadPantry } from '@/lib/pantry';
@@ -33,15 +34,17 @@ import { useUndoableAction } from '@/hooks/useUndoableAction';
 import { hasGenericFact, linkPantryFoodKeys, useFoodNaming } from '@/lib/foodNames';
 import { ProductCard } from '@/components/pantry/ProductCard';
 import { colors, radius, shadows, sizes, spacing, typography } from '@/constants/theme';
+import { showDialog } from '@/lib/dialog';
 
-type Filter = 'all' | 'urgent' | 'leftovers';
+type Filter = 'all' | 'urgent' | 'leftovers' | StorageLocation;
 type Group = LotGroup<PantryIngredient> & { total?: string };
 
-// Ligne urgente : son lot le plus ancien est périmé ou proche de sa date
-const isUrgent = (group: Group) => {
-  const status = expiryStatus(group.first.expires_at);
-  return status === 'expired' || status === 'soon';
-};
+// Ligne urgente : un de ses lots a une date stricte passée ou proche, hors congélateur
+const isUrgent = (group: Group) => group.lots.some(isUrgentLot);
+// Ligne entièrement au congélateur
+const isFrozen = (group: Group) => group.lots.every((lot) => lot.location === 'freezer');
+// Emplacement d'un lot (lot d'avant la phase 8 : emplacement par défaut)
+const locationOf = (lot: PantryIngredient) => (lot.location as StorageLocation | null) ?? defaultLocation(lot.category, lot.kind, lot.food_key);
 
 // Suppression annulable : un aliment entier (tous ses lots) ou un seul lot
 interface Removal {
@@ -67,6 +70,10 @@ export default function IngredientsScreen() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
+  // « Est-ce encore bon ? » demandé depuis un lot (la fiche défile jusqu'à la section)
+  const [stillGoodRequest, setStillGoodRequest] = useState(0);
+  // Message sous un lot de la feuille de l'aliment (congélation, décongélation)
+  const [lotNotice, setLotNotice] = useState<LotNotice | null>(null);
   const [editingExpiry, setEditingExpiry] = useState<PantryIngredient | null>(null);
   const [savingExpiry, setSavingExpiry] = useState(false);
   const household = useHousehold();
@@ -134,20 +141,63 @@ export default function IngredientsScreen() {
     },
   });
 
-  // Renvoie vrai si la date est enregistrée
-  const saveLotExpiry = async (lot: PantryIngredient, expiresAt: string | null): Promise<boolean> => {
+  // Changement d'un lot (date, type de date, emplacement, ouverture, congélation) ; renvoie vrai s'il est
+  // enregistré
+  const updateLot = async (lot: PantryIngredient, patch: Partial<PantryIngredient>): Promise<boolean> => {
     const { error } = await supabase
       .from('ingredients')
-      .update({ expires_at: expiresAt })
+      .update(patch)
       .eq('id', lot.id);
-    if (error) {
-      alertWriteError(t, 'updating expiry date', error);
+    if (error?.message.includes('refreeze_forbidden')) {
+      // Décongelé entre-temps sur un autre téléphone, ou version précédente de l'app
+      showDialog(t('storage.freeze'), t(refreezeRule(lot.category, lot.kind) === 'eat' ? 'storage.thawedEat' : 'storage.thawedCookFirst'));
       return false;
     }
-    setIngredients((current) => sortByUrgency(current.map((ing) => ing.id === lot.id ? { ...ing, expires_at: expiresAt } : ing)));
+    if (error) {
+      alertWriteError(t, 'updating pantry lot', error);
+      return false;
+    }
+    setIngredients((current) => sortByUrgency(current.map((ing) => ing.id === lot.id ? { ...ing, ...patch } : ing)));
     notifyPantryChanged();
-    if (expiresAt) await maybeAskNotificationPermission();
+    if (patch.expires_at) await maybeAskNotificationPermission();
     return true;
+  };
+  // Date choisie par l'utilisateur : plus estimée
+  const saveLotExpiry = (lot: PantryIngredient, expiresAt: string | null) => updateLot(lot, { expires_at: expiresAt, expiry_estimated: false });
+  const saveLotPatch = (lot: PantryIngredient, patch: LotPatch) => updateLot(lot, patch);
+
+  // « Congeler » : au congélateur, nouvelle date estimée selon l'aliment (qualité, indicative), conseil sous le
+  // lot ; déjà décongelé : seulement ce qui se recongèle sans risque (avertissement dans la feuille)
+  const freezeLot = async (lot: PantryIngredient) => {
+    if (!canFreeze(lot)) return;
+    const expiresAt = frozenExpiry(lot.category, lot.kind);
+    if (!await updateLot(lot, { location: 'freezer', frozen_at: todayISO(), thawed_at: null, expires_at: expiresAt, date_kind: 'best_before', expiry_estimated: true })) return;
+    setLotNotice({
+      id: lot.id,
+      title: t('storage.freezeTipTitle'),
+      text: [
+        t('storage.frozenDone', { date: formatDate(expiresAt, language) }),
+        t(`storage.freezeTip_${freezeFamily(lot.category, lot.kind)}`),
+      ].filter(Boolean).join('\n\n'),
+    });
+  };
+  // « Décongeler » : au frigo, date courte (1 à 2 jours, stricte), et ce qu'on peut en faire ensuite (cuisiner
+  // avant de recongeler, consommer sans recongeler, ou recongeler avec une perte de qualité), sous le lot
+  const thawLot = async (lot: PantryIngredient) => {
+    const expiresAt = thawedExpiry(lot.category, lot.kind);
+    if (!await updateLot(lot, { location: 'fridge', thawed_at: todayISO(), expires_at: expiresAt, date_kind: 'use_by', expiry_estimated: true })) return;
+    setLotNotice({
+      id: lot.id,
+      title: t('storage.thawTitle'),
+      text: t(`storage.thawDone_${refreezeRule(lot.category, lot.kind)}`, { date: formatDate(expiresAt, language) }),
+    });
+  };
+  // « Je l'ai ouvert » : date la plus proche entre celle d'origine et la conservation après ouverture ; si
+  // c'est celle d'après ouverture, elle devient stricte (et estimée)
+  const openLot = async (lot: PantryIngredient) => {
+    const expiresAt = openedExpiry(lot.expires_at, lot.category, lot.kind);
+    const shortened = expiresAt !== lot.expires_at;
+    await updateLot(lot, { opened_at: todayISO(), expires_at: expiresAt, ...(shortened && { date_kind: 'use_by', expiry_estimated: true }) });
   };
 
   const saveExpiry = async (expiresAt: string | null) => {
@@ -175,13 +225,18 @@ export default function IngredientsScreen() {
     all: searched.length,
     urgent: searched.filter(isUrgent).length,
     leftovers: searched.filter((group) => group.first.kind === 'dish').length,
-  };
+    ...Object.fromEntries(LOCATIONS.map((location) => [location, searched.filter((group) => group.lots.some((lot) => locationOf(lot) === location)).length])),
+  } as Record<Filter, number>;
   const visible = searched.filter((group) =>
-    filter === 'urgent' ? isUrgent(group) : filter === 'leftovers' ? group.first.kind === 'dish' : true,
+    filter === 'urgent' ? isUrgent(group)
+      : filter === 'leftovers' ? group.first.kind === 'dish'
+        : filter === 'all' ? true
+          : group.lots.some((lot) => locationOf(lot) === filter),
   );
   const sections = [
     { key: 'urgent', title: t('pantry.groupUrgent'), items: visible.filter(isUrgent), color: colors.expired.text },
-    { key: 'later', title: t('pantry.groupLater'), items: visible.filter((group) => !isUrgent(group)), color: colors.textSecondary },
+    { key: 'later', title: t('pantry.groupLater'), items: visible.filter((group) => !isUrgent(group) && !isFrozen(group)), color: colors.textSecondary },
+    { key: 'freezer', title: t('storage.groupFreezer'), items: visible.filter((group) => !isUrgent(group) && isFrozen(group)), color: colors.foodFamilies.cold.icon },
   ].filter((section) => section.items.length > 0);
 
   const sheetGroup = sheet
@@ -271,6 +326,9 @@ export default function IngredientsScreen() {
               <Chip label={t('pantry.filterAll', { count: counts.all })} selected={filter === 'all'} onPress={() => setFilter('all')} />
               <Chip label={t('pantry.filterUrgent', { count: counts.urgent })} selected={filter === 'urgent'} onPress={() => setFilter('urgent')} />
               <Chip label={t('pantry.filterLeftovers', { count: counts.leftovers })} selected={filter === 'leftovers'} onPress={() => setFilter('leftovers')} />
+              {LOCATIONS.filter((location) => counts[location] > 0).map((location) => (
+                <Chip key={location} label={`${t(`storage.${location}`)} · ${counts[location]}`} selected={filter === location} onPress={() => setFilter(location)} />
+              ))}
             </ScrollView>
 
             {sections.length === 0 ? (
@@ -312,7 +370,11 @@ export default function IngredientsScreen() {
         title={sheetGroup ? foodName(sheetGroup.first) : undefined}
         subtitle={sheetGroup ? naming.generic(sheetGroup.first) : null}
         product={sheetGroup?.first.barcode ? <ProductCard ingredient={sheetGroup.first} /> : null}
-        onClose={() => setSheet(null)}
+        stillGoodRequest={stillGoodRequest}
+        onClose={() => {
+          setSheet(null);
+          setLotNotice(null);
+        }}
         // Fiche générique : aliments bruts, et produits peu transformés (NOVA 1 ou 2)
         withFact={!!sheetGroup && sheetGroup.first.kind !== 'dish' && (!sheetGroup.first.barcode || hasGenericFact(sheetGroup.first))}
         pantry={sheetGroup ? (
@@ -324,8 +386,14 @@ export default function IngredientsScreen() {
               setSheet(null);
               removeGroup(sheetGroup);
             }}
-            onSaveExpiry={saveLotExpiry}
+            onUpdateLot={saveLotPatch}
+            onFreeze={freezeLot}
+            onThaw={thawLot}
+            onOpen={openLot}
             onMerge={mergeLots}
+            notice={lotNotice}
+            onDismissNotice={() => setLotNotice(null)}
+            onShowStillGood={() => setStillGoodRequest((request) => request + 1)}
           />
         ) : null}
         toast={<Toast message={toastMessage} actionLabel={t('common.undo')} onAction={toastAction} inset={false} />}

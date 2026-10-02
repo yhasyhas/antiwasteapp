@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { ListChecks, Plus } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -33,6 +33,7 @@ import {
   type ShoppingItem,
 } from '@/lib/shopping';
 import { colors, opacity, radius, sizes, spacing, typography } from '@/constants/theme';
+import { showDialog } from '@/lib/dialog';
 
 // Liste de courses du foyer : ajout à la main (ou depuis une recette), coché quand c'est acheté, puis
 // rangé au garde-manger avec une date proposée. Partagée et mise à jour en temps réel.
@@ -45,7 +46,7 @@ export default function ShoppingScreen() {
   const [quantity, setQuantity] = useState('');
   const [adding, setAdding] = useState(false);
   // Articles à ranger, avec la date choisie pour chacun
-  const [stocking, setStocking] = useState<{ item: ShoppingItem; expires_at: string }[] | null>(null);
+  const [stocking, setStocking] = useState<{ item: ShoppingItem; expires_at: string; estimated: boolean }[] | null>(null);
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
@@ -77,7 +78,7 @@ export default function ShoppingScreen() {
 
   const failed = (error: unknown) => {
     console.warn('[courses]', error);
-    Alert.alert(t('errors.writeTitle'), t('errors.writeText'));
+    showDialog(t('errors.writeTitle'), t('errors.writeText'));
   };
 
   const add = async () => {
@@ -106,15 +107,15 @@ export default function ShoppingScreen() {
   };
 
   // Date proposée : une semaine (modifiable pour chaque article)
-  const openStock = () => setStocking(inCart.map((item) => ({ item, expires_at: expiryFromShelfLife(undefined) })));
+  const openStock = () => setStocking(inCart.map((item) => ({ item, expires_at: expiryFromShelfLife(undefined), estimated: true })));
 
   const confirmStock = async () => {
     if (!stocking) return;
     setSaving(true);
     try {
-      const count = await stockShoppingItems(stocking.map(({ item, expires_at }) => ({ id: item.id, expires_at })));
+      const count = await stockShoppingItems(stocking.map(({ item, expires_at, estimated }) => ({ id: item.id, expires_at, expiry_estimated: estimated })));
       setStocking(null);
-      Alert.alert(t('shopping.stockedTitle'), t('shopping.stockedText', { count }));
+      showDialog(t('shopping.stockedTitle'), t('shopping.stockedText', { count }));
     } catch (error) {
       failed(error);
     } finally {
@@ -236,7 +237,7 @@ export default function ShoppingScreen() {
               <Text style={styles.itemName}>{capitalizeFirst(item.name)}{item.quantity ? ` · ${displayQuantity(item.quantity, language)}` : ''}</Text>
               <ExpiryPicker
                 value={expires_at}
-                onChange={(value) => setStocking((current) => current?.map((entry, i) => (i === index ? { ...entry, expires_at: value } : entry)) ?? null)}
+                onChange={(value) => setStocking((current) => current?.map((entry, i) => (i === index ? { ...entry, expires_at: value, estimated: false } : entry)) ?? null)}
               />
             </View>
           ))}

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { ScrollView, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 import { router } from 'expo-router';
-import { Leaf, Sparkles, Trash2, X } from 'lucide-react-native';
+import { Ban, Eye, Leaf, Sparkles, Trash2, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fetchFoodFact, reportFoodFact, type FoodFactResult } from '@/lib/foodFacts';
 import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
@@ -16,6 +16,7 @@ import { TextField } from '@/components/ui/Input';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Touchable } from '@/components/ui/Touchable';
 import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
+import { showDialog } from '@/lib/dialog';
 
 interface FactIngredient {
   id: string;
@@ -42,15 +43,25 @@ interface Props {
   subtitle?: string | null;
   // Fiche du produit (code-barres), sous la section du garde-manger
   product?: React.ReactNode;
+  // Change à chaque demande d'aller à « Est-ce encore bon ? » (lien d'une date indicative dépassée)
+  stillGoodRequest?: number;
 }
 
+// Catégories de produits frais : saison affichée pour une fiche d'avant la phase 8 (sans l'indication)
+const FRESH_CATEGORIES: string[] = ['fruit', 'vegetable', 'fish'];
 const CATEGORIES = ['fruit', 'vegetable', 'meat', 'fish', 'dairy', 'egg', 'grain', 'legume', 'bakery', 'condiment', 'spice', 'beverage', 'snack', 'frozen', 'other'] as const;
 
 // Feuille d'un aliment du garde-manger : en haut, « Dans ton garde-manger » (ses lots) ; en dessous, sa fiche :
 // description, origine, saison, atouts nutritionnels, astuces anti-gaspi, « Cuisiner cet aliment ».
 // Informations générales seulement (mention en bas), avec « Signaler une erreur ».
-export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact = true, toast, title, subtitle, product }: Props) {
+export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact = true, toast, title, subtitle, product, stillGoodRequest }: Props) {
   const { t, language } = useLanguage();
+  // « Est-ce encore bon ? » : position dans la fiche, pour y aller depuis le lien d'un lot
+  const scrollRef = useRef<ScrollView>(null);
+  const stillGoodY = useRef<number | null>(null);
+  useEffect(() => {
+    if (stillGoodRequest && stillGoodY.current !== null) scrollRef.current?.scrollTo({ y: stillGoodY.current, animated: true });
+  }, [stillGoodRequest]);
   const [result, setResult] = useState<FoodFactResult | null>(null);
   const [reporting, setReporting] = useState(false);
   const [message, setMessage] = useState('');
@@ -86,10 +97,10 @@ export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact 
     setSending(true);
     const sent = await reportFoodFact(result.foodKey, lang, message);
     setSending(false);
-    if (!sent) return Alert.alert(t('errors.writeTitle'), t('errors.writeText'));
+    if (!sent) return showDialog(t('errors.writeTitle'), t('errors.writeText'));
     setReporting(false);
     setMessage('');
-    Alert.alert(t('facts.reportedTitle'), t('facts.reportedText'));
+    showDialog(t('facts.reportedTitle'), t('facts.reportedText'));
   };
 
   const cook = () => {
@@ -133,7 +144,7 @@ export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact 
         </Touchable>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.body}>
+      <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.body}>
         {pantry}
         {product}
         {!withFact ? cookButton : null}
@@ -159,10 +170,13 @@ export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact 
                 <Text style={styles.factLabel}>{t('facts.origin')}</Text>
                 <Text style={styles.factValue}>{capitalize(section.origin)}</Text>
               </Card>
-              <Card style={styles.fact}>
-                <Text style={styles.factLabel}>{t('facts.season')}</Text>
-                <Text style={styles.factValue}>{capitalize(section.season)}</Text>
-              </Card>
+              {/* Saison : seulement pour les produits frais (fruits, légumes, poissons, fruits de mer) */}
+              {(section.seasonal ?? (category ? FRESH_CATEGORIES.includes(category) : false)) ? (
+                <Card style={styles.fact}>
+                  <Text style={styles.factLabel}>{t('facts.season')}</Text>
+                  <Text style={styles.factValue}>{capitalize(section.season)}</Text>
+                </Card>
+              ) : null}
             </View>
 
             {section.nutrition.length > 0 && (
@@ -188,6 +202,37 @@ export function FoodFactSheet({ ingredient, onClose, onRemove, pantry, withFact 
                 ))}
               </Card>
             )}
+
+            {section.signs?.length || section.discard?.length ? (
+              <View onLayout={(event: LayoutChangeEvent) => { stillGoodY.current = event.nativeEvent.layout.y; }}>
+              <Card style={styles.tipsCard}>
+                <Text style={[styles.groupTitle, styles.tipsTitle]}>{t('stillGood.title')}</Text>
+                {section.signs?.length ? (
+                  <View style={styles.stillGoodGroup}>
+                    <Text style={styles.factLabel}>{t('stillGood.signs')}</Text>
+                    {section.signs.map((sign, index) => (
+                      <View key={index} style={styles.tip}>
+                        <IconChip icon={Eye} tone="soft" size={sizes.iconChip - spacing.sm} />
+                        <Text style={styles.tipText}>{capitalize(sign)}</Text>
+                      </View>
+                    ))}
+                  </View>
+                ) : null}
+                {section.discard?.length ? (
+                  <View style={styles.stillGoodGroup}>
+                    <View style={cardStyles.divider} />
+                    <Text style={[styles.factLabel, styles.discardLabel]}>{t('stillGood.discard')}</Text>
+                    {section.discard.map((item, index) => (
+                      <View key={index} style={styles.tip}>
+                        <IconChip icon={Ban} tone="danger" size={sizes.iconChip - spacing.sm} />
+                        <Text style={styles.tipText}>{capitalize(item)}</Text>
+                      </View>
+                    ))}
+                  </View>
+                ) : null}
+              </Card>
+              </View>
+            ) : null}
 
             {cookButton}
             {removeButton}
@@ -310,6 +355,14 @@ const styles = StyleSheet.create({
   },
   tipsCard: {
     paddingVertical: spacing.xs,
+  },
+  stillGoodGroup: {
+    gap: spacing.xs,
+    paddingBottom: spacing.md,
+  },
+  discardLabel: {
+    marginTop: spacing.md,
+    color: colors.expired.text,
   },
   tipsTitle: {
     paddingVertical: spacing.md,

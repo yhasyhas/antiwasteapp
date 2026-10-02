@@ -1,4 +1,5 @@
-import { Alert, Platform } from 'react-native';
+import { Platform } from 'react-native';
+import { showDialog } from '@/lib/dialog';
 import { isRunningInExpoGo } from 'expo';
 import * as Notifications from '@/lib/notificationsApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -8,9 +9,11 @@ import { addDays, fromISODate, todayISO } from '@/lib/expiry';
 import { notifyPantryChanged } from '@/lib/pantryEvents';
 import { activeHouseholdId } from '@/lib/household';
 import { ensurePushRegistration } from '@/lib/pushNotifications';
+import { loadDigestSettings } from '@/lib/digestSettings';
 
-// Rappels de péremption : une seule notification par jour à 9 h, qui regroupe les aliments du foyer qui
-// expirent ce jour-là ou le lendemain. Aucune notification les jours où rien n'expire.
+// Rappels de péremption : une seule notification par jour, à l'heure choisie dans les Réglages (9 h par
+// défaut, lib/digestSettings.ts), qui regroupe les aliments du foyer à date stricte, hors congélateur, qui
+// expirent ce jour-là ou le lendemain. Aucune notification les jours où rien n'expire, ni résumé désactivé.
 // Avec un jeton push enregistré, c'est le serveur qui l'envoie (lib/pushNotifications.ts) et les rappels
 // locaux de l'appareil sont annulés : jamais les deux. Sinon (secours), notifications locales : les rappels
 // des 14 prochains jours sont programmés à l'avance et recalculés à chaque changement du garde-manger, à
@@ -19,7 +22,6 @@ import { ensurePushRegistration } from '@/lib/pushNotifications';
 
 export const notificationsSupported = Platform.OS !== 'web';
 
-const REMINDER_HOUR = 9;
 const HORIZON_DAYS = 14;
 const ID_PREFIX = 'expiry-';
 const CHANNEL_ID = 'expiry';
@@ -44,11 +46,12 @@ interface ReminderItem {
   id: string;
   name: string;
   expires_at: string | null;
+  location?: string | null;
 }
 
-// Même règle que generate-recipes : 1 recette pour 1 ou 2 ingrédients, 2 jusqu'à 5, sinon 3
+// Même règle que generate-recipes : 2 recettes pour 1 ou 2 aliments, 3 à partir de 3
 function recipeCount(pantrySize: number): number {
-  return pantrySize <= 2 ? 1 : pantrySize <= 5 ? 2 : 3;
+  return pantrySize <= 2 ? 2 : 3;
 }
 
 // Plusieurs lots d'un même aliment le même jour : son nom une seule fois
@@ -122,7 +125,7 @@ async function loadPantry(_userId: string): Promise<ReminderItem[] | null> {
   if (!householdId) return null;
   const { data, error } = await supabase
     .from('ingredients')
-    .select('id, name, expires_at')
+    .select('id, name, expires_at, location')
     .eq('household_id', householdId);
   if (error) {
     console.warn('[rappels] garde-manger illisible :', error.message);
@@ -146,22 +149,30 @@ async function scheduleReminders(userId: string | null) {
     return;
   }
 
+  const settings = await loadDigestSettings(userId);
+  if (!settings.enabled) {
+    await cancelReminders();
+    return;
+  }
   const pantry = await loadPantry(userId);
   // Hors connexion : on garde les rappels déjà programmés
   if (!pantry) return;
   await cancelReminders();
   await ensureChannel();
+  // Congélateur : jamais dans le rappel ; date indicative : comme une date stricte (le rappel ne porte que sur
+  // aujourd'hui et demain, jamais sur une date dépassée), comme le résumé du serveur
+  const reminded = pantry.filter((item) => item.location !== 'freezer');
 
   const now = Date.now();
   const firstDay = todayISO();
   for (let offset = 0; offset < HORIZON_DAYS; offset++) {
     const day = addDays(firstDay, offset);
     const fireAt = fromISODate(day);
-    fireAt.setHours(REMINDER_HOUR, 0, 0, 0);
+    fireAt.setHours(settings.hour, 0, 0, 0);
     if (fireAt.getTime() <= now) continue;
 
-    const today = pantry.filter((item) => item.expires_at === day);
-    const tomorrow = pantry.filter((item) => item.expires_at === addDays(day, 1));
+    const today = reminded.filter((item) => item.expires_at === day);
+    const tomorrow = reminded.filter((item) => item.expires_at === addDays(day, 1));
     if (today.length === 0 && tomorrow.length === 0) continue;
 
     await Notifications.scheduleNotificationAsync({
@@ -195,7 +206,7 @@ export async function maybeAskNotificationPermission(): Promise<void> {
 
     const t = i18n.t;
     const accepted = await new Promise<boolean>((resolve) => {
-      Alert.alert(
+      showDialog(
         t('notifications.permissionTitle'),
         t('notifications.permissionText'),
         [

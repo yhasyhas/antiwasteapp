@@ -37,6 +37,7 @@ export default function SavedScreen() {
                 imageLoading={isImageLoading(recipe.id)}
                 onPress={() => openRecipe(recipe)}
                 favorite={{ active: true, onToggle: () => toggleFavorite(recipe.id) }}
+                showCooked
               />
             </ListItemMotion>
           ))}
@@ -51,6 +52,7 @@ export default function SavedScreen() {
                   imageLoading={isImageLoading(recipe.id)}
                   onPress={() => openRecipe(recipe)}
                   favorite={{ active: false, onToggle: () => toggleFavorite(recipe.id) }}
+                  showCooked
                 />
               ))}
             </>

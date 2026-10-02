@@ -16,7 +16,9 @@ import { QuantityField } from '@/components/pantry/QuantityField';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import { shortDuration } from '@/lib/expiry';
 import { existingFor } from '@/lib/pantry';
-import { capitalizeFirst } from '@/lib/foodNames';
+import { useFoodNames } from '@/lib/foodNames';
+import type { StorageLocation } from '@/lib/storage';
+import { LocationChoice } from '@/components/pantry/LocationChoice';
 import { displayQuantity } from '@/lib/quantity';
 import type { LotGroup } from '@/lib/pantryLots';
 import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
@@ -29,6 +31,7 @@ interface Props {
   onToggle: (index: number) => void;
   onExpiryChange: (index: number, expiresAt: string) => void;
   onQuantityChange: (index: number, quantity: string) => void;
+  onLocationChange: (index: number, location: StorageLocation) => void;
   onChoiceChange: (index: number, choice: AddChoice) => void;
   // Garde-manger du foyer : aliments déjà présents
   groups: LotGroup<PantryIngredient>[];
@@ -40,11 +43,14 @@ interface Props {
 // Aliments détectés sur la photo : l'utilisateur décoche ceux qu'il ne veut pas ajouter, corrige la quantité
 // (+ et − pour ce qui se compte) et peut changer la durée de conservation proposée (toucher la pastille de
 // durée). Aliment déjà dans le garde-manger : ajouter aux existants, séparément ou pas du tout.
-export function ConfirmIngredientsModal({ visible, ingredients, photo, onToggle, onExpiryChange, onQuantityChange, onChoiceChange, groups, saving, onConfirm, onClose }: Props) {
+export function ConfirmIngredientsModal({ visible, ingredients, photo, onToggle, onExpiryChange, onQuantityChange, onLocationChange, onChoiceChange, groups, saving, onConfirm, onClose }: Props) {
   const { t, language } = useLanguage();
   // Aliment dont la date est en cours de modification
   const [editing, setEditing] = useState<number | null>(null);
   const confirmedCount = ingredients.filter((i) => i.confirmed).length;
+  // Nom de la fiche dans la langue de l'app quand elle existe (« Milk » pour un « lait » détecté), sinon le nom
+  // proposé par l'analyse
+  const nameOf = useFoodNames(ingredients);
 
   const thumbnail = (
     <View style={styles.thumbnail}>
@@ -78,12 +84,12 @@ export function ConfirmIngredientsModal({ visible, ingredients, photo, onToggle,
                 style={styles.itemMain}
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked: ing.confirmed }}
-                accessibilityLabel={capitalizeFirst(ing.name)}
+                accessibilityLabel={nameOf(ing)}
               >
                 <Checkbox checked={ing.confirmed} />
                 <View style={styles.itemText}>
                   <View style={styles.nameRow}>
-                    <Text style={[styles.name, !ing.confirmed && styles.unchecked]}>{capitalizeFirst(ing.name)}</Text>
+                    <Text style={[styles.name, !ing.confirmed && styles.unchecked]}>{nameOf(ing)}</Text>
                     {ing.kind === 'dish' && <Badge label={t('pantry.leftover')} tone="leftover" />}
                   </View>
                   {!ing.confirmed && ing.quantity !== '' && <Text style={styles.quantity}>{displayQuantity(ing.quantity, language)}</Text>}
@@ -121,6 +127,7 @@ export function ConfirmIngredientsModal({ visible, ingredients, photo, onToggle,
                     placeholder={t('manual.quantityPlaceholder')}
                   />
                 ) : null}
+                {ing.confirmed ? <LocationChoice value={ing.location} onChange={(location) => onLocationChange(index, location)} /> : null}
                 {existing ? (
                   <ExistingFoodChoice
                     group={existing.group}

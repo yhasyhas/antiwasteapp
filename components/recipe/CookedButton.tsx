@@ -1,22 +1,28 @@
-import React, { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Check, Minus, Plus } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { notifyPantryChanged } from '@/lib/pantryEvents';
 import { useFoodNames } from '@/lib/foodNames';
-import { loadPantry } from '@/lib/pantry';
-import { consumeOldestFirst, findExisting, groupLots, lotsStock, totalLabel, type LotGroup } from '@/lib/pantryLots';
+import { formatDate, isToday, localDateOf, shortDate } from '@/lib/expiry';
+import { addPantryItems, loadPantry } from '@/lib/pantry';
+import { frozenExpiry, wasThawed } from '@/lib/storage';
+import { alertWriteError } from '@/lib/alertWriteError';
+import { consumeOldestFirst, findExisting, foodIdentity, groupLots, lotsStock, totalLabel, type LotGroup } from '@/lib/pantryLots';
 import { formatQuantity, parseQuantity, stepOf, usedFromRecipe, type Quantity } from '@/lib/quantity';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
+import { QuantityField } from '@/components/pantry/QuantityField';
 import { useUndoableAction } from '@/hooks/useUndoableAction';
 import { BottomSheet, SheetHeader } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/Button';
 import { cardStyles } from '@/components/ui/Card';
 import { Chip } from '@/components/ui/Chip';
 import { Toast } from '@/components/ui/Toast';
+import { Touchable } from '@/components/ui/Touchable';
 import { StepButton } from '@/components/ui/StepButton';
-import { colors, sizes, spacing, typography } from '@/constants/theme';
+import { colors, motion, sizes, spacing, typography } from '@/constants/theme';
+import { showDialog } from '@/lib/dialog';
 
 interface UsedIngredient {
   name: string;
@@ -28,6 +34,10 @@ interface UsedIngredient {
 
 interface Props {
   ingredientsUsed: UsedIngredient[] | null | undefined;
+  // Recette enregistrée : le repas lui est relié (« Cuisiné aujourd'hui », « Modifier », « Cuisinée le … »)
+  recipeId?: string | null;
+  // Nom du plat (restes congelés après le repas)
+  recipeTitle?: string;
   // Conteneur du bouton (barre fixée en bas de la fiche recette)
   style?: StyleProp<ViewStyle>;
 }
@@ -45,49 +55,98 @@ interface CookRow {
   used: Used;
 }
 
+// Quantités saisies, gardées avec l'action pour rouvrir la feuille (« Modifier »)
+type Inputs = { rows: { key: string; used: Used }[] };
+
 // Changements de la validation : lots finis et lots entamés
 interface Cooking {
   id: string;
   usedUp: string[];
   leftovers: { id: string; quantity: string }[];
+  inputs: Inputs;
 }
+
+// Dernière action « J'ai cuisiné ça » de la recette, encore modifiable (24 heures)
+interface LastCook {
+  id: string;
+  created_at: string;
+  removed: PantryIngredient[];
+  updated: { before: PantryIngredient; after: PantryIngredient }[];
+  inputs: Inputs | null;
+}
+
+// Feuille ouverte : nouveau repas, ou correction du dernier
+type Mode = { kind: 'new' } | { kind: 'modify'; action: LastCook };
 
 // « J'ai cuisiné ça » : pour chaque aliment du garde-manger utilisé par la recette, la quantité utilisée,
 // préremplie avec celle de la recette ; en dessous, ce qu'il en restera. La quantité est prise du lot le plus
 // ancien au plus récent : les lots finis sont retirés et comptés « sauvés », un lot entamé garde sa date et
-// prend la quantité restante. Enregistré tout de suite, puis « Retiré du garde-manger · Annuler » pendant
-// 5 secondes (état d'avant rétabli par le serveur, tous les lots compris).
-export function CookedButton({ ingredientsUsed, style }: Props) {
+// prend la quantité restante. Enregistré tout de suite, puis « Retiré du garde-manger · Annuler » (état d'avant
+// rétabli par le serveur, tous les lots compris).
+// Recette enregistrée : ensuite « ✓ Cuisiné aujourd'hui » (grisé), récapitulatif avant / après de chaque
+// aliment, « Modifier » (feuille rouverte avec les quantités saisies ; la correction remplace l'action en une
+// seule opération, conflit compris) et « Je l'ai cuisinée à nouveau » (vrai deuxième repas).
+export function CookedButton({ ingredientsUsed, recipeId, recipeTitle, style }: Props) {
   const { t, language } = useLanguage();
   const [rows, setRows] = useState<CookRow[] | null>(null);
+  const [mode, setMode] = useState<Mode>({ kind: 'new' });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const foodName = useFoodNames(rows?.map((row) => row.group.first));
+  const [lastCook, setLastCook] = useState<LastCook | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  // Restes du plat au congélateur : quantité saisie (feuille ouverte), puis date une fois congelés
+  const [leftovers, setLeftovers] = useState<string | null>(null);
+  const [savingLeftovers, setSavingLeftovers] = useState(false);
+  const [leftoversFrozenUntil, setLeftoversFrozenUntil] = useState<string | null>(null);
+  const recapLots = lastCook ? [...lastCook.removed, ...lastCook.updated.map((change) => change.before)] : [];
+  const foodName = useFoodNames([...(rows?.map((row) => row.group.first) ?? []), ...recapLots]);
+
+  // Dernière action modifiable de la recette (la mienne, moins de 24 heures)
+  const loadLastCook = useCallback(async () => {
+    if (!recipeId) return;
+    const { data, error } = await supabase.rpc('last_cook_action', { p_recipe_id: recipeId });
+    if (error) {
+      console.warn('[cuisiné] dernière action illisible :', error.message);
+      return;
+    }
+    setLastCook((data as LastCook[] | null)?.[0] ?? null);
+  }, [recipeId]);
+  useEffect(() => {
+    loadLastCook();
+  }, [loadLastCook]);
+  // « Correction enregistrée » : message bref
+  useEffect(() => {
+    if (!notice) return;
+    const timer = setTimeout(() => setNotice(null), motion.undoWindow);
+    return () => clearTimeout(timer);
+  }, [notice]);
 
   const cooking = useUndoableAction<Cooking>({
     label: 'removing cooked ingredients',
-    // Retirés et comptés « sauvés » ; lots entamés mis à jour sans être comptés
-    perform: async ({ usedUp, leftovers }) => {
-      const { data, error } = await supabase.rpc('cook_with_undo', { p_ids: usedUp, p_leftovers: leftovers });
+    // Retirés et comptés « sauvés » ; lots entamés mis à jour sans être comptés ; repas relié à la recette
+    perform: async ({ usedUp, leftovers, inputs }) => {
+      const { data, error } = await supabase.rpc('cook_with_undo', {
+        p_ids: usedUp, p_leftovers: leftovers, p_recipe_id: recipeId ?? null, p_inputs: inputs,
+      });
       if (error) throw error;
       return data as string;
     },
-    onDone: () => notifyPantryChanged(),
-    onUndone: () => notifyPantryChanged(),
+    onDone: () => {
+      notifyPantryChanged();
+      loadLastCook();
+    },
+    onUndone: () => {
+      notifyPantryChanged();
+      loadLastCook();
+    },
   });
 
   const used = (ingredientsUsed ?? []).filter((item) => !!item?.pantry_id);
   // Recettes d'avant la phase 3 : pas d'identifiants, rien à retirer
   if (used.length === 0) return null;
 
-  const open = async () => {
-    setLoading(true);
-    const pantry = await loadPantry();
-    setLoading(false);
-    if (!pantry) {
-      Alert.alert(t('common.error'), t('errors.writeText'));
-      return;
-    }
+  // Lignes de la feuille à partir d'un garde-manger (actuel, ou celui d'avant le repas pour « Modifier »)
+  const rowsFrom = (pantry: PantryIngredient[], inputs: Inputs | null): CookRow[] => {
     // Aliment de chaque ingrédient de la recette : celui du lot choisi à la génération, ou, s'il n'est plus
     // là, le même aliment ajouté depuis
     const groups = groupLots(pantry);
@@ -99,13 +158,37 @@ export function CookedButton({ ingredientsUsed, style }: Props) {
       const stock = lotsStock(group.lots);
       const needed = parseQuantity([item.quantity, item.unit].filter(Boolean).join(' '), group.first.name);
       const amount = usedFromRecipe(stock, needed);
-      found.set(group.key, { key: group.key, group, stock, used: amount !== null ? { kind: 'amount', value: amount } : { kind: 'all' } });
+      const saved = inputs?.rows.find((row) => row.key === group.key)?.used;
+      const valid = saved && (saved.kind !== 'amount' || (stock && saved.value <= stock.value));
+      found.set(group.key, {
+        key: group.key, group, stock,
+        used: valid ? saved : amount !== null ? { kind: 'amount', value: amount } : { kind: 'all' },
+      });
     }
-    if (found.size === 0) {
-      Alert.alert(t('cooked.button'), t('cooked.nothingLeft'));
+    return [...found.values()];
+  };
+
+  const open = async (next: Mode = { kind: 'new' }) => {
+    setLoading(true);
+    const pantry = await loadPantry();
+    setLoading(false);
+    if (!pantry) {
+      showDialog(t('common.error'), t('errors.writeText'));
       return;
     }
-    setRows([...found.values()]);
+    let base = pantry;
+    if (next.kind === 'modify') {
+      // Garde-manger d'avant le repas : lots entamés à leur quantité d'avant, lots finis de retour
+      const before = new Map(next.action.updated.map((change) => [change.before.id, change.before]));
+      base = [...pantry.filter((lot) => !before.has(lot.id)), ...before.values(), ...next.action.removed];
+    }
+    const found = rowsFrom(base, next.kind === 'modify' ? next.action.inputs : null);
+    if (found.length === 0) {
+      showDialog(t('cooked.button'), t('cooked.nothingLeft'));
+      return;
+    }
+    setMode(next);
+    setRows(found);
   };
 
   const setUsed = (key: string, next: Used) =>
@@ -156,22 +239,157 @@ export function CookedButton({ ingredientsUsed, style }: Props) {
 
   const changes = (rows ?? []).filter((row) => remaining(row) !== '');
 
+  // Correction : l'action précédente remplacée en une seule opération (rien ne change en cas de refus)
+  const modify = async (action: LastCook, usedUp: string[], leftovers: { id: string; quantity: string }[], inputs: Inputs) => {
+    const { data, error } = await supabase.rpc('modify_cook_action', {
+      p_action_id: action.id, p_ids: usedUp, p_leftovers: leftovers, p_inputs: inputs,
+    });
+    if (error) {
+      showDialog(t('cookedMore.modifyTitle'), t('undo.failedText'));
+      return false;
+    }
+    const status = (data as { status: string }).status;
+    notifyPantryChanged();
+    await loadLastCook();
+    if (status === 'modified' || status === 'undone') {
+      setNotice(t('cookedMore.modified'));
+      return true;
+    }
+    showDialog(t('cookedMore.modifyTitle'), status === 'conflict' ? t('undo.conflictText') : status === 'expired' ? t('undo.expiredText') : t('undo.failedText'));
+    return status !== 'conflict';
+  };
+
   // Enregistré avant de fermer la fiche : en cas d'échec (hors connexion), erreur et fiche gardée ouverte
   const confirm = async () => {
     const all = changes.map(changesOf);
     const usedUp = all.flatMap((change) => change.usedUp);
     const leftovers = all.flatMap((change) => change.leftovers);
-    if (usedUp.length + leftovers.length === 0) return setRows(null);
+    const inputs: Inputs = { rows: (rows ?? []).map((row) => ({ key: row.key, used: row.used })) };
     setSaving(true);
-    const saved = await cooking.run({ id: `cooking-${Date.now()}`, usedUp, leftovers });
+    let saved: boolean;
+    if (mode.kind === 'modify') {
+      saved = await modify(mode.action, usedUp, leftovers, inputs);
+    } else if (usedUp.length + leftovers.length === 0) {
+      saved = true;
+    } else {
+      saved = await cooking.run({ id: `cooking-${Date.now()}`, usedUp, leftovers, inputs });
+    }
     setSaving(false);
     if (saved) setRows(null);
   };
 
+  // Récapitulatif du dernier repas : avant → après de chaque aliment (« Tomates : 4 → 1 », « Riz : fini »)
+  const recap = (() => {
+    if (!lastCook) return [];
+    const foods = new Map<string, { before: PantryIngredient[]; after: PantryIngredient[] }>();
+    const entry = (lot: PantryIngredient) => {
+      const key = foodIdentity(lot.name);
+      if (!foods.has(key)) foods.set(key, { before: [], after: [] });
+      return foods.get(key)!;
+    };
+    for (const lot of lastCook.removed) entry(lot).before.push(lot);
+    for (const change of lastCook.updated) {
+      entry(change.before).before.push(change.before);
+      entry(change.before).after.push(change.after);
+    }
+    return [...foods.values()].map(({ before, after }) => ({
+      name: foodName(before[0]),
+      line: `${totalLabel(before, language)} → ${after.length > 0 ? totalLabel(after, language) : t('cookedMore.finished')}`,
+    }));
+  })();
+  const cookedLabel = lastCook
+    ? isToday(lastCook.created_at) ? t('cookedMore.doneToday') : `✓ ${t('cookedMore.cookedOn', { date: shortDate(localDateOf(lastCook.created_at), language) })}`
+    : null;
+  const showConfirmed = lastCook && !cooking.pending;
+  // Repas avec un aliment décongelé : congeler les restes du plat est mis en avant (l'aliment ne se recongèle
+  // pas cru)
+  const thawedUsed = recapLots.some(wasThawed);
+  const leftoversExpiry = frozenExpiry(null, 'dish');
+
+  const freezeLeftovers = async () => {
+    if (!recipeTitle || leftovers === null) return;
+    setSavingLeftovers(true);
+    try {
+      await addPantryItems([{
+        name: recipeTitle,
+        quantity: leftovers.trim(),
+        kind: 'dish',
+        expires_at: leftoversExpiry,
+        added_via: 'manual',
+        choice: 'separate',
+        location: 'freezer',
+        date_kind: 'best_before',
+        expiry_estimated: true,
+      }], [], language);
+      notifyPantryChanged();
+      setLeftovers(null);
+      setLeftoversFrozenUntil(leftoversExpiry);
+    } catch (error) {
+      alertWriteError(t, 'freezing leftovers', error);
+    } finally {
+      setSavingLeftovers(false);
+    }
+  };
+  const openLeftovers = () => setLeftovers(formatQuantity(1, 'portion', language));
+
   return (
     <View style={style}>
-      <Toast message={cooking.pending ? t('cooked.removed') : null} actionLabel={t('common.undo')} onAction={cooking.undo} inset={false} />
-      <Button label={t('cooked.button')} icon={Check} onPress={open} loading={loading} />
+      <Toast message={cooking.pending ? t('cooked.removed') : notice} actionLabel={cooking.pending ? t('common.undo') : undefined} onAction={cooking.pending ? cooking.undo : undefined} inset={false} />
+      {showConfirmed ? (
+        <View style={styles.confirmed}>
+          <Button label={cookedLabel!} variant="soft" size="medium" disabled onPress={() => undefined} />
+          {/* Récapitulatif compact (la barre du bas ne doit pas couvrir la recette) */}
+          {recap.length > 0 ? (
+            <Text
+              style={styles.recapLine}
+              numberOfLines={3}
+              accessibilityLabel={`${t('cookedMore.recapTitle')} : ${recap.map((item) => `${item.name} ${item.line}`).join(', ')}`}
+            >
+              {recap.map((item) => `${item.name} : ${item.line}`).join(' · ')}
+            </Text>
+          ) : null}
+          {recipeTitle && thawedUsed && !leftoversFrozenUntil ? (
+            <>
+              <Text style={styles.recapLine}>{t('cookedMore.freezeLeftoversHint')}</Text>
+              <Button label={t('cookedMore.freezeLeftovers')} variant="outline" size="medium" onPress={openLeftovers} />
+            </>
+          ) : null}
+          {leftoversFrozenUntil ? (
+            <Text style={styles.recapLine}>{t('cookedMore.leftoversDone', { date: formatDate(leftoversFrozenUntil, language) })}</Text>
+          ) : null}
+          <View style={styles.links}>
+            <Touchable onPress={() => open({ kind: 'modify', action: lastCook })} style={styles.link} accessibilityRole="button">
+              <Text style={styles.linkText}>{t('cookedMore.modify')}</Text>
+            </Touchable>
+            {recipeTitle && !thawedUsed && !leftoversFrozenUntil ? (
+              <Touchable onPress={openLeftovers} style={styles.link} accessibilityRole="button">
+                <Text style={styles.linkSecondary}>{t('cookedMore.freezeLeftovers')}</Text>
+              </Touchable>
+            ) : null}
+            <Touchable onPress={() => open()} style={styles.link} accessibilityRole="button">
+              <Text style={styles.linkSecondary}>{t('cookedMore.cookAgain')}</Text>
+            </Touchable>
+          </View>
+        </View>
+      ) : (
+        <Button label={t('cooked.button')} icon={Check} onPress={() => open()} loading={loading} />
+      )}
+
+      {/* Restes du plat au congélateur, comme un reste : date du congélateur, conseil */}
+      <BottomSheet visible={leftovers !== null} onClose={() => setLeftovers(null)} keyboard>
+        <SheetHeader title={t('cookedMore.leftoversTitle')} subtitle={recipeTitle} onClose={() => setLeftovers(null)} />
+        <View style={styles.leftovers}>
+          <QuantityField
+            label={t('cookedMore.leftoversQuantity')}
+            value={leftovers ?? ''}
+            onChange={setLeftovers}
+            itemName={recipeTitle ?? ''}
+          />
+          <Text style={styles.remaining}>{t('storage.frozenDone', { date: formatDate(leftoversExpiry, language) })}</Text>
+          <Text style={styles.remaining}>{t('storage.freezeTip_dish')}</Text>
+        </View>
+        <Button label={t('cookedMore.leftoversConfirm')} onPress={freezeLeftovers} loading={savingLeftovers} style={styles.confirm} />
+      </BottomSheet>
 
       <BottomSheet visible={rows !== null} onClose={() => setRows(null)}>
         <SheetHeader title={t('cooked.title')} subtitle={t('cooked.subtitle')} onClose={() => setRows(null)} />
@@ -210,8 +428,8 @@ export function CookedButton({ ingredientsUsed, style }: Props) {
           ))}
         </ScrollView>
         <Button
-          label={changes.length > 0 ? t('cooked.confirm', { count: changes.length }) : t('common.close')}
-          variant={changes.length > 0 ? 'primary' : 'outline'}
+          label={mode.kind === 'modify' ? t('cookedMore.saveModification') : changes.length > 0 ? t('cooked.confirm', { count: changes.length }) : t('common.close')}
+          variant={mode.kind === 'modify' || changes.length > 0 ? 'primary' : 'outline'}
           onPress={confirm}
           loading={saving}
           style={styles.confirm}
@@ -222,6 +440,31 @@ export function CookedButton({ ingredientsUsed, style }: Props) {
 }
 
 const styles = StyleSheet.create({
+  confirmed: {
+    gap: spacing.xs,
+  },
+  recapLine: {
+    ...typography.secondary,
+    textAlign: 'center',
+  },
+  links: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: spacing.md,
+  },
+  link: {
+    minHeight: sizes.touch,
+    justifyContent: 'center',
+  },
+  linkText: {
+    ...typography.bodyStrong,
+    color: colors.primary,
+  },
+  linkSecondary: {
+    ...typography.secondary,
+    textDecorationLine: 'underline',
+  },
   list: {
     flexGrow: 0,
   },
@@ -274,5 +517,8 @@ const styles = StyleSheet.create({
   },
   confirm: {
     marginTop: spacing.lg,
+  },
+  leftovers: {
+    gap: spacing.md,
   },
 });
