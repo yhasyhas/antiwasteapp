@@ -157,7 +157,7 @@ Pour le renouveler : générer une valeur aléatoire, la poser dans les fonction
 |---|---|---|
 | Supabase | Base, authentification, fonctions, stockage | `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, Dashboard (utilisateur) |
 | Google AI Studio | Clé Gemini (offre gratuite : données utilisées par Google, passage payant en phase 13) | `GEMINI_API_KEY` (secret Supabase) |
-| Groq | Clé du fournisseur de secours | `GROQ_API_KEY` (secret Supabase) |
+| Groq | Génération des recettes (fournisseur principal, `gpt-oss-120b`) et secours du scan. **Offre Developer** depuis le 02/10/2026, avec un **plafond de dépenses de 5 $ par mois** (exception à la règle « services payants en phase 13 » : coût négligeable, nécessaire pour l'évaluation). Limites vérifiées le 02/10/2026 : 250 000 tokens par minute et 500 000 requêtes par jour par modèle. Plafond et moyen de paiement : console.groq.com → Settings → Billing, limite de dépenses (chemin du menu à confirmer à la prochaine visite) ; consommation : console.groq.com → Usage. Les évaluations (`scripts/recipe-eval`) partagent ce compte avec l'app | `GROQ_API_KEY` (secret Supabase) ; compte Groq (utilisateur) |
 | Sentry | Erreurs de l'app et des fonctions (organisation `yhasral`, région UE) | DSN (`.env`, `SENTRY_DSN`), `SENTRY_ACCESS_TOKEN` (lecture) |
 | Expo / EAS | Builds, identifiants, notifications push | `EXPO_TOKEN` ; compte propriétaire de l'équipe EAS |
 | Firebase | FCM (push Android) | Console Firebase (utilisateur) ; clé de compte de service (section 5) |
