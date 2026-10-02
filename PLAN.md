@@ -297,7 +297,7 @@ Suite de la phase 7, sur la branche `phase-7-finalisation`.
 - [x] Saison affichée seulement pour les produits frais (fruits, légumes, poissons, fruits de mer), jamais pour le reste
 - [x] Fiches aliments régénérées une seule fois pour « Est-ce encore bon ? » et la saison, après sauvegarde, avec un contrôle de qualité
 - [x] Compteur anti-gaspi et notifications cohérents avec les nouvelles règles (congelés, dates indicatives)
-- [ ] Fluidité vérifiée sur le Galaxy A30
+- [x] Fluidité vérifiée sur le Galaxy A30
 
 **Terminé quand** : un aliment peut être rangé, congelé et marqué ouvert, sa date et ses rappels suivent, un produit « de préférence avant » dépassé n'est jamais présenté ni compté comme gaspillé, et « J'ai cuisiné ça » peut être confirmé et corrigé.
 
@@ -593,3 +593,4 @@ Ancienne phase 8.
 | 01/10/2026 | Recongélation selon la catégorie (`refreeze_rule`, même règle dans `lib/storage.ts`) : viande, poisson et fruits de mer, surgelés décongelés : « Déjà décongelé : à cuisiner avant de le recongeler », sans « Congeler » ; plat ou reste décongelé : à consommer sans le recongeler ; pain, fruits, légumes, laitages… : « Congeler » avec un avertissement (goût, texture). Garde-fou côté serveur (`guard_refreeze`, migration `20261001140000_refreeze_rule.sql`). Après « J'ai cuisiné ça » : « Congeler les restes du plat » (nouveau lot « reste » au congélateur, 3 mois, date indicative), mis en avant si un aliment décongelé a été cuisiné, sinon lien discret | Les surgelés (catégorie « frozen ») sont traités comme de la viande ou du poisson crus, par prudence (contenu inconnu) ; un plat décongelé ne se recongèle pas |
 | 01/10/2026 | Messages dans le design de l'app : congélation et décongélation dans la feuille de l'aliment, sous le lot ; toutes les autres alertes du système remplacées par une petite feuille du bas (`lib/dialog.ts`, `DialogHost`), même usage qu'`Alert.alert` | Sur le web, les alertes du système ne s'affichaient pas du tout ; elles s'affichent maintenant aussi |
 | | *(résultat du test Gemini vs Clarifai)* | |
+| 02/10/2026 | **Phase 8 validée** sur les deux téléphones (langue du scan, recongélation, restes congelés, messages dans le style de l’app) et fusionnée dans `master`. Choix validés : surgelés traités comme de la viande crue, restes à 1 portion par défaut | — |
