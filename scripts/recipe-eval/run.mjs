@@ -36,6 +36,8 @@ const noLibrary = process.argv.includes('--no-library');
 // Nouveaux essais d'une génération refusée (limite par minute, modèle surchargé) ; 0 pour économiser un quota
 // quotidien en requêtes (Gemini : 20 par jour et par modèle dans l'offre gratuite)
 const RETRIES = Number(arg('retries', '3'));
+// Cas fixes : cases.json (13 situations) ou cases-regions.json (une par région, et « Autre cuisine », v4 seulement)
+const CASES_FILE = arg('cases-file', 'cases.json');
 // Génération seule (notes du juge plus tard avec --rejudge)
 const noJudge = process.argv.includes('--no-judge');
 // Pause entre deux générations : l'offre gratuite de Groq limite gpt-oss-120b à 8 000 tokens par minute
@@ -58,7 +60,7 @@ async function judgeWithRetry(body) {
 }
 const previous = rejudge ? JSON.parse(fs.readFileSync(path.resolve(HERE, rejudge), 'utf8')) : null;
 
-const cases = JSON.parse(fs.readFileSync(path.join(HERE, 'cases.json'), 'utf8')).filter((c) => onlyCases.length === 0 || onlyCases.includes(c.id));
+const cases = JSON.parse(fs.readFileSync(path.join(HERE, CASES_FILE), 'utf8')).filter((c) => onlyCases.length === 0 || onlyCases.includes(c.id));
 const results = [];
 if (previous) version = previous.summary.version;
 for (const [n, situation] of cases.entries()) {
@@ -177,7 +179,7 @@ const summary = {
 summary.judge_mean = mean(Object.values(summary.judge).filter((v) => v !== null));
 
 fs.mkdirSync(path.join(HERE, 'results'), { recursive: true });
-const label = `${version}${model ? `-${model.replace(/[^a-z0-9.]+/gi, '_')}` : ''}${noLibrary ? '-sans-bibliotheque' : ''}${previous ? '-rejuge' : ''}`;
+const label = `${CASES_FILE === 'cases.json' ? '' : 'regions-'}${version}${model ? `-${model.replace(/[^a-z0-9.]+/gi, '_')}` : ''}${noLibrary ? '-sans-bibliotheque' : ''}${previous ? '-rejuge' : ''}`;
 const file = path.join(HERE, 'results', `${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}-${label}.json`);
 fs.writeFileSync(file, JSON.stringify({ summary, results }, null, 1));
 console.log('\nRésumé :', JSON.stringify(summary, (k, v) => (typeof v === 'number' && !Number.isInteger(v) ? Number(v.toFixed(2)) : v), 1));

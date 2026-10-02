@@ -15,10 +15,10 @@
 | [Afrique de l'Est](#afrique-est) | Africaine | 60 | 21 | 11 |
 | [Afrique australe](#afrique-australe) | Africaine | 53 | 13 | 12 |
 | [Océan Indien](#ocean-indien) | Africaine | 44 | 11 | 17 |
-| [Maghreb](#maghreb) | Maghreb | 49 | 14 | 14 |
+| [Afrique du Nord (Maghreb)](#maghreb) | Maghreb | 49 | 14 | 14 |
 | [Asie de l'Est](#asie-est) | Asiatique | 59 | 25 | 14 |
 | [Asie du Sud-Est](#asie-sud-est) | Asiatique | 60 | 27 | 18 |
-| [Asie du Sud](#asie-sud) | Asiatique | 60 | 23 | 13 |
+| [Inde et Asie du Sud](#asie-sud) | Asiatique | 60 | 23 | 13 |
 | [Mexique et Amérique centrale](#mexique-amerique-centrale) | Amérique latine | 60 | 23 | 19 |
 | [Caraïbes](#caraibes) | Amérique latine | 60 | 16 | 11 |
 | [Amérique du Sud](#amerique-sud) | Amérique latine | 60 | 19 | 18 |
@@ -330,7 +330,7 @@
 
 <a id="maghreb"></a>
 
-## Maghreb (49 plats)
+## Afrique du Nord (Maghreb) (49 plats)
 
 | Plat | Pays | Ingrédients essentiels | Techniques | Moments | Régime |
 |---|---|---|---|---|---|
@@ -519,7 +519,7 @@
 
 <a id="asie-sud"></a>
 
-## Asie du Sud (60 plats)
+## Inde et Asie du Sud (60 plats)
 
 | Plat | Pays | Ingrédients essentiels | Techniques | Moments | Régime |
 |---|---|---|---|---|---|

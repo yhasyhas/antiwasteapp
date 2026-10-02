@@ -30,7 +30,7 @@ const tokensOf = (usage) => {
 const cents = (value) => (value === null || value === undefined ? '—' : `${(value * 100).toFixed(3)} c$`);
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const LANGUAGE = Object.fromEntries(JSON.parse(fs.readFileSync(path.join(HERE, 'cases.json'), 'utf8')).map((c) => [c.id, c.preferences.language]));
+const LANGUAGE = Object.fromEntries(['cases.json', 'cases-regions.json'].flatMap((file) => JSON.parse(fs.readFileSync(path.join(HERE, file), 'utf8'))).map((c) => [c.id, c.preferences.language]));
 const load = (spec) => {
   const files = spec.split('+').map((file) => JSON.parse(fs.readFileSync(path.resolve(HERE, file), 'utf8')));
   const cases = new Map();

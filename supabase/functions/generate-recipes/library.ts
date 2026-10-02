@@ -48,10 +48,10 @@ export const REGIONS: Region[] = [
   region('afrique-est', "Afrique de l'Est", 'african', afriqueEst),
   region('afrique-australe', 'Afrique australe', 'african', afriqueAustrale),
   region('ocean-indien', 'Océan Indien', 'african', oceanIndien),
-  region('maghreb', 'Maghreb', 'maghreb', maghreb),
+  region('maghreb', 'Afrique du Nord (Maghreb)', 'maghreb', maghreb),
   region('asie-est', "Asie de l'Est", 'asian', asieEst),
   region('asie-sud-est', 'Asie du Sud-Est', 'asian', asieSudEst),
-  region('asie-sud', 'Asie du Sud', 'asian', asieSud),
+  region('asie-sud', 'Inde et Asie du Sud', 'asian', asieSud),
   region('mexique-amerique-centrale', 'Mexique et Amérique centrale', 'latin', mexiqueAmeriqueCentrale),
   region('caraibes', 'Caraïbes', 'latin', caraibes),
   region('amerique-sud', 'Amérique du Sud', 'latin', ameriqueSud),
@@ -67,10 +67,11 @@ export interface SampledDish extends Dish {
 // Plats tirés au hasard pour une génération : du moment demandé, répartis entre les régions de la cuisine,
 // de préférence compatibles avec un régime végétarien ou vegan (sinon, les autres servent quand même
 // d'inspiration : le prompt demande d'adapter). Aucun plat avec « Peu importe » (cuisine libre).
-export function sampleDishes(cuisine: string, options: { mealType: string; diets?: string[]; count?: number; random?: () => number }): SampledDish[] {
+// regions : régions précises (découpage de la phase 9, cuisines.ts) à la place de la cuisine de l'app
+export function sampleDishes(cuisine: string, options: { mealType: string; diets?: string[]; count?: number; random?: () => number; regions?: string[] }): SampledDish[] {
   const random = options.random ?? Math.random;
   const count = options.count ?? 5;
-  const regions = REGIONS.filter((r) => r.cuisine === cuisine);
+  const regions = options.regions ? REGIONS.filter((r) => options.regions!.includes(r.id)) : REGIONS.filter((r) => r.cuisine === cuisine);
   if (regions.length === 0) return [];
   const diets = options.diets ?? [];
   const dietOk = (dish: Dish) => diets.includes('vegan') ? dish.diet === 'vegan' : diets.includes('vegetarian') ? dish.diet !== '' : true;

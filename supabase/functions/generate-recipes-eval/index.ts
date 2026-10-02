@@ -39,6 +39,7 @@ import {
 } from '../generate-recipes/recipes.ts';
 import { buildCorrectionPrompt, buildPrompts, CUISINES, type Cuisine, PROMPT_VERSIONS, type PromptVersion } from '../generate-recipes/prompt.ts';
 import { sampleDishes } from '../generate-recipes/library.ts';
+import { resolveCuisine } from '../generate-recipes/cuisines.ts';
 import { type SafetyIssue, safetyIssues } from '../generate-recipes/safety.ts';
 import { recentTitles } from '../generate-recipes/history.ts';
 import { JUDGE_SCHEMA, judgePrompt, VARIETY_SCHEMA, varietyPrompt } from './judge.ts';
@@ -96,15 +97,20 @@ async function generate(body: any) {
 
   const dietary = Array.isArray(preferences.dietary) ? preferences.dietary : [];
   const diets = strictDietsOf(dietary);
-  const cuisine: Cuisine = (CUISINES as readonly string[]).includes(preferences.cuisine || '') ? preferences.cuisine : 'any';
+  const legacyCuisine = (CUISINES as readonly string[]).includes(preferences.cuisine || '');
+  const cuisine: Cuisine = legacyCuisine ? preferences.cuisine : 'any';
+  // Découpage de la phase 9 (v4) : région, famille ou « Autre cuisine… » (cuisineOther) ; les 7 valeurs actuelles
+  // de l'app gardent leur traitement
+  const resolved = legacyCuisine || version !== 'v4' ? { kind: 'any' as const } : resolveCuisine(preferences.cuisine, preferences.cuisineOther);
   const difficulty = preferences.difficulty || 'easy';
   const count = recipeCount(pantry.items.length);
   const excluded = cleanExcluded(preferences.excluded);
   const servings = cleanServings(preferences.servings);
-  const context = { mealType: preferences.mealType || 'dinner', cuisine, difficulty, dietary, maxRecipes: count, mode, otherPantry, excluded, servings };
+  const context = { mealType: preferences.mealType || 'dinner', cuisine: resolved.kind === 'regions' ? resolved.id : resolved.kind === 'other' ? 'other' : cuisine, difficulty, dietary, maxRecipes: count, mode, otherPantry, excluded, servings };
   const v4 = version === 'v4';
   // Plats de référence : seulement avec une cuisine précise ; library: false pour mesurer sans
-  const examples = v4 && body.library !== false ? sampleDishes(cuisine, { mealType: context.mealType, diets }) : [];
+  const examples = !v4 || body.library === false || resolved.kind === 'other' ? []
+    : sampleDishes(cuisine, { mealType: context.mealType, diets, ...(resolved.kind === 'regions' && { regions: resolved.regions }) });
   const promptOptions = {
     pantryText: pantryForPrompt(pantry),
     count,
@@ -124,6 +130,8 @@ async function generate(body: any) {
     servings,
     version,
     examples,
+    ...(resolved.kind === 'regions' && { cuisineChoice: { label: resolved.prompt } }),
+    ...(resolved.kind === 'other' && { cuisineChoice: { other: resolved.text } }),
     recentTitles: Array.isArray(body.recent_titles) ? body.recent_titles.filter((t: unknown) => typeof t === 'string').slice(0, 30) : [],
   };
   const providers = providersFor(body.providers, typeof body.model === 'string' && body.model ? body.model : undefined);

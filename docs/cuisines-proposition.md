@@ -1,46 +1,75 @@
-# Découpage des cuisines : proposition (phase 9)
+# Découpage des cuisines (phase 9)
 
-Statut : **proposition, rien n'est changé dans l'app avant décision.** La bibliothèque de plats (`docs/bibliotheque-plats.md`) est déjà rangée par région : elle sert le découpage actuel comme le découpage proposé.
+Statut : **décidé le 02/10/2026, préparé sur la branche `phase-9`.** Les écrans de l'app ne changent qu'après la validation de la phase 8 et de la bibliothèque de plats (`docs/bibliotheque-plats.md`).
 
-## Aujourd'hui
+## Avant
 
 7 choix : Peu importe, Africaine, Maghreb, Asiatique, Amérique latine, Méditerranéenne, Française.
 
-« Africaine », « Asiatique » et « Amérique latine » regroupent des cuisines qui n'ont presque rien en commun : un thiéboudienne, un injera et un romazava, ou un ramen et un dal. Le modèle choisit alors souvent la région la plus connue, et l'utilisateur ne peut pas demander la sienne.
+« Africaine », « Asiatique » et « Amérique latine » regroupaient des cuisines qui n'ont presque rien en commun. Le modèle choisissait alors souvent la région la plus connue, et l'utilisateur ne pouvait pas demander la sienne.
 
-## Proposition : deux niveaux
+## Décisions
 
-On choisit d'abord une grande famille, puis, si on veut, une région. Le choix de la famille entière reste possible (« Toute l'Afrique ») et garde la variété.
+On choisit une famille, puis, si on veut, une région. Le choix de la famille entière (« Toute l'Afrique ») reste possible et garde la variété.
 
-| Famille | Régions proposées | Pays principaux |
+| Famille | Régions | Pays principaux |
 |---|---|---|
 | Afrique | Afrique de l'Ouest | Sénégal, Mali, Guinée, Côte d'Ivoire, Burkina Faso, Ghana, Nigeria, Bénin, Togo… |
 | | Afrique centrale | Cameroun, Gabon, Congo, RDC, Centrafrique, Tchad… |
 | | Afrique de l'Est | Éthiopie, Érythrée, Somalie, Kenya, Tanzanie, Ouganda, Rwanda… |
 | | Afrique australe | Afrique du Sud, Zimbabwe, Mozambique, Angola, Zambie… |
 | | Océan Indien | Madagascar, Maurice, La Réunion, Comores, Mayotte |
-| | Maghreb | Maroc, Algérie, Tunisie, Libye |
+| | Afrique du Nord (Maghreb) | Maroc, Algérie, Tunisie, Libye |
 | Asie | Asie de l'Est | Chine, Japon, Corée, Taïwan |
 | | Asie du Sud-Est | Thaïlande, Vietnam, Cambodge, Indonésie, Malaisie, Philippines… |
-| | Asie du Sud | Inde, Pakistan, Bangladesh, Sri Lanka, Népal |
+| | Inde et Asie du Sud | Inde, Pakistan, Bangladesh, Sri Lanka, Népal |
 | Amériques | Mexique et Amérique centrale | Mexique, Guatemala, Salvador, Honduras, Costa Rica… |
 | | Caraïbes | Guadeloupe, Martinique, Haïti, Cuba, République dominicaine, Jamaïque… |
 | | Amérique du Sud | Pérou, Colombie, Venezuela, Brésil, Argentine, Chili… |
 | Méditerranée | Europe du Sud | Italie, Espagne, Portugal, Grèce |
 | | Proche-Orient et Turquie | Liban, Syrie, Palestine, Turquie, Égypte… |
-| France | France | cuisine du quotidien et des régions |
+| — | **France** | choix direct, sans second niveau |
+| — | **Autre cuisine…** | champ libre court (40 caractères au plus), traité par l'IA sans bibliothèque |
 
-## Points à trancher
+- Maghreb : dans la famille Afrique, sous le nom « Afrique du Nord (Maghreb) ».
+- Afrique australe et océan Indien : deux régions séparées.
+- Caraïbes : région à part.
+- Libellé « Inde et Asie du Sud ».
+- Libellés dans les trois langues : `supabase/functions/generate-recipes/cuisines.ts`.
 
-1. **Maghreb** : dans la famille Afrique (géographie), dans Méditerranée (cuisine), ou à part comme aujourd'hui ?
-2. **Afrique australe et océan Indien** : deux régions, ou une seule (bibliothèques plus petites : 53 et 44 plats) ?
-3. **Caraïbes** : à part (proposé : important pour les Antilles françaises et Haïti), ou dans « Amérique latine » ?
-4. **Asie du Sud** : « Inde » est plus parlant pour beaucoup, mais exclut le Pakistan, le Bangladesh et le Sri Lanka.
-5. **Régions absentes** : Europe du Nord et de l'Est, Iran et Asie centrale, Amérique du Nord. À ajouter plus tard si des utilisateurs les demandent.
+## « Autre cuisine… »
 
-## Ce que le changement demandera (après décision)
+- Champ libre court, dans les trois langues (« Autre cuisine… », « Other cuisine… », « Otra cocina… »). Le texte est réduit aux lettres, espaces, traits d'union et apostrophes, 40 caractères au plus.
+- Le prompt le traite comme un simple nom de cuisine (aucune consigne lue dedans), sans plats de référence. Si ce n'est pas une cuisine reconnaissable, la cuisine est libre.
+- **Demandes enregistrées sans donnée personnelle**, pour repérer les cuisines à ajouter : table `cuisine_requests` (texte nettoyé, langue, date ; ni utilisateur, ni foyer), écrite par le serveur seulement. La migration est prête dans `supabase/migrations-pending/` et n'est pas appliquée : elle sera déplacée dans `supabase/migrations/` au moment de l'intégration.
 
-- Écran des préférences : choix en deux niveaux, libellés et noms de régions traduits (fr, en, es).
-- Préférences enregistrées : les valeurs actuelles restent valides (« Africaine » devient « Toute l'Afrique », etc.) ; aucune migration de données n'est nécessaire.
-- Fonction : la liste des cuisines du prompt et le tirage des plats de référence par région (déjà prêt dans `library.ts`).
-- Évaluation : un cas par région ajouté aux cas fixes.
+## Ergonomie
+
+- La cuisine préférée des Préférences est présélectionnée sur l'écran de génération (on peut la changer pour une génération).
+- France : choix direct.
+- Familles : un premier rang de choix (Peu importe, Afrique, Asie, Amériques, Méditerranée, France, Autre cuisine…). Choisir une famille ouvre ses régions, avec « Toute l'Afrique » sélectionné par défaut.
+
+## Préférences déjà enregistrées
+
+Les valeurs actuelles restent valides, aucune migration de données :
+
+| Valeur actuelle | Devient |
+|---|---|
+| Africaine | Toute l'Afrique (le Maghreb y entre désormais) |
+| Maghreb | Afrique du Nord (Maghreb) |
+| Asiatique | Toute l'Asie |
+| Amérique latine | Toutes les Amériques |
+| Méditerranéenne | Toute la Méditerranée |
+| Française | France |
+
+## Déjà prêt sur `phase-9`
+
+- `cuisines.ts` : familles, régions, libellés, anciennes valeurs, nettoyage du champ libre ; tests dans `cuisines.test.ts`.
+- Prompt v4 : région ou famille (libellé avec les pays), « Autre cuisine… » ; plats de référence tirés dans les régions choisies.
+- Évaluation : un cas par région et un pour « Autre cuisine » (`scripts/recipe-eval/cases-regions.json`).
+
+## Reste à faire à l'intégration (après validation)
+
+- Écrans des Préférences et de génération, traductions (fr, en, es).
+- `generate-recipes` : version v4 par défaut, lecture du choix de cuisine, enregistrement des demandes « Autre cuisine ».
+- Appliquer la migration `cuisine_requests` (testée en transaction annulée).
