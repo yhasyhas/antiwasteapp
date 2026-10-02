@@ -1,6 +1,8 @@
 // Logique de generate-recipes sans appel réseau (testée par recipes.test.ts) :
 // schéma de sortie, alias des ingrédients du garde-manger, lecture de la réponse du modèle, régimes.
 
+import { withoutOvenHeatLevel } from './safety.ts';
+
 // ---------- Garde-manger ----------
 
 export type FoodKind = 'ingredient' | 'dish';
@@ -367,12 +369,26 @@ export function dietViolations(recipe: any, diets: StrictDiet[]): string[] {
   return violations;
 }
 
+// Repères internes du prompt recopiés par le modèle dans un texte affiché : identifiants du garde-manger (« (p10) »),
+// « (buy) », « (missing) », étiquettes de la liste (« [URGENT : …] », « [reste de plat] »)
+const INTERNAL_CODES = [
+  /\s*[([]\s*(?:p\d{1,3}|buy|to buy|missing|à acheter|a comprar|pantry_id[^)\]]*)(?:\s*[,;/]\s*(?:p\d{1,3}|buy|missing))*\s*[)\]]/gi,
+  /\s*\[(?:URGENT[^\]]*|reste de plat|date dépassée)\]/gi,
+  /\b(?:pantry_id\s*[:=]?\s*)?p\d{1,3}\b/g,
+];
+export function withoutInternalCodes(text: string): string {
+  return INTERNAL_CODES.reduce((current, pattern) => current.replace(pattern, ''), String(text ?? ''))
+    .replace(/\s+([,.;:!?)])/g, '$1').replace(/\s{2,}/g, ' ').trim();
+}
+export const hasInternalCodes = (text: string) => INTERNAL_CODES.some((pattern) => new RegExp(pattern.source, pattern.flags.replace('g', '')).test(text));
+
 export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; cuisine: string; difficulty: string; dietary: string[]; servings?: number | null }): Recipe {
   const ingredients: RecipeIngredient[] = raw.ingredients.map((ingredient: any) => {
     const pantryItem = ingredient.pantry_id === MISSING ? undefined : pantry.aliasOf.get(ingredient.pantry_id);
     return {
-      // Un ingrédient du garde-manger garde le nom qu'il a dans le garde-manger
-      name: pantryItem ? pantryItem.name : ingredient.name.trim(),
+      // Nom écrit par le modèle, dans la langue de la recette (« eggs » pour « œufs » du garde-manger) ; le nom du
+      // garde-manger seulement si le modèle n'en donne pas
+      name: withoutInternalCodes(ingredient.name) || pantryItem?.name || '',
       quantity: String(ingredient.quantity ?? '').replace(/[a-zA-ZÀ-ÿ\s]/g, '').trim() || '1',
       unit: typeof ingredient.unit === 'string' ? ingredient.unit.trim() : '',
       pantry_id: pantryItem ? pantryItem.id : null,
@@ -380,11 +396,11 @@ export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; 
   });
 
   const unique = (names: string[]) => names.filter((name, i) => names.findIndex((other) => normalizeName(other) === normalizeName(name)) === i);
-  const suggestion = typeof raw.suggestion === 'string' ? raw.suggestion.trim() : '';
+  const suggestion = typeof raw.suggestion === 'string' ? withoutInternalCodes(raw.suggestion) : '';
 
   return {
-    title: raw.title.trim(),
-    description: typeof raw.description === 'string' ? raw.description : '',
+    title: withoutInternalCodes(raw.title),
+    description: typeof raw.description === 'string' ? withoutInternalCodes(raw.description) : '',
     difficulty: DIFFICULTIES.includes(raw.difficulty) ? raw.difficulty : context.difficulty,
     prep_time: isCount(raw.prep_time) ? Math.round(raw.prep_time) : 15,
     cook_time: isCount(raw.cook_time) ? Math.round(raw.cook_time) : 20,
@@ -397,8 +413,9 @@ export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; 
     ingredients_from_list: unique(ingredients.filter((i) => i.pantry_id).map((i) => i.name)),
     // À acheter : sans les basiques (sel, poivre, huile, eau), toujours disponibles
     missing_ingredients: unique(ingredients.filter((i) => !i.pantry_id && !isBasic(i.name)).map((i) => i.name)),
-    instructions: raw.instructions,
-    tips: isStringArray(raw.tips) ? raw.tips : [],
+    // Au four, la température suffit : le niveau de feu (« on medium heat ») est retiré
+    instructions: raw.instructions.map((step: string) => withoutOvenHeatLevel(withoutInternalCodes(step))),
+    tips: isStringArray(raw.tips) ? raw.tips.map(withoutInternalCodes).filter(Boolean) : [],
     ...(suggestion && { suggestion }),
     image_prompt: typeof raw.image_prompt === 'string' && raw.image_prompt.trim() !== ''
       ? raw.image_prompt

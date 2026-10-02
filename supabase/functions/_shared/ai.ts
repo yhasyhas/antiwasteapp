@@ -305,6 +305,8 @@ export function runWithFallback<T>(
     hedgeDelayMs?: number;
     // Tests : échec simulé par fournisseur, sans appel réel
     simulate?: Record<string, SimulatedFailure>;
+    // Échéance (horodatage en ms) : au-delà, les appels en cours sont annulés et l'appel échoue (délai dépassé)
+    deadline?: number;
   },
 ): Promise<FallbackResult<T>> {
   const controller = new AbortController();
@@ -313,12 +315,14 @@ export function runWithFallback<T>(
     let pending = 0;
     let settled = false;
     let hedgeTimer: ReturnType<typeof setTimeout> | undefined;
+    let deadlineTimer: ReturnType<typeof setTimeout> | undefined;
     // Échecs des fournisseurs : la raison finale et les quotas épuisés en découlent
     const failures: Array<{ provider: string; reason: ProviderFailureReason; details: string }> = [];
 
     const finish = (result: AttemptResult<T>) => {
       settled = true;
       clearTimeout(hedgeTimer);
+      clearTimeout(deadlineTimer);
       controller.abort();
       const quotaHits = failures
         .filter((failure) => failure.reason === 'provider_quota')
@@ -349,6 +353,15 @@ export function runWithFallback<T>(
       }
     };
 
+    if (options.deadline !== undefined) {
+      const failure = `délai dépassé (${options.label})`;
+      deadlineTimer = setTimeout(() => {
+        if (settled) return;
+        console.warn(`[${options.label}] ${failure}`);
+        failures.push({ provider: providers[0]?.name ?? '', reason: 'provider_error', details: failure });
+        finish({ ok: false, failure, code: 'ai_error', provider: providers[0], reason: 'provider_error' });
+      }, Math.max(0, options.deadline - Date.now()));
+    }
     startNext();
   });
 }

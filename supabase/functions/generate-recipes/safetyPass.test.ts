@@ -51,3 +51,46 @@ Deno.test('safetyPass : recette corrigée gardée, recette toujours en défaut �
   assertEquals(result.report.dropped.map((d) => d.title), ['Poulet B']);
   assertEquals(fake.calls, 1);
 });
+
+// Fournisseur factice qui répond selon la demande : correction (« ne respectent pas les règles ») ou nouvelle recette
+const byRequest = (correction: unknown, replacement: unknown, delayMs = 0) => {
+  const fake = { calls: 0 } as AiProvider & { calls: number };
+  Object.assign(fake, {
+    name: 'fake', model: 'fake', configured: true,
+    call: async (request: { prompt: string }) => {
+      fake.calls++;
+      if (delayMs) await new Promise((resolve) => setTimeout(resolve, delayMs));
+      return { ok: true, text: JSON.stringify(request.prompt.includes('ne respectent pas les règles') ? correction : replacement) };
+    },
+  });
+  return fake;
+};
+const replacementRequest = (count: number) => ({ prompt: `nouvelles recettes : ${count}`, schema: {}, schemaName: 'recipes', temperature: 0, maxOutputTokens: 100 });
+
+Deno.test('safetyPass : recette toujours en défaut remplacée par une nouvelle recette demandée en parallèle', async () => {
+  const fake = byRequest({ recipes: [raw('Poulet B', 'Fais dorer le poulet 20 minutes.')], refusal: '' }, { recipes: [raw('Poulet rôti', SAFE)], refusal: '' });
+  const result = await safetyPass(recipesOf(raw('Poulet sûr', SAFE), raw('Poulet B', 'Fais dorer le poulet 20 minutes.')), { ...options([fake]), replacementRequest });
+  assertEquals(result.recipes.map((r) => r.title), ['Poulet sûr', 'Poulet rôti']);
+  assertEquals([result.report.dropped.map((d) => d.title), result.report.replaced], [['Poulet B'], ['Poulet rôti']]);
+  // Correction et remplacement : deux appels, lancés ensemble
+  assertEquals(fake.calls, 2);
+});
+
+Deno.test('safetyPass : défaut sans risque (four sans température) jamais écarté, même sans correction', async () => {
+  const oven = 'Fais dorer le poulet 25 minutes au four, jusqu\'à ce que le jus soit clair (74 °C à cœur).';
+  const fake = byRequest({ recipes: [], refusal: '' }, { recipes: [], refusal: '' });
+  const result = await safetyPass(recipesOf(raw('Poulet au four', oven)), { ...options([fake]), replacementRequest });
+  assertEquals(result.report.first[0].issues.map((i) => i.code), ['oven_celsius']);
+  assertEquals(result.recipes.map((r) => r.title), ['Poulet au four']);
+  // Pas de remplacement demandé pour un défaut sans risque
+  assertEquals(fake.calls, 1);
+});
+
+Deno.test('safetyPass : échéance dépassée, les recettes déjà valides sont servies', async () => {
+  const fake = byRequest({ recipes: [raw('Poulet B corrigé', SAFE)], refusal: '' }, { recipes: [raw('Poulet rôti', SAFE)], refusal: '' }, 300);
+  const t = Date.now();
+  const result = await safetyPass(recipesOf(raw('Poulet sûr', SAFE), raw('Poulet B', 'Fais dorer le poulet 20 minutes.')), { ...options([fake]), replacementRequest, deadline: Date.now() + 50 });
+  assertEquals(result.recipes.map((r) => r.title), ['Poulet sûr']);
+  assertEquals(result.report.dropped.map((d) => d.title), ['Poulet B']);
+  assertEquals(Date.now() - t < 250, true);
+});

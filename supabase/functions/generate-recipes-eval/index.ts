@@ -153,11 +153,17 @@ async function generate(body: any) {
   }
 
   // Contrôle de sécurité (v4 et suivantes, ou safety: true) : même code que generate-recipes (safetyPass.ts)
-  let safety: Omit<SafetyReport, 'correction'> & { checked: boolean } = { checked: false, first: [], corrected: [], dropped: [] };
+  let safety: Omit<SafetyReport, 'correction' | 'replacement'> & { checked: boolean } = { checked: false, first: [], corrected: [], replaced: [], dropped: [] };
   if (body.safety ?? v4) {
-    const pass = await safetyPass(recipes, { pantry, pantryText: promptOptions.pantryText, diets, context, providers, request: request(prompts), log, t0, label: 'generate-recipes-eval:correction', ...(version === 'v4.1' && { maxPurchases: MAX_PURCHASES }) });
+    // Comme generate-recipes : recettes de remplacement en parallèle de la correction, même échéance
+    const pass = await safetyPass(recipes, {
+      pantry, pantryText: promptOptions.pantryText, diets, context, providers, request: request(prompts), log, t0, label: 'generate-recipes-eval:correction',
+      ...(version === 'v4.1' && { maxPurchases: MAX_PURCHASES }),
+      replacementRequest: (replacements, avoidTitles) => request(buildPrompts({ ...promptOptions, count: replacements, avoidTitles })),
+      deadline: t0 + 45_000,
+    });
     recipes = pass.recipes;
-    safety = { checked: true, first: pass.report.first, corrected: pass.report.corrected, dropped: pass.report.dropped };
+    safety = { checked: true, first: pass.report.first, corrected: pass.report.corrected, replaced: pass.report.replaced, dropped: pass.report.dropped };
   }
 
   return json({

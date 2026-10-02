@@ -38,6 +38,10 @@ export type SafetyCode =
   | 'raw_fish'
   | 'leftover_reheat'
   | 'rice_cooling'
+  // Pas une règle sanitaire : four sans température en °C (corrigé si possible, jamais écarté)
+  | 'oven_celsius'
+  // Signe visible absent alors que la température à cœur est au seuil (bœuf, porc, poisson) : demandé, jamais écarté
+  | 'doneness_hint'
   // Pas une règle sanitaire : trop d'ingrédients à acheter (safetyPass.ts, même correction)
   | 'too_many_purchases';
 
@@ -190,6 +194,25 @@ function proteinOf(name: string): Protein | null {
 
 const isDryLegume = (name: string) => hasKeyword(name, DRY_LEGUMES) && !hasKeyword(name, NOT_DRY_LEGUME);
 
+// Mots de la famille d'un aliment, en trois langues : retrouve « poisson » dans des étapes qui disent « fish »
+// (garde-manger écrit dans une autre langue que la recette)
+const PROTEIN_FAMILY: Record<Protein, string[]> = { poultry: POULTRY, minced: [...MINCED, ...POULTRY, ...PORK, ...RED_MEAT], pork: PORK, red: RED_MEAT, fish: FISH, shellfish: SHELLFISH };
+function familyOf(name: string): string[] {
+  if (isDryLegume(name)) return DRY_LEGUMES;
+  if (isStarch(name)) return STARCHES;
+  if (hasKeyword(name, TUBERS)) return TUBERS;
+  const protein = proteinOf(name);
+  return protein ? PROTEIN_FAMILY[protein] : [];
+}
+
+// Étapes qui parlent d'un ingrédient : par son nom dans la recette ou dans le garde-manger ; si aucune ne le nomme,
+// par un mot de sa famille
+function aboutIngredient(steps: string[], names: string[], family: string[]): (step: string) => boolean {
+  const named = (step: string) => names.some((name) => mentions(step, name));
+  if (steps.some(named) || family.length === 0) return named;
+  return (step: string) => hasKeyword(step, family);
+}
+
 // ---------- Contrôle ----------
 
 export function safetyIssues(recipe: SafetyRecipe, pantry: SafetyPantryItem[]): SafetyIssue[] {
@@ -205,24 +228,27 @@ export function safetyIssues(recipe: SafetyRecipe, pantry: SafetyPantryItem[]): 
   for (const ingredient of recipe.ingredients_used ?? []) {
     const item = ingredient.pantry_id ? pantry.find((p) => p.id === ingredient.pantry_id) : undefined;
     const name = ingredient.name;
+    // Nom de la recette et nom du garde-manger (parfois dans une autre langue) : la famille de l'aliment se lit dans les deux
+    const kindName = item && normalizeText(item.name) !== normalizeText(name) ? `${name} ${item.name}` : name;
+    const about_ = aboutIngredient(steps, item ? [name, item.name] : [name], familyOf(kindName));
     // Nom et quantité du garde-manger (« 1 boîte ») : indiquent une conserve ou un plat cuit
     const described = `${name} ${item?.name ?? ''} ${item?.quantity ?? ''} ${ingredient.unit ?? ''}`;
-    const about = stepsAbout(name);
+    const about = steps.filter(about_);
     const aboutText = about.join(' \n ');
-    const leftover = item?.kind === 'dish' || hasKeyword(name, ['reste', 'leftover', 'sobra']);
+    const leftover = item?.kind === 'dish' || hasKeyword(kindName, ['reste', 'leftover', 'sobra']);
 
     // Restes et riz déjà cuit : réchauffés à cœur
-    if (leftover || hasKeyword(name, COOKED_RICE)) {
+    if (leftover || hasKeyword(kindName, COOKED_RICE)) {
       reheatNeeded ??= name;
       continue;
     }
     const cooked = hasKeyword(described, COOKED) || hasKeyword(described, CANNED);
 
     // Légumineuses sèches : trempage et longue cuisson, sauf conserve précisée
-    if (isDryLegume(name)) {
+    if (isDryLegume(kindName)) {
       const canned = cooked || hasKeyword(aboutText, CANNED);
       if (!canned) {
-        const quick = hasKeyword(name, QUICK_LEGUMES);
+        const quick = hasKeyword(kindName, QUICK_LEGUMES);
         // Durée de cuisson : sans les étapes de trempage (« trempe 4 h » n'est pas une cuisson)
         const minutes = longestMinutes(about.filter((step) => !hasKeyword(step, SOAK)).join(' '));
         const pressure = hasKeyword(aboutText, PRESSURE);
@@ -239,8 +265,8 @@ export function safetyIssues(recipe: SafetyRecipe, pantry: SafetyPantryItem[]): 
     }
 
     // Féculents crus : cuits dans un liquide dans les étapes (liquide dans l'étape, ou porté à ébullition juste avant)
-    if (isStarch(name) && !cooked) {
-      const inLiquid = steps.some((step, i) => mentions(step, name)
+    if (isStarch(kindName) && !cooked) {
+      const inLiquid = steps.some((step, i) => about_(step)
         && (hasKeyword(step, LIQUID) || (hasKeyword(step, HEAT) && (steps.slice(Math.max(0, i - 2), i).some((before) => hasKeyword(before, LIQUID))
           // Eau ou bouillon porté à ébullition plus tôt (soupe) : les nouilles cuisent dedans
           || steps.slice(0, i).some((before) => hasKeyword(before, BOILING))))));
@@ -251,18 +277,18 @@ export function safetyIssues(recipe: SafetyRecipe, pantry: SafetyPantryItem[]): 
     }
 
     // Tubercules : cuits
-    if (hasKeyword(name, TUBERS) && !cooked) {
+    if (hasKeyword(kindName, TUBERS) && !cooked) {
       // Cuit dans une étape qui en parle ou plus loin (plantain râpé dans des galettes, puis frites)
-      const from = steps.findIndex((step) => mentions(step, name));
+      const from = steps.findIndex(about_);
       if (!(from >= 0 && steps.slice(from).some((step) => hasKeyword(step, HEAT)))) add('not_cooked', name, `« ${name} » est cru : une étape doit le cuire (durée et repère, ex. tendre à la pointe du couteau).`);
       continue;
     }
 
     // Viande et poisson crus : cuisson, température à cœur au seuil et signe visible
-    const protein = proteinOf(name);
+    const protein = proteinOf(kindName);
     if (!protein || cooked) continue;
     // Cuit : une étape qui en parle, ou une étape suivante (« enfourne 20 minutes »), chauffe
-    const first = steps.findIndex((step) => mentions(step, name));
+    const first = steps.findIndex(about_);
     const heated = first >= 0 && steps.slice(first).some((step) => hasKeyword(step, HEAT));
     if (!heated) {
       if ((protein === 'fish' || protein === 'shellfish') && hasKeyword(allSteps, FROZEN_BEFORE)) continue;
@@ -272,16 +298,25 @@ export function safetyIssues(recipe: SafetyRecipe, pantry: SafetyPantryItem[]): 
       continue;
     }
     const threshold = THRESHOLDS[protein];
-    if (threshold !== null && !celsius(allSteps).some((t) => t >= threshold && t <= 100)) {
+    const atThreshold = threshold !== null && celsius(allSteps).some((t) => t >= threshold && t <= 100);
+    if (threshold !== null && !atThreshold) {
       add('core_temperature', name, `« ${name} » : écrire la température à cœur (${PROTEIN_LABEL[protein]}).`);
     }
     const signs = protein === 'fish' ? SIGNS_FISH : protein === 'shellfish' ? SIGNS_SHELLFISH : SIGNS_MEAT;
     const signed = hasKeyword(allSteps, signs) || (protein !== 'fish' && protein !== 'shellfish' && MEAT_SIGN_PATTERNS.some((pattern) => pattern.test(normalizeText(allSteps))));
-    if (!signed) add('doneness_sign', name, `« ${name} » : ajouter un signe visible de cuisson (${PROTEIN_LABEL[protein]}).`);
+    // Bœuf, porc, poisson à la température à cœur : sûrs, le signe visible reste demandé sans écarter la recette ;
+    // volaille et viande hachée : signe obligatoire (sans thermomètre, c'est le seul repère)
+    const softSign = atThreshold && protein !== 'poultry' && protein !== 'minced';
+    if (!signed) add(softSign ? 'doneness_hint' : 'doneness_sign', name, `« ${name} » : ajouter un signe visible de cuisson (${PROTEIN_LABEL[protein]}).`);
   }
 
   if (reheatNeeded && !hasKeyword(allSteps, REHEAT)) {
     add('leftover_reheat', reheatNeeded, `« ${reheatNeeded} » (reste ou riz déjà cuit) : le réchauffer une seule fois, jusqu'à ce qu'il soit fumant à cœur, et servir aussitôt (l'écrire dans l'étape).`);
+  }
+
+  // Four sans température (« Bake 18 minutes on medium heat ») : la température en °C est demandée
+  if (ovenWithoutTemperature(recipe)) {
+    add('oven_celsius', 'four', 'La cuisson au four doit donner la température du four en °C (ex. « Préchauffe le four à 200 °C »), jamais un niveau de feu (doux, moyen, vif : seulement sur la plaque).');
   }
 
   // Riz cuit pour la recette puis refroidi : vite, et au frais
@@ -327,4 +362,32 @@ export function celsiusWithoutMeat(recipe: SafetyRecipe): boolean {
   const meat = (recipe.ingredients_used ?? []).some((i) => proteinOf(i.name) !== null && !hasKeyword(i.name, COOKED));
   if (meat) return false;
   return (recipe.instructions ?? []).some((step) => !hasKeyword(step, OVEN) && !hasKeyword(step, FRYING_OIL) && celsius(step).some((t) => t >= 55 && t <= 100));
+}
+
+// ---------- Four ----------
+
+// Étape au four : four, enfourner, cuire au four (« bake », « roast » sans poêle ni casserole)
+// « four » seul est aussi le nombre 4 en anglais : seulement « au four », « le four »…
+const OVEN_WORDS = ['au four', 'le four', 'du four', 'four a ', 'four prechauffe', 'four chaud', 'enfourn', 'oven', 'bake', 'baking', 'horno', 'hornea'];
+const OVEN_STEP = [...OVEN_WORDS, 'roast', 'gratin', 'rotir'];
+// « baking powder », « baking soda » : pas une cuisson au four
+const noLeavening = (step: string) => step.replace(/baking\s+(powder|soda)/gi, '');
+const isOvenStep = (step: string) => hasKeyword(noLeavening(step), OVEN_STEP) && !hasKeyword(step, VESSEL);
+// Température d'un four : 100 à 300 °C (ou en °F : 200 à 560)
+const ovenTemperature = (text: string) => celsius(text).some((t) => t >= 100 && t <= 560);
+
+export function ovenWithoutTemperature(recipe: SafetyRecipe): boolean {
+  const steps = (recipe.instructions ?? []).map(String);
+  return steps.some((step) => hasKeyword(noLeavening(step), OVEN_WORDS)) && !ovenTemperature(steps.join(' '));
+}
+
+// Niveau de feu dans une étape au four (« roast 20 minutes on medium heat ») : retiré, la température du four suffit
+const OVEN_HEAT_LEVEL = [
+  /,?\s*\b(?:on|over|at|using)\s+(?:a\s+)?(?:very\s+)?(?:medium[\s-]+high|medium[\s-]+low|low|medium|high|moderate)\s+heat\b/gi,
+  /,?\s*(?:à|\ba|\bsur|\bau)\s+(?:un\s+)?feu\s+(?:très\s+|tres\s+)?(?:moyen[\s-]+vif|moyen[\s-]+doux|doux|moyen|vif|fort)\b/gi,
+  /,?\s*\b(?:a|en|con)\s+fuego\s+(?:muy\s+)?(?:medio[\s-]+alto|medio[\s-]+bajo|bajo|medio|alto|fuerte|lento)\b/gi,
+];
+export function withoutOvenHeatLevel(step: string): string {
+  if (!isOvenStep(step)) return step;
+  return OVEN_HEAT_LEVEL.reduce((text, pattern) => text.replace(pattern, ''), step).replace(/\s+([,.;])/g, '$1');
 }

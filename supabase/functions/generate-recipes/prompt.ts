@@ -59,6 +59,18 @@ const UNITS: Record<string, string> = {
   es: 'g, kg, ml, l, cda, cdta, pieza, rebanada, diente, pizca, lata, manojo',
 };
 
+// v4 : noms du garde-manger traduits dans la langue de la recette, étiquettes dans cette langue
+const TRANSLATED_NAME_EXAMPLE: Record<string, string> = {
+  fr: '« œufs » pour « eggs » dans une recette en français',
+  en: '"eggs" for « œufs », "milk" for « lait » in an English recipe',
+  es: '« huevos » pour « œufs », « leche » pour « milk » dans une recette en espagnol',
+};
+const TAG_EXAMPLES: Record<string, string> = {
+  fr: 'ex. « végétarien », « riche en protéines », « rapide »',
+  en: 'ex. "vegetarian", "high-protein", "quick"',
+  es: 'ex. « vegetariano », « rico en proteínas », « rápido »',
+};
+
 // Plats typiques, y compris du matin, pour choisir un vrai plat de la cuisine demandée
 const CUISINE_DISHES: Record<Cuisine, string> = {
   any: '',
@@ -207,7 +219,9 @@ INGRÉDIENTS :
 - Un ingrédient marqué [reste de plat] est un plat déjà cuisiné : on le transforme ou on l'intègre, et il n'est réchauffé qu'une fois, bien à cœur.` : ''}
 - Un ingrédient marqué [date dépassée] n'est jamais mis en avant ; s'il s'agit d'un produit frais (viande, poisson, produit laitier, plat cuisiné), ne l'utilise pas.
 - "pantry_id" : l'identifiant (p1, p2…) de l'ingrédient du garde-manger utilisé, ou "missing" pour tout ingrédient qui n'en vient pas (y compris sel, poivre, huile).
-- Pour un ingrédient du garde-manger, "name" reprend son nom tel qu'il est écrit dans la liste.
+${v4 ? `- Pour un ingrédient du garde-manger, "name" est son nom en ${languageName}, traduit s'il est écrit dans une autre langue (${TRANSLATED_NAME_EXAMPLE[options.language] || TRANSLATED_NAME_EXAMPLE.en}) ; les étapes le nomment de la même façon.
+- Les identifiants (p1, p2…), "missing" et les repères de la liste ([URGENT], [reste de plat]…) servent seulement au champ "pantry_id" : jamais dans un texte (titre, description, étapes, astuces, suggestion).
+- "dietary_tags" : 0 à 3 étiquettes courtes, en ${languageName} (${TAG_EXAMPLES[options.language] || TAG_EXAMPLES.en}).` : `- Pour un ingrédient du garde-manger, "name" reprend son nom tel qu'il est écrit dans la liste.`}
 - "name" : le nom de l'ingrédient seul, sans préparation ni précision (« ail » et non « ail, émincé ») ; la préparation va dans les étapes.
 - Chaque recette utilise au moins un ingrédient du garde-manger.${v41 ? `
 - Au plus ${MAX_PURCHASES} ingrédients à acheter par recette (hors sel, poivre, huile, eau), seulement les indispensables (règle vérifiée après coup) ; tout le reste vient du garde-manger.` : ''}${v2 ? `
@@ -229,7 +243,7 @@ MODE « TRANSFORMER MES RESTES » (règle stricte) :
 
 ÉTAPES :${v2 ? `
 - Chaque étape reprend la quantité des ingrédients qu'elle utilise (« Ajoute les 200 g de riz », « Émince les 2 oignons ») : on cuisine sans remonter à la liste.
-- ${v4 ? "Chaque cuisson donne la durée et un repère visuel ou de texture ; sur le feu, seulement le niveau (feu doux, moyen ou vif), jamais de °C ; au four, la température en °C. Une étape sans cuisson (couper, mélanger, assaisonner, dresser) n'indique ni feu ni durée de cuisson" : `Chaque cuisson donne ${v3 ? "le niveau de feu (doux, moyen, vif) ou la température du four en °C (jamais de °C sur le feu, sauf l'huile de friture et la cuisson à cœur)" : "le feu ou la température du four (en °C)"}, la durée et un repère visuel ou de texture`} (ex. « Fais dorer à feu vif 3 minutes, jusqu'à ce que les bords soient croustillants »).
+- ${v4 ? "Chaque cuisson donne la durée et un repère visuel ou de texture ; sur le feu, seulement le niveau (feu doux, moyen ou vif), jamais de °C ; au four, toujours la température du four en °C, jamais un niveau de feu (« feu moyen » n'existe pas au four). Une étape sans cuisson (couper, mélanger, assaisonner, dresser) n'indique ni feu ni durée de cuisson" : `Chaque cuisson donne ${v3 ? "le niveau de feu (doux, moyen, vif) ou la température du four en °C (jamais de °C sur le feu, sauf l'huile de friture et la cuisson à cœur)" : "le feu ou la température du four (en °C)"}, la durée et un repère visuel ou de texture`} (ex. « Fais dorer à feu vif 3 minutes, jusqu'à ce que les bords soient croustillants »).
 - Ordre complet : préchauffer le four, cuire le riz, les pâtes ou les légumineuses du garde-manger (crus, sauf s'ils sont marqués [reste de plat]), lancer les cuissons longues en premier.
 - Chaque ingrédient de la liste est utilisé dans les étapes, et les étapes n'utilisent rien d'autre (sauf l'eau).
 - Jamais de consigne vague comme « faites cuire jusqu'à cuisson », « bien chaud » ou « assaisonnez ».

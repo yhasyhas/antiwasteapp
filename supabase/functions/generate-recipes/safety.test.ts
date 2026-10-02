@@ -1,5 +1,5 @@
 import { assertEquals } from 'jsr:@std/assert@1';
-import { celsiusWithoutMeat, heatWithoutCooking, longestMinutes, type SafetyPantryItem, safetyIssues, stoveCelsius } from './safety.ts';
+import { celsiusWithoutMeat, heatWithoutCooking, longestMinutes, ovenWithoutTemperature, type SafetyPantryItem, safetyIssues, stoveCelsius, withoutOvenHeatLevel } from './safety.ts';
 
 const pantry: SafetyPantryItem[] = [
   { id: 'rice', name: 'Riz', quantity: '1 kg', kind: 'ingredient' },
@@ -100,4 +100,46 @@ Deno.test('longestMinutes : plages, heures et minutes', () => {
   assertEquals(longestMinutes('Mijote 1 h 30 à feu doux'), 90);
   assertEquals(longestMinutes('Simmer 45 min'), 45);
   assertEquals(longestMinutes('Coupe 2 tomates'), 0);
+});
+
+// Garde-manger en français, recette en anglais (générations du 02/10 : recettes avec viande et poisson écartées à tort)
+const frenchPantry: SafetyPantryItem[] = [
+  { id: 'potato', name: 'pomme de terre', quantity: '2', kind: 'ingredient' },
+  { id: 'fish', name: 'poisson', quantity: '2', kind: 'ingredient' },
+  { id: 'beef', name: 'bœuf', quantity: '2 morceaux', kind: 'ingredient' },
+  { id: 'chicken', name: 'poulet', quantity: '1 morceau', kind: 'ingredient' },
+];
+const frenchCodes = (ingredients: [string, string | null][], instructions: string[]) => safetyIssues(recipe(ingredients, instructions), frenchPantry).map((issue) => issue.code);
+
+Deno.test('safetyIssues : garde-manger dans une autre langue que la recette, recettes correctes acceptées', () => {
+  // Nom du garde-manger recopié par le modèle, étapes en anglais
+  assertEquals(frenchCodes([['pomme de terre', 'potato']], ['Preheat the oven to 200 °C.', 'Cut the potatoes into 1‑cm cubes, toss with 1 tbsp olive oil; spread on a baking sheet and roast 20 minutes, until golden and crisp.']), []);
+  assertEquals(frenchCodes([['poisson', 'fish']], ['Preheat the oven to 180 °C.', 'Place the fish fillets on a piece of parchment.', 'Bake in the oven for 10 minutes, until the flesh flakes easily and reaches an internal temperature of 63°C.']), []);
+  assertEquals(frenchCodes([['bœuf', 'beef']], ['Pat the beef steaks dry.', 'Sear the steaks 3 minutes per side over medium-high heat, until 63 °C at the centre; rest 3 minutes, the juices run clear.']), []);
+  // Nom traduit par le modèle (« potatoes ») : même résultat
+  assertEquals(frenchCodes([['potatoes', 'potato']], ['Boil the potatoes 15 minutes, until tender.']), []);
+});
+
+Deno.test('safetyIssues : garde-manger dans une autre langue, vrais défauts toujours relevés', () => {
+  assertEquals(frenchCodes([['poisson', 'fish']], ['Slice the fish and marinate it in lime juice for 15 minutes.']), ['raw_fish']);
+  assertEquals(frenchCodes([['poulet', 'chicken']], ['Fry the chicken 10 minutes.']), ['core_temperature', 'doneness_sign']);
+  assertEquals(frenchCodes([['pomme de terre', 'potato']], ['Grate the potatoes into the salad.']), ['not_cooked']);
+});
+
+Deno.test('safetyIssues : bœuf ou poisson à la température à cœur sans signe visible : signalé sans bloquer ; volaille : bloquant', () => {
+  assertEquals(frenchCodes([['bœuf', 'beef']], ['Bake the beef and rice 25 minutes at 180 °C, until the beef reaches 63 °C inside.']), ['doneness_hint']);
+  assertEquals(frenchCodes([['poulet', 'chicken']], ['Bake the chicken 25 minutes at 200 °C, until it reaches 74 °C inside.']), ['doneness_sign']);
+});
+
+Deno.test('four : température en °C exigée, niveau de feu retiré des étapes au four', () => {
+  assertEquals(ovenWithoutTemperature(recipe([], ['Bake for 18 minutes on medium heat, until golden.'])), true);
+  assertEquals(ovenWithoutTemperature(recipe([], ['Preheat the oven to 200 °C.', 'Bake for 18 minutes, until golden.'])), false);
+  assertEquals(ovenWithoutTemperature(recipe([], ['Enfourne 20 minutes à 180 °C.'])), false);
+  // « four » nombre anglais, levure chimique : pas un four
+  assertEquals(ovenWithoutTemperature(recipe([], ['Cook for four minutes.', 'Add 1 tsp baking powder.'])), false);
+  assertEquals(withoutOvenHeatLevel('Roast the pumpkin 20 minutes on medium heat, stirring halfway.'), 'Roast the pumpkin 20 minutes, stirring halfway.');
+  assertEquals(withoutOvenHeatLevel('Enfourne le gratin 20 minutes à feu moyen.'), 'Enfourne le gratin 20 minutes.');
+  assertEquals(withoutOvenHeatLevel('Hornea 15 minutos a fuego medio.'), 'Hornea 15 minutos.');
+  // Sur la plaque : inchangé
+  assertEquals(withoutOvenHeatLevel('Sear the steak in a skillet over medium-high heat.'), 'Sear the steak in a skillet over medium-high heat.');
 });

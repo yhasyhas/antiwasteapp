@@ -42,6 +42,10 @@ const PROVIDERS: AiProvider[] = orderProviders([
 // 3 recettes détaillées tiennent dans ~3 500 tokens ; le raisonnement de gpt-oss compte aussi
 const MAX_OUTPUT_TOKENS = 8000;
 
+// Durée maximale d'une génération avant de servir les recettes déjà valides : la correction et les recettes de
+// remplacement s'arrêtent à cette échéance (un premier appel lent laisse moins de temps à la correction)
+const GENERATION_BUDGET_MS = 45_000;
+
 // Version du prompt (évaluation de la phase 9 : scripts/recipe-eval), réglable par secret sans redéployer ;
 // v1 : l'ancienne version, sans contrôle de sécurité ni plats de référence
 const DEFAULT_PROMPT_VERSION: PromptVersion = 'v4.1';
@@ -307,16 +311,22 @@ Deno.serve(withCors(async (req: Request) => {
         pantry, pantryText: promptOptions.pantryText, diets, context, providers, log, t0, label: 'generate-recipes:correction',
         ...(PROMPT_VERSION === 'v4.1' && { maxPurchases: MAX_PURCHASES }),
         request: { system, prompt, schema, schemaName: 'recipes', temperature: 0.8, maxOutputTokens: MAX_OUTPUT_TOKENS },
+        // Recettes de remplacement, demandées en même temps que la correction
+        replacementRequest: (replacements, avoidTitles) => {
+          const again = buildPrompts({ ...promptOptions, count: replacements, avoidTitles });
+          return { system: again.system, prompt: again.prompt, schema, schemaName: 'recipes', temperature: 0.8, maxOutputTokens: MAX_OUTPUT_TOKENS };
+        },
+        deadline: t0 + GENERATION_BUDGET_MS,
         ...(simulation?.providers && { simulate: simulation.providers }),
       });
-      for (const hit of pass.report.correction?.quotaHits ?? []) {
+      for (const hit of [...pass.report.correction?.quotaHits ?? [], ...pass.report.replacement?.quotaHits ?? []]) {
         reportInBackground(reportProviderQuota(hit.provider, 'generate-recipes', hit.details, simulation !== null));
       }
       // Tests (clé secrète) : toutes les recettes écartées, pour vérifier que la génération n'est pas comptée
       recipes = simulation?.safety_drop_all ? [] : pass.recipes;
-      safetyReport = { first: pass.report.first, corrected: pass.report.corrected, dropped: pass.report.dropped };
+      safetyReport = { first: pass.report.first, corrected: pass.report.corrected, replaced: pass.report.replaced, dropped: pass.report.dropped };
       if (pass.report.first.length > 0) {
-        console.warn(`[generate-recipes] sécurité : ${pass.report.first.length} en défaut, ${pass.report.corrected.length} corrigée(s), ${pass.report.dropped.length} écartée(s) (${pass.report.dropped.map((d) => `${d.title} : ${d.issues.map((i) => i.code).join(', ')}`).join(' ; ')})`);
+        console.warn(`[generate-recipes] contrôle : ${pass.report.first.length} en défaut (${pass.report.first.map((f) => `${f.title} : ${f.issues.map((i) => `${i.code} ${i.ingredient}`).join(', ')}`).join(' ; ')}), ${pass.report.corrected.length} corrigée(s), ${pass.report.replaced.length} remplacée(s), ${pass.report.dropped.length} écartée(s) en ${Date.now() - t0} ms`);
       }
       if (recipes.length === 0) {
         // Toutes écartées (rare) : panne du point de vue de l'utilisateur, la génération n'est pas comptée

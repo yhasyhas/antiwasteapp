@@ -9,6 +9,7 @@ import {
   cleanExcluded,
   cleanServings,
   excludedUsed,
+  hasInternalCodes,
   isBasic,
   dietViolations,
   isDietException,
@@ -20,6 +21,7 @@ import {
   parseRecipes,
   recipeCount,
   strictDietsOf,
+  withoutInternalCodes,
   toRecipe,
   urgentItems,
 } from './recipes.ts';
@@ -74,12 +76,12 @@ Deno.test('schéma : alias et « missing » en liste fermée ; diet_violations s
   assert(veganIngredient.required.includes('diet_violations'));
 });
 
-Deno.test('correspondance des identifiants : alias → uuid et nom du garde-manger ; missing → null', () => {
-  const result = parse([recipe([ing('Bananes mûres', 'p1'), ing('lait', 'p2'), ing('cannelle', MISSING)])]);
+Deno.test('correspondance des identifiants : alias → uuid ; nom écrit par le modèle (langue de la recette) ; missing → null', () => {
+  const result = parse([recipe([ing('Bananes mûres', 'p1'), ing('milk', 'p2'), ing('cannelle', MISSING)])]);
   assert(result.ok);
   const [r] = result.value.recipes;
-  assertEquals(r.ingredients_used.map((i) => [i.name, i.pantry_id]), [['banane', 'uuid-banane'], ['lait', 'uuid-lait'], ['cannelle', null]]);
-  assertEquals(r.ingredients_from_list, ['banane', 'lait']);
+  assertEquals(r.ingredients_used.map((i) => [i.name, i.pantry_id]), [['Bananes mûres', 'uuid-banane'], ['milk', 'uuid-lait'], ['cannelle', null]]);
+  assertEquals(r.ingredients_from_list, ['Bananes mûres', 'milk']);
   assertEquals(r.missing_ingredients, ['cannelle']);
 });
 
@@ -282,4 +284,17 @@ Deno.test('à acheter : sans sel, poivre, huile ni eau, avec ou sans sélection'
   const raw = recipe([ing('tomates', 'p1'), ing('sel', 'missing'), ing("huile d'olive", 'missing'), ing('eau', 'missing'), ing('poivre noir', 'missing'), ing('oignon', 'missing')]);
   const result = toRecipe(raw, pantry, { mealType: 'dinner', cuisine: 'any', difficulty: 'easy', dietary: [] });
   assertEquals(result.missing_ingredients, ['oignon']);
+});
+
+Deno.test('repères internes retirés des textes affichés : (p10), (buy), [URGENT…], pantry_id', () => {
+  assertEquals(withoutInternalCodes('Serve with Greek yogurt (p10) and grated cheese (buy).'), 'Serve with Greek yogurt and grated cheese.');
+  assertEquals(withoutInternalCodes('Ajoute le riz [URGENT : expire demain] (p3, p4).'), 'Ajoute le riz.');
+  assertEquals(withoutInternalCodes('Use p2 for the sauce.'), 'Use for the sauce.');
+  // Rien d'autre n'est touché
+  assertEquals(withoutInternalCodes('Cuis 2 minutes (jusqu’à ce que ce soit doré).'), 'Cuis 2 minutes (jusqu’à ce que ce soit doré).');
+  const result = parse([recipe([ing('banane', 'p1')], { tips: ['Remplace la banane (p1) par une pomme.'], instructions: ['Écrase la banane (p1).'] })]);
+  assert(result.ok);
+  const [r] = result.value.recipes;
+  assertEquals([r.tips[0], r.instructions[0]], ['Remplace la banane par une pomme.', 'Écrase la banane.']);
+  assert(![r.title, r.description, ...r.instructions, ...r.tips].some(hasInternalCodes));
 });
