@@ -2,12 +2,14 @@
 // requête, pris en compte seulement avec l'en-tête x-simulate-key égal à la clé secrète (jamais depuis l'app).
 //   { "user_quota": true }                              quota personnel atteint
 //   { "providers": { "gemini": "quota", "groq": "error" } }   quota épuisé ou panne chez un fournisseur
+//   { "safety_drop_all": true }                        generate-recipes : toutes les recettes écartées par le contrôle
 
 import { SUPABASE_SECRET_KEY } from './keys.ts';
 import type { SimulatedFailure } from './ai.ts';
 
 export interface Simulation {
   user_quota: boolean;
+  safety_drop_all: boolean;
   providers: Record<string, SimulatedFailure>;
 }
 
@@ -19,5 +21,5 @@ export function readSimulation(req: Request, body: any): Simulation | null {
   for (const [name, failure] of Object.entries(raw.providers ?? {})) {
     if (failure === 'quota' || failure === 'error') providers[name] = failure;
   }
-  return { user_quota: raw.user_quota === true, providers };
+  return { user_quota: raw.user_quota === true, safety_drop_all: raw.safety_drop_all === true, providers };
 }

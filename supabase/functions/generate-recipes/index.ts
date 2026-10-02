@@ -312,7 +312,8 @@ Deno.serve(withCors(async (req: Request) => {
       for (const hit of pass.report.correction?.quotaHits ?? []) {
         reportInBackground(reportProviderQuota(hit.provider, 'generate-recipes', hit.details, simulation !== null));
       }
-      recipes = pass.recipes;
+      // Tests (clé secrète) : toutes les recettes écartées, pour vérifier que la génération n'est pas comptée
+      recipes = simulation?.safety_drop_all ? [] : pass.recipes;
       safetyReport = { first: pass.report.first, corrected: pass.report.corrected, dropped: pass.report.dropped };
       if (pass.report.first.length > 0) {
         console.warn(`[generate-recipes] sécurité : ${pass.report.first.length} en défaut, ${pass.report.corrected.length} corrigée(s), ${pass.report.dropped.length} écartée(s) (${pass.report.dropped.map((d) => `${d.title} : ${d.issues.map((i) => i.code).join(', ')}`).join(' ; ')})`);
@@ -333,7 +334,7 @@ Deno.serve(withCors(async (req: Request) => {
       rejected: Math.max(0, count - recipes.length),
       fewIngredients: count < 3,
       provider: result.provider.name,
-      ...(debug === true && { debug: { ...debugInfo.debug, dietary_rejections: dietaryRejections, invalid, version: PROMPT_VERSION, safety: safetyReport } }),
+      ...(debug === true && { debug: { ...debugInfo.debug, dietary_rejections: dietaryRejections, invalid, version: PROMPT_VERSION, safety: safetyReport, examples: promptOptions.examples, recent_titles: promptOptions.recentTitles } }),
     }, 200);
   } catch (error) {
     console.error('Error generating recipes:', error);
