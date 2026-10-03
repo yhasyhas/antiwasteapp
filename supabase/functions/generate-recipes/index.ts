@@ -19,7 +19,7 @@ import {
   strictDietsOf,
   urgentItems,
 } from './recipes.ts';
-import { buildPrompts, CUISINES, type Cuisine, MAX_PURCHASES, PROMPT_VERSIONS, type PromptVersion } from './prompt.ts';
+import { buildPrompts, CUISINES, geminiRecipeNote, type Cuisine, MAX_PURCHASES, PROMPT_VERSIONS, type PromptVersion } from './prompt.ts';
 import { sampleDishes } from './library.ts';
 import { recentTitles } from './history.ts';
 import { safetyPass } from './safetyPass.ts';
@@ -247,6 +247,8 @@ Deno.serve(withCors(async (req: Request) => {
     const { system, prompt } = buildPrompts(promptOptions);
     const schema = buildRecipeSchema(pantry, diets, UNIT_HINT);
 
+    // Consigne propre à Gemini (secours), v4 et suivantes
+    const providerNotes = V4_FAMILY ? { gemini: geminiRecipeNote(language) } : undefined;
     const providers = debug === true && requestedOrder
       ? orderProviders(PROVIDERS, requestedOrder).filter((p) => requestedOrder.split(',').includes(p.name))
       : PROVIDERS;
@@ -265,7 +267,7 @@ Deno.serve(withCors(async (req: Request) => {
       system,
       prompt,
       schema,
-      schemaName: 'recipes',
+      schemaName: 'recipes', providerNotes,
       temperature: 0.8,
       maxOutputTokens: MAX_OUTPUT_TOKENS,
     }, (text) => parseRecipes(text, pantry, diets, context), { label: 'generate-recipes', log, t0, simulate: simulation?.providers });
@@ -294,7 +296,7 @@ Deno.serve(withCors(async (req: Request) => {
         system: again.system,
         prompt: again.prompt,
         schema,
-        schemaName: 'recipes',
+        schemaName: 'recipes', providerNotes,
         temperature: 0.8,
         maxOutputTokens: MAX_OUTPUT_TOKENS,
       }, (text) => parseRecipes(text, pantry, diets, { ...context, maxRecipes: missing }), { label: 'generate-recipes', log, t0, simulate: simulation?.providers });
@@ -319,11 +321,11 @@ Deno.serve(withCors(async (req: Request) => {
       const pass = await safetyPass(recipes, {
         pantry, pantryText: promptOptions.pantryText, diets, context, providers, log, t0, label: 'generate-recipes:correction',
         ...(PROMPT_VERSION === 'v4.1' && { maxPurchases: MAX_PURCHASES }),
-        request: { system, prompt, schema, schemaName: 'recipes', temperature: 0.8, maxOutputTokens: MAX_OUTPUT_TOKENS },
+        request: { system, prompt, schema, schemaName: 'recipes', providerNotes, temperature: 0.8, maxOutputTokens: MAX_OUTPUT_TOKENS },
         // Recettes de remplacement, demandées en même temps que la correction
         replacementRequest: (replacements, avoidTitles) => {
           const again = buildPrompts({ ...promptOptions, count: replacements, avoidTitles });
-          return { system: again.system, prompt: again.prompt, schema, schemaName: 'recipes', temperature: 0.8, maxOutputTokens: MAX_OUTPUT_TOKENS };
+          return { system: again.system, prompt: again.prompt, schema, schemaName: 'recipes', providerNotes, temperature: 0.8, maxOutputTokens: MAX_OUTPUT_TOKENS };
         },
         deadline: t0 + GENERATION_BUDGET_MS,
         ...(simulation?.providers && { simulate: simulation.providers }),

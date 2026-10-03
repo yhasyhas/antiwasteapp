@@ -37,7 +37,7 @@ import {
   strictDietsOf,
   urgentItems,
 } from '../generate-recipes/recipes.ts';
-import { buildPrompts, CUISINES, type Cuisine, MAX_PURCHASES, PROMPT_VERSIONS, type PromptVersion } from '../generate-recipes/prompt.ts';
+import { buildPrompts, CUISINES, geminiRecipeNote, type Cuisine, MAX_PURCHASES, PROMPT_VERSIONS, type PromptVersion } from '../generate-recipes/prompt.ts';
 import { sampleDishes } from '../generate-recipes/library.ts';
 import { resolveCuisine } from '../generate-recipes/cuisines.ts';
 import { type SafetyReport, safetyPass } from '../generate-recipes/safetyPass.ts';
@@ -133,6 +133,7 @@ async function generate(body: any) {
     prompt: prompts.prompt,
     schema,
     schemaName: 'recipes',
+    ...(v4 && { providerNotes: { gemini: geminiRecipeNote(language) } }),
     temperature: 0.8,
     maxOutputTokens: MAX_OUTPUT_TOKENS,
   });

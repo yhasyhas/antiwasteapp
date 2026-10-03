@@ -96,7 +96,8 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - `usage_counters` (user_id, day UTC, scans, generations, images) : écrite seulement par les fonctions
 - `household_invites` (code, household_id, expires_at) : lue et écrite seulement par les fonctions du foyer ; `profiles.display_name` : nom affiché aux membres
 - `push_tokens` (token, user_id, timezone, language) et `daily_digests` (user_id, local_date, status, ticket_ids) : résumé de 9 h
-- `provider_quota_events` : quotas épuisés et échecs d'envoi (`expo_push`), une alerte par jour
+- `provider_quota_events` : quotas épuisés, échecs d'envoi (`expo_push`) et dysfonctionnements des fournisseurs (`alert` : `provider_quota`, `push_failure`, `provider_failure`), une alerte par jour et par type
+- `provider_usage_daily` : recettes servies par jour et par fournisseur, secours distingué (« État des services »)
 - Storage : bucket `recipe-images`, public en lecture, écriture réservée à la fonction (clé secrète)
 
 ### Configuration requise
@@ -182,7 +183,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 
 ### Quotas visibles (branche `quota-alerts`)
 - Raison précise des échecs (`user_quota`, `provider_quota`, `provider_error`) dans les trois fonctions, journaux `[quota]`, message traduit dans l'app (à l'emplacement de l'image pour les images).
-- Alerte Sentry une fois par jour et par fournisseur quand un quota de fournisseur est épuisé (`provider_quota_events`, secret `SENTRY_DSN`).
+- Alerte Sentry une fois par jour et par fournisseur quand un quota de fournisseur est épuisé (`provider_quota_events`, secret `SENTRY_DSN`), et quand un fournisseur dysfonctionne (`alert:provider_failure` : réponse refusée, schéma invalide, réponse illisible) même si le secours a répondu.
 - Écran « État des services » (développement) ; simulation des erreurs réservée à la clé secrète ; 45 tests Deno.
 
 ### Cartes de recettes (branche `recipe-cards`)

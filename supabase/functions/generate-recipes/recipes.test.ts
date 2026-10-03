@@ -337,6 +337,12 @@ Deno.test('étiquettes : seulement les régimes vérifiés, sous la forme « die
   assertEquals(tagsOf([free('banane', 'p1'), { ...ing('tofu fumé', MISSING), diet_violations: ['gluten-free'] }]).includes('diet:gluten-free'), false);
 });
 
+Deno.test('étiquettes : couscous en espagnol (« cuscús cocido ») jamais « sans gluten »', () => {
+  // Mesuré le 03/10 (Groq) : « cuscús » manquait à la liste espagnole
+  assertEquals(tagsOf([free('banane', 'p1'), free('cuscús cocido'), free('garbanzos')], ['Saltea el cuscús.']).includes('diet:gluten-free'), false);
+  assertEquals(tagsOf([free('banane', 'p1'), free('cous cous')], ['Mix.']).includes('diet:gluten-free'), false);
+});
+
 Deno.test('régimes choisis : ingrédient interdit repéré par le serveur même sans signalement du modèle', () => {
   const vegetarian = parseRecipes(JSON.stringify({ recipes: [recipe([free('banane', 'p1'), free('lardons')])], refusal: '' }), PANTRY, ['vegetarian'], CONTEXT);
   assert(vegetarian.ok);

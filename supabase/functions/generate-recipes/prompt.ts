@@ -283,6 +283,19 @@ ${refusal}`;
 
 // Demande de correction (v4) des recettes qui ne respectent pas les règles de sécurité (safety.ts) : mêmes
 // consignes système, mêmes ingrédients ; le serveur vérifie de nouveau et écarte celles qui restent en défaut.
+// Consigne propre à Gemini (secours) : mesuré le 03/10, il recopie un nom du garde-manger écrit dans une autre langue
+// quand aucune fiche ne le traduit (« pork chops » dans une recette en espagnol), là où Groq le traduit
+const GEMINI_NAME_EXAMPLE: Record<string, string> = {
+  fr: '« côtelettes de porc » pour « pork chops », « merlu » pour « merluza »',
+  en: '"pork chops" for « chuletas de cerdo », "hake" for « merluza », "potatoes" for « patatas »',
+  es: '« chuletas de cerdo » pour « pork chops », « merluza » pour « merlu »',
+};
+
+export function geminiRecipeNote(language: string): string {
+  const languageName = LANGUAGE_NAMES[language] || LANGUAGE_NAMES['en'];
+  return `Vérification finale avant de répondre : relis chaque "name" de "ingredients_used" et chaque étape. Tout nom d'ingrédient est écrit en ${languageName}, y compris un aliment du garde-manger écrit dans une autre langue : traduis-le (${GEMINI_NAME_EXAMPLE[language] || GEMINI_NAME_EXAMPLE.en}), ne le recopie jamais tel quel. Le titre ne mentionne ni style ni origine (« -Style », « Inspired », « façon ») ; ce qui se compte n'a pas d'unité (« 2 œufs », jamais « 2 pièces »).`;
+}
+
 export function buildCorrectionPrompt(pantryText: string, flawed: { recipe: unknown; problems: string[] }[]): string {
   return `Garde-manger (identifiant : nom) :
 ${pantryText}

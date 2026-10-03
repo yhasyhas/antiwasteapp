@@ -34,7 +34,7 @@ const DIET_WORDS = {
   'dairy-free': ['lait', 'fromage', 'beurre', 'creme', 'yaourt', 'feta', 'mozzarella', 'parmesan', 'milk', 'cheese', 'butter', 'cream', 'yogurt', 'leche', 'queso', 'mantequilla', 'nata', 'yogur'],
 };
 // Versions végétales permises (lait de coco, sauce soja sans gluten n'est pas vérifiable : signalée)
-const PLANT = /(coco|coconut|amande|almond|almendra|avoine|oat|avena|soja|soy|riz|rice|arroz|vegetal|plant|vegan|cacahuete|peanut|mani|sarrasin|buckwheat|mais|corn|maiz|tamari|sans gluten|gluten free|sin gluten)/;
+const PLANT = /(coco|coconut|amande|almond|almendra|avoine|oat|avena|soja|soy|riz|rice|arroz|vegetal|plant|vegan|cacahuete|peanut|arachide|mani|sarrasin|buckwheat|mais|corn|maiz|tamari|sans gluten|gluten free|sin gluten)/;
 // Le végétarien permet les œufs et les produits laitiers ; la viande des mots composés reste détectée
 function dietHits(recipe, diets) {
   const hits = [];
@@ -113,6 +113,9 @@ export function checkRecipe(recipe, situation, pantry) {
     uses_urgent: usesUrgent ? 1 : 0,
     rules_respected: forbidden.length === 0 ? 1 : 0,
     names_in_language: namesInLanguage(recipe, situation).share,
+    title_without_style: titleWithoutStyle(recipe.title) ? 1 : 0,
+    natural_counts: naturalCounts(recipe) ? 1 : 0,
+    diet_tags_valid: dietTagsValid(recipe) ? 1 : 0,
     foreign_names_copied: namesInLanguage(recipe, situation).copied,
     forbidden,
     steps: steps.length,
@@ -159,3 +162,21 @@ export function unitsInLanguage(recipe, language) {
 // recette n'en contient aucune ; le four, l'huile de friture et la cuisson à cœur gardent leurs °C
 const STOVE_CELSIUS = /\b(feu|heat|fuego)\b[^.;]{0,20}?\(?\s*[≈~]?\s*\d{2,3}\s*°/i;
 export const noStoveCelsius = (recipe) => ((recipe.instructions ?? []).some((step) => STOVE_CELSIUS.test(step)) ? 0 : 1);
+
+// Titre sans mention de style ou d'origine (« -Style », « Inspired », « façon », « estilo »…), tel qu'affiché
+const STYLE_TITLE = /(style|inspired|inspir[eé]e?s?|fa[cç]on|estilo|inspirad[oa]s?|a la manera)/i;
+export const titleWithoutStyle = (title) => !STYLE_TITLE.test(String(title ?? ''));
+
+// Formulations naturelles : ce qui se compte n'a pas d'unité « pièce » (« 2 beef steaks », jamais « 2 pieces of »)
+const PIECE_WORDS = /(pieces? of|pi[eè]ces? de|piezas? de|unidad(es)? de|units? of)/i;
+const PIECE_UNIT = /^(pieces?|pcs?|pi[eè]ces?|piezas?|unidad(es)?|unit[eé]s?|units?|x)$/i;
+export const naturalCounts = (recipe) => !(recipe.instructions ?? []).some((step) => PIECE_WORDS.test(step))
+  && !(recipe.ingredients_used ?? []).some((i) => PIECE_UNIT.test(String(i.unit ?? '').trim()) || PIECE_WORDS.test(String(i.name ?? '')));
+
+// Étiquettes : seulement des régimes vérifiés (« diet:… »), et aucun ingrédient contraire au régime annoncé
+const TAG_DIETS = { vegan: ['vegetarian', 'vegan'], vegetarian: ['vegetarian'], 'gluten-free': ['gluten-free'], 'dairy-free': ['dairy-free'] };
+export function dietTagsValid(recipe) {
+  const tags = recipe.dietary_tags ?? [];
+  if (tags.some((tag) => !String(tag).startsWith('diet:') || !TAG_DIETS[String(tag).slice(5)])) return false;
+  return tags.every((tag) => dietHits(recipe, TAG_DIETS[tag.slice(5)]).length === 0);
+}

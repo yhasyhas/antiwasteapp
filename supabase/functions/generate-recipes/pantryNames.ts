@@ -15,15 +15,24 @@ export interface FactNames {
   es?: string | null;
 }
 
+// Alias d'un nom, puis ses formes au singulier (« patatas » → « patata », « pork chops » → « pork chop ») : les fiches
+// n'ont souvent que le singulier dans l'une des langues
+export function aliasForms(name: string): string[] {
+  const alias = normalizeAlias(name);
+  const words = alias.split(' ');
+  const strip = (suffix: string) => words.map((word) => (word.length > 3 + suffix.length - 1 && word.endsWith(suffix) ? word.slice(0, -suffix.length) : word)).join(' ');
+  return [...new Set([alias, strip('s'), strip('es')])];
+}
+
 // Renomme les aliments reconnus ; renvoie le nombre de noms changés
 export function translatePantryNames(pantry: Pantry, facts: FactNames[], language: string): number {
   let changed = 0;
   for (const item of pantry.items) {
     if (item.kind === 'dish') continue;
-    const alias = normalizeAlias(item.name);
-    const fact = facts.find((row) => Array.isArray(row.aliases) && row.aliases.includes(alias));
+    const forms = aliasForms(item.name);
+    const fact = forms.map((form) => facts.find((row) => Array.isArray(row.aliases) && row.aliases.includes(form))).find(Boolean);
     const name = fact?.[language as 'fr' | 'en' | 'es'];
-    if (typeof name === 'string' && name.trim() !== '' && normalizeAlias(name) !== alias) {
+    if (typeof name === 'string' && name.trim() !== '' && !forms.includes(normalizeAlias(name))) {
       item.name = name.trim();
       changed++;
     }
@@ -33,7 +42,7 @@ export function translatePantryNames(pantry: Pantry, facts: FactNames[], languag
 
 // Fiches dont un alias correspond à un aliment du garde-manger (une seule requête, 3 s au plus)
 export async function factNamesFor(pantry: Pantry): Promise<FactNames[]> {
-  const aliases = [...new Set(pantry.items.filter((item) => item.kind !== 'dish').map((item) => normalizeAlias(item.name)).filter((alias) => alias.length >= 2))];
+  const aliases = [...new Set(pantry.items.filter((item) => item.kind !== 'dish').flatMap((item) => aliasForms(item.name)).filter((alias) => alias.length >= 2))];
   if (aliases.length === 0 || !SUPABASE_URL || !SUPABASE_SECRET_KEY) return [];
   const list = `{${aliases.map((alias) => `"${alias}"`).join(',')}}`;
   try {

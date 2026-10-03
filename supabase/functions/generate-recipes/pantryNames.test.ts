@@ -1,6 +1,6 @@
 import { assertEquals } from 'jsr:@std/assert@1';
 import { buildPantry } from './recipes.ts';
-import { translatePantryNames } from './pantryNames.ts';
+import { aliasForms, translatePantryNames } from './pantryNames.ts';
 
 const FACTS = [
   { aliases: ['viande hachee', 'ground beef', 'carne picada'], fr: 'Viande hachée', en: 'Ground beef', es: 'Carne picada' },
@@ -28,4 +28,22 @@ Deno.test('noms du garde-manger : déjà dans la bonne langue, ou fiches illisib
   assertEquals(translatePantryNames(pantry, FACTS, 'en'), 0);
   assertEquals(translatePantryNames(pantry, [], 'fr'), 0);
   assertEquals(pantry.items[0].name, 'Milk');
+});
+
+Deno.test('noms du garde-manger au pluriel retrouvés par le singulier des fiches (« patatas », « Onions »)', () => {
+  const facts = [...FACTS, { aliases: ['pomme de terre', 'potato', 'patata'], fr: 'Pomme de terre', en: 'Potato', es: 'Patata' }];
+  const pantry = buildPantry([
+    { id: 'a', name: 'patatas', quantity: '1 kg' },
+    { id: 'b', name: 'Potatoes', quantity: '1 kg' },
+    // Mot court : pas de singulier deviné (« riz », « gas »)
+    { id: 'c', name: 'lait', quantity: '1 l' },
+  ]);
+  assertEquals(translatePantryNames(pantry, facts, 'en'), 2);
+  assertEquals(pantry.items.map((item) => item.name), ['Potato', 'Potatoes', 'Milk']);
+});
+
+Deno.test('formes au singulier : chaque mot, mots courts intacts', () => {
+  assertEquals(aliasForms('Pork chops'), ['pork chops', 'pork chop']);
+  assertEquals(aliasForms('tomates'), ['tomates', 'tomate', 'tomat']);
+  assertEquals(aliasForms('riz'), ['riz']);
 });

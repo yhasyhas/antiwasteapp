@@ -17,6 +17,16 @@ export interface AiRequest {
   schemaName: string;
   temperature: number;
   maxOutputTokens: number;
+  // Consigne propre à un fournisseur (par son nom), ajoutée à la fin des consignes générales : un défaut
+  // constaté chez lui seulement (ex. Gemini qui recopie un nom étranger)
+  providerNotes?: Record<string, string>;
+}
+
+// Consignes générales, avec la consigne propre au fournisseur
+function systemFor(request: AiRequest, provider: string): string | undefined {
+  const note = request.providerNotes?.[provider];
+  if (!note) return request.system;
+  return request.system ? `${request.system}\n\n${note}` : note;
 }
 
 export type ProviderResult =
@@ -55,7 +65,8 @@ export function geminiProvider(options: {
     configured: options.apiKey !== '' && options.model !== '',
     call: async (request, signal) => {
       try {
-        const input: unknown[] = [{ type: 'text', text: request.system ? `${request.system}\n\n${request.prompt}` : request.prompt }];
+        const system = systemFor(request, 'gemini');
+        const input: unknown[] = [{ type: 'text', text: system ? `${system}\n\n${request.prompt}` : request.prompt }];
         if (request.image) input.push({ type: 'image', data: request.image.base64, mime_type: request.image.mimeType });
 
         const response = await fetch(GEMINI_API_URL, {
@@ -124,7 +135,7 @@ async function requestGroq(
       body: JSON.stringify({
         model: options.model,
         messages: [
-          ...(request.system ? [{ role: 'system', content: request.system }] : []),
+          ...(systemFor(request, 'groq') ? [{ role: 'system', content: systemFor(request, 'groq') }] : []),
           { role: 'user', content: userContent },
         ],
         response_format: {
