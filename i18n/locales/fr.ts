@@ -378,6 +378,8 @@ const fr = {
     rejectedNote_other: "{{count}} recettes ne respectaient pas tes critères : elles ont été écartées.",
     rejectedQualityNote_one: "Une recette a été écartée par nos contrôles de qualité.",
     rejectedQualityNote_other: "{{count}} recettes ont été écartées par nos contrôles de qualité.",
+    generatingNote: "Création des recettes en cours (10 à 20 secondes)…",
+    quotaReachedNote: "Limite du jour atteinte : de retour demain.",
     fewIngredientsNote: "Peu d'aliments choisis, donc moins de recettes. Ajoutes-en pour plus d'idées.",
     canEditSelection: "Tu peux modifier cette sélection.",
     withYourFoods: "Avec tes aliments",

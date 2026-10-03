@@ -377,6 +377,8 @@ const es: Translations = {
     rejectedNote_other: "{{count}} recetas no cumplían tus criterios y se descartaron.",
     rejectedQualityNote_one: "Una receta se descartó en nuestros controles de calidad.",
     rejectedQualityNote_other: "{{count}} recetas se descartaron en nuestros controles de calidad.",
+    generatingNote: "Creando tus recetas (de 10 a 20 segundos)…",
+    quotaReachedNote: "Límite diario alcanzado: vuelve mañana.",
     fewIngredientsNote: "Pocos alimentos elegidos, así que menos recetas. Añade más para tener más ideas.",
     canEditSelection: "Puedes cambiar esta selección.",
     withYourFoods: "Con tus alimentos",

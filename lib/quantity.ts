@@ -226,3 +226,16 @@ export function formatQuantity(rawValue: number, rawUnit: string, language: stri
       : unit;
   return word ? `${text} ${word}` : text;
 }
+
+// Quantité d'un ingrédient de recette (« 2 » + « piece », « 3 » + « clove ») : le nombre seul pour ce qui se compte
+// (« 4 » à côté de « eggs », jamais « 4 piece »), sinon l'unité accordée et dans la langue donnée (« 2 cloves »)
+const RECIPE_PIECES = new Set(['piece', 'pieces', 'pc', 'pcs', 'unite', 'unites', 'unit', 'units', 'pieza', 'piezas', 'unidad', 'unidades', 'x']);
+export function recipeAmount(quantity: string | null | undefined, unit: string | null | undefined, language: string): string {
+  const value = String(quantity ?? '').trim();
+  const rawUnit = String(unit ?? '').trim();
+  if (!rawUnit || RECIPE_PIECES.has(normalize(rawUnit))) return value;
+  const number = Number(value.replace(',', '.'));
+  if (value && Number.isFinite(number) && number > 0) return formatQuantity(number, rawUnit, language);
+  // « 1/2 », « un peu » : unité courante au singulier, traduite
+  return [value, translateUnit(rawUnit, 1, language) ?? rawUnit].filter(Boolean).join(' ');
+}

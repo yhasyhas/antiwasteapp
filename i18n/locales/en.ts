@@ -377,6 +377,8 @@ const en: Translations = {
     rejectedNote_other: "{{count}} recipes didn't match your criteria and were left out.",
     rejectedQualityNote_one: "One recipe was left out by our quality checks.",
     rejectedQualityNote_other: "{{count}} recipes were left out by our quality checks.",
+    generatingNote: "Creating your recipes (10 to 20 seconds)…",
+    quotaReachedNote: "Daily limit reached: back tomorrow.",
     fewIngredientsNote: "Few foods chosen, so fewer recipes. Add more for more ideas.",
     canEditSelection: "You can change this selection.",
     withYourFoods: "With your foods",

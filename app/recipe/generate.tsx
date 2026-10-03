@@ -31,6 +31,7 @@ export default function GenerateRecipeScreen() {
     loading,
     generating,
     generatingMode,
+    quotaReached,
     selectedRecipe,
     setSelectedRecipe,
     isImageLoading,
@@ -97,7 +98,7 @@ export default function GenerateRecipeScreen() {
             icon={Sparkles}
             onPress={() => generateRecipes('standard')}
             loading={generatingMode === 'standard'}
-            disabled={generating || ingredients.length === 0}
+            disabled={generating || quotaReached || ingredients.length === 0}
           />
           {hasLeftovers && (
             <Button
@@ -107,10 +108,16 @@ export default function GenerateRecipeScreen() {
               size="small"
               onPress={() => generateRecipes('leftovers')}
               loading={generatingMode === 'leftovers'}
-              disabled={generating}
+              disabled={generating || quotaReached}
               style={styles.leftovers}
             />
           )}
+          {/* Boutons grisés : toujours la raison */}
+          {generating ? (
+            <Text style={styles.note}>{t('generate.generatingNote')}</Text>
+          ) : quotaReached ? (
+            <Text style={styles.note}>{t('generate.quotaReachedNote')}</Text>
+          ) : null}
         </View>
       </ScrollView>
 
