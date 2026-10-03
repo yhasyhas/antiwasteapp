@@ -342,8 +342,10 @@ export function buildRecipeSchema(pantry: Pantry, diets: StrictDiet[], unitHint 
   // Toujours, pour les quatre régimes : régimes choisis (recette écartée) et étiquettes vérifiées
   ingredientProperties.diet_violations = {
     type: 'array',
-    items: { type: 'string', enum: [...STRICT_DIETS] },
-    description: 'Régimes que cet ingrédient ne respecte pas (liste vide s\'il les respecte tous)',
+    // Texte libre : une liste fermée fait refuser la réponse par Groq dès que le modèle écrit une autre valeur (03/10) ;
+    // seules les quatre valeurs connues comptent
+    items: { type: 'string' },
+    description: `Régimes que cet ingrédient ne respecte pas, parmi ${STRICT_DIETS.join(', ')} (liste vide s'il les respecte tous)`,
   };
 
   const recipe = {
@@ -474,6 +476,26 @@ export function withoutInternalCodes(text: string): string {
 }
 export const hasInternalCodes = (text: string) => INTERNAL_CODES.some((pattern) => new RegExp(pattern.source, pattern.flags.replace('g', '')).test(text));
 
+const PIECE_UNITS = new Set(['piece', 'pieces', 'pc', 'pcs', 'unite', 'unites', 'unit', 'units', 'pieza', 'piezas', 'unidad', 'unidades', 'x']);
+
+// Mentions de style ou d'origine ajoutées au titre (« – West African Inspired », « (East African Style) »,
+// « Coconut-Style », « façon tajine ») : retirées, le titre garde la description du plat (tests du 03/10)
+const STYLE_WORD = String.raw`(?:inspired|style|styled|inspiré|inspirée|inspirés|inspirées|estilo|inspirado|inspirada|comfort)`;
+const TITLE_MENTIONS = [
+  new RegExp(String.raw`\s*\([^()]*\b${STYLE_WORD}\b[^()]*\)`, 'giu'),
+  new RegExp(String.raw`\s+[–—-]\s+[^–—]*\b${STYLE_WORD}\b[^–—]*$`, 'iu'),
+  /\s+(?:al\s+)?estilo\s+[\p{L}'’ -]+$/iu,
+  /\s+(?:à la\s+)?façon\s+[\p{L}'’ -]+$/iu,
+  /\s+inspired by\s+[\p{L}'’ -]+$/iu,
+  // « Coconut-Style », « Sub-Saharan Inspired », « West African-Style » : un mot, ou deux si le premier précise une région
+  new RegExp(String.raw`(?:^|\s)(?:(?:west|east|north|south|central|southern|northern|eastern|western|sub|middle|latin|southeast|south-east)[\s-])?[\p{L}'’]+[\s-]${STYLE_WORD.replace('|comfort', '')}\b`, 'giu'),
+];
+export function withoutStyleMentions(title: string): string {
+  const cleaned = TITLE_MENTIONS.reduce((text, pattern) => text.replace(pattern, ''), title).replace(/\s{2,}/g, ' ').replace(/^[\s,–—-]+|[\s,–—-]+$/g, '').trim();
+  // Titre vidé par erreur : on garde l'original
+  return cleaned.length >= 4 ? cleaned.charAt(0).toUpperCase() + cleaned.slice(1) : title;
+}
+
 export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; cuisine: string; difficulty: string; dietary: string[]; servings?: number | null }): Recipe {
   const ingredients: RecipeIngredient[] = raw.ingredients.map((ingredient: any) => {
     const pantryItem = ingredient.pantry_id === MISSING ? undefined : pantry.aliasOf.get(ingredient.pantry_id);
@@ -482,7 +504,8 @@ export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; 
       // garde-manger seulement si le modèle n'en donne pas
       name: withoutInternalCodes(ingredient.name) || pantryItem?.name || '',
       quantity: String(ingredient.quantity ?? '').replace(/[a-zA-ZÀ-ÿ\s]/g, '').trim() || '1',
-      unit: typeof ingredient.unit === 'string' ? ingredient.unit.trim() : '',
+      // Ce qui se compte n'a pas d'unité : « 4 œufs », jamais « 4 pièces d'œufs »
+      unit: typeof ingredient.unit === 'string' && !PIECE_UNITS.has(normalizeName(ingredient.unit)) ? ingredient.unit.trim() : '',
       pantry_id: pantryItem ? pantryItem.id : null,
     };
   });
@@ -491,7 +514,7 @@ export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; 
   const suggestion = typeof raw.suggestion === 'string' ? withoutInternalCodes(raw.suggestion) : '';
 
   return {
-    title: withoutInternalCodes(raw.title),
+    title: withoutStyleMentions(withoutInternalCodes(raw.title)),
     description: typeof raw.description === 'string' ? withoutInternalCodes(raw.description) : '',
     difficulty: DIFFICULTIES.includes(raw.difficulty) ? raw.difficulty : context.difficulty,
     prep_time: isCount(raw.prep_time) ? Math.round(raw.prep_time) : 15,

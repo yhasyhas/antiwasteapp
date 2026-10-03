@@ -24,6 +24,7 @@ import {
   recipeCount,
   strictDietsOf,
   withoutInternalCodes,
+  withoutStyleMentions,
   toRecipe,
   urgentItems,
 } from './recipes.ts';
@@ -65,11 +66,13 @@ Deno.test('garde-manger : alias p1, p2… dans l\'ordre, noms simples acceptés,
   assertEquals(buildPantry(Array.from({ length: 80 }, (_, i) => `aliment ${i}`)).items.length, MAX_PANTRY_ITEMS);
 });
 
-Deno.test('schéma : alias et « missing » en liste fermée ; diet_violations pour les quatre régimes, toujours ; pas d\'étiquettes du modèle', () => {
+Deno.test('schéma : alias et « missing » en liste fermée ; diet_violations toujours, en texte libre ; pas d\'étiquettes du modèle', () => {
   const schema: any = buildRecipeSchema(PANTRY, []);
   const ingredient = schema.properties.recipes.items.properties.ingredients.items;
   assertEquals(ingredient.properties.pantry_id.enum, ['p1', 'p2', 'p3', MISSING]);
-  assertEquals(ingredient.properties.diet_violations.items.enum, ['vegan', 'vegetarian', 'gluten-free', 'dairy-free']);
+  // Texte libre (une liste fermée fait refuser la réponse par Groq) ; les quatre régimes sont nommés dans la description
+  assertEquals(ingredient.properties.diet_violations.items, { type: 'string' });
+  assert(ingredient.properties.diet_violations.description.includes('gluten-free'));
   assert(ingredient.required.includes('diet_violations'));
   assertEquals(ingredient.additionalProperties, false);
   assertEquals(schema.properties.recipes.items.properties.dietary_tags, undefined);
@@ -356,4 +359,25 @@ Deno.test('étiquettes : bouillon ou miso, jamais « sans gluten » (souvent du 
   assertEquals(veg, ['diet:vegan', 'diet:dairy-free']);
   // « au fond de la casserole » n'est pas un fond de veau
   assertEquals(dietWordInText('Gratte les sucs au fond de la casserole.', 'vegetarian'), false);
+});
+
+Deno.test('régime inconnu écrit par le modèle ignoré ; unité « pièce » retirée (« 4 œufs », pas « 4 pièces »)', () => {
+  const result = parse([recipe([{ ...ing('banane', 'p1'), diet_violations: ['lactose-free', 'dairy'], unit: 'pieces', quantity: '2' }, { ...ing('œufs', MISSING), unit: 'pièce' }, { ...ing('farine', MISSING), unit: 'g' }])], ['dairy-free']);
+  assert(result.ok);
+  const [r] = result.value.recipes;
+  assertEquals(r.ingredients_used.map((i) => i.unit), ['', '', 'g']);
+});
+
+Deno.test('titres : mentions de style ou d’origine retirées (tests du 03/10), vrais noms de plats gardés', () => {
+  assertEquals(withoutStyleMentions('Beef Steak and Eggplant Stew with Rosemary (West African Inspired)'), 'Beef Steak and Eggplant Stew with Rosemary');
+  assertEquals(withoutStyleMentions('Spicy Beef Steak with Roasted Eggplant – West African Style'), 'Spicy Beef Steak with Roasted Eggplant');
+  assertEquals(withoutStyleMentions('Sub-Saharan Inspired Beef and Rosemary Skillet'), 'Beef and Rosemary Skillet');
+  assertEquals(withoutStyleMentions('Creamy Coconut-Style Fish and Potato Broth'), 'Creamy Fish and Potato Broth');
+  assertEquals(withoutStyleMentions('West African-Style Savory Rosemary Egg Scramble'), 'Savory Rosemary Egg Scramble');
+  assertEquals(withoutStyleMentions('Poulet aux légumes façon tajine'), 'Poulet aux légumes');
+  assertEquals(withoutStyleMentions('Pollo con verduras al estilo marroquí'), 'Pollo con verduras');
+  // Inchangés
+  for (const title of ['Rosemary Comfort Soup', 'Mafé de bœuf', 'Stir-Fry de bœuf au gingembre', 'Pan-Seared Steak with Rosemary', 'Tajine de poulet aux olives']) {
+    assertEquals(withoutStyleMentions(title), title);
+  }
 });

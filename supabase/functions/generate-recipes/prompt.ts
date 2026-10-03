@@ -59,7 +59,18 @@ const UNITS: Record<string, string> = {
   es: 'g, kg, ml, l, cda, cdta, pieza, rebanada, diente, pizca, lata, manojo',
 };
 
+// v4.1 : titres, pour toutes les cuisines (« Coconut-Style » sans noix de coco, « Sub-Saharan Inspired » pour un bœuf au
+// romarin : relevés aux tests du 03/10)
+const TITLE_RULE = `TITRE :
+- Jamais de mention de style ou d'origine dans le titre (« -style », « façon », « inspired », « inspiré de », « estilo », « West African », « à la marocaine ») : la cuisine choisie se voit dans le plat, pas dans le titre. Un vrai nom de plat (mafé, yassa, tajine) reste permis s'il en a les ingrédients et la technique essentiels.
+- Sinon, un titre qui décrit simplement la recette (ingrédients principaux et technique : « Bœuf poêlé au romarin et pommes de terre rôties »).`;
+
 // v4 : noms du garde-manger traduits dans la langue de la recette
+const COUNT_EXAMPLE: Record<string, string> = {
+  fr: '« 2 steaks de bœuf », « les 4 œufs », « 1 aubergine »',
+  en: '"2 beef steaks", "the 4 eggs", "1 aubergine"',
+  es: '« 2 filetes de ternera », « los 4 huevos », « 1 berenjena »',
+};
 const TRANSLATED_NAME_EXAMPLE: Record<string, string> = {
   fr: '« œufs » pour « eggs » dans une recette en français',
   en: '"eggs" for « œufs », "milk" for « lait » in an English recipe',
@@ -206,7 +217,8 @@ TYPE DE REPAS (${MEAL_NAMES[options.mealType] || options.mealType}) — préfér
 ${MEAL_PREFERENCES[options.mealType] || ''}
 - Si les ingrédients s'y prêtent mal, propose quand même la meilleure recette possible et remplis "suggestion" avec une phrase courte indiquant le moment où elle est idéale (ex. « Idéal aussi en petit-déjeuner »). Sinon, "suggestion" est une chaîne vide.
 
-${cuisineRule}
+${cuisineRule}${v41 ? `
+${TITLE_RULE}` : ''}
 
 INGRÉDIENTS :
 - Utilise en priorité les ingrédients du garde-manger, pour éviter le gaspillage.${options.hasUrgent ? `
@@ -221,7 +233,8 @@ ${v4 ? `- Pour un ingrédient du garde-manger, "name" est son nom en ${languageN
 - Au plus ${MAX_PURCHASES} ingrédients à acheter par recette (hors sel, poivre, huile, eau), seulement les indispensables (règle vérifiée après coup) ; tout le reste vient du garde-manger.` : ''}${v2 ? `
 - Un ingrédient du garde-manger qui ne respecte pas un régime ou une exclusion n'est jamais utilisé : ignore-le (ex. la feta pour un repas vegan).
 - La liste contient tout ce que les étapes utilisent, même un accompagnement (« servir avec du riz » : le riz est dans la liste et cuit dans les étapes) ; pas d'ingrédient facultatif : les variantes vont dans les astuces.
-- "quantity" : le nombre seul (ex. "500", "2", "1/2") ; "unit" : l'unité abrégée, en ${languageName} (${UNITS[options.language] || UNITS.en}) ; sel et poivre : 1 ${options.language === 'en' ? 'pinch' : options.language === 'es' ? 'pizca' : 'pincée'}.` : `
+- "quantity" : le nombre seul (ex. "500", "2", "1/2") ; "unit" : l'unité abrégée, en ${languageName} (${UNITS[options.language] || UNITS.en}) ; sel et poivre : 1 ${options.language === 'en' ? 'pinch' : options.language === 'es' ? 'pizca' : 'pincée'}.${v4 ? `
+- Ce qui se compte (œufs, steaks, aubergines, filets) : "unit" vide, et les étapes le nomment naturellement, au pluriel si besoin (${COUNT_EXAMPLE[options.language] || COUNT_EXAMPLE.en}), jamais avec « pièce » (pas « 2 pièces de steak », « 4 pièces d'œufs »).` : ''}` : `
 - "quantity" : le nombre seul (ex. "500", "2", "1/2") ; "unit" : l'unité abrégée (g, kg, ml, cl, l, c. à soupe, c. à café, pièce, tranche, gousse, pincée).`}
 - "diet_violations" : pour chaque ingrédient, ceux des régimes vegan, vegetarian, gluten-free et dairy-free qu'il ne respecte pas (liste vide s'il les respecte tous). Sois exact : le lait de coco est vegan, le beurre ne l'est pas ; la farine de blé, le pain, les pâtes et la sauce soja contiennent du gluten ; le beurre, la crème et le fromage sont des produits laitiers. Liste aussi la farine, le beurre ou le lait d'une sauce (béchamel).${options.selection ? `
 
