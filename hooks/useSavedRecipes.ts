@@ -6,12 +6,12 @@ import { alertWriteError } from '@/lib/alertWriteError';
 import { loadFavoriteIds, setFavorite } from '@/lib/favorites';
 import { supabase } from '@/lib/supabase';
 import { useRecipeImages } from '@/hooks/useRecipeImages';
-import { recipeFromRow, type Recipe } from '@/components/recipe/types';
+import { recipeFromRow } from '@/components/recipe/types';
+import type { SavedRecipe } from '@/lib/savedRecipes';
 
-// Recette de l'historique, avec son état de favori
-export type SavedRecipe = Recipe & { id: string; is_favorite: boolean };
+export type { SavedRecipe };
 
-// Historique des recettes et favoris ; image générée à l'ouverture d'une recette qui n'en a pas
+// Historique des recettes, favoris et signets « Pour plus tard » ; image générée à l'ouverture d'une recette qui n'en a pas
 export function useSavedRecipes() {
   const { user } = useAuth();
   const { t } = useLanguage();
@@ -69,6 +69,20 @@ export function useSavedRecipes() {
     setSelectedRecipe((current) => (current?.id === recipeId ? { ...current, is_favorite: !current.is_favorite } : current));
   };
 
+  // « Pour plus tard » : signet indépendant du cœur (recipes.later_at) ; l'état ne change que si l'écriture réussit
+  const toggleLater = async (recipeId: string) => {
+    const recipe = recipes.find((r) => r.id === recipeId);
+    if (!user || !recipe) return;
+    const laterAt = recipe.later_at ? null : new Date().toISOString();
+    const { error } = await supabase.from('recipes').update({ later_at: laterAt }).eq('id', recipeId);
+    if (error) {
+      alertWriteError(t, 'saving recipe for later', error);
+      return;
+    }
+    setRecipes((current) => current.map((r) => (r.id === recipeId ? { ...r, later_at: laterAt } : r)));
+    setSelectedRecipe((current) => (current?.id === recipeId ? { ...current, later_at: laterAt } : current));
+  };
+
   return {
     // Avec leur image, dès qu'elle est connue (demandée ici ou sur un autre écran)
     recipes: recipes.map(images.withImage),
@@ -79,5 +93,6 @@ export function useSavedRecipes() {
     imageNotice: images.notice,
     openRecipe,
     toggleFavorite,
+    toggleLater,
   };
 }

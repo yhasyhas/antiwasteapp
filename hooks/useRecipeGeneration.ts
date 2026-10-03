@@ -219,6 +219,8 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
     total_time: recipe.total_time,
     difficulty: recipe.difficulty,
     meal_type: recipe.meal_type,
+    // Cuisine choisie à la génération (filtre de « Mes recettes »)
+    cuisine: recipe.cuisine ?? filters.cuisine,
     dietary_tags: recipe.dietary_tags,
     servings: recipe.servings,
     tips: recipe.tips || [],

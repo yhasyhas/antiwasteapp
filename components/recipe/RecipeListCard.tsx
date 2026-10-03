@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
-import { Clock, Heart, Sparkles } from 'lucide-react-native';
+import { Bookmark, Clock, Heart, Sparkles } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { difficultyLabel } from '@/lib/labels';
 import { toSaveCount, usePantryUrgency } from '@/hooks/usePantryUrgency';
@@ -24,12 +24,16 @@ interface Props {
   variant?: 'large' | 'compact';
   // « Cuisinée le [date] » (Mes recettes)
   showCooked?: boolean;
+  // Signet « Pour plus tard », indépendant du cœur (Mes recettes)
+  later?: { active: boolean; onToggle: () => void };
+  // « X/Y ingrédients disponibles » d'après le garde-manger actuel (hors sel, poivre, huile, eau)
+  availability?: { available: number; total: number };
 }
 
 // Carte de recette unique pour toutes les listes. Elle affiche l'image si elle existe, sans jamais la
 // demander elle-même (voir useRecipeImages) ; sinon une illustration. Badge « X à sauver » : aliments du
 // garde-manger utilisés qui expirent bientôt.
-export function RecipeListCard({ recipe, onPress, favorite, variant = 'large', showCooked = false }: Props) {
+export function RecipeListCard({ recipe, onPress, favorite, variant = 'large', showCooked = false, later, availability }: Props) {
   const { t, language } = useLanguage();
   const cooked = showCooked && recipe.last_cooked_at
     ? <Text style={styles.cooked}>{t('cookedMore.cookedOn', { date: shortDate(localDateOf(recipe.last_cooked_at), language) })}</Text>
@@ -61,6 +65,9 @@ export function RecipeListCard({ recipe, onPress, favorite, variant = 'large', s
       </View>
       {recipe.difficulty ? <Badge label={difficultyLabel(t, recipe.difficulty)} tone="soft" /> : null}
       {toSave > 0 ? <Badge label={t('recipe.toSave', { count: toSave })} tone="expired" /> : null}
+      {availability && availability.total > 0 ? (
+        <Badge label={t('saved.available', { available: availability.available, total: availability.total })} tone={availability.available === availability.total ? 'ok' : 'neutral'} />
+      ) : null}
     </View>
   );
 
@@ -76,6 +83,19 @@ export function RecipeListCard({ recipe, onPress, favorite, variant = 'large', s
     </Touchable>
   ) : null;
 
+  const bookmark = later ? (
+    <Touchable
+      onPress={later.onToggle}
+      style={styles.heart}
+      accessibilityRole="button"
+      accessibilityState={{ selected: later.active }}
+      accessibilityLabel={later.active ? t('saved.removeLater') : t('saved.saveForLater')}
+    >
+      <Bookmark size={sizes.iconLarge} color={later.active ? colors.primary : colors.text} fill={later.active ? colors.primary : colors.transparent} />
+    </Touchable>
+  ) : null;
+  const actions = bookmark || heart ? <View style={styles.actions}>{bookmark}{heart}</View> : null;
+
   if (compact) {
     return (
       <Card onPress={onPress} style={styles.compactCard} accessibilityLabel={recipe.title}>
@@ -85,7 +105,7 @@ export function RecipeListCard({ recipe, onPress, favorite, variant = 'large', s
           {meta}
           {cooked}
         </View>
-        {heart}
+        {actions}
       </Card>
     );
   }
@@ -96,7 +116,7 @@ export function RecipeListCard({ recipe, onPress, favorite, variant = 'large', s
       <View style={styles.body}>
         <View style={styles.header}>
           <Text style={styles.title} numberOfLines={3}>{recipe.title}</Text>
-          {heart}
+          {actions}
         </View>
         {recipe.description ? <Text style={styles.description} numberOfLines={3}>{recipe.description}</Text> : null}
         {recipe.suggestion ? (
@@ -138,6 +158,9 @@ const styles = StyleSheet.create({
   title: {
     ...typography.title3,
     flex: 1,
+  },
+  actions: {
+    flexDirection: 'row',
   },
   heart: {
     width: sizes.touch,

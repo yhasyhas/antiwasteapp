@@ -20,6 +20,8 @@ import { displayQuantity } from '@/lib/quantity';
 import { recipeFromRow, type Recipe } from '@/components/recipe/types';
 import { RecipeSheet } from '@/components/recipe/RecipeSheet';
 import { RecipeListCard } from '@/components/recipe/RecipeListCard';
+import { feasibility, usePantryUrgency } from '@/hooks/usePantryUrgency';
+import { MAX_MISSING } from '@/lib/savedRecipes';
 import { WasteCounter } from '@/components/home/WasteCounter';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import { ExpiryBadge } from '@/components/expiry/ExpiryBadge';
@@ -53,6 +55,7 @@ export default function HomeScreen() {
   const [selectedRecipe, setSelectedRecipe] = useState<RecentRecipe | null>(null);
   // Images lues dans l'état partagé : une image générée sur un autre écran apparaît ici aussi
   const images = useRecipeImages();
+  const pantry = usePantryUrgency();
   const foodName = useFoodNames(ingredients);
 
   // Rechargé à chaque retour sur l'onglet : ingrédients scannés, recettes générées entre-temps
@@ -130,7 +133,13 @@ export default function HomeScreen() {
     .filter((entry) => entry.lot)
     .map(({ group, lot }) => ({ ...lot!, quantity: lotLabel(lot!, group.lots, language) }))
     .slice(0, URGENT_COUNT);
-  const myRecipes = [...recipes.filter((recipe) => favoriteIds.has(recipe.id)), ...recipes.filter((recipe) => !favoriteIds.has(recipe.id))]
+  // Mes recettes : celles faisables maintenant d'abord (au plus un ingrédient manquant), puis les favoris
+  const missing = (recipe: RecentRecipe) => {
+    const { available, total } = feasibility(recipe, pantry);
+    return total - available;
+  };
+  const myRecipes = [...recipes]
+    .sort((a, b) => Number(missing(a) > MAX_MISSING) - Number(missing(b) > MAX_MISSING) || Number(favoriteIds.has(b.id)) - Number(favoriteIds.has(a.id)))
     .slice(0, MY_RECIPES_COUNT);
   const cookUrgent = () => router.push({ pathname: '/recipe/generate', params: { priority: urgent.map((i) => i.id).join(',') } });
 
@@ -241,6 +250,7 @@ export default function HomeScreen() {
                 imageLoading={images.isLoading(recipe.id)}
                 onPress={() => openRecipe(recipe)}
                 favorite={{ active: favoriteIds.has(recipe.id), onToggle: () => toggleFavorite(recipe) }}
+                availability={feasibility(recipe, pantry)}
                 showCooked
               />
             ))}

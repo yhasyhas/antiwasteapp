@@ -39,6 +39,13 @@ export function rememberFoodNames(foodKey: string, fact: Record<Language, { name
   notify();
 }
 
+// Noms des fiches dans les trois langues (chargés à la demande) : correspondance entre un nom de recette (« beef ») et
+// un aliment du garde-manger (« bœuf »)
+export async function loadFoodNames(keys: string[]): Promise<void> {
+  await loadNames(keys);
+}
+export const foodNamesOf = (key: string): string[] => Object.values(names.get(key) ?? {}).filter((name): name is string => !!name);
+
 async function loadNames(keys: string[]) {
   const missing = [...new Set(keys)].filter((key) => !names.has(key) && !loading.has(key));
   if (missing.length === 0) return;

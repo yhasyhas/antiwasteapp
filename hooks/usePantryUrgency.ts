@@ -5,6 +5,8 @@ import { onPantryChanged } from '@/lib/pantryEvents';
 import { expiryStatus } from '@/lib/expiry';
 import { isUrgentLot } from '@/lib/storage';
 import { foodIdentity } from '@/lib/pantryLots';
+import { foodNamesOf, loadFoodNames } from '@/lib/foodNames';
+import { isBasic } from '@/lib/basics';
 import type { Recipe } from '@/components/recipe/types';
 
 // Dates du garde-manger actuel du foyer (seulement celles des lots à utiliser vite), partagées par les cartes et fiches de recette pour le badge
@@ -30,11 +32,13 @@ const earliest = (a: string | null | undefined, b: string | null) => (a === unde
 async function reload() {
   const householdId = await activeHouseholdId();
   if (!householdId) return;
-  const { data, error } = await supabase.from('ingredients').select('id, name, expires_at, date_kind, location').eq('household_id', householdId);
+  const { data, error } = await supabase.from('ingredients').select('id, name, food_key, expires_at, date_kind, location').eq('household_id', householdId);
   if (error) {
     console.warn('[urgence]', error.message);
     return;
   }
+  // Noms des fiches dans les trois langues : une recette en anglais retrouve « bœuf » sous « beef »
+  await loadFoodNames((data ?? []).map((row) => row.food_key as string | null).filter((key): key is string => !!key));
   const byId = new Map<string, string | null>();
   const byFood = new Map<string, string | null>();
   for (const row of data ?? []) {
@@ -42,8 +46,8 @@ async function reload() {
     const date = isUrgentLot(row as { expires_at: string | null; date_kind: string | null; location: string | null })
       ? (row.expires_at as string) : null;
     byId.set(row.id as string, date);
-    const food = foodIdentity(row.name as string);
-    byFood.set(food, earliest(byFood.get(food), date));
+    const identities = new Set([row.name as string, ...(row.food_key ? foodNamesOf(row.food_key as string) : [])].map(foodIdentity));
+    for (const food of identities) byFood.set(food, earliest(byFood.get(food), date));
   }
   dates = { byId, byFood };
   loaded = true;
@@ -76,6 +80,14 @@ export function toSaveCount(recipe: Pick<Recipe, 'ingredients_used'>, pantry: Pa
     if (status === 'expired' || status === 'soon') count++;
   }
   return count;
+}
+
+// « Faisable maintenant » : ingrédients de la recette (hors sel, poivre, huile, eau) présents dans le garde-manger
+// actuel, par le lot noté à la génération ou par le nom de l'aliment (dans l'une des trois langues)
+export function feasibility(recipe: Pick<Recipe, 'ingredients_used'>, pantry: PantryDates): { available: number; total: number } {
+  const needed = recipe.ingredients_used.filter((item) => !isBasic(item.name));
+  const available = needed.filter((item) => (item.pantry_id && pantry.byId.has(item.pantry_id)) || pantry.byFood.has(foodIdentity(item.name))).length;
+  return { available, total: needed.length };
 }
 
 export function usePantryUrgency(): PantryDates {
