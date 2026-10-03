@@ -1,5 +1,5 @@
--- Tests du signet « Pour plus tard » (recipes.later_at) : posé et retiré par l'auteur de la recette, jamais sur la
--- recette d'un autre utilisateur.
+-- Tests de « Mes recettes » 2.0 : signet « Pour plus tard » (recipes.later_at) posé et retiré par l'auteur de la recette,
+-- jamais sur la recette d'un autre utilisateur ; cuisine enregistrée avec la recette (recipes.cuisine).
 --
 -- Lancement (base liée, mot de passe dans SUPABASE_DB_PASSWORD) :
 --   PGPASSWORD="$SUPABASE_DB_PASSWORD" psql "$(cat supabase/.temp/pooler-url)" -v ON_ERROR_STOP=1 -f supabase/tests/recipes_later.sql
@@ -35,6 +35,15 @@ DO $$
 BEGIN
   IF (SELECT later_at FROM public.recipes WHERE id = '00000000-0000-4000-a000-0000000f0a01') IS NOT NULL THEN
     RAISE EXCEPTION 'signet non retiré par l''auteur';
+  END IF;
+END $$;
+
+-- Cuisine enregistrée à l'insertion par l'auteur
+INSERT INTO public.recipes (user_id, title, cuisine) VALUES ('00000000-0000-4000-a000-000000000f0a', 'Tajine', 'maghreb');
+DO $$
+BEGIN
+  IF (SELECT cuisine FROM public.recipes WHERE title = 'Tajine' AND user_id = '00000000-0000-4000-a000-000000000f0a') IS DISTINCT FROM 'maghreb' THEN
+    RAISE EXCEPTION 'cuisine non enregistrée';
   END IF;
 END $$;
 
