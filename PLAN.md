@@ -317,7 +317,7 @@ Suite de la phase 7, sur la branche `phase-7-finalisation`.
 - [ ] Évaluation : 3 garde-manger par région dans les cas fixes, une fois la bibliothèque relue
 - [x] « Mes recettes » 2.0 (JavaScript seulement) : trois onglets Favoris · Pour plus tard · Toutes (« Pour plus tard » : signet sur chaque carte, indépendant du cœur, `recipes.later_at`) ; filtre « Faisable maintenant » (« X/Y ingrédients disponibles » d’après le garde-manger actuel, hors basiques, les plus faisables d’abord) et « Utilise mes aliments urgents » ; recherche par titre et par ingrédient ; filtres rapides cuisine (`recipes.cuisine`), moins de 30 min, régime, type de repas ; vue compacte ou en cartes ; sections par période ; sur l’accueil, recettes faisables maintenant en premier
 - [x] Surveillance du secours : alerte Sentry (tag `alert:provider_failure`, une fois par jour et par fournisseur) quand un fournisseur échoue pour une autre raison qu'un quota ou une surcharge (réponse refusée, schéma invalide, réponse illisible) ; part des recettes servies par le secours sur 7 jours dans « État des services » (`provider_usage_daily`)
-- [ ] « Faisable maintenant » : ingrédient manquant affiché sur la carte (« Il manque : oignon »), avec un bouton pour l'ajouter aux courses
+- [x] « Faisable maintenant » : ingrédient manquant affiché sur la carte (« Il manque : oignon »), avec un bouton pour l'ajouter aux courses
 - [ ] Qualité du secours : évaluation avec Gemini seul (cas de base et langues mélangées), mêmes mesures que Groq ; post-traitements du serveur renforcés si Gemini fait nettement moins bien
 - [ ] Mode cuisine étape par étape avec minuteurs (si garder l'écran allumé demande un module natif, cette partie va en phase 12)
 

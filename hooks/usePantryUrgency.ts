@@ -83,11 +83,15 @@ export function toSaveCount(recipe: Pick<Recipe, 'ingredients_used'>, pantry: Pa
 }
 
 // « Faisable maintenant » : ingrédients de la recette (hors sel, poivre, huile, eau) présents dans le garde-manger
-// actuel, par le lot noté à la génération ou par le nom de l'aliment (dans l'une des trois langues)
-export function feasibility(recipe: Pick<Recipe, 'ingredients_used'>, pantry: PantryDates): { available: number; total: number } {
+// actuel, par le lot noté à la génération ou par le nom de l'aliment (dans l'une des trois langues) ; missing :
+// ceux qui manquent, avec leur quantité (ajout aux courses depuis la carte)
+export type Feasibility = { available: number; total: number; missing: Recipe['ingredients_used'] };
+
+export function feasibility(recipe: Pick<Recipe, 'ingredients_used'>, pantry: PantryDates): Feasibility {
   const needed = recipe.ingredients_used.filter((item) => !isBasic(item.name));
-  const available = needed.filter((item) => (item.pantry_id && pantry.byId.has(item.pantry_id)) || pantry.byFood.has(foodIdentity(item.name))).length;
-  return { available, total: needed.length };
+  const inPantry = (item: Recipe['ingredients_used'][number]) => (item.pantry_id && pantry.byId.has(item.pantry_id)) || pantry.byFood.has(foodIdentity(item.name));
+  const missing = needed.filter((item) => !inPantry(item));
+  return { available: needed.length - missing.length, total: needed.length, missing };
 }
 
 export function usePantryUrgency(): PantryDates {

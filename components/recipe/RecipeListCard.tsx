@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
-import { Bookmark, Clock, Heart, Sparkles } from 'lucide-react-native';
+import { Bookmark, Check, Clock, Heart, ShoppingCart, Sparkles } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { difficultyLabel } from '@/lib/labels';
-import { toSaveCount, usePantryUrgency } from '@/hooks/usePantryUrgency';
+import { type Feasibility, toSaveCount, usePantryUrgency } from '@/hooks/usePantryUrgency';
+import { MAX_MISSING } from '@/lib/savedRecipes';
+import { recipeAmount } from '@/lib/quantity';
+import { addMissingToShoppingList } from '@/lib/shopping';
+import { showDialog } from '@/lib/dialog';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { RecipePlaceholder } from '@/components/ui/Illustrations';
@@ -26,8 +30,43 @@ interface Props {
   showCooked?: boolean;
   // Signet « Pour plus tard », indépendant du cœur (Mes recettes)
   later?: { active: boolean; onToggle: () => void };
-  // « X/Y ingrédients disponibles » d'après le garde-manger actuel (hors sel, poivre, huile, eau)
-  availability?: { available: number; total: number };
+  // « X/Y ingrédients disponibles » d'après le garde-manger actuel (hors sel, poivre, huile, eau) ; s'il en
+  // manque peu (MAX_MISSING), « Il manque : oignon » avec un bouton pour l'ajouter aux courses
+  availability?: Feasibility;
+}
+
+// « Il manque : oignon » et « Ajouter aux courses » (avec la quantité de la recette, sans doublon dans la liste)
+function MissingRow({ recipe, missing }: { recipe: Recipe; missing: Feasibility['missing'] }) {
+  const { t, language } = useLanguage();
+  const [state, setState] = useState<'idle' | 'adding' | 'added'>('idle');
+  const add = async () => {
+    setState('adding');
+    try {
+      await addMissingToShoppingList(missing.map((item) => item.name), missing.map((item) => recipeAmount(item.quantity, item.unit, language)), recipe.id, recipe.title);
+      setState('added');
+    } catch (error) {
+      console.warn('[courses] ajout impossible :', error);
+      setState('idle');
+      showDialog(t('errors.writeTitle'), t('errors.writeText'));
+    }
+  };
+  const added = state === 'added';
+  return (
+    <View style={styles.missing}>
+      <Text style={styles.missingText} numberOfLines={2}>{t('saved.missing', { names: missing.map((item) => item.name).join(', ') })}</Text>
+      <Touchable
+        onPress={add}
+        disabled={state !== 'idle'}
+        style={styles.missingButton}
+        accessibilityRole="button"
+        accessibilityState={{ disabled: state !== 'idle' }}
+        accessibilityLabel={added ? t('saved.missingAdded') : t('saved.addMissing')}
+      >
+        {added ? <Check size={sizes.iconSmall} color={colors.primary} /> : <ShoppingCart size={sizes.iconSmall} color={colors.primary} />}
+        <Text style={styles.missingButtonText}>{added ? t('saved.missingAdded') : t('saved.addMissing')}</Text>
+      </Touchable>
+    </View>
+  );
 }
 
 // Carte de recette unique pour toutes les listes. Elle affiche l'image si elle existe, sans jamais la
@@ -95,6 +134,9 @@ export function RecipeListCard({ recipe, onPress, favorite, variant = 'large', s
     </Touchable>
   ) : null;
   const actions = bookmark || heart ? <View style={styles.actions}>{bookmark}{heart}</View> : null;
+  const missingRow = availability && availability.missing.length > 0 && availability.missing.length <= MAX_MISSING && availability.available > 0
+    ? <MissingRow recipe={recipe} missing={availability.missing} />
+    : null;
 
   if (compact) {
     return (
@@ -103,6 +145,7 @@ export function RecipeListCard({ recipe, onPress, favorite, variant = 'large', s
         <View style={styles.compactBody}>
           <Text style={styles.compactTitle} numberOfLines={2}>{recipe.title}</Text>
           {meta}
+          {missingRow}
           {cooked}
         </View>
         {actions}
@@ -126,6 +169,7 @@ export function RecipeListCard({ recipe, onPress, favorite, variant = 'large', s
           </View>
         ) : null}
         {meta}
+        {missingRow}
         {cooked}
       </View>
     </Card>
@@ -202,6 +246,29 @@ const styles = StyleSheet.create({
   },
   cooked: {
     ...typography.secondary,
+  },
+  missing: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  missingText: {
+    ...typography.secondary,
+    color: colors.text,
+    flexShrink: 1,
+  },
+  missingButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    minHeight: sizes.touch,
+    paddingHorizontal: spacing.sm,
+  },
+  missingButtonText: {
+    ...typography.secondary,
+    color: colors.primary,
+    fontWeight: '600',
   },
   timeText: {
     ...typography.body,
