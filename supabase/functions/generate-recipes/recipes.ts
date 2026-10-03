@@ -160,43 +160,75 @@ export function isDietException(name: string, diet: StrictDiet): boolean {
 // Contrôle du serveur, en plus des régimes signalés par le modèle : mots (trois langues, formes normalisées) qu'un
 // ingrédient ne peut pas contenir pour respecter le régime. Sert aux régimes choisis (recette écartée) et aux
 // étiquettes affichées (seules les étiquettes vérifiées sont gardées). Mots de 4 lettres ou moins : mot entier
-// (« ble » ne doit pas trouver « blend ») ; plus longs : début de mot (« saucisse » trouve « saucisses »).
+// (« ble » ne doit pas trouver « blend ») ; plus longs : début de mot (« saucisse » trouve « saucisses »). Dans une
+// expression, chaque mot peut être au pluriel (« salsas de soja »). Revue systématique le 03/10/2026, en trois langues,
+// au singulier et au pluriel : dietWords.test.ts.
 const MEAT_WORDS = ['poulet', 'poule', 'dinde', 'canard', 'pintade', 'volaille', 'boeuf', 'veau', 'agneau', 'mouton', 'porc', 'cochon', 'jambon', 'lard', 'lardon', 'bacon',
   'saucisse', 'saucisson', 'chorizo', 'merguez', 'kefta', 'kofta', 'viande', 'steak', 'foie', 'abats', 'gibier', 'lapin', 'chevreau', 'cabri', 'fond de veau', 'fond de volaille',
+  'oie', 'caille', 'chevreuil', 'cerf', 'sanglier', 'pancetta', 'coppa', 'prosciutto', 'speck', 'bresaola', 'chipolata', 'knack', 'andouill', 'boudin', 'mortadel', 'rillette',
+  'entrecote', 'rumsteck', 'rumsteak', 'faux filet', 'tournedos', 'chateaubriand', 'paleron', 'gigot', 'cotelette', 'magret', 'gesier', 'tripe', 'rognon', 'kebab', 'nugget',
+  'saindoux', 'demi glace',
   'chicken', 'turkey', 'duck', 'beef', 'veal', 'lamb', 'mutton', 'pork', 'ham', 'sausage', 'meat', 'liver', 'rabbit', 'goat meat', 'ground beef', 'burger', 'meatball', 'pepperoni', 'salami',
+  'goose', 'geese', 'quail', 'venison', 'boar', 'hot dog', 'frankfurter', 'bratwurst', 'black pudding', 'sirloin', 'brisket', 'tenderloin', 'ribeye', 'rib eye', 't bone',
+  'spare rib', 'pork rib', 'short rib', 'beef rib', 'lamb chop', 'gizzard', 'sweetbread', 'offal', 'hamburger', 'suet', 'tallow',
   'pollo', 'pavo', 'pato', 'carne', 'ternera', 'cordero', 'cerdo', 'jamon', 'tocino', 'salchicha', 'panceta', 'higado', 'conejo', 'cabrito',
-  'gelatine', 'gelatin', 'gelatina'];
+  'ganso', 'codorni', 'venado', 'jabali', 'beicon', 'fiambre', 'cecina', 'longaniza', 'chistorra', 'butifarra', 'sobrasada', 'morcilla', 'salchichon', 'bistec', 'biftec',
+  'solomillo', 'chuleta', 'costilla', 'pechuga', 'muslo', 'albondiga', 'callos', 'molleja', 'rinon', 'hamburguesa',
+  'gelatine', 'gelatin', 'gelatina', 'grenetine'];
 const FISH_WORDS = ['poisson', 'saumon', 'thon', 'cabillaud', 'colin', 'merlu', 'sardine', 'maquereau', 'dorade', 'daurade', 'truite', 'tilapia', 'morue', 'anchois', 'hareng',
   'crevette', 'gambas', 'moule', 'calamar', 'poulpe', 'seiche', 'crabe', 'homard', 'huitre', 'saint jacques', 'surimi', 'nuoc mam', 'sauce poisson',
+  'filet de bar', 'bar de ligne', 'loup de mer', 'sole', 'plie', 'limande', 'lotte', 'eglefin', 'lieu noir', 'lieu jaune', 'merlan', 'fletan', 'turbot', 'espadon', 'capitaine',
+  'thiof', 'carpe', 'brochet', 'perche', 'langoustine', 'ecrevisse', 'palourde', 'bulot', 'bigorneau', 'calmar', 'encornet', 'pieuvre', 'oursin', 'fruits de mer', 'crustace',
+  'coquillage', 'caviar', 'tarama', 'anguille', 'bonite',
   'fish', 'salmon', 'tuna', 'cod', 'hake', 'mackerel', 'trout', 'anchov', 'herring', 'shrimp', 'prawn', 'mussel', 'squid', 'octopus', 'crab', 'lobster', 'oyster', 'scallop', 'worcestershire', 'dashi', 'bonito',
-  'pescado', 'atun', 'bacalao', 'merluza', 'sardina', 'caballa', 'trucha', 'anchoa', 'arenque', 'camaron', 'gamba', 'langostino', 'mejillon', 'pulpo', 'cangrejo', 'langosta', 'ostra', 'salsa de pescado'];
+  'sea bass', 'sea bream', 'snapper', 'plaice', 'monkfish', 'haddock', 'pollock', 'whiting', 'coley', 'halibut', 'swordfish', 'catfish', 'codfish', 'whitefish', 'perch', 'carp',
+  'crayfish', 'crawfish', 'clam', 'cockle', 'whelk', 'calamari', 'cuttlefish', 'urchin', 'seafood', 'shellfish', 'roe', 'eel',
+  'pescado', 'atun', 'bacalao', 'merluza', 'sardina', 'caballa', 'trucha', 'anchoa', 'arenque', 'camaron', 'gamba', 'langostino', 'mejillon', 'pulpo', 'cangrejo', 'langosta', 'ostra', 'salsa de pescado',
+  'boqueron', 'lubina', 'dorada', 'lenguado', 'rape', 'abadejo', 'pescadilla', 'rodaballo', 'pez', 'peces', 'mojarra', 'corvina', 'pargo', 'carpa', 'cigala', 'centollo',
+  'almeja', 'berberecho', 'vieira', 'chipiron', 'sepia', 'erizo de mar', 'marisco', 'hueva', 'anguila', 'angula'];
 // Bouillons et cubes (noms d'ingrédients) : de viande, sauf « de légumes » écrit
-const STOCK_WORDS = ['bouillon', 'cube', 'maggi', 'kub', 'jumbo', 'stock', 'broth', 'caldo', 'consome', 'consomme', 'avecrem'];
+const STOCK_WORDS = ['bouillon', 'cube', 'maggi', 'kub', 'jumbo', 'knorr', 'oxo', 'stock', 'broth', 'caldo', 'consome', 'consomme', 'avecrem'];
 const VEGETABLE_STOCK = ['legume', 'vegetable', 'vegetal', 'verdura', 'champignon', 'mushroom', 'hongo', 'vegan', 'vegetarien', 'vegetarian', 'vegetariano'];
 const DAIRY_WORDS = ['lait', 'beurre', 'creme', 'fromage', 'yaourt', 'yogourt', 'kefir', 'ghee', 'parmesan', 'mozzarella', 'feta', 'ricotta', 'mascarpone', 'emmental', 'gruyere', 'comte', 'cheddar', 'chevre', 'brie', 'camembert', 'raclette', 'bechamel', 'petit suisse',
-  'milk', 'butter', 'cream', 'cheese', 'yogurt', 'yoghurt', 'whey', 'buttermilk', 'custard',
-  'leche', 'mantequilla', 'nata', 'crema', 'queso', 'yogur', 'requeson', 'suero'];
-const EGG_WORDS = ['oeuf', 'mayonnaise', 'egg', 'mayo', 'huevo', 'yema', 'mayonesa', 'meringue', 'merengue'];
+  'chantilly', 'lactoserum', 'babeurre', 'casein', 'skyr', 'faisselle', 'parmigiano', 'pecorino', 'burrata', 'stracciatella', 'scamorza', 'halloumi', 'paneer', 'gouda', 'edam',
+  'roquefort', 'gorgonzola', 'provolone', 'reblochon', 'tomme', 'munster', 'beaufort', 'grana padano', 'cancoillotte',
+  'milk', 'butter', 'cream', 'cheese', 'yogurt', 'yoghurt', 'whey', 'buttermilk', 'custard', 'quark', 'labneh', 'white sauce', 'half and half',
+  'leche', 'mantequilla', 'nata', 'crema', 'queso', 'yogur', 'requeson', 'suero', 'cuajada', 'manchego', 'cabrales', 'besamel', 'natilla', 'helado'];
+const EGG_WORDS = ['oeuf', 'mayonnaise', 'egg', 'mayo', 'huevo', 'yema', 'mayonesa', 'meringue', 'merengue', 'aioli', 'alioli', 'hollandaise', 'holandesa', 'bearnaise', 'bearnesa', 'brioche'];
 const HONEY_WORDS = ['miel', 'honey'];
 const GLUTEN_WORDS = ['ble', 'farine', 'pain', 'baguette', 'brioche', 'pates', 'pate feuillet', 'pate bris', 'pate sabl', 'pate a pizza', 'pate a crepe', 'semoule', 'couscous', 'boulgour', 'orge', 'seigle', 'epeautre', 'avoine',
-  'chapelure', 'biscotte', 'biscuit', 'gateau', 'crepe', 'bechamel', 'roux', 'seitan', 'sauce soja', 'biere', 'nouille', 'vermicelle', 'raviol', 'lasagne', 'tagliatelle', 'spaghetti', 'macaroni', 'penne', 'gnocchi', 'croissant', 'crouton', 'panure', 'pita', 'naan', 'chapati',
-  'wheat', 'flour', 'bread', 'bun', 'pasta', 'noodle', 'bulgur', 'barley', 'rye', 'spelt', 'oat', 'breadcrumb', 'cracker', 'cookie', 'cake', 'pastry', 'dough', 'soy sauce', 'beer', 'udon', 'ramen', 'soba', 'flour tortilla', 'wrap',
+  'chapelure', 'biscotte', 'biscuit', 'gateau', 'crepe', 'bechamel', 'roux', 'seitan', 'sauce soja', 'biere', 'nouille', 'vermicell', 'raviol', 'lasagn', 'tagliatelle', 'spaghetti', 'macaroni', 'penne', 'gnocchi', 'croissant', 'crouton', 'panure', 'pita', 'naan', 'chapati',
+  'panko', 'teriyaki', 'malt', 'pizza', 'gaufre', 'feuille de brick', 'filo', 'phyllo', 'beignet',
+  'wheat', 'flour', 'bread', 'bun', 'pasta', 'noodle', 'bulgur', 'barley', 'rye', 'spelt', 'oat', 'breadcrumb', 'cracker', 'cookie', 'cake', 'pastry', 'pastries', 'dough', 'soy sauce', 'beer', 'udon', 'ramen', 'soba', 'flour tortilla', 'wrap',
+  'semolina', 'pancake', 'waffle', 'dumpling', 'gyoza', 'wonton', 'muffin', 'bagel', 'pretzel', 'scone', 'donut',
   'trigo', 'harina', 'pan', 'cuscus', 'cous cous', 'fideo', 'cebada', 'centeno', 'avena', 'pan rallado', 'galleta', 'cerveza', 'salsa de soja', 'semola', 'bizcocho', 'masa',
+  'espelta', 'malta', 'espagueti', 'macarron', 'lasana', 'tallarin', 'noqui', 'hojaldre', 'gofre', 'picatoste', 'empanad', 'bollo', 'magdalena',
   // Bouillons, cubes et miso : souvent avec du blé ou de l'orge, par prudence
-  'cube', 'maggi', 'kub', 'jumbo', 'stock', 'avecrem', 'bouillon', 'fond de', 'broth', 'caldo', 'consome', 'consomme', 'miso'];
+  'cube', 'maggi', 'kub', 'jumbo', 'knorr', 'oxo', 'stock', 'avecrem', 'bouillon', 'fond de', 'broth', 'caldo', 'consome', 'consomme', 'miso'];
 // Dans un titre ou une étape, des mots trop ambigus (« pan » : poêle en anglais ; « cut into cubes ») sont ignorés
-const TEXT_AMBIGUOUS = new Set(['pan', 'bun', 'masa', 'wrap', 'cube', 'kub', 'jumbo', 'cake', 'stock', 'ham', 'cod', 'crema', 'fond de']);
-// Précision qui rend un nom d'ingrédient compatible (« farine de riz », « lait d'avoine », « pâtes sans gluten »)
-const PLANT_MILKS = ['vegetal', 'vegan', 'plant based', 'coco', 'coconut', 'amande', 'almond', 'almendra', 'avoine', 'oat milk', 'avena', 'soja', 'soy', 'riz', 'rice milk', 'arroz', 'cajou', 'cashew', 'anacardo', 'cacahuete', 'arachide', 'peanut', 'mani', 'cacao', 'cocoa'];
-const FREE_OF: Record<StrictDiet, string[]> = {
-  'gluten-free': ['sans gluten', 'gluten free', 'sin gluten', 'riz', 'rice', 'arroz', 'sarrasin', 'buckwheat', 'pois chiche', 'chickpea', 'garbanzo', 'manioc', 'cassava', 'yuca', 'tapioca',
+const TEXT_AMBIGUOUS = new Set(['pan', 'bun', 'masa', 'wrap', 'cube', 'kub', 'jumbo', 'cake', 'stock', 'ham', 'cod', 'crema', 'fond de', 'sole', 'plie', 'perch', 'rape', 'pez', 'roe']);
+// Précisions qui rendent un nom d'ingrédient compatible, où qu'elles soient dans le nom (« saucisses fumées végétales »,
+// « pâtes complètes sans gluten »)
+const QUALIFIERS: Record<StrictDiet, string[]> = {
+  'gluten-free': ['sans gluten', 'gluten free', 'sin gluten'],
+  'dairy-free': ['sans lactose', 'lactose free', 'sin lactosa', 'vegetal', 'vegan', 'plant based', 'dairy free'],
+  vegan: ['vegetal', 'vegan', 'plant based'],
+  vegetarian: ['vegetarien', 'vegetarian', 'vegetariano', 'vegetal', 'vegan', 'veggie', 'plant based', 'sans viande', 'sin carne', 'meatless', 'meat free'],
+};
+// Ingrédients de base qui rendent le nom compatible seulement accolés au mot interdit : juste avant (« oat milk »,
+// « rice noodles ») ou juste après, avec au plus des petits mots de liaison (« lait de riz », « yaourt au soja ») ;
+// « riz au lait », « arroz con leche » ou « poulet sauce soja » restent interdits
+const PLANT_BASES = ['coco', 'coconut', 'amande', 'almond', 'almendra', 'avoine', 'oat', 'avena', 'soja', 'soy', 'riz', 'rice', 'arroz', 'cajou', 'cashew', 'anacardo', 'cacahuete', 'arachide', 'peanut', 'mani', 'cacao', 'cocoa', 'noisette', 'hazelnut', 'avellana'];
+const BASES: Record<StrictDiet, string[]> = {
+  'gluten-free': ['riz', 'rice', 'arroz', 'sarrasin', 'buckwheat', 'sarraceno', 'pois chiche', 'chickpea', 'garbanzo', 'lentille', 'lentil', 'lenteja', 'quinoa', 'manioc', 'cassava', 'yuca', 'tapioca',
     'farine de mais', 'semoule de mais', 'polenta', 'corn tortilla', 'tortilla de maiz', 'cornmeal', 'harina de maiz', 'farine d amande', 'almond flour', 'harina de almendra', 'farine de coco', 'coconut flour'],
-  'dairy-free': ['sans lactose', 'lactose free', 'sin lactosa', ...PLANT_MILKS],
-  vegan: PLANT_MILKS,
-  vegetarian: ['vegetarien', 'vegetarian', 'vegetariano', 'vegetal', 'vegan', 'soja', 'soy'],
+  'dairy-free': PLANT_BASES,
+  vegan: PLANT_BASES,
+  vegetarian: ['soja', 'soy', 'tofu'],
 };
 // Mots à ne pas confondre avec un aliment interdit
-const NOT_FORBIDDEN = ['buttercup', 'butternut', 'cream of tartar', 'creme de tartre', 'beurre de cacahuete', 'beurre d arachide', 'beurre de karite', 'creme de coco', 'lait de coco', 'coconut milk', 'coconut cream', 'leche de coco', 'crema de coco'];
+const NOT_FORBIDDEN = ['buttercup', 'butternut', 'cream of tartar', 'creme de tartre', 'beurre de cacahuete', 'beurre d arachide', 'beurre de karite', 'creme de coco', 'lait de coco', 'coconut milk', 'coconut cream', 'leche de coco', 'crema de coco',
+  'pan fried', 'pan seared', 'pan roasted', 'creme de marron', 'creme de marrons', 'creme de cassis', 'creme de menthe'];
 const DIET_WORDS: Record<StrictDiet, string[]> = {
   vegetarian: [...MEAT_WORDS, ...FISH_WORDS],
   vegan: [...MEAT_WORDS, ...FISH_WORDS, ...DAIRY_WORDS, ...EGG_WORDS, ...HONEY_WORDS],
@@ -205,21 +237,51 @@ const DIET_WORDS: Record<StrictDiet, string[]> = {
 };
 
 const escape = (word: string) => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const wordsPattern = (words: string[]) => new RegExp(` (?:${words.map((w) => (w.length <= 4 ? `${escape(w)}(?:s|x|es)?(?= )` : escape(w))).join('|')})`);
-const NAME_PATTERNS = Object.fromEntries(STRICT_DIETS.map((diet) => [diet, wordsPattern(DIET_WORDS[diet])])) as Record<StrictDiet, RegExp>;
+// Un mot ou une expression : chaque mot d'une expression peut être au pluriel ; le dernier mot est entier (4 lettres ou
+// moins) ou un début de mot
+const wordSource = (word: string) => {
+  const parts = word.split(' ');
+  const body = parts.map((part, i) => (i < parts.length - 1 ? `${escape(part)}(?:s|x|es)?` : escape(part))).join(' ');
+  return word.length <= 4 ? `${body}(?:s|x|es)?(?= )` : body;
+};
+const wordsPattern = (words: string[], flags = '') => new RegExp(` (?:${words.map(wordSource).join('|')})`, flags);
+const NAME_PATTERNS = Object.fromEntries(STRICT_DIETS.map((diet) => [diet, wordsPattern(DIET_WORDS[diet], 'g')])) as Record<StrictDiet, RegExp>;
 const TEXT_PATTERNS = Object.fromEntries(STRICT_DIETS.map((diet) => [diet, wordsPattern(DIET_WORDS[diet].filter((w) => !TEXT_AMBIGUOUS.has(w)))])) as Record<StrictDiet, RegExp>;
-const FREE_PATTERNS = Object.fromEntries(STRICT_DIETS.map((diet) => [diet, wordsPattern(FREE_OF[diet])])) as Record<StrictDiet, RegExp>;
+const QUALIFIER_PATTERNS = Object.fromEntries(STRICT_DIETS.map((diet) => [diet, wordsPattern(QUALIFIERS[diet])])) as Record<StrictDiet, RegExp>;
+const BASE_PATTERNS = Object.fromEntries(STRICT_DIETS.map((diet) => [diet, wordsPattern(BASES[diet], 'g')])) as Record<StrictDiet, RegExp>;
 const STOCK_PATTERN = wordsPattern(STOCK_WORDS);
 const VEGETABLE_STOCK_PATTERN = wordsPattern(VEGETABLE_STOCK);
 const withoutHarmless = (text: string, diet: StrictDiet) =>
   [...NOT_FORBIDDEN, ...DIET_EXCEPTIONS[diet]].reduce((padded, phrase) => padded.replaceAll(` ${phrase} `, ' '), ` ${normalizeName(text)} `);
+
+// Mots trouvés (début et fin du mot entier, dans le texte entouré d'espaces)
+function spans(pattern: RegExp, padded: string): { start: number; end: number }[] {
+  return [...padded.matchAll(pattern)].map((match) => {
+    const start = match.index! + 1;
+    return { start, end: padded.indexOf(' ', match.index! + match[0].length) };
+  });
+}
+const LINKS = new Set(['de', 'd', 'du', 'des', 'a', 'au', 'aux', 'la', 'l', 'en', 'al', 'del', 'of']);
+
+// Mot interdit rendu compatible par un ingrédient de base accolé (« lait de riz », « oat milk », « farine de maïs »)
+function freeByBase(padded: string, word: { start: number; end: number }, bases: { start: number; end: number }[]): boolean {
+  let next = word.end + 1;
+  for (;;) {
+    const following = padded.slice(next, padded.indexOf(' ', next));
+    if (!LINKS.has(following)) break;
+    next += following.length + 1;
+  }
+  return bases.some((base) => (base.start < word.end && base.end > word.start) || base.end === word.start - 1 || base.start === next);
+}
 
 // Nom d'ingrédient qui ne respecte pas le régime
 export function dietWordInName(name: string, diet: StrictDiet): boolean {
   if (isDietException(name, diet)) return false;
   const padded = withoutHarmless(name, diet);
   if ((diet === 'vegetarian' || diet === 'vegan') && STOCK_PATTERN.test(padded) && !VEGETABLE_STOCK_PATTERN.test(padded)) return true;
-  return NAME_PATTERNS[diet].test(padded) && !FREE_PATTERNS[diet].test(padded);
+  if (QUALIFIER_PATTERNS[diet].test(padded)) return false;
+  const bases = spans(BASE_PATTERNS[diet], padded);
+  return spans(NAME_PATTERNS[diet], padded).some((word) => !freeByBase(padded, word, bases));
 }
 
 // Titre ou étape qui nomme un aliment interdit par le régime (farine d'une béchamel absente de la liste)
