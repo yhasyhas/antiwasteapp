@@ -1,10 +1,10 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { getAuthenticatedUser } from '../_shared/auth.ts';
 import { consumeQuota, dailyLimit, refundQuota } from '../_shared/quota.ts';
-import { logUserQuota, reportInBackground, reportProviderQuota } from '../_shared/quotaAlerts.ts';
+import { logUserQuota, recordProviderUsage, reportInBackground, reportProviderFailure, reportProviderQuota } from '../_shared/quotaAlerts.ts';
 import { readSimulation } from '../_shared/simulate.ts';
 import { withCors } from '../_shared/cors.ts';
-import { type AiProvider, type AttemptLog, geminiProvider, groqProvider, orderProviders, runWithFallback } from '../_shared/ai.ts';
+import { type AiProvider, type AttemptLog, type ProviderQuotaHit, geminiProvider, groqProvider, orderProviders, runWithFallback } from '../_shared/ai.ts';
 import {
   buildPantry,
   buildOtherPantry,
@@ -251,6 +251,16 @@ Deno.serve(withCors(async (req: Request) => {
       ? orderProviders(PROVIDERS, requestedOrder).filter((p) => requestedOrder.split(',').includes(p.name))
       : PROVIDERS;
     const log: AttemptLog[] = [];
+    // Quotas épuisés et dysfonctionnements des fournisseurs, même si le secours a répondu : alerte (une fois
+    // par jour, par fournisseur et par type)
+    const reportHits = (call: { quotaHits: ProviderQuotaHit[]; failureHits: ProviderQuotaHit[] } | null | undefined) => {
+      for (const hit of call?.quotaHits ?? []) {
+        reportInBackground(reportProviderQuota(hit.provider, 'generate-recipes', hit.details, simulation !== null));
+      }
+      for (const hit of call?.failureHits ?? []) {
+        reportInBackground(reportProviderFailure(hit.provider, 'generate-recipes', hit.details, simulation !== null));
+      }
+    };
     const result = await runWithFallback(providers, {
       system,
       prompt,
@@ -259,10 +269,7 @@ Deno.serve(withCors(async (req: Request) => {
       temperature: 0.8,
       maxOutputTokens: MAX_OUTPUT_TOKENS,
     }, (text) => parseRecipes(text, pantry, diets, context), { label: 'generate-recipes', log, t0, simulate: simulation?.providers });
-    // Quotas de fournisseurs épuisés, même si le secours a répondu : alerte (une fois par jour et par fournisseur)
-    for (const hit of result.quotaHits) {
-      reportInBackground(reportProviderQuota(hit.provider, 'generate-recipes', hit.details, simulation !== null));
-    }
+    reportHits(result);
     const debugInfo = debug === true ? { debug: { total_ms: Date.now() - t0, attempts: log } } : {};
 
     if (!result.ok) {
@@ -291,9 +298,7 @@ Deno.serve(withCors(async (req: Request) => {
         temperature: 0.8,
         maxOutputTokens: MAX_OUTPUT_TOKENS,
       }, (text) => parseRecipes(text, pantry, diets, { ...context, maxRecipes: missing }), { label: 'generate-recipes', log, t0, simulate: simulation?.providers });
-      for (const hit of second.quotaHits) {
-        reportInBackground(reportProviderQuota(hit.provider, 'generate-recipes', hit.details, simulation !== null));
-      }
+      reportHits(second);
       if (second.ok) {
         const titles = new Set(recipes.map((recipe) => recipe.title.toLowerCase()));
         recipes = [...recipes, ...second.value.recipes.filter((recipe) => !titles.has(recipe.title.toLowerCase()))].slice(0, count);
@@ -323,9 +328,8 @@ Deno.serve(withCors(async (req: Request) => {
         deadline: t0 + GENERATION_BUDGET_MS,
         ...(simulation?.providers && { simulate: simulation.providers }),
       });
-      for (const hit of [...pass.report.correction?.quotaHits ?? [], ...pass.report.replacement?.quotaHits ?? []]) {
-        reportInBackground(reportProviderQuota(hit.provider, 'generate-recipes', hit.details, simulation !== null));
-      }
+      reportHits(pass.report.correction);
+      reportHits(pass.report.replacement);
       // Tests (clé secrète) : toutes les recettes écartées, pour vérifier que la génération n'est pas comptée
       recipes = simulation?.safety_drop_all ? [] : pass.recipes;
       safetyReport = { first: pass.report.first, corrected: pass.report.corrected, replaced: pass.report.replaced, dropped: pass.report.dropped };
@@ -339,6 +343,8 @@ Deno.serve(withCors(async (req: Request) => {
       }
     }
 
+    // Part des recettes servies par le secours (« État des services ») ; essais (debug, simulation) à part
+    reportInBackground(recordProviderUsage('generate-recipes', result.provider.name, result.provider !== providers[0], recipes.length, simulation !== null || debug === true));
     console.log(`[generate-recipes] ${result.provider.name} (${result.provider.model}) : ${recipes.length}/${count} recette(s) en ${Date.now() - t0} ms, prompt ${PROMPT_VERSION}, cuisine ${cuisine}, langue ${language}`);
     return jsonResponse({
       recipes,

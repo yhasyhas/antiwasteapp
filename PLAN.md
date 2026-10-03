@@ -316,6 +316,9 @@ Suite de la phase 7, sur la branche `phase-7-finalisation`.
 - [ ] Limite d'achats : au plus 3 ingrédients à acheter par recette, hors sel, poivre, huile, eau, avec ou sans sélection (consigne de la v4.1 et contrôle du serveur, recette corrigée puis écartée)
 - [ ] Évaluation : 3 garde-manger par région dans les cas fixes, une fois la bibliothèque relue
 - [x] « Mes recettes » 2.0 (JavaScript seulement) : trois onglets Favoris · Pour plus tard · Toutes (« Pour plus tard » : signet sur chaque carte, indépendant du cœur, `recipes.later_at`) ; filtre « Faisable maintenant » (« X/Y ingrédients disponibles » d’après le garde-manger actuel, hors basiques, les plus faisables d’abord) et « Utilise mes aliments urgents » ; recherche par titre et par ingrédient ; filtres rapides cuisine (`recipes.cuisine`), moins de 30 min, régime, type de repas ; vue compacte ou en cartes ; sections par période ; sur l’accueil, recettes faisables maintenant en premier
+- [x] Surveillance du secours : alerte Sentry (tag `alert:provider_failure`, une fois par jour et par fournisseur) quand un fournisseur échoue pour une autre raison qu'un quota ou une surcharge (réponse refusée, schéma invalide, réponse illisible) ; part des recettes servies par le secours sur 7 jours dans « État des services » (`provider_usage_daily`)
+- [ ] « Faisable maintenant » : ingrédient manquant affiché sur la carte (« Il manque : oignon »), avec un bouton pour l'ajouter aux courses
+- [ ] Qualité du secours : évaluation avec Gemini seul (cas de base et langues mélangées), mêmes mesures que Groq ; post-traitements du serveur renforcés si Gemini fait nettement moins bien
 - [ ] Mode cuisine étape par étape avec minuteurs (si garder l'écran allumé demande un module natif, cette partie va en phase 12)
 
 **Terminé quand** : l'évaluation rejouable donne un meilleur résultat après l'amélioration du prompt, et une recette peut être suivie étape par étape avec ses minuteurs.
@@ -381,6 +384,7 @@ Ancienne phase 8a.
 - [ ] Sauvegardes automatiques de la base et test de restauration
 - [ ] Vérifier les délais de la base (transactions inactives, requêtes longues)
 - [ ] Environnement de test séparé (second projet Supabase) pour ne plus déployer sur la base utilisée par l'app pendant le développement
+- [ ] Vérifier que les post-traitements (noms, titres, sécurité, étiquettes) s'appliquent quel que soit le fournisseur
 - [ ] Tests automatisés des parcours critiques sur téléphone : connexion, scan, génération, « J'ai cuisiné ça », foyer
 
 **Terminé quand** : chaque point de l'audit est traité ou noté au journal avec sa raison.

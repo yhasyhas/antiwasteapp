@@ -214,21 +214,36 @@ export function classifyProviderFailure(status: number | undefined, details: str
   return status === 429 || QUOTA_PATTERN.test(details) ? 'provider_quota' : 'provider_error';
 }
 
-// Fournisseur dont le quota s'est révélé épuisé pendant l'appel (même si un autre a pris le relais)
+// Surcharge ou indisponibilité passagère : HTTP 5xx, 498 (capacité de Groq dépassée), délai, réseau
+const OVERLOAD_PATTERN = /TimeoutError|AbortError|timed out|network|connection|error sending request|ECONNRESET|overloaded|UNAVAILABLE/i;
+
+// Dysfonctionnement d'un fournisseur, à surveiller : ni quota ni surcharge, donc une réponse refusée
+// (400 json_validate_failed), un schéma invalide, une clé refusée, une réponse vide, tronquée ou illisible.
+// Le secours masque ces échecs à l'utilisateur : sans alerte, on ne les verrait pas.
+export function isProviderMalfunction(status: number | undefined, details: string): boolean {
+  if (classifyProviderFailure(status, details) === 'provider_quota') return false;
+  if (status !== undefined) return status < 500 && status !== 498;
+  return !OVERLOAD_PATTERN.test(details);
+}
+
+// Fournisseur dont le quota s'est révélé épuisé, ou qui a dysfonctionné, pendant l'appel (même si un
+// autre a pris le relais)
 export interface ProviderQuotaHit {
   provider: string;
   details: string;
 }
 
 export type FallbackResult<T> =
-  | { ok: true; value: T; provider: AiProvider; quotaHits: ProviderQuotaHit[] }
-  | { ok: false; failure: string; code: FailureCode; provider: AiProvider; reason: ProviderFailureReason; quotaHits: ProviderQuotaHit[] };
+  | { ok: true; value: T; provider: AiProvider; quotaHits: ProviderQuotaHit[]; failureHits: ProviderQuotaHit[] }
+  | { ok: false; failure: string; code: FailureCode; provider: AiProvider; reason: ProviderFailureReason; quotaHits: ProviderQuotaHit[]; failureHits: ProviderQuotaHit[] };
 
-// Erreurs simulées pour les tests (jamais d'appel réel au fournisseur) : quota épuisé ou panne
-export type SimulatedFailure = 'quota' | 'error';
+// Erreurs simulées pour les tests (jamais d'appel réel au fournisseur) : quota épuisé, panne, ou réponse
+// refusée par le fournisseur (dysfonctionnement)
+export type SimulatedFailure = 'quota' | 'error' | 'refused';
 
 function simulatedResult(provider: AiProvider, failure: SimulatedFailure): ProviderResult {
   const name = provider.name.charAt(0).toUpperCase() + provider.name.slice(1);
+  if (failure === 'refused') return { ok: false, status: 400, details: `${name} 400 (simulé) : json_validate_failed, réponse refusée` };
   return failure === 'quota'
     ? { ok: false, status: 429, details: `${name} 429 (simulé) : quota épuisé (RESOURCE_EXHAUSTED / rate_limit_exceeded)` }
     : { ok: false, status: 500, details: `${name} 500 (simulé) : panne du fournisseur` };
@@ -237,7 +252,7 @@ function simulatedResult(provider: AiProvider, failure: SimulatedFailure): Provi
 // Résultat interne d'une tentative, avec la raison de l'échec
 type AttemptResult<T> =
   | { ok: true; value: T; provider: AiProvider }
-  | { ok: false; failure: string; code: FailureCode; provider: AiProvider; reason: ProviderFailureReason };
+  | { ok: false; failure: string; code: FailureCode; provider: AiProvider; reason: ProviderFailureReason; malfunction: boolean };
 
 // Journal des tentatives, renvoyé en mode debug (durées, tokens)
 export interface AttemptLog {
@@ -267,7 +282,7 @@ async function attempt<T>(
   let outcome: AttemptResult<T>;
   if (!result.ok) {
     const reason = classifyProviderFailure(result.status, result.details);
-    outcome = { ok: false, failure: result.details, code: 'ai_error', provider, reason };
+    outcome = { ok: false, failure: result.details, code: 'ai_error', provider, reason, malfunction: isProviderMalfunction(result.status, result.details) };
     if (reason === 'provider_quota') {
       console.error(`[${label}] QUOTA ÉPUISÉ chez ${provider.name} (${provider.model}) : ${result.details.slice(0, 200)}`);
     }
@@ -276,18 +291,19 @@ async function attempt<T>(
       console.error(`[${label}] ${provider.name} (${provider.model}) CLÉ ${provider.name.toUpperCase()} INVALIDE (HTTP ${result.status}) : vérifier le secret de sa clé API`);
     }
   } else if (result.text.trim() === '') {
-    outcome = { ok: false, failure: `${provider.name} : réponse vide`, code: 'invalid_response', provider, reason: 'provider_error' };
+    outcome = { ok: false, failure: `${provider.name} : réponse vide`, code: 'invalid_response', provider, reason: 'provider_error', malfunction: true };
   } else {
     const parsed = parse(result.text);
     outcome = parsed.ok
       ? { ok: true, value: parsed.value, provider }
-      : { ok: false, failure: `${provider.name} : ${parsed.failure}`, code: parsed.code, provider, reason: 'provider_error' };
+      : { ok: false, failure: `${provider.name} : ${parsed.failure}`, code: parsed.code, provider, reason: 'provider_error', malfunction: true };
   }
 
   if (!outcome.ok) {
     entry.details = outcome.failure.slice(0, 300);
     // Une annulation n'est pas une panne : l'autre fournisseur a déjà répondu
-    if (!signal.aborted) console.error(`[${label}] ${provider.name} (${provider.model}) échec en ${entry.ms} ms : ${outcome.failure}`);
+    if (signal.aborted) outcome.malfunction = false;
+    else console.error(`[${label}] ${provider.name} (${provider.model}) échec en ${entry.ms} ms : ${outcome.failure}`);
   } else {
     entry.ok = true;
   }
@@ -317,7 +333,7 @@ export function runWithFallback<T>(
     let hedgeTimer: ReturnType<typeof setTimeout> | undefined;
     let deadlineTimer: ReturnType<typeof setTimeout> | undefined;
     // Échecs des fournisseurs : la raison finale et les quotas épuisés en découlent
-    const failures: Array<{ provider: string; reason: ProviderFailureReason; details: string }> = [];
+    const failures: Array<{ provider: string; reason: ProviderFailureReason; details: string; malfunction: boolean }> = [];
 
     const finish = (result: AttemptResult<T>) => {
       settled = true;
@@ -327,12 +343,15 @@ export function runWithFallback<T>(
       const quotaHits = failures
         .filter((failure) => failure.reason === 'provider_quota')
         .map(({ provider, details }) => ({ provider, details }));
-      if (result.ok) return resolve({ ...result, quotaHits });
+      const failureHits = failures
+        .filter((failure) => failure.malfunction)
+        .map(({ provider, details }) => ({ provider, details }));
+      if (result.ok) return resolve({ ...result, quotaHits, failureHits });
       // Tous les fournisseurs ont échoué : quota seulement si c'est la cause pour chacun d'eux
       const reason: ProviderFailureReason = failures.length > 0 && failures.every((failure) => failure.reason === 'provider_quota')
         ? 'provider_quota'
         : 'provider_error';
-      resolve({ ...result, reason, quotaHits });
+      resolve({ ...result, reason, quotaHits, failureHits });
     };
 
     const startNext = () => {
@@ -343,7 +362,7 @@ export function runWithFallback<T>(
       attempt(provider, request, parse, controller.signal, options.log, options.t0, options.label, options.simulate?.[provider.name]).then((result) => {
         pending--;
         if (settled) return;
-        if (!result.ok) failures.push({ provider: provider.name, reason: result.reason, details: result.failure });
+        if (!result.ok) failures.push({ provider: provider.name, reason: result.reason, details: result.failure, malfunction: result.malfunction });
         if (result.ok) return finish(result);
         if (next < providers.length) startNext();
         else if (pending === 0) finish(result);
@@ -358,8 +377,8 @@ export function runWithFallback<T>(
       deadlineTimer = setTimeout(() => {
         if (settled) return;
         console.warn(`[${options.label}] ${failure}`);
-        failures.push({ provider: providers[0]?.name ?? '', reason: 'provider_error', details: failure });
-        finish({ ok: false, failure, code: 'ai_error', provider: providers[0], reason: 'provider_error' });
+        failures.push({ provider: providers[0]?.name ?? '', reason: 'provider_error', details: failure, malfunction: false });
+        finish({ ok: false, failure, code: 'ai_error', provider: providers[0], reason: 'provider_error', malfunction: false });
       }, Math.max(0, options.deadline - Date.now()));
     }
     startNext();

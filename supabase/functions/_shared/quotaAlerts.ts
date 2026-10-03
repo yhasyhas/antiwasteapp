@@ -13,9 +13,18 @@ export function logUserQuota(fn: string, kind: string, limit: number, userId: st
   console.warn(`[quota] QUOTA PERSONNEL ATTEINT (user_quota) : ${kind}, ${limit} par jour, fonction ${fn}, utilisateur ${userId}`);
 }
 
-// Type d'alerte (tag Sentry « alert ») : quota d'un fournisseur d'IA épuisé, ou échec d'envoi des
-// notifications push (Expo Push)
-export type AlertKind = 'provider_quota' | 'push_failure';
+// Type d'alerte (tag Sentry « alert ») : quota d'un fournisseur d'IA épuisé, échec d'envoi des
+// notifications push (Expo Push), ou dysfonctionnement d'un fournisseur d'IA (réponse refusée, schéma
+// invalide, réponse illisible : ni quota ni surcharge)
+export type AlertKind = 'provider_quota' | 'push_failure' | 'provider_failure';
+
+const LOGGERS: Record<AlertKind, string> = { provider_quota: 'provider-quota', push_failure: 'push-failure', provider_failure: 'provider-failure' };
+
+function alertMessage(alert: AlertKind, provider: string, fn: string, day: string) {
+  if (alert === 'push_failure') return `Échec d'envoi des notifications push (${fn}) le ${day}`;
+  if (alert === 'provider_failure') return `Échec de ${provider} (réponse refusée ou non conforme, secours utilisé) (${fn}) le ${day}`;
+  return `Quota ${provider} épuisé (${fn}) le ${day}`;
+}
 
 // Exportée pour vérifier l'envoi en local (même format que les alertes des fonctions)
 export async function sendSentryWarning(provider: string, fn: string, details: string, simulated: boolean, alert: AlertKind = 'provider_quota') {
@@ -32,17 +41,15 @@ export async function sendSentryWarning(provider: string, fn: string, details: s
     timestamp: Date.now() / 1000,
     platform: 'javascript',
     level: 'warning',
-    logger: alert === 'push_failure' ? 'push-failure' : 'provider-quota',
+    logger: LOGGERS[alert],
     environment: simulated ? 'test' : 'production',
     message: {
-      formatted: alert === 'push_failure'
-        ? `Échec d'envoi des notifications push (${fn}) le ${day}${simulated ? ' [simulé]' : ''}`
-        : `Quota ${provider} épuisé (${fn}) le ${day}${simulated ? ' [simulé]' : ''}`,
+      formatted: `${alertMessage(alert, provider, fn, day)}${simulated ? ' [simulé]' : ''}`,
     },
     tags: { alert, provider, function: fn, day, simulated: String(simulated) },
     extra: { details: details.slice(0, 500) },
-    // Un problème Sentry par fournisseur et par jour : chaque jour d'échec crée un nouveau problème
-    fingerprint: [alert === 'push_failure' ? 'push-failure' : 'provider-quota', provider, day, simulated ? 'test' : 'production'],
+    // Un problème Sentry par type, fournisseur et jour : chaque jour d'échec crée un nouveau problème
+    fingerprint: [LOGGERS[alert], provider, day, simulated ? 'test' : 'production'],
   };
   const body = [JSON.stringify({ event_id: eventId, dsn: SENTRY_DSN }), JSON.stringify({ type: 'event' }), JSON.stringify(event)].join('\n');
   const response = await fetch(`https://${dsn.host}/api/${projectId}/envelope/`, {
@@ -71,13 +78,35 @@ export async function reportPushFailure(fn: string, details: string, simulated =
   await recordAndAlert('expo_push', fn, details, simulated, 'push_failure');
 }
 
+// Dysfonctionnement d'un fournisseur d'IA (le secours a pu répondre) : journal, base, alerte Sentry une
+// fois par jour et par fournisseur (tag alert:provider_failure)
+export async function reportProviderFailure(provider: string, fn: string, details: string, simulated = false) {
+  console.error(`[ai] DYSFONCTIONNEMENT (provider_failure) : ${provider}, fonction ${fn}${simulated ? ' [simulé]' : ''} : ${details.slice(0, 200)}`);
+  await recordAndAlert(provider, fn, details, simulated, 'provider_failure');
+}
+
+// Génération servie : décompte par jour et par fournisseur, secours distingué (« État des services »)
+export async function recordProviderUsage(fn: string, provider: string, fallback: boolean, recipes: number, simulated = false) {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/record_provider_usage`, {
+      method: 'POST',
+      headers: { apikey: SUPABASE_SECRET_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_function: fn, p_provider: provider, p_fallback: fallback, p_recipes: recipes, p_simulated: simulated }),
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!response.ok) console.error(`[ai] décompte impossible : HTTP ${response.status} ${(await response.text()).slice(0, 200)}`);
+  } catch (error) {
+    console.error('[ai] décompte impossible :', error);
+  }
+}
+
 async function recordAndAlert(provider: string, fn: string, details: string, simulated: boolean, alert: AlertKind) {
   try {
     const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/record_provider_quota`, {
       method: 'POST',
       // Clé secrète en apikey seulement (rôle service_role)
       headers: { apikey: SUPABASE_SECRET_KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ p_provider: provider, p_function: fn, p_error: details.slice(0, 500), p_simulated: simulated }),
+      body: JSON.stringify({ p_provider: provider, p_function: fn, p_error: details.slice(0, 500), p_simulated: simulated, p_alert: alert }),
       signal: AbortSignal.timeout(5000),
     });
     if (!response.ok) {
