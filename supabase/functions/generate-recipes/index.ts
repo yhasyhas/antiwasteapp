@@ -23,6 +23,7 @@ import { buildPrompts, CUISINES, type Cuisine, MAX_PURCHASES, PROMPT_VERSIONS, t
 import { sampleDishes } from './library.ts';
 import { recentTitles } from './history.ts';
 import { safetyPass } from './safetyPass.ts';
+import { factNamesFor, translatePantryNames } from './pantryNames.ts';
 
 // Modèles configurables par secret : les fournisseurs retirent régulièrement des modèles
 const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') || '';
@@ -208,6 +209,8 @@ Deno.serve(withCors(async (req: Request) => {
     quotaUserId = user.id;
     // Titres des recettes récentes et des favoris (à ne pas reproposer), lus pendant la préparation du prompt
     const recentPromise = V4_FAMILY ? recentTitles(user.id) : Promise.resolve([]);
+    // Noms du garde-manger écrits dans une autre langue : traduits par les alias des fiches (pantryNames.ts)
+    const namesPromise = V4_FAMILY ? factNamesFor(pantry) : Promise.resolve([]);
 
     const dietary = Array.isArray(preferences.dietary) ? preferences.dietary : [];
     const diets = strictDietsOf(dietary);
@@ -218,6 +221,7 @@ Deno.serve(withCors(async (req: Request) => {
     const servings = cleanServings(preferences.servings);
     const context = { mealType: preferences.mealType, cuisine, difficulty, dietary, maxRecipes: count, mode, otherPantry, excluded, servings };
 
+    if (V4_FAMILY) translatePantryNames(pantry, await namesPromise, language);
     const promptOptions = {
       pantryText: pantryForPrompt(pantry),
       count,

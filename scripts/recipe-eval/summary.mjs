@@ -6,10 +6,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkRecipe, noStoveCelsius, unitsInLanguage } from './checks.mjs';
+import { checkRecipe, namesInLanguage, noStoveCelsius, unitsInLanguage } from './checks.mjs';
 import { celsiusWithoutMeat, heatWithoutCooking, ovenWithoutTemperature, safetyIssues } from '../../supabase/functions/generate-recipes/safety.ts';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
+const SITUATIONS = Object.fromEntries(['cases.json', 'cases-regions.json', 'cases-proteins.json'].flatMap((file) => JSON.parse(fs.readFileSync(path.join(HERE, file), 'utf8'))).map((c) => [c.id, c]));
 const LANGUAGE = Object.fromEntries(['cases.json', 'cases-regions.json', 'cases-proteins.json'].flatMap((file) => JSON.parse(fs.readFileSync(path.join(HERE, file), 'utf8'))).map((c) => [c.id, c.preferences.language]));
 const PRICES = { 'openai/gpt-oss-120b': [0.15, 0.6], 'qwen/qwen3.8-27b': [0.8, 4], 'gemini-3.8-flash': [0.75, 3.75], 'gemini-3.7-flash': [0.75, 3.75] };
 const tokensOf = (usage) => ({
@@ -62,6 +63,7 @@ const stats = series.map((s) => {
     heat_no_cook: mean(recipes.map((r) => (heatWithoutCooking(r.recipe).length === 0 ? 1 : 0))),
     celsius_no_meat: mean(recipes.map((r) => (celsiusWithoutMeat(r.recipe) ? 0 : 1))),
     internal_codes: mean(recipes.map((r) => checkRecipe(r.recipe, { preferences: {} }, r.entry.generation.pantry).no_internal_codes)),
+    names_language: mean(recipes.filter((r) => SITUATIONS[r.entry.id]?.ingredients.some((i) => i.foreign)).map((r) => namesInLanguage(r.recipe, SITUATIONS[r.entry.id]).share)),
     oven_heat: mean(recipes.map((r) => checkRecipe(r.recipe, { preferences: {} }, r.entry.generation.pantry).no_oven_heat_level)),
     oven_celsius: mean(recipes.map((r) => (ovenWithoutTemperature(r.recipe) ? 0 : 1))),
     rules: mean(recipes.map((r) => r.checks.rules_respected)),
@@ -95,6 +97,7 @@ line('Pas de °C à cœur hors viande et poisson', (s) => pc(s.celsius_no_meat))
 line('Four : température en °C', (s) => pc(s.oven_celsius));
 line('Four : pas de niveau de feu', (s) => pc(s.oven_heat));
 line('Aucun repère interne (p10, buy) dans les textes', (s) => pc(s.internal_codes));
+line('Noms dans la langue de la recette (cas en langues mélangées)', (s) => pc(s.names_language));
 line('Régimes, exclusions, sélection', (s) => pc(s.rules));
 line('Aliment urgent utilisé', (s) => pc(s.urgent));
 line('Ingrédients à acheter par recette (moyenne / max)', (s) => `${s.purchases.toFixed(1)} / ${s.purchases_max}`);

@@ -112,9 +112,22 @@ export function checkRecipe(recipe, situation, pantry) {
     reheat_cue: reheatCue ? 1 : 0,
     uses_urgent: usesUrgent ? 1 : 0,
     rules_respected: forbidden.length === 0 ? 1 : 0,
+    names_in_language: namesInLanguage(recipe, situation).share,
+    foreign_names_copied: namesInLanguage(recipe, situation).copied,
     forbidden,
     steps: steps.length,
   };
+}
+
+// Noms du garde-manger dans une autre langue que la recette (cas en langues mélangées, « "foreign": true ») : le nom
+// affiché dans la liste et les étapes est traduit, jamais recopié tel quel (« poisson » dans une recette en anglais)
+export function namesInLanguage(recipe, situation) {
+  const foreign = (situation.ingredients ?? []).map((item, i) => ({ ...item, id: `${situation.id}-${i + 1}` })).filter((item) => item.foreign);
+  const used = foreign.filter((item) => (recipe.ingredients_used ?? []).some((i) => i.pantry_id === item.id));
+  if (used.length === 0) return { share: 1, copied: [] };
+  const texts = [...(recipe.ingredients_used ?? []).map((i) => i.name), ...(recipe.instructions ?? []), recipe.title].map((t) => ` ${normalize(t)} `);
+  const copied = used.filter((item) => texts.some((t) => t.includes(` ${normalize(item.name)} `))).map((item) => item.name);
+  return { share: 1 - copied.length / used.length, copied };
 }
 
 // Diversité d'une génération : 1 - ressemblance moyenne des ingrédients et des titres entre recettes

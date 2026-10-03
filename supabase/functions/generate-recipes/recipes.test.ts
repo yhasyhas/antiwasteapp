@@ -375,6 +375,7 @@ Deno.test('titres : mentions de style ou d’origine retirées (tests du 03/10),
   assertEquals(withoutStyleMentions('Creamy Coconut-Style Fish and Potato Broth'), 'Creamy Fish and Potato Broth');
   assertEquals(withoutStyleMentions('West African-Style Savory Rosemary Egg Scramble'), 'Savory Rosemary Egg Scramble');
   assertEquals(withoutStyleMentions('Poulet aux légumes façon tajine'), 'Poulet aux légumes');
+  assertEquals(withoutStyleMentions('Spanish‑Style Potato and Egg Tortilla'), 'Potato and Egg Tortilla');
   assertEquals(withoutStyleMentions('Pollo con verduras al estilo marroquí'), 'Pollo con verduras');
   // Inchangés
   for (const title of ['Rosemary Comfort Soup', 'Mafé de bœuf', 'Stir-Fry de bœuf au gingembre', 'Pan-Seared Steak with Rosemary', 'Tajine de poulet aux olives']) {

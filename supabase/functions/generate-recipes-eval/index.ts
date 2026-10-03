@@ -42,6 +42,7 @@ import { sampleDishes } from '../generate-recipes/library.ts';
 import { resolveCuisine } from '../generate-recipes/cuisines.ts';
 import { type SafetyReport, safetyPass } from '../generate-recipes/safetyPass.ts';
 import { recentTitles } from '../generate-recipes/history.ts';
+import { factNamesFor, translatePantryNames } from '../generate-recipes/pantryNames.ts';
 import { JUDGE_SCHEMA, judgePrompt, VARIETY_SCHEMA, varietyPrompt } from './judge.ts';
 
 const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') || '';
@@ -98,6 +99,8 @@ async function generate(body: any) {
       // library: 'pantry' : la moitié des exemples partage un ingrédient avec le garde-manger, et chaque recette
       // s'appuie sur un exemple différent (variante mesurée par variety.mjs)
       ...((body.library === 'pantry' || (version === 'v5' && body.library !== true)) && { pantry: pantry.items.map((item) => item.name) }) });
+  // Comme generate-recipes : noms du garde-manger traduits par les alias des fiches
+  if (v4) translatePantryNames(pantry, await factNamesFor(pantry), language);
   const promptOptions = {
     pantryText: pantryForPrompt(pantry),
     count,

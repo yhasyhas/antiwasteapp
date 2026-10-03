@@ -491,7 +491,8 @@ const TITLE_MENTIONS = [
   new RegExp(String.raw`(?:^|\s)(?:(?:west|east|north|south|central|southern|northern|eastern|western|sub|middle|latin|southeast|south-east)[\s-])?[\p{L}'’]+[\s-]${STYLE_WORD.replace('|comfort', '')}\b`, 'giu'),
 ];
 export function withoutStyleMentions(title: string): string {
-  const cleaned = TITLE_MENTIONS.reduce((text, pattern) => text.replace(pattern, ''), title).replace(/\s{2,}/g, ' ').replace(/^[\s,–—-]+|[\s,–—-]+$/g, '').trim();
+  // Traits d'union insécables (« Spanish‑Style ») : traits d'union ordinaires
+  const cleaned = TITLE_MENTIONS.reduce((text, pattern) => text.replace(pattern, ''), title.replace(/[‐‑]/g, '-')).replace(/\s{2,}/g, ' ').replace(/^[\s,–—-]+|[\s,–—-]+$/g, '').trim();
   // Titre vidé par erreur : on garde l'original
   return cleaned.length >= 4 ? cleaned.charAt(0).toUpperCase() + cleaned.slice(1) : title;
 }

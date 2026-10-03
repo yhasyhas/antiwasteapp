@@ -6,19 +6,19 @@
     "ingredients": [
       { "name": "beef steak", "quantity": "4", "days_left": 1 },
       { "name": "aubergine", "quantity": "1", "days_left": 2 },
-      { "name": "lait", "quantity": "1 l", "days_left": 2 },
-      { "name": "poivron", "quantity": "3", "days_left": 4 },
+      { "name": "lait", "quantity": "1 l", "days_left": 2, "foreign": true },
+      { "name": "poivron", "quantity": "3", "days_left": 4, "foreign": true },
       { "name": "milk", "quantity": "1 bottle, 1 glass", "days_left": 5 },
       { "name": "rosemary", "quantity": "1 sprig", "days_left": 7 },
-      { "name": "pomme de terre", "quantity": "2", "days_left": 17 },
-      { "name": "œufs", "quantity": "4", "days_left": 27 },
+      { "name": "pomme de terre", "quantity": "2", "days_left": 17, "foreign": true },
+      { "name": "œufs", "quantity": "4", "days_left": 27, "foreign": true },
       { "name": "cooked rice", "quantity": "1 bowl", "kind": "dish" },
-      { "name": "yaourt grec", "quantity": "880 g" },
-      { "name": "poisson", "quantity": "2" },
+      { "name": "yaourt grec", "quantity": "880 g", "foreign": true },
+      { "name": "poisson", "quantity": "2", "foreign": true },
       { "name": "baguette", "quantity": "2" },
-      { "name": "poulet", "quantity": "1 morceau" },
-      { "name": "bœuf", "quantity": "2 morceaux" },
-      { "name": "citrouille", "quantity": "1" }
+      { "name": "poulet", "quantity": "1 morceau", "foreign": true },
+      { "name": "bœuf", "quantity": "2 morceaux", "foreign": true },
+      { "name": "citrouille", "quantity": "1", "foreign": true }
     ]
   },
   {
@@ -30,9 +30,9 @@
     "ingredients": [
       { "name": "cooked rice", "quantity": "1 bowl", "kind": "dish" },
       { "name": "baguette", "quantity": "2" },
-      { "name": "bœuf", "quantity": "2 morceaux" },
-      { "name": "poulet", "quantity": "1 morceau" },
-      { "name": "citrouille", "quantity": "1" }
+      { "name": "bœuf", "quantity": "2 morceaux", "foreign": true },
+      { "name": "poulet", "quantity": "1 morceau", "foreign": true },
+      { "name": "citrouille", "quantity": "1", "foreign": true }
     ]
   },
   {
@@ -73,13 +73,13 @@
     "note": "Viande hachée à utiliser aujourd'hui, garde-manger aux noms anglais, recette en français",
     "preferences": { "language": "fr", "cuisine": "any", "mealType": "dinner", "difficulty": "easy", "maxCookTime": 45 },
     "ingredients": [
-      { "name": "ground beef", "quantity": "500 g", "days_left": 0 },
-      { "name": "pasta", "quantity": "500 g" },
-      { "name": "tomatoes", "quantity": "5" },
-      { "name": "onion", "quantity": "2" },
-      { "name": "carrots", "quantity": "3" },
-      { "name": "cheese", "quantity": "1 block" },
-      { "name": "milk", "quantity": "1 l" }
+      { "name": "ground beef", "quantity": "500 g", "days_left": 0, "foreign": true },
+      { "name": "pasta", "quantity": "500 g", "foreign": true },
+      { "name": "tomatoes", "quantity": "5", "foreign": true },
+      { "name": "onion", "quantity": "2", "foreign": true },
+      { "name": "carrots", "quantity": "3", "foreign": true },
+      { "name": "cheese", "quantity": "1 block", "foreign": true },
+      { "name": "milk", "quantity": "1 l", "foreign": true }
     ]
   }
 ]

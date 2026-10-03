@@ -181,14 +181,14 @@
     "note": "Langues mélangées : noms en français, receta en español ; pollo urgente y salmón",
     "preferences": { "language": "es", "cuisine": "any", "mealType": "dinner", "difficulty": "easy", "maxCookTime": 60 },
     "ingredients": [
-      { "name": "cuisses de poulet", "quantity": "4", "days_left": 1 },
-      { "name": "saumon", "quantity": "2 pavés", "days_left": 2 },
-      { "name": "riz", "quantity": "1 kg" },
-      { "name": "oignons", "quantity": "3" },
-      { "name": "poivrons", "quantity": "2" },
+      { "name": "cuisses de poulet", "quantity": "4", "days_left": 1, "foreign": true },
+      { "name": "saumon", "quantity": "2 pavés", "days_left": 2, "foreign": true },
+      { "name": "riz", "quantity": "1 kg", "foreign": true },
+      { "name": "oignons", "quantity": "3", "foreign": true },
+      { "name": "poivrons", "quantity": "2", "foreign": true },
       { "name": "tomates", "quantity": "4" },
-      { "name": "ail", "quantity": "1 tête" },
-      { "name": "citron", "quantity": "2" }
+      { "name": "ail", "quantity": "1 tête", "foreign": true },
+      { "name": "citron", "quantity": "2", "foreign": true }
     ]
   },
   {
@@ -196,13 +196,13 @@
     "note": "Langues mélangées : noms en anglais, receta en español ; cerdo urgente y gambas",
     "preferences": { "language": "es", "cuisine": "any", "mealType": "lunch", "difficulty": "easy", "maxCookTime": 60 },
     "ingredients": [
-      { "name": "pork chops", "quantity": "4", "days_left": 0 },
-      { "name": "shrimp", "quantity": "300 g", "days_left": 1 },
-      { "name": "potatoes", "quantity": "1 kg" },
-      { "name": "onion", "quantity": "2" },
-      { "name": "bell peppers", "quantity": "2" },
-      { "name": "rice", "quantity": "1 kg" },
-      { "name": "garlic", "quantity": "1 head" }
+      { "name": "pork chops", "quantity": "4", "days_left": 0, "foreign": true },
+      { "name": "shrimp", "quantity": "300 g", "days_left": 1, "foreign": true },
+      { "name": "potatoes", "quantity": "1 kg", "foreign": true },
+      { "name": "onion", "quantity": "2", "foreign": true },
+      { "name": "bell peppers", "quantity": "2", "foreign": true },
+      { "name": "rice", "quantity": "1 kg", "foreign": true },
+      { "name": "garlic", "quantity": "1 head", "foreign": true }
     ]
   },
   {
@@ -210,13 +210,13 @@
     "note": "Langues mélangées : noms en espagnol, recipe in English ; viande hachée urgente et merlu",
     "preferences": { "language": "en", "cuisine": "any", "mealType": "dinner", "difficulty": "easy", "maxCookTime": 60 },
     "ingredients": [
-      { "name": "carne picada", "quantity": "500 g", "days_left": 0 },
-      { "name": "merluza", "quantity": "2 filetes", "days_left": 1 },
-      { "name": "patatas", "quantity": "1 kg" },
-      { "name": "cebolla", "quantity": "2" },
-      { "name": "zanahorias", "quantity": "3" },
-      { "name": "arroz", "quantity": "1 kg" },
-      { "name": "huevos", "quantity": "6" }
+      { "name": "carne picada", "quantity": "500 g", "days_left": 0, "foreign": true },
+      { "name": "merluza", "quantity": "2 filetes", "days_left": 1, "foreign": true },
+      { "name": "patatas", "quantity": "1 kg", "foreign": true },
+      { "name": "cebolla", "quantity": "2", "foreign": true },
+      { "name": "zanahorias", "quantity": "3", "foreign": true },
+      { "name": "arroz", "quantity": "1 kg", "foreign": true },
+      { "name": "huevos", "quantity": "6", "foreign": true }
     ]
   },
   {
@@ -224,13 +224,13 @@
     "note": "Langues mélangées : noms en anglais et en espagnol, recette en français ; poulet urgent et thon frais",
     "preferences": { "language": "fr", "cuisine": "any", "mealType": "dinner", "difficulty": "easy", "maxCookTime": 60 },
     "ingredients": [
-      { "name": "chicken thighs", "quantity": "4", "days_left": 1 },
-      { "name": "atún fresco", "quantity": "2 filetes", "days_left": 2 },
-      { "name": "papas", "quantity": "1 kg" },
-      { "name": "onions", "quantity": "2" },
-      { "name": "tomatoes", "quantity": "4" },
-      { "name": "pasta", "quantity": "500 g" },
-      { "name": "queso", "quantity": "200 g" }
+      { "name": "chicken thighs", "quantity": "4", "days_left": 1, "foreign": true },
+      { "name": "atún fresco", "quantity": "2 filetes", "days_left": 2, "foreign": true },
+      { "name": "papas", "quantity": "1 kg", "foreign": true },
+      { "name": "onions", "quantity": "2", "foreign": true },
+      { "name": "tomatoes", "quantity": "4", "foreign": true },
+      { "name": "pasta", "quantity": "500 g", "foreign": true },
+      { "name": "queso", "quantity": "200 g", "foreign": true }
     ]
   }
 ]
