@@ -21,9 +21,9 @@ export function imagePromptVersion(value: string | undefined | null): ImagePromp
 const FISH = String.raw`(?:fish|sea ?bream|bream|dorade|tilapia|salmon|cod|trout|mackerel|sardines?|snapper|sea ?bass|bass|hake|tuna|catfish|carp|mullet|grouper|thiof|whiting|pollock|haddock|herring|swordfish|monkfish|plaice|sole|barramundi|capitaine|captain fish)`;
 const POULTRY = String.raw`(?:chicken|duck|turkey|guinea ?fowl|hen|quail|poussin|pigeon)`;
 const COOKED = String.raw`(?:(?:roast(?:ed)?|grilled|fried|baked|braised|stuffed|steamed|golden|crispy|spicy|marinated|smoked)\s+)*`;
-const FISH_WORD = new RegExp(String.raw`\b${FISH}\b`, 'i');
-const WHOLE_FISH = new RegExp(String.raw`\bwhole\s+(${COOKED}${FISH})\b`, 'gi');
-const WHOLE_POULTRY = new RegExp(String.raw`\bwhole\s+(${COOKED}${POULTRY})\b`, 'gi');
+const FISH_WORD = new RegExp(String.raw`\b${FISH}(?:e?s)?\b`, 'i');
+const WHOLE_FISH = new RegExp(String.raw`\bwhole\s+(${COOKED}${FISH})(?:e?s)?\b`, 'gi');
+const WHOLE_POULTRY = new RegExp(String.raw`\bwhole\s+(${COOKED}${POULTRY})s?\b`, 'gi');
 const HEAD = /,?\s*\b(?:head[- ]on|with (?:its |the )?head(?: and tail)?)\b/gi;
 
 // La règle de la v1.1, ajoutée seulement aux plats concernés ; formulée sans négation (FLUX montre souvent ce qu'on
@@ -32,12 +32,15 @@ export function withFishPoultryRule(prompt: string): string {
   const hasFish = FISH_WORD.test(prompt);
   const hasWholePoultry = new RegExp(WHOLE_POULTRY.source, 'i').test(prompt);
   if (!hasFish && !hasWholePoultry) return prompt;
-  const dish = prompt.replace(WHOLE_FISH, '$1').replace(WHOLE_POULTRY, '$1').replace(HEAD, '').replace(/\s{2,}/g, ' ').trim().replace(/[.\s]+$/, '');
+  // « whole grilled sea bream » devient « grilled sea bream fillets » : une description positive, que FLUX suit mieux
+  const dish = prompt.replace(WHOLE_FISH, '$1 fillets').replace(WHOLE_POULTRY, '$1 pieces').replace(HEAD, '').replace(/\s{2,}/g, ' ').trim().replace(/[.\s]+$/, '');
   const rules = [
-    hasFish ? 'The fish is served as fillets or chunks, partly covered by the sauce, seen from a normal table distance' : '',
+    hasFish ? 'Plated portions of boneless fish fillet cut into pieces, partly covered by the sauce, seen from a normal table distance' : '',
     hasWholePoultry ? 'The poultry is carved into pieces, partly in the sauce' : '',
   ].filter(Boolean).join('. ');
-  return `${dish}. ${rules}.`;
+  // Règle en tête : FLUX donne plus de poids au début de la consigne (essai du 06/10/2026 : en fin de consigne, les
+  // poissons restaient souvent entiers)
+  return `${rules}. ${dish}.`;
 }
 
 export interface ImagePromptRecipe {

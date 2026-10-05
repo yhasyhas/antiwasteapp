@@ -49,10 +49,15 @@ Deno.test('image v1.1 : poisson en filets ou morceaux, sans « whole » ni tête
     description: null,
     image_prompt: 'Professional food photography, whole grilled sea bream with its head, lemon slices, onion sauce, natural light',
   }, 'v1.1');
-  assertEquals(prompt, 'Professional food photography, grilled sea bream, lemon slices, onion sauce, natural light. The fish is served as fillets or chunks, partly covered by the sauce, seen from a normal table distance.');
+  assertEquals(prompt, 'Plated portions of boneless fish fillet cut into pieces, partly covered by the sauce, seen from a normal table distance. Professional food photography, grilled sea bream fillets, lemon slices, onion sauce, natural light.');
 });
 
 Deno.test('image v1.1 : volaille entière découpée', () => {
   const prompt = buildImagePrompt({ title: 'Poulet rôti', description: null, image_prompt: 'Professional food photography, golden whole roast chicken with potatoes, roasting dish' }, 'v1.1');
-  assertEquals(prompt, 'Professional food photography, golden roast chicken with potatoes, roasting dish. The poultry is carved into pieces, partly in the sauce.');
+  assertEquals(prompt, 'The poultry is carved into pieces, partly in the sauce. Professional food photography, golden roast chicken pieces with potatoes, roasting dish.');
+});
+
+Deno.test('image v1.1 : poissons au pluriel', () => {
+  const prompt = buildImagePrompt({ title: 'Maquereaux', description: null, image_prompt: 'Professional food photography, two whole grilled mackerels with charred skin, potato salad' }, 'v1.1');
+  assertEquals(prompt, 'Plated portions of boneless fish fillet cut into pieces, partly covered by the sauce, seen from a normal table distance. Professional food photography, two grilled mackerel fillets with charred skin, potato salad.');
 });
