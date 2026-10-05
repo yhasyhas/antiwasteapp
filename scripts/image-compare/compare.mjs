@@ -2,7 +2,8 @@
 // fonction generate-recipe-image (version imposée par « prompt_version », accepté avec la clé secrète seulement).
 // Compte de test créé par l'API admin (aucun e-mail envoyé) ; ses images et le compte sont supprimés à la fin ;
 // aucun secret affiché. Coût : 2 images par recette (≈ 0,002 $ l'image au-delà de l'allocation gratuite).
-// Lancement depuis la racine : node scripts/image-compare/compare.mjs <dossier de sortie> [images en parallèle, 3 par défaut]
+// Lancement depuis la racine :
+//   node scripts/image-compare/compare.mjs <dossier de sortie> [images en parallèle, 3 par défaut] [versions, « v1,v2 » par défaut] [jeu : varied | fish]
 // Chaque image est redemandée jusqu'à 3 fois si Cloudflare échoue (pannes passagères du 05/10/2026).
 // Résultat : <dossier>/comparaison.json (recette, consigne, image en base64), pour une page côte à côte.
 import fs from 'node:fs';
@@ -19,7 +20,7 @@ const admin = { apikey: SECRET, Authorization: `Bearer ${SECRET}`, 'Content-Type
 
 // Six recettes variées, avec la description d'image écrite par generate-recipes (évaluations de la phase 9) ;
 // la dorade, absente des évaluations, est écrite dans le même style
-const DISHES = [
+const VARIED = [
   { title: 'Mafé de poulet', image_prompt: 'Professional food photography, hearty chicken mafé in a rustic clay pot, creamy peanut sauce, bright red tomatoes, green carrots, warm lighting' },
   { title: 'Dorade entière grillée, sauce aux oignons', image_prompt: 'Professional food photography, whole grilled sea bream with crispy charred skin, lemon slices and fresh herbs, onion and tomato sauce on the side, served on an oval platter, natural light' },
   { title: 'Ragoût de porc aux poireaux et haricots verts', image_prompt: 'Hearty French ragout in a rustic casserole, cubes of pork tenderloin in a creamy mustard sauce with translucent leeks, green beans, and shallots, steam rising, wooden table, natural light' },
@@ -27,7 +28,17 @@ const DISHES = [
   { title: 'Salade méchouia de carottes et pois chiches', image_prompt: 'Bright Mediterranean salad bowl with orange carrot ribbons, chickpeas, fresh herbs, and a drizzle of olive oil, natural light' },
   { title: 'Omelette du soir aux restes de poulet, courgettes et fromage', image_prompt: 'Golden fluffy omelette folded, filled with shredded chicken, green zucchini ribbons, melted cheese, soft interior, plated on a white ceramic dish, soft morning light' },
 ];
-const VERSIONS = ['v1', 'v2'];
+// Poissons et volaille entière (règle de la v1.1) : les descriptions imitent celles de generate-recipes
+const FISH_DISHES = [
+  VARIED[1],
+  { title: 'Thiéboudienne', image_prompt: 'Professional food photography, Senegalese thieboudienne, whole stuffed grouper on a bed of red tomato rice, cassava, carrots and cabbage, large communal platter, warm natural light' },
+  { title: 'Tilapia braisé, sauce tomate pimentée', image_prompt: 'Professional food photography, whole braised tilapia in a spicy tomato and pepper sauce, fried plantains on the side, rustic plate, natural light' },
+  { title: 'Curry de poisson au lait de coco', image_prompt: 'Professional food photography, creamy coconut fish curry with chunks of white fish, tomatoes and fresh coriander, served in a clay pot with steamed rice, warm light' },
+  { title: 'Maquereaux grillés, salade de pommes de terre', image_prompt: 'Professional food photography, two whole grilled mackerels with charred skin, warm potato salad with herbs, lemon wedges, wooden table, natural light' },
+  { title: 'Poulet rôti aux pommes de terre', image_prompt: 'Professional food photography, golden whole roast chicken with crispy skin, roasted potatoes and thyme in a roasting dish, natural light' },
+];
+const DISHES = process.argv[5] === 'fish' ? FISH_DISHES : VARIED;
+const VERSIONS = (process.argv[4] || 'v1,v2').split(',');
 const CONCURRENCY = Math.max(1, Number(process.argv[3]) || 3);
 const ATTEMPTS = 3;
 
@@ -76,7 +87,7 @@ try {
       results.push({ title: job.title, version: job.version, ms, image: `data:image/jpeg;base64,${bytes.toString('base64')}` });
     }));
   }
-  fs.writeFileSync(path.join(out, 'comparaison.json'), JSON.stringify({ dishes: DISHES, results }, null, 1));
+  fs.writeFileSync(path.join(out, 'comparaison.json'), JSON.stringify({ versions: VERSIONS, dishes: DISHES, results }, null, 1));
   console.log(`résultat : ${path.join(out, 'comparaison.json')}`);
 } catch (error) {
   console.log('ÉCHEC :', String(error?.message ?? error).slice(0, 300));

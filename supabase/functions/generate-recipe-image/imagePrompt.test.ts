@@ -35,3 +35,24 @@ Deno.test('image v2 : mots de studio retirés de la description', () => {
   assert(buildImagePrompt({ title: 'Dorade grillée', description: null, image_prompt: 'Professional food photography, 4k' }, 'v2').startsWith('Homemade Dorade grillée. ') === false);
   assert(buildImagePrompt({ title: 'Dorade grillée', description: null, image_prompt: 'Professional food photography, 4k' }, 'v2').startsWith('Homemade dorade grillée. '));
 });
+
+Deno.test('image v1.1 : v1 inchangée sans poisson ni volaille entière', () => {
+  assertEquals(imagePromptVersion('v1.1'), 'v1.1');
+  assertEquals(buildImagePrompt(MAFE, 'v1.1'), MAFE.image_prompt);
+  const roastChicken = 'Professional food photography, chicken thighs in a creamy peanut sauce, natural light';
+  assertEquals(buildImagePrompt({ title: 'Poulet', description: null, image_prompt: roastChicken }, 'v1.1'), roastChicken);
+});
+
+Deno.test('image v1.1 : poisson en filets ou morceaux, sans « whole » ni tête', () => {
+  const prompt = buildImagePrompt({
+    title: 'Dorade',
+    description: null,
+    image_prompt: 'Professional food photography, whole grilled sea bream with its head, lemon slices, onion sauce, natural light',
+  }, 'v1.1');
+  assertEquals(prompt, 'Professional food photography, grilled sea bream, lemon slices, onion sauce, natural light. The fish is served as fillets or chunks, partly covered by the sauce, seen from a normal table distance.');
+});
+
+Deno.test('image v1.1 : volaille entière découpée', () => {
+  const prompt = buildImagePrompt({ title: 'Poulet rôti', description: null, image_prompt: 'Professional food photography, golden whole roast chicken with potatoes, roasting dish' }, 'v1.1');
+  assertEquals(prompt, 'Professional food photography, golden roast chicken with potatoes, roasting dish. The poultry is carved into pieces, partly in the sauce.');
+});
