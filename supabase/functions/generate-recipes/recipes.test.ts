@@ -24,6 +24,8 @@ import {
   recipeCount,
   strictDietsOf,
   withoutInternalCodes,
+  withoutUrgencyWords,
+  hasUrgencyWords,
   withoutStyleMentions,
   toRecipe,
   urgentItems,
@@ -387,4 +389,34 @@ Deno.test('titres : mentions de style ou d’origine retirées (tests du 03/10),
   for (const title of ['Rosemary Comfort Soup', 'Mafé de bœuf', 'Stir-Fry de bœuf au gingembre', 'Pan-Seared Steak with Rosemary', 'Tajine de poulet aux olives']) {
     assertEquals(withoutStyleMentions(title), title);
   }
+});
+
+Deno.test('mot « urgent » jamais affiché : retiré des textes en trois langues', () => {
+  assertEquals(withoutUrgencyWords('Sauté the urgent bell peppers with onions.'), 'Sauté the bell peppers with onions.');
+  assertEquals(withoutUrgencyWords('Urgent bell peppers and rice skillet'), 'Bell peppers and rice skillet');
+  assertEquals(withoutUrgencyWords('Use the most urgent vegetables first.'), 'Use the vegetables first.');
+  assertEquals(withoutUrgencyWords('Faites revenir les poivrons urgents avec l’oignon.'), 'Faites revenir les poivrons avec l’oignon.');
+  assertEquals(withoutUrgencyWords('Une poêlée qui utilise la courgette, à consommer d’urgence (urgente).'), 'Une poêlée qui utilise la courgette, à consommer.');
+  assertEquals(withoutUrgencyWords("Utilise d'abord le plus urgent : le lait."), "Utilise d'abord : le lait.");
+  assertEquals(withoutUrgencyWords('Saltea los pimientos urgentes con cebolla.'), 'Saltea los pimientos con cebolla.');
+  assertEquals(withoutUrgencyWords('Usa con urgencia la leche.'), 'Usa la leche.');
+  // Sans le mot : texte inchangé (« insurgent », « urgentiste » ne sont pas visés)
+  assertEquals(withoutUrgencyWords('Purée de courgettes au lait.'), 'Purée de courgettes au lait.');
+  assertEquals(hasUrgencyWords('insurgent'), false);
+});
+
+Deno.test('mot « urgent » retiré des recettes reçues (titre, description, étapes, ingrédients)', () => {
+  const raw = recipe([ing('urgent bananas', 'p1')], {
+    title: 'Urgent Banana Smoothie',
+    description: 'A quick drink with urgent bananas.',
+    instructions: ['Slice the urgent bananas.', 'Blend 1 minute.'],
+    tips: ['Use urgently, while ripe.'],
+  });
+  const result = toRecipe(raw, PANTRY, CONTEXT);
+  for (const text of [result.title, result.description, ...result.instructions, ...result.tips, ...result.ingredients_used.map((i) => i.name)]) {
+    assertEquals(hasUrgencyWords(text), false, text);
+  }
+  assertEquals(result.title, 'Banana Smoothie');
+  assertEquals(result.description, 'A quick drink with bananas.');
+  assertEquals(result.ingredients_used[0].name, 'bananas');
 });

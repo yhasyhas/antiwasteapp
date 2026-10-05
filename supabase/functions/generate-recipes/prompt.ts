@@ -227,7 +227,8 @@ INGRÉDIENTS :
 - Un ingrédient marqué [date dépassée] n'est jamais mis en avant ; s'il s'agit d'un produit frais (viande, poisson, produit laitier, plat cuisiné), ne l'utilise pas.
 - "pantry_id" : l'identifiant (p1, p2…) de l'ingrédient du garde-manger utilisé, ou "missing" pour tout ingrédient qui n'en vient pas (y compris sel, poivre, huile).
 ${v4 ? `- Pour un ingrédient du garde-manger, "name" est son nom en ${languageName}, traduit s'il est écrit dans une autre langue (${TRANSLATED_NAME_EXAMPLE[options.language] || TRANSLATED_NAME_EXAMPLE.en}) ; les étapes le nomment de la même façon.
-- Les identifiants (p1, p2…), "missing" et les repères de la liste ([URGENT], [reste de plat]…) servent seulement au champ "pantry_id" : jamais dans un texte (titre, description, étapes, astuces, suggestion).` : `- Pour un ingrédient du garde-manger, "name" reprend son nom tel qu'il est écrit dans la liste.`}
+- Les identifiants (p1, p2…), "missing" et les repères de la liste ([URGENT], [reste de plat]…) servent seulement au champ "pantry_id" : jamais dans un texte (titre, description, étapes, astuces, suggestion).
+- N'écris jamais le mot « urgent » ni un équivalent (urgente, urgence, urgently, urgente, urgencia…) dans un texte ni dans un nom d'ingrédient : écris « des poivrons », pas « des poivrons urgents ».` : `- Pour un ingrédient du garde-manger, "name" reprend son nom tel qu'il est écrit dans la liste.`}
 - "name" : le nom de l'ingrédient seul, sans préparation ni précision (« ail » et non « ail, émincé ») ; la préparation va dans les étapes.
 - Chaque recette utilise au moins un ingrédient du garde-manger.${v41 ? `
 - Au plus ${MAX_PURCHASES} ingrédients à acheter par recette (hors sel, poivre, huile, eau), seulement les indispensables (règle vérifiée après coup) ; tout le reste vient du garde-manger.` : ''}${v2 ? `
