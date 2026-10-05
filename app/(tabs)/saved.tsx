@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocalSearchParams } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LayoutList, Rows3, Search, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -34,7 +35,14 @@ export default function SavedScreen() {
   const { recipes, loading, selectedRecipe, setSelectedRecipe, isImageLoading, imageNotice, openRecipe, toggleFavorite, toggleLater } = useSavedRecipes();
   const { t } = useLanguage();
   const pantry = usePantryUrgency();
-  const [tab, setTab] = useState<SavedTab>('favorites');
+  // Onglet demandé par l'accueil (« Tout voir ») : Favoris s'il y en a au moins un, sinon Toutes
+  // (« at » : chaque toucher est une nouvelle demande, même après un changement d'onglet à la main)
+  const params = useLocalSearchParams<{ tab?: string; at?: string }>();
+  const requestedTab = params.tab === 'favorites' || params.tab === 'later' || params.tab === 'all' ? params.tab : null;
+  const [tab, setTab] = useState<SavedTab>(requestedTab ?? 'favorites');
+  useEffect(() => {
+    if (requestedTab) setTab(requestedTab);
+  }, [requestedTab, params.at]);
   const [filters, setFilters] = useState<SavedFilters>(NO_FILTERS);
   const [compact, setCompact] = useState(false);
   const update = (change: Partial<SavedFilters>) => setFilters((current) => ({ ...current, ...change }));

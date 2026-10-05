@@ -40,9 +40,9 @@ type RecentRecipe = Recipe & { id: string };
 
 // Nombre d'aliments « à utiliser vite » affichés sur l'accueil
 const URGENT_COUNT = 3;
-// « Mes recettes » : favoris d'abord, puis les plus récentes
+// « Mes recettes » : favoris d'abord (faisables maintenant en tête), puis les plus récentes
 const MY_RECIPES_COUNT = 3;
-// Recettes lues pour la section (les favoris peuvent être plus anciens que les dernières générées)
+// Dernières recettes lues pour la section ; les favoris sont lus en plus, quel que soit leur âge
 const RECIPES_LOADED = 30;
 
 export default function HomeScreen() {
@@ -95,15 +95,25 @@ export default function HomeScreen() {
   const loadRecipes = async () => {
     if (!user) return;
 
-    const { data } = await supabase
-      .from('recipes')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(RECIPES_LOADED);
+    const favorites = await loadFavoriteIds(user.id);
+    const [recent, favored] = await Promise.all([
+      supabase
+        .from('recipes')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(RECIPES_LOADED),
+      favorites.size > 0
+        ? supabase.from('recipes').select('*').in('id', [...favorites])
+        : Promise.resolve({ data: [] as unknown[] }),
+    ]);
 
-    if (data) setRecipes(data.map((row) => recipeFromRow(row) as RecentRecipe));
-    setFavoriteIds(await loadFavoriteIds(user.id));
+    if (recent.data) {
+      const rows = [...recent.data, ...(favored.data ?? [])];
+      const unique = rows.filter((row: any, i) => rows.findIndex((other: any) => other.id === row.id) === i);
+      setRecipes(unique.map((row) => recipeFromRow(row) as RecentRecipe));
+    }
+    setFavoriteIds(favorites);
   };
 
   const openRecipe = (recipe: RecentRecipe) => {
@@ -134,13 +144,15 @@ export default function HomeScreen() {
     .filter((entry) => entry.lot)
     .map(({ group, lot }) => ({ ...lot!, quantity: lotLabel(lot!, group.lots, language) }))
     .slice(0, URGENT_COUNT);
-  // Mes recettes : celles faisables maintenant d'abord (au plus un ingrédient manquant), puis les favoris
+  // Mes recettes : les favoris d'abord, ceux faisables maintenant (au plus un ingrédient manquant) en tête ;
+  // puis les autres recettes, faisables d'abord ; à égalité, les plus récentes
   const missing = (recipe: RecentRecipe) => {
     const { available, total } = feasibility(recipe, pantry);
     return total - available;
   };
+  const rank = (recipe: RecentRecipe) => (favoriteIds.has(recipe.id) ? 0 : 2) + (missing(recipe) <= MAX_MISSING ? 0 : 1);
   const myRecipes = [...recipes]
-    .sort((a, b) => Number(missing(a) > MAX_MISSING) - Number(missing(b) > MAX_MISSING) || Number(favoriteIds.has(b.id)) - Number(favoriteIds.has(a.id)))
+    .sort((a, b) => rank(a) - rank(b) || (b.created_at ?? '').localeCompare(a.created_at ?? ''))
     .slice(0, MY_RECIPES_COUNT);
   const cookUrgent = () => router.push({ pathname: '/recipe/generate', params: { priority: urgent.map((i) => i.id).join(',') } });
 
@@ -242,7 +254,11 @@ export default function HomeScreen() {
           <View style={styles.section}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>{t('saved.title')}</Text>
-              <Touchable onPress={() => router.navigate('/saved')} style={styles.link} accessibilityRole="link">
+              <Touchable
+                onPress={() => router.navigate({ pathname: '/saved', params: { tab: favoriteIds.size > 0 ? 'favorites' : 'all', at: String(Date.now()) } })}
+                style={styles.link}
+                accessibilityRole="link"
+              >
                 <Text style={styles.linkText}>{t('home.seeAll')}</Text>
               </Touchable>
             </View>
