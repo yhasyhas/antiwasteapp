@@ -48,6 +48,12 @@ const UNITS: Record<string, Record<UnitLanguage, [string, string]>> = {
   pinch: { fr: ['pincée', 'pincées'], en: ['pinch', 'pinches'], es: ['pizca', 'pizcas'] },
   block: { fr: ['bloc', 'blocs'], en: ['block', 'blocks'], es: ['bloque', 'bloques'] },
   loaf: { fr: ['miche', 'miches'], en: ['loaf', 'loaves'], es: ['barra', 'barras'] },
+  chunk: { fr: ['morceau', 'morceaux'], en: ['piece', 'pieces'], es: ['trozo', 'trozos'] },
+  glass: { fr: ['verre', 'verres'], en: ['glass', 'glasses'], es: ['vaso', 'vasos'] },
+  bowl: { fr: ['bol', 'bols'], en: ['bowl', 'bowls'], es: ['tazón', 'tazones'] },
+  sprig: { fr: ['brin', 'brins'], en: ['sprig', 'sprigs'], es: ['ramita', 'ramitas'] },
+  head: { fr: ['tête', 'têtes'], en: ['head', 'heads'], es: ['cabeza', 'cabezas'] },
+  handful: { fr: ['poignée', 'poignées'], en: ['handful', 'handfuls'], es: ['puñado', 'puñados'] },
 };
 // Autres façons courantes d'écrire ces unités
 const UNIT_ALIASES: Record<string, string> = {
@@ -219,4 +225,17 @@ export function formatQuantity(rawValue: number, rawUnit: string, language: stri
     : value > 1 && (language === 'fr' || language === 'es') && /^\p{L}{3,}$/u.test(unit) && !/[sxz]$/.test(unit) && !measure ? `${unit}s`
       : unit;
   return word ? `${text} ${word}` : text;
+}
+
+// Quantité d'un ingrédient de recette (« 2 » + « piece », « 3 » + « clove ») : le nombre seul pour ce qui se compte
+// (« 4 » à côté de « eggs », jamais « 4 piece »), sinon l'unité accordée et dans la langue donnée (« 2 cloves »)
+const RECIPE_PIECES = new Set(['piece', 'pieces', 'pc', 'pcs', 'unite', 'unites', 'unit', 'units', 'pieza', 'piezas', 'unidad', 'unidades', 'x']);
+export function recipeAmount(quantity: string | null | undefined, unit: string | null | undefined, language: string): string {
+  const value = String(quantity ?? '').trim();
+  const rawUnit = String(unit ?? '').trim();
+  if (!rawUnit || RECIPE_PIECES.has(normalize(rawUnit))) return value;
+  const number = Number(value.replace(',', '.'));
+  if (value && Number.isFinite(number) && number > 0) return formatQuantity(number, rawUnit, language);
+  // « 1/2 », « un peu » : unité courante au singulier, traduite
+  return [value, translateUnit(rawUnit, 1, language) ?? rawUnit].filter(Boolean).join(' ');
 }

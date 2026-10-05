@@ -1,0 +1,586 @@
+{
+ "summary": {
+  "version": "v4.1",
+  "date": "2026-10-02T14:36:03.018Z",
+  "model": "openai/gpt-oss-120b",
+  "judge_model": "gemini-3.1-flash-lite",
+  "cases": 1,
+  "failed_cases": 0,
+  "recipes": 3,
+  "judge": {
+   "quantities": 2,
+   "cooking_cues": 4,
+   "order": 5,
+   "ingredients_used": 3,
+   "authenticity": 4.666666666666667,
+   "safety": 5,
+   "diet": 5
+  },
+  "diversity_judge": 3,
+  "auto": {
+   "ingredients_in_steps": 1,
+   "quantities_in_steps": 0.8333333333333334,
+   "timed_cooking": 0.9523809523809524,
+   "oven_temperature": 1,
+   "reheat_cue": 1,
+   "uses_urgent": 0.6666666666666666,
+   "rules_respected": 1,
+   "units_language": 1,
+   "safety_rules": 1,
+   "no_heat_without_cooking": 1,
+   "no_celsius_without_meat": 1,
+   "diversity": 0.6592592592592592
+  },
+  "rejected_first": 0,
+  "median_ms": 5549,
+  "judge_mean": 4.095238095238096
+ },
+ "results": [
+  {
+   "id": "en-r-asie-sud",
+   "note": "India and South Asia, vegan dinner",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 5549,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [],
+    "corrected": [],
+    "dropped": []
+   },
+   "examples": [
+    {
+     "name": "Sambar (lentilles aux légumes et tamarin)",
+     "region": "Inde et Asie du Sud"
+    },
+    {
+     "name": "Aloo gobi (pommes de terre et chou-fleur)",
+     "region": "Inde et Asie du Sud"
+    },
+    {
+     "name": "Rasam (bouillon poivré au tamarin)",
+     "region": "Inde et Asie du Sud"
+    },
+    {
+     "name": "Appa (hoppers, crêpes en bol)",
+     "region": "Inde et Asie du Sud"
+    },
+    {
+     "name": "Dal bhat (riz, lentilles et accompagnements)",
+     "region": "Inde et Asie du Sud"
+    }
+   ],
+   "diversity_auto": 0.6592592592592592,
+   "diversity_judge": 3,
+   "diversity_comment": "Les recettes sont techniquement distinctes (curry, pilaf, tikka masala), mais elles souffrent toutes de la même imprécision sur les quantités et d'une dépendance excessive à des ingrédients extérieurs au garde-manger fourni.",
+   "judge_model": "gemini-3.1-flash-lite",
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [],
+     "corrected": [],
+     "dropped": []
+    },
+    "examples": [
+     {
+      "name": "Sambar (lentilles aux légumes et tamarin)",
+      "region": "Inde et Asie du Sud"
+     },
+     {
+      "name": "Aloo gobi (pommes de terre et chou-fleur)",
+      "region": "Inde et Asie du Sud"
+     },
+     {
+      "name": "Rasam (bouillon poivré au tamarin)",
+      "region": "Inde et Asie du Sud"
+     },
+     {
+      "name": "Appa (hoppers, crêpes en bol)",
+      "region": "Inde et Asie du Sud"
+     },
+     {
+      "name": "Dal bhat (riz, lentilles et accompagnements)",
+      "region": "Inde et Asie du Sud"
+     }
+    ],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "en-r-asie-sud-1",
+      "name": "Cauliflower",
+      "quantity": "1",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "en-r-asie-sud-2",
+      "name": "Potatoes",
+      "quantity": "5",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "en-r-asie-sud-3",
+      "name": "Dried chickpeas",
+      "quantity": "500 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "en-r-asie-sud-4",
+      "name": "Basmati rice",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "en-r-asie-sud-5",
+      "name": "Tomatoes",
+      "quantity": "3",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "en-r-asie-sud-6",
+      "name": "Yogurt",
+      "quantity": "500 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "en-r-asie-sud-7",
+      "name": "Garam masala",
+      "quantity": "1 jar",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 5549,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 2,
+      "ms": 5537,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.053389284,
+       "prompt_tokens": 2767,
+       "prompt_time": 0.141294666,
+       "completion_tokens": 2523,
+       "completion_time": 5.295495148,
+       "total_tokens": 5290,
+       "total_time": 5.436789814,
+       "completion_tokens_details": {
+        "reasoning_tokens": 139
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "307449",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "243996"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Cauliflower and Chickpea Curry",
+     "recipe": {
+      "title": "Cauliflower and Chickpea Curry",
+      "description": "A hearty, spiced curry featuring urgent cauliflower and protein‑rich chickpeas, simmered in a fragrant tomato‑garam masala sauce.",
+      "difficulty": "medium",
+      "prep_time": 10,
+      "cook_time": 30,
+      "total_time": 40,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "asie-sud",
+      "dietary_tags": [
+       "vegan",
+       "gluten‑free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Cauliflower",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-r-asie-sud-1"
+       },
+       {
+        "name": "Dried chickpeas",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "en-r-asie-sud-3"
+       },
+       {
+        "name": "Tomatoes",
+        "quantity": "3",
+        "unit": "piece",
+        "pantry_id": "en-r-asie-sud-5"
+       },
+       {
+        "name": "Garam masala",
+        "quantity": "2",
+        "unit": "tsp",
+        "pantry_id": "en-r-asie-sud-7"
+       },
+       {
+        "name": "Coconut milk",
+        "quantity": "400",
+        "unit": "ml",
+        "pantry_id": null
+       },
+       {
+        "name": "Ground cumin",
+        "quantity": "1",
+        "unit": "tsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Vegetable oil",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Cauliflower",
+       "Dried chickpeas",
+       "Tomatoes",
+       "Garam masala"
+      ],
+      "missing_ingredients": [
+       "Coconut milk",
+       "Ground cumin"
+      ],
+      "instructions": [
+       "Rinse the dried chickpeas, place them in a bowl, cover with water and soak for at least 4 hours (or overnight).",
+       "Drain the chickpeas, transfer to a pot, add fresh water, bring to a boil, then simmer on medium heat for 45 minutes, until tender; drain and set aside.",
+       "Cut the cauliflower into florets (about 2 cm pieces).",
+       "Blanch the cauliflower florets in boiling water for 3 minutes, then drain and set aside.",
+       "Dice the tomatoes.",
+       "Heat 2 tbsp vegetable oil in a large pan over medium heat. Add 1 tsp ground cumin and sauté for 30 seconds until fragrant.",
+       "Add the diced tomatoes and cook for 5 minutes, stirring, until they break down and become saucy.",
+       "Stir in 2 tsp garam masala and cook 1 minute, watching for a deep, aromatic brown color.",
+       "Add the blanched cauliflower florets and the cooked chickpeas, mix well.",
+       "Pour in 400 ml coconut milk, bring to a gentle simmer, lower to a soft boil and cook for 12 minutes, until the cauliflower is tender and the sauce thickens.",
+       "Season with salt to taste, garnish with fresh cilantro if desired, and serve hot."
+      ],
+      "tips": [
+       "If you run short on time, use canned chickpeas (rinsed) instead of dried; adjust cook time accordingly.",
+       "A squeeze of lemon juice at the end brightens the flavors."
+      ],
+      "image_prompt": "Professional food photography, bright orange cauliflower chickpea curry in a copper bowl, fresh cilantro garnish, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.75,
+      "timed_cooking": 0.8571428571428571,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 11,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 2,
+      "cooking_cues": 4,
+      "order": 5,
+      "ingredients_used": 3,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "Les étapes ne précisent pas les quantités (ex: 'Cut the cauliflower' au lieu de 'Cut the 1 cauliflower').",
+      "La recette utilise des ingrédients absents du garde-manger (lait de coco, cumin, huile) sans justification.",
+      "L'étape 1 ne précise pas la quantité d'eau pour le trempage."
+     ],
+     "strengths": [
+      "La gestion du temps de cuisson des pois chiches est rigoureuse et sécuritaire.",
+      "L'ordre des opérations est logique et permet une exécution fluide."
+     ]
+    },
+    {
+     "title": "Spiced Potato & Tomato Basmati Pilaf",
+     "recipe": {
+      "title": "Spiced Potato & Tomato Basmati Pilaf",
+      "description": "Fluffy basmati rice cooked with golden potatoes, ripe tomatoes and garam masala, a light yet satisfying dinner dish.",
+      "difficulty": "medium",
+      "prep_time": 8,
+      "cook_time": 30,
+      "total_time": 38,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "asie-sud",
+      "dietary_tags": [
+       "vegan",
+       "gluten‑free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Basmati rice",
+        "quantity": "250",
+        "unit": "g",
+        "pantry_id": "en-r-asie-sud-4"
+       },
+       {
+        "name": "Potatoes",
+        "quantity": "3",
+        "unit": "piece",
+        "pantry_id": "en-r-asie-sud-2"
+       },
+       {
+        "name": "Tomatoes",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-r-asie-sud-5"
+       },
+       {
+        "name": "Garam masala",
+        "quantity": "1",
+        "unit": "tsp",
+        "pantry_id": "en-r-asie-sud-7"
+       },
+       {
+        "name": "Ground turmeric",
+        "quantity": "1/2",
+        "unit": "tsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Cumin seeds",
+        "quantity": "1",
+        "unit": "tsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Vegetable oil",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Basmati rice",
+       "Potatoes",
+       "Tomatoes",
+       "Garam masala"
+      ],
+      "missing_ingredients": [
+       "Ground turmeric",
+       "Cumin seeds"
+      ],
+      "instructions": [
+       "Rinse the basmati rice under cold water until the water runs clear; soak for 10 minutes, then drain.",
+       "Peel the potatoes and cut them into 1‑cm dice.",
+       "Dice the tomatoes.",
+       "Heat 2 tbsp vegetable oil in a saucepan over medium heat. Add 1 tsp cumin seeds and let them sizzle for 20 seconds until they start to pop.",
+       "Add the diced potatoes, sauté for 5 minutes, stirring, until the edges turn lightly golden.",
+       "Stir in the diced tomatoes, 1/2 tsp turmeric and 1 tsp garam masala; cook for 3 minutes, until the tomatoes soften.",
+       "Add the drained rice, gently toast for 2 minutes, stirring to coat each grain with the spices.",
+       "Pour in 500 ml water, bring to a boil over high heat, then reduce to a gentle simmer (low heat). Cover the pan with a tight lid and cook for 12 minutes, until the rice is fluffy and all liquid is absorbed.",
+       "Remove from heat, let stand covered for 5 minutes, then fluff the pilaf with a fork and serve."
+      ],
+      "tips": [
+       "For extra aroma, add a small cinnamon stick to the water; remove before serving.",
+       "A handful of frozen peas can be tossed in with the tomatoes for a pop of colour."
+      ],
+      "image_prompt": "Professional food photography, golden basmati pilaf with tender potato cubes and juicy tomato pieces, garnished with cilantro, rustic plate, soft natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.75,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 0,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 2,
+      "cooking_cues": 4,
+      "order": 5,
+      "ingredients_used": 3,
+      "authenticity": 5,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "Les quantités ne sont pas rappelées dans les étapes (ex: 'Peel the potatoes' sans préciser les 3 pommes de terre).",
+      "Utilisation d'ingrédients non listés dans le garde-manger (curcuma, cumin, huile).",
+      "L'étape 1 ne précise pas la quantité de riz à rincer."
+     ],
+     "strengths": [
+      "La technique de cuisson du riz pilaf est maîtrisée et respecte les standards de la cuisine indienne.",
+      "Le temps de repos final est une excellente pratique pour la texture du riz."
+     ]
+    },
+    {
+     "title": "Cauliflower‑Potato Tikka Masala (Vegan)",
+     "recipe": {
+      "title": "Cauliflower‑Potato Tikka Masala (Vegan)",
+      "description": "A creamy, mildly spiced tikka masala using cauliflower and potatoes as the main vegetables, finished with a coconut‑based sauce.",
+      "difficulty": "medium",
+      "prep_time": 12,
+      "cook_time": 35,
+      "total_time": 47,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "asie-sud",
+      "dietary_tags": [
+       "vegan",
+       "gluten‑free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "Cauliflower",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-r-asie-sud-1"
+       },
+       {
+        "name": "Potatoes",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-r-asie-sud-2"
+       },
+       {
+        "name": "Tomatoes",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-r-asie-sud-5"
+       },
+       {
+        "name": "Garam masala",
+        "quantity": "1.5",
+        "unit": "tsp",
+        "pantry_id": "en-r-asie-sud-7"
+       },
+       {
+        "name": "Coconut milk",
+        "quantity": "300",
+        "unit": "ml",
+        "pantry_id": null
+       },
+       {
+        "name": "Ground coriander",
+        "quantity": "1",
+        "unit": "tsp",
+        "pantry_id": null
+       },
+       {
+        "name": "Vegetable oil",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "Cauliflower",
+       "Potatoes",
+       "Tomatoes",
+       "Garam masala"
+      ],
+      "missing_ingredients": [
+       "Coconut milk",
+       "Ground coriander"
+      ],
+      "instructions": [
+       "Cut the cauliflower into bite‑size florets.",
+       "Peel the potatoes and cut them into 1‑cm cubes.",
+       "Blend the single tomato into a smooth puree.",
+       "Heat 2 tbsp vegetable oil in a deep skillet over medium heat. Add the potato cubes and sauté for 6 minutes, stirring, until they start to turn golden.",
+       "Add the cauliflower florets, continue sautéing for another 5 minutes, until the cauliflower begins to soften.",
+       "Stir in 1 tsp ground coriander and 1.5 tsp garam masala; cook for 1 minute, watching for a deep, fragrant brown hue.",
+       "Pour in the tomato puree, mix well, and let it simmer for 4 minutes, until the mixture thickens slightly.",
+       "Add 300 ml coconut milk, bring the sauce to a gentle boil, then lower to a soft simmer and cook for 12 minutes, until the potatoes are fully cooked and the sauce is rich and glossy.",
+       "Season with salt to taste, garnish with fresh cilantro if available, and serve hot with basmati rice or flatbread."
+      ],
+      "tips": [
+       "If you prefer a thicker sauce, mash a few potatoes against the side of the pan before adding coconut milk.",
+       "A pinch of smoked paprika adds a subtle smoky note without breaking the vegan rule."
+      ],
+      "image_prompt": "Professional food photography, rich orange‑red cauliflower potato tikka masala in a shallow bowl, drizzle of coconut cream, fresh coriander, warm lighting"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": {
+      "quantities": 2,
+      "cooking_cues": 4,
+      "order": 5,
+      "ingredients_used": 3,
+      "authenticity": 4,
+      "safety": 5,
+      "diet": 5
+     },
+     "issues": [
+      "Absence systématique des quantités dans les étapes de préparation.",
+      "Utilisation d'ingrédients non fournis dans le garde-manger (lait de coco, coriandre, huile).",
+      "L'étape 3 ne précise pas la quantité de tomates à mixer."
+     ],
+     "strengths": [
+      "La méthode de cuisson des légumes en deux temps (pommes de terre puis chou-fleur) assure une texture homogène.",
+      "La consigne de faire réduire la purée de tomates avant d'ajouter le lait de coco est techniquement juste."
+     ]
+    }
+   ]
+  }
+ ]
+}

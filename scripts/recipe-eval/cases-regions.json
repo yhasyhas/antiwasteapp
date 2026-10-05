@@ -1,0 +1,223 @@
+[
+  {
+    "id": "fr-r-afrique-ouest",
+    "note": "Région Afrique de l'Ouest, dîner, poisson à utiliser vite",
+    "preferences": { "language": "fr", "cuisine": "afrique-ouest", "mealType": "dinner", "difficulty": "medium", "maxCookTime": 60 },
+    "ingredients": [
+      { "name": "Filets de thiof", "quantity": "600 g", "days_left": 1 },
+      { "name": "Riz brisé", "quantity": "1 kg" },
+      { "name": "Oignons", "quantity": "4" },
+      { "name": "Tomates", "quantity": "3" },
+      { "name": "Concentré de tomate", "quantity": "1 boîte" },
+      { "name": "Chou", "quantity": "1/2" },
+      { "name": "Manioc", "quantity": "1" },
+      { "name": "Piment", "quantity": "2" }
+    ]
+  },
+  {
+    "id": "en-r-afrique-centrale",
+    "note": "Central Africa, lunch, spinach-like greens and peanuts",
+    "preferences": { "language": "en", "cuisine": "afrique-centrale", "mealType": "lunch", "difficulty": "medium", "maxCookTime": 75 },
+    "ingredients": [
+      { "name": "Spinach", "quantity": "400 g", "days_left": 1 },
+      { "name": "Raw peanuts", "quantity": "300 g" },
+      { "name": "Beef", "quantity": "500 g", "days_left": 2 },
+      { "name": "Plantains", "quantity": "3" },
+      { "name": "Onion", "quantity": "2" },
+      { "name": "Garlic", "quantity": "1 head" }
+    ]
+  },
+  {
+    "id": "es-r-afrique-est",
+    "note": "África oriental, cena vegetariana",
+    "preferences": { "language": "es", "cuisine": "afrique-est", "mealType": "dinner", "difficulty": "easy", "maxCookTime": 50, "dietary": ["vegetarian"] },
+    "ingredients": [
+      { "name": "Lentejas rojas", "quantity": "400 g" },
+      { "name": "Col", "quantity": "1", "days_left": 2 },
+      { "name": "Patatas", "quantity": "4" },
+      { "name": "Zanahorias", "quantity": "3" },
+      { "name": "Cebollas", "quantity": "2" },
+      { "name": "Jengibre", "quantity": "1 trozo" },
+      { "name": "Harina de trigo", "quantity": "1 kg" }
+    ]
+  },
+  {
+    "id": "fr-r-afrique-australe",
+    "note": "Afrique australe, déjeuner, viande hachée urgente",
+    "preferences": { "language": "fr", "cuisine": "afrique-australe", "mealType": "lunch", "difficulty": "medium", "maxCookTime": 70 },
+    "ingredients": [
+      { "name": "Bœuf haché", "quantity": "500 g", "days_left": 0 },
+      { "name": "Farine de maïs", "quantity": "1 kg" },
+      { "name": "Œufs", "quantity": "6" },
+      { "name": "Oignons", "quantity": "2" },
+      { "name": "Curry en poudre", "quantity": "1 pot" },
+      { "name": "Pain de mie", "quantity": "1 paquet", "days_left": 1 },
+      { "name": "Lait", "quantity": "1 l" }
+    ]
+  },
+  {
+    "id": "fr-r-ocean-indien",
+    "note": "Océan Indien, dîner, garde-manger moyen avec restes",
+    "preferences": { "language": "fr", "cuisine": "ocean-indien", "mealType": "dinner", "difficulty": "easy", "maxCookTime": 45 },
+    "ingredients": [
+      { "name": "Saucisses fumées", "quantity": "6" },
+      { "name": "Tomates", "quantity": "4", "days_left": 1 },
+      { "name": "Riz", "quantity": "1 kg" },
+      { "name": "Gingembre", "quantity": "1 morceau" },
+      { "name": "Curcuma", "quantity": "1 pot" },
+      { "name": "Brèdes (feuilles de chou chinois)", "quantity": "1 botte", "days_left": 2 },
+      { "name": "Grains (haricots rouges secs)", "quantity": "500 g" }
+    ]
+  },
+  {
+    "id": "en-r-maghreb",
+    "note": "North Africa (Maghreb), breakfast",
+    "preferences": { "language": "en", "cuisine": "maghreb", "mealType": "breakfast", "difficulty": "easy", "maxCookTime": 30 },
+    "ingredients": [
+      { "name": "Eggs", "quantity": "6" },
+      { "name": "Fine semolina", "quantity": "500 g" },
+      { "name": "Tomatoes", "quantity": "4", "days_left": 1 },
+      { "name": "Peppers", "quantity": "2" },
+      { "name": "Honey", "quantity": "1 jar" },
+      { "name": "Butter", "quantity": "250 g" }
+    ]
+  },
+  {
+    "id": "es-r-asie-est",
+    "note": "Asia oriental, cena, cerdo y fideos",
+    "preferences": { "language": "es", "cuisine": "asie-est", "mealType": "dinner", "difficulty": "medium", "maxCookTime": 45 },
+    "ingredients": [
+      { "name": "Panceta de cerdo fresca", "quantity": "500 g", "days_left": 1 },
+      { "name": "Fideos de trigo", "quantity": "400 g" },
+      { "name": "Col china", "quantity": "1", "days_left": 2 },
+      { "name": "Salsa de soja", "quantity": "1 botella" },
+      { "name": "Huevos", "quantity": "6" },
+      { "name": "Cebolletas", "quantity": "1 manojo" },
+      { "name": "Tofu firme", "quantity": "400 g" }
+    ]
+  },
+  {
+    "id": "fr-r-asie-sud-est",
+    "note": "Asie du Sud-Est, déjeuner, crevettes et lait de coco",
+    "preferences": { "language": "fr", "cuisine": "asie-sud-est", "mealType": "lunch", "difficulty": "easy", "maxCookTime": 40 },
+    "ingredients": [
+      { "name": "Crevettes crues", "quantity": "400 g", "days_left": 1 },
+      { "name": "Lait de coco", "quantity": "1 boîte" },
+      { "name": "Nouilles de riz", "quantity": "300 g" },
+      { "name": "Citronnelle", "quantity": "2 tiges" },
+      { "name": "Citron vert", "quantity": "2" },
+      { "name": "Concombre", "quantity": "1", "days_left": 2 },
+      { "name": "Sauce poisson", "quantity": "1 bouteille" }
+    ]
+  },
+  {
+    "id": "en-r-asie-sud",
+    "note": "India and South Asia, vegan dinner",
+    "preferences": { "language": "en", "cuisine": "asie-sud", "mealType": "dinner", "difficulty": "medium", "maxCookTime": 60, "dietary": ["vegan"] },
+    "ingredients": [
+      { "name": "Cauliflower", "quantity": "1", "days_left": 1 },
+      { "name": "Potatoes", "quantity": "5" },
+      { "name": "Dried chickpeas", "quantity": "500 g" },
+      { "name": "Basmati rice", "quantity": "1 kg" },
+      { "name": "Tomatoes", "quantity": "3" },
+      { "name": "Yogurt", "quantity": "500 g" },
+      { "name": "Garam masala", "quantity": "1 jar" }
+    ]
+  },
+  {
+    "id": "es-r-mexique",
+    "note": "México y Centroamérica, desayuno",
+    "preferences": { "language": "es", "cuisine": "mexique-amerique-centrale", "mealType": "breakfast", "difficulty": "easy", "maxCookTime": 30 },
+    "ingredients": [
+      { "name": "Tortillas de maíz", "quantity": "12", "days_left": 1 },
+      { "name": "Huevos", "quantity": "6" },
+      { "name": "Tomates", "quantity": "4" },
+      { "name": "Chiles serranos", "quantity": "3" },
+      { "name": "Frijoles negros", "quantity": "1 lata" },
+      { "name": "Queso fresco", "quantity": "200 g", "days_left": 2 }
+    ]
+  },
+  {
+    "id": "fr-r-caraibes",
+    "note": "Caraïbes, déjeuner, morue et légumes pays",
+    "preferences": { "language": "fr", "cuisine": "caraibes", "mealType": "lunch", "difficulty": "medium", "maxCookTime": 60 },
+    "ingredients": [
+      { "name": "Morue salée", "quantity": "400 g" },
+      { "name": "Bananes plantains", "quantity": "3", "days_left": 1 },
+      { "name": "Ignames", "quantity": "2" },
+      { "name": "Cives", "quantity": "1 botte", "days_left": 2 },
+      { "name": "Piment antillais", "quantity": "1" },
+      { "name": "Citrons verts", "quantity": "3" },
+      { "name": "Farine", "quantity": "1 kg" }
+    ]
+  },
+  {
+    "id": "en-r-amerique-sud",
+    "note": "South America, dinner, chicken and corn",
+    "preferences": { "language": "en", "cuisine": "amerique-sud", "mealType": "dinner", "difficulty": "medium", "maxCookTime": 60 },
+    "ingredients": [
+      { "name": "Chicken breasts", "quantity": "2", "days_left": 1 },
+      { "name": "Corn on the cob", "quantity": "3" },
+      { "name": "Potatoes", "quantity": "6" },
+      { "name": "Yellow chili paste", "quantity": "1 jar" },
+      { "name": "Red onion", "quantity": "2" },
+      { "name": "Limes", "quantity": "3" },
+      { "name": "Rice", "quantity": "1 kg" }
+    ]
+  },
+  {
+    "id": "es-r-europe-sud",
+    "note": "Europa del Sur, almuerzo sin gluten",
+    "preferences": { "language": "es", "cuisine": "europe-sud", "mealType": "lunch", "difficulty": "easy", "maxCookTime": 45, "dietary": ["gluten-free"] },
+    "ingredients": [
+      { "name": "Calabacines", "quantity": "3", "days_left": 1 },
+      { "name": "Arroz arborio", "quantity": "500 g" },
+      { "name": "Queso parmesano", "quantity": "150 g" },
+      { "name": "Pasta de trigo", "quantity": "500 g" },
+      { "name": "Ajo", "quantity": "1 cabeza" },
+      { "name": "Limones", "quantity": "2" },
+      { "name": "Gambas", "quantity": "300 g", "days_left": 1 }
+    ]
+  },
+  {
+    "id": "fr-r-levant",
+    "note": "Proche-Orient et Turquie, dîner, agneau haché et aubergines",
+    "preferences": { "language": "fr", "cuisine": "levant-turquie", "mealType": "dinner", "difficulty": "medium", "maxCookTime": 60 },
+    "ingredients": [
+      { "name": "Agneau haché", "quantity": "400 g", "days_left": 1 },
+      { "name": "Aubergines", "quantity": "2", "days_left": 2 },
+      { "name": "Boulgour", "quantity": "500 g" },
+      { "name": "Yaourt grec", "quantity": "400 g" },
+      { "name": "Persil", "quantity": "1 botte" },
+      { "name": "Pain pita", "quantity": "4", "days_left": 1 },
+      { "name": "Tahini", "quantity": "1 pot" }
+    ]
+  },
+  {
+    "id": "en-r-france",
+    "note": "France, snack with leftovers and stale bread",
+    "preferences": { "language": "en", "cuisine": "france", "mealType": "snack", "difficulty": "easy", "maxCookTime": 30 },
+    "ingredients": [
+      { "name": "Stale baguette", "quantity": "1", "days_left": 0 },
+      { "name": "Milk", "quantity": "1 l", "days_left": 2 },
+      { "name": "Eggs", "quantity": "6" },
+      { "name": "Apples", "quantity": "4", "days_left": 2 },
+      { "name": "Butter", "quantity": "250 g" },
+      { "name": "Comté", "quantity": "200 g" }
+    ]
+  },
+  {
+    "id": "fr-autre-georgienne",
+    "note": "Autre cuisine… saisie libre : géorgienne (sans bibliothèque)",
+    "preferences": { "language": "fr", "cuisine": "other", "cuisineOther": "géorgienne", "mealType": "dinner", "difficulty": "medium", "maxCookTime": 60 },
+    "ingredients": [
+      { "name": "Haricots rouges en conserve", "quantity": "2 boîtes" },
+      { "name": "Noix", "quantity": "200 g" },
+      { "name": "Coriandre", "quantity": "1 botte", "days_left": 1 },
+      { "name": "Cuisses de poulet", "quantity": "4", "days_left": 1 },
+      { "name": "Ail", "quantity": "1 tête" },
+      { "name": "Fromage frais", "quantity": "200 g" },
+      { "name": "Farine", "quantity": "1 kg" }
+    ]
+  }
+]

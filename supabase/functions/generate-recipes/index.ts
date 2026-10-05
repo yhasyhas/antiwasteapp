@@ -1,10 +1,10 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { getAuthenticatedUser } from '../_shared/auth.ts';
 import { consumeQuota, dailyLimit, refundQuota } from '../_shared/quota.ts';
-import { logUserQuota, reportInBackground, reportProviderQuota } from '../_shared/quotaAlerts.ts';
+import { logUserQuota, recordProviderUsage, reportInBackground, reportProviderFailure, reportProviderQuota } from '../_shared/quotaAlerts.ts';
 import { readSimulation } from '../_shared/simulate.ts';
 import { withCors } from '../_shared/cors.ts';
-import { type AiProvider, type AttemptLog, geminiProvider, groqProvider, orderProviders, runWithFallback } from '../_shared/ai.ts';
+import { type AiProvider, type AttemptLog, type ProviderQuotaHit, geminiProvider, groqProvider, orderProviders, runWithFallback } from '../_shared/ai.ts';
 import {
   buildPantry,
   buildOtherPantry,
@@ -19,6 +19,11 @@ import {
   strictDietsOf,
   urgentItems,
 } from './recipes.ts';
+import { buildPrompts, CUISINES, geminiRecipeNote, type Cuisine, MAX_PURCHASES, PROMPT_VERSIONS, type PromptVersion } from './prompt.ts';
+import { sampleDishes } from './library.ts';
+import { recentTitles } from './history.ts';
+import { safetyPass } from './safetyPass.ts';
+import { factNamesFor, translatePantryNames } from './pantryNames.ts';
 
 // Modèles configurables par secret : les fournisseurs retirent régulièrement des modèles
 const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') || '';
@@ -38,8 +43,18 @@ const PROVIDERS: AiProvider[] = orderProviders([
 // 3 recettes détaillées tiennent dans ~3 500 tokens ; le raisonnement de gpt-oss compte aussi
 const MAX_OUTPUT_TOKENS = 8000;
 
-const CUISINES = ['any', 'african', 'maghreb', 'asian', 'latin', 'mediterranean', 'french'] as const;
-type Cuisine = typeof CUISINES[number];
+// Durée maximale d'une génération avant de servir les recettes déjà valides : la correction et les recettes de
+// remplacement s'arrêtent à cette échéance (un premier appel lent laisse moins de temps à la correction)
+const GENERATION_BUDGET_MS = 45_000;
+
+// Version du prompt (évaluation de la phase 9 : scripts/recipe-eval), réglable par secret sans redéployer ;
+// v1 : l'ancienne version, sans contrôle de sécurité ni plats de référence
+const DEFAULT_PROMPT_VERSION: PromptVersion = 'v4.1';
+const requestedVersion = Deno.env.get('RECIPE_PROMPT_VERSION') || '';
+const PROMPT_VERSION: PromptVersion = (PROMPT_VERSIONS as readonly string[]).includes(requestedVersion) ? requestedVersion as PromptVersion : DEFAULT_PROMPT_VERSION;
+// v4 et suivantes : plats de référence, titres récents, contrôle de sécurité, unités dans la langue de la recette
+const V4_FAMILY = !['v1', 'v2', 'v3'].includes(PROMPT_VERSION);
+const UNIT_HINT = PROMPT_VERSION === 'v1' ? undefined : 'Unité abrégée, dans la langue de la recette';
 
 interface GenerateRecipeRequest {
   // { id, name, quantity } depuis la phase 3, + days_left, kind, priority depuis la phase 5 ; simples noms acceptés
@@ -147,124 +162,6 @@ function failureResponse(reason: FailureReason, language: string, extra: Record<
   return jsonResponse({ error: reason, ...(FAILURE_KIND[reason] && { reason: FAILURE_KIND[reason] }), message: messages[reason], ...extra }, FAILURE_STATUS[reason]);
 }
 
-// ---------- Prompt ----------
-
-const LANGUAGE_NAMES: Record<string, string> = { fr: 'français', en: 'anglais', es: 'espagnol' };
-
-const MEAL_NAMES: Record<string, string> = {
-  breakfast: 'petit-déjeuner', lunch: 'déjeuner', dinner: 'dîner', snack: 'goûter',
-};
-
-// Le type de repas est une préférence : ces descriptions orientent la recette sans l'interdire
-const MEAL_PREFERENCES: Record<string, string> = {
-  breakfast: 'Repas du matin. Idéalement : rapide (15-20 min), léger, énergisant. De préférence éviter : plats lourds, viandes grasses, friture.',
-  lunch: 'Repas de midi. Idéalement : équilibré, rassasiant, peut être préparé à l\'avance. De préférence : protéine + légume + féculent.',
-  dinner: 'Repas du soir. Idéalement : plus léger que le déjeuner, digeste, pas trop épicé ni gras.',
-  snack: 'Encas rapide. Idéalement : très rapide (5-10 min), sucré ou salé léger, peu ou pas de cuisson.',
-};
-
-const DIETARY_RULES: Record<string, string> = {
-  vegan: 'vegan : ni viande, ni poisson, ni fruits de mer, ni œufs, ni lait, fromage, beurre, crème, yaourt, ni miel, gélatine, caséine. Les laits et beurres végétaux (lait de coco, lait d\'amande, beurre de cacahuète…) sont autorisés.',
-  vegetarian: 'végétarien : ni viande, ni poisson, ni fruits de mer (œufs et produits laitiers autorisés).',
-  'gluten-free': 'sans gluten : ni blé, orge, seigle, épeautre, ni farine de blé, pâtes, pain, semoule, couscous classiques. Sarrasin, riz, maïs, quinoa autorisés.',
-  'dairy-free': 'sans lactose : ni lait animal, fromage, beurre, crème, yaourt, lait en poudre, caséine. Les laits végétaux sont autorisés.',
-  'low-carb': 'pauvre en glucides (préférence) : limiter pain, pâtes, riz, pommes de terre, sucre ; privilégier viandes, poissons, œufs, légumes verts.',
-};
-
-const CUISINE_DESCRIPTIONS: Record<Cuisine, string> = {
-  any: '',
-  african: 'cuisine d\'Afrique subsaharienne (ex. mafé, yassa, thiéboudienne, ndolé, attiéké, alloco)',
-  maghreb: 'cuisine du Maghreb (ex. tajine, couscous, chakchouka, harira, brick, ras-el-hanout)',
-  asian: 'cuisine asiatique (ex. sautés au wok, currys, bouillons, riz sauté, sauces soja et gingembre)',
-  latin: 'cuisine d\'Amérique latine (ex. tacos, arepas, ceviche, chili, feijoada, épices et agrumes)',
-  mediterranean: 'cuisine méditerranéenne (ex. huile d\'olive, légumes grillés, herbes, pois chiches, poisson)',
-  french: 'cuisine française (ex. gratins, quiches, ratatouille, blanquette, sauces classiques)',
-};
-
-function buildPrompts(options: {
-  pantryText: string;
-  count: number;
-  language: string;
-  mealType: string;
-  difficulty: string;
-  maxCookTime: number;
-  cuisine: Cuisine;
-  dietary: string[];
-  hasStrictDiet: boolean;
-  hasUrgent: boolean;
-  hasLeftovers: boolean;
-  mode: GenerationMode;
-  selection: boolean;
-  otherPantry: string[];
-  excluded: string[];
-  servings: number | null;
-  // Nouvelle demande après une recette écartée : titres déjà proposés, à ne pas refaire
-  avoidTitles?: string[];
-}): { system: string; prompt: string } {
-  const languageName = LANGUAGE_NAMES[options.language] || LANGUAGE_NAMES['en'];
-  const dietaryRules = options.dietary.map((diet) => DIETARY_RULES[diet.toLowerCase()]).filter(Boolean);
-  const cuisineRule = options.cuisine === 'any'
-    ? 'Cuisine : libre. Varie les styles d\'une recette à l\'autre.'
-    : `Cuisine demandée : ${CUISINE_DESCRIPTIONS[options.cuisine]}. Les recettes doivent en être typiques (épices, techniques, noms de plats), en s'adaptant aux ingrédients disponibles.`;
-
-  const system = `Tu es un chef expert en cuisine anti-gaspi. Tu écris en ${languageName} (tous les textes : titre, description, noms d'ingrédients, étapes, astuces, suggestion).
-
-RÉGIMES ALIMENTAIRES (règles strictes) :
-${dietaryRules.length > 0 ? dietaryRules.map((rule) => `- ${rule}`).join('\n') : '- aucun'}
-${options.excluded.length > 0 ? `
-ALIMENTS EXCLUS (allergies ou goûts, règle stricte) : n'utilise jamais ${options.excluded.join(', ')}, ni un produit qui en contient ou en dérive (sauce, pâte, beurre, lait…), même s'il est dans le garde-manger.
-` : ''}
-TYPE DE REPAS (${MEAL_NAMES[options.mealType] || options.mealType}) — préférence, pas une règle :
-${MEAL_PREFERENCES[options.mealType] || ''}
-- Si les ingrédients s'y prêtent mal, propose quand même la meilleure recette possible et remplis "suggestion" avec une phrase courte indiquant le moment où elle est idéale (ex. « Idéal aussi en petit-déjeuner »). Sinon, "suggestion" est une chaîne vide.
-
-${cuisineRule}
-
-INGRÉDIENTS :
-- Utilise en priorité les ingrédients du garde-manger, pour éviter le gaspillage.${options.hasUrgent ? `
-- ANTI-GASPI : les ingrédients marqués [URGENT] passent avant tous les autres. Chaque recette en utilise au moins un, au cœur du plat (pas en simple garniture), et l'ensemble des recettes les utilise tous si c'est possible.` : ''}${options.hasLeftovers ? `
-- Un ingrédient marqué [reste de plat] est un plat déjà cuisiné : on le transforme ou on l'intègre, et il n'est réchauffé qu'une fois, bien à cœur.` : ''}
-- Un ingrédient marqué [date dépassée] n'est jamais mis en avant ; s'il s'agit d'un produit frais (viande, poisson, produit laitier, plat cuisiné), ne l'utilise pas.
-- "pantry_id" : l'identifiant (p1, p2…) de l'ingrédient du garde-manger utilisé, ou "missing" pour tout ingrédient qui n'en vient pas (y compris sel, poivre, huile).
-- Pour un ingrédient du garde-manger, "name" reprend son nom tel qu'il est écrit dans la liste.
-- "name" : le nom de l'ingrédient seul, sans préparation ni précision (« ail » et non « ail, émincé ») ; la préparation va dans les étapes.
-- Chaque recette utilise au moins un ingrédient du garde-manger.
-- "quantity" : le nombre seul (ex. "500", "2", "1/2") ; "unit" : l'unité abrégée (g, kg, ml, cl, l, c. à soupe, c. à café, pièce, tranche, gousse, pincée).${options.hasStrictDiet ? `
-- "diet_violations" : pour chaque ingrédient, les régimes sélectionnés qu'il ne respecte pas (liste vide s'il les respecte tous). Sois exact : le lait de coco est vegan, le beurre ne l'est pas.` : ''}${options.selection ? `
-
-SÉLECTION DE L'UTILISATEUR (règle stricte) :
-- Il veut cuisiner avec les seuls ingrédients listés dans le garde-manger, plus les basiques : sel, poivre, huile, eau (avec "pantry_id" = "missing").
-- Tout autre ingrédient est à acheter : au plus 2 par recette, et seulement s'il est indispensable.${options.otherPantry.length > 0 ? `
-- Ces ingrédients sont chez lui mais réservés : n'en utilise AUCUN, ni sous un autre nom : ${options.otherPantry.join(', ')}.` : ''}` : ''}${options.mode === 'leftovers' ? `
-
-MODE « TRANSFORMER MES RESTES » (règle stricte) :
-- Chaque recette part d'au moins un ingrédient marqué [reste de plat] et le transforme en un nouveau plat (ex. riz → riz sauté ou galettes, gratin de pâtes → croquettes, poulet rôti → wraps ou salade composée), au lieu de simplement le réchauffer.
-- Le titre et la description présentent la transformation (ex. « Galettes croustillantes avec ton reste de riz »).` : ''}
-
-ÉTAPES :
-- Précises et actionnables : technique, température, durée et repère visuel (ex. « Faites dorer à feu vif 3 minutes, jusqu'à ce que les bords soient croustillants »).
-- Jamais de consigne vague comme « faites cuire jusqu'à cuisson » ou « assaisonnez ».
-
-"image_prompt" : description en anglais pour une photo culinaire de la recette (ex. "Professional food photography, golden chicken tajine with olives, rustic clay pot, natural light").`;
-
-  const refusal = options.hasStrictDiet
-    ? 'Si les régimes empêchent toute recette utilisant au moins un ingrédient du garde-manger, renvoie "recipes": [] et explique pourquoi dans "refusal" ; n’invente pas de recette sans ingrédient du garde-manger. Sinon, "refusal" est une chaîne vide.'
-    : '"refusal" est toujours une chaîne vide : propose toujours des recettes.';
-
-  const prompt = `Garde-manger (identifiant : nom) :
-${options.pantryText}
-
-Crée exactement ${options.count} recette${options.count > 1 ? 's' : ''}${options.count > 1 ? ' vraiment différentes les unes des autres (plat, technique de cuisson, texture)' : ''}.
-- Difficulté : ${options.difficulty}
-- Temps total maximum : ${options.maxCookTime} minutes${options.avoidTitles && options.avoidTitles.length > 0 ? `
-- Déjà proposées, à ne pas refaire (autre plat, autre technique) : ${options.avoidTitles.map((title) => `« ${title} »`).join(', ')}` : ''}${options.servings ? `
-- Pour ${options.servings} personne${options.servings > 1 ? 's' : ''} : quantités adaptées, "servings" = ${options.servings}` : ''}
-
-${refusal}`;
-
-  return { system, prompt };
-}
-
 // ---------- Requête ----------
 
 Deno.serve(withCors(async (req: Request) => {
@@ -310,6 +207,10 @@ Deno.serve(withCors(async (req: Request) => {
       return requestErrorResponse('quota_exceeded', language, dailyLimit(user, 'generations'));
     }
     quotaUserId = user.id;
+    // Titres des recettes récentes et des favoris (à ne pas reproposer), lus pendant la préparation du prompt
+    const recentPromise = V4_FAMILY ? recentTitles(user.id) : Promise.resolve([]);
+    // Noms du garde-manger écrits dans une autre langue : traduits par les alias des fiches (pantryNames.ts)
+    const namesPromise = V4_FAMILY ? factNamesFor(pantry) : Promise.resolve([]);
 
     const dietary = Array.isArray(preferences.dietary) ? preferences.dietary : [];
     const diets = strictDietsOf(dietary);
@@ -320,6 +221,7 @@ Deno.serve(withCors(async (req: Request) => {
     const servings = cleanServings(preferences.servings);
     const context = { mealType: preferences.mealType, cuisine, difficulty, dietary, maxRecipes: count, mode, otherPantry, excluded, servings };
 
+    if (V4_FAMILY) translatePantryNames(pantry, await namesPromise, language);
     const promptOptions = {
       pantryText: pantryForPrompt(pantry),
       count,
@@ -337,25 +239,39 @@ Deno.serve(withCors(async (req: Request) => {
       otherPantry,
       excluded,
       servings,
+      version: PROMPT_VERSION,
+      // Quelques plats de référence tirés au hasard, seulement avec une cuisine précise
+      examples: V4_FAMILY ? sampleDishes(cuisine, { mealType: preferences.mealType, diets }) : [],
+      recentTitles: await recentPromise,
     };
     const { system, prompt } = buildPrompts(promptOptions);
+    const schema = buildRecipeSchema(pantry, diets, UNIT_HINT);
 
+    // Consigne propre à Gemini (secours), v4 et suivantes
+    const providerNotes = V4_FAMILY ? { gemini: geminiRecipeNote(language) } : undefined;
     const providers = debug === true && requestedOrder
       ? orderProviders(PROVIDERS, requestedOrder).filter((p) => requestedOrder.split(',').includes(p.name))
       : PROVIDERS;
     const log: AttemptLog[] = [];
+    // Quotas épuisés et dysfonctionnements des fournisseurs, même si le secours a répondu : alerte (une fois
+    // par jour, par fournisseur et par type)
+    const reportHits = (call: { quotaHits: ProviderQuotaHit[]; failureHits: ProviderQuotaHit[] } | null | undefined) => {
+      for (const hit of call?.quotaHits ?? []) {
+        reportInBackground(reportProviderQuota(hit.provider, 'generate-recipes', hit.details, simulation !== null));
+      }
+      for (const hit of call?.failureHits ?? []) {
+        reportInBackground(reportProviderFailure(hit.provider, 'generate-recipes', hit.details, simulation !== null));
+      }
+    };
     const result = await runWithFallback(providers, {
       system,
       prompt,
-      schema: buildRecipeSchema(pantry, diets),
-      schemaName: 'recipes',
+      schema,
+      schemaName: 'recipes', providerNotes,
       temperature: 0.8,
       maxOutputTokens: MAX_OUTPUT_TOKENS,
     }, (text) => parseRecipes(text, pantry, diets, context), { label: 'generate-recipes', log, t0, simulate: simulation?.providers });
-    // Quotas de fournisseurs épuisés, même si le secours a répondu : alerte (une fois par jour et par fournisseur)
-    for (const hit of result.quotaHits) {
-      reportInBackground(reportProviderQuota(hit.provider, 'generate-recipes', hit.details, simulation !== null));
-    }
+    reportHits(result);
     const debugInfo = debug === true ? { debug: { total_ms: Date.now() - t0, attempts: log } } : {};
 
     if (!result.ok) {
@@ -379,14 +295,12 @@ Deno.serve(withCors(async (req: Request) => {
       const second = await runWithFallback(providers, {
         system: again.system,
         prompt: again.prompt,
-        schema: buildRecipeSchema(pantry, diets),
-        schemaName: 'recipes',
+        schema,
+        schemaName: 'recipes', providerNotes,
         temperature: 0.8,
         maxOutputTokens: MAX_OUTPUT_TOKENS,
       }, (text) => parseRecipes(text, pantry, diets, { ...context, maxRecipes: missing }), { label: 'generate-recipes', log, t0, simulate: simulation?.providers });
-      for (const hit of second.quotaHits) {
-        reportInBackground(reportProviderQuota(hit.provider, 'generate-recipes', hit.details, simulation !== null));
-      }
+      reportHits(second);
       if (second.ok) {
         const titles = new Set(recipes.map((recipe) => recipe.title.toLowerCase()));
         recipes = [...recipes, ...second.value.recipes.filter((recipe) => !titles.has(recipe.title.toLowerCase()))].slice(0, count);
@@ -400,7 +314,40 @@ Deno.serve(withCors(async (req: Request) => {
       return failureResponse('dietary_refusal', language, debug === true ? { debug: { ...debugInfo.debug, dietary_rejections: dietaryRejections, invalid, refusal } } : debugInfo);
     }
 
-    console.log(`[generate-recipes] ${result.provider.name} (${result.provider.model}) : ${recipes.length}/${count} recette(s) en ${Date.now() - t0} ms, cuisine ${cuisine}, langue ${language}`);
+    // Contrôle de sécurité (v4 et suivantes, safety.ts) : une demande de correction pour les recettes en défaut,
+    // puis celles qui restent en défaut sont écartées ; aucune génération de plus comptée dans le quota
+    let safetyReport = null;
+    if (V4_FAMILY) {
+      const pass = await safetyPass(recipes, {
+        pantry, pantryText: promptOptions.pantryText, diets, context, providers, log, t0, label: 'generate-recipes:correction',
+        ...(PROMPT_VERSION === 'v4.1' && { maxPurchases: MAX_PURCHASES }),
+        request: { system, prompt, schema, schemaName: 'recipes', providerNotes, temperature: 0.8, maxOutputTokens: MAX_OUTPUT_TOKENS },
+        // Recettes de remplacement, demandées en même temps que la correction
+        replacementRequest: (replacements, avoidTitles) => {
+          const again = buildPrompts({ ...promptOptions, count: replacements, avoidTitles });
+          return { system: again.system, prompt: again.prompt, schema, schemaName: 'recipes', providerNotes, temperature: 0.8, maxOutputTokens: MAX_OUTPUT_TOKENS };
+        },
+        deadline: t0 + GENERATION_BUDGET_MS,
+        ...(simulation?.providers && { simulate: simulation.providers }),
+      });
+      reportHits(pass.report.correction);
+      reportHits(pass.report.replacement);
+      // Tests (clé secrète) : toutes les recettes écartées, pour vérifier que la génération n'est pas comptée
+      recipes = simulation?.safety_drop_all ? [] : pass.recipes;
+      safetyReport = { first: pass.report.first, corrected: pass.report.corrected, replaced: pass.report.replaced, dropped: pass.report.dropped };
+      if (pass.report.first.length > 0) {
+        console.warn(`[generate-recipes] contrôle : ${pass.report.first.length} en défaut (${pass.report.first.map((f) => `${f.title} : ${f.issues.map((i) => `${i.code} ${i.ingredient}`).join(', ')}`).join(' ; ')}), ${pass.report.corrected.length} corrigée(s), ${pass.report.replaced.length} remplacée(s), ${pass.report.dropped.length} écartée(s) en ${Date.now() - t0} ms`);
+      }
+      if (recipes.length === 0) {
+        // Toutes écartées (rare) : panne du point de vue de l'utilisateur, la génération n'est pas comptée
+        await refundQuota(user.id, 'generations');
+        return failureResponse('api_error', language, debug === true ? { debug: { ...debugInfo.debug, safety: safetyReport } } : debugInfo);
+      }
+    }
+
+    // Part des recettes servies par le secours (« État des services ») ; essais (debug, simulation) à part
+    reportInBackground(recordProviderUsage('generate-recipes', result.provider.name, result.provider !== providers[0], recipes.length, simulation !== null || debug === true));
+    console.log(`[generate-recipes] ${result.provider.name} (${result.provider.model}) : ${recipes.length}/${count} recette(s) en ${Date.now() - t0} ms, prompt ${PROMPT_VERSION}, cuisine ${cuisine}, langue ${language}`);
     return jsonResponse({
       recipes,
       totalGenerated: recipes.length,
@@ -409,7 +356,7 @@ Deno.serve(withCors(async (req: Request) => {
       rejected: Math.max(0, count - recipes.length),
       fewIngredients: count < 3,
       provider: result.provider.name,
-      ...(debug === true && { debug: { ...debugInfo.debug, dietary_rejections: dietaryRejections, invalid } }),
+      ...(debug === true && { debug: { ...debugInfo.debug, dietary_rejections: dietaryRejections, invalid, version: PROMPT_VERSION, safety: safetyReport, examples: promptOptions.examples, recent_titles: promptOptions.recentTitles } }),
     }, 200);
   } catch (error) {
     console.error('Error generating recipes:', error);

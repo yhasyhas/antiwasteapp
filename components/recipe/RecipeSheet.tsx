@@ -7,7 +7,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
 import { toSaveCount, usePantryUrgency } from '@/hooks/usePantryUrgency';
 import { isBasic } from '@/lib/basics';
-import { dietLabel, difficultyLabel } from '@/lib/labels';
+import { difficultyLabel, verifiedDietLabels } from '@/lib/labels';
+import { recipeAmount } from '@/lib/quantity';
 import { failureTitle } from '@/lib/quotaReason';
 import { cachedTranslation, translateRecipe } from '@/lib/recipeTranslation';
 import { Badge } from '@/components/ui/Badge';
@@ -42,6 +43,8 @@ const normalize = (value: string) => value.trim().toLowerCase();
 // langue que l'app : « Traduire en … » (traduction gardée en base, générée une seule fois).
 export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFavorite, onToggleFavorite, onClose }: Props) {
   const { t, language } = useLanguage();
+  // Étiquettes de régime vérifiées par le serveur seulement (codes, traduits par l’app)
+  const dietLabels = verifiedDietLabels(t, original.dietary_tags);
   const safe = useSafeSpacing();
 
   // Traduction dans la langue de l'app : déjà faite (en base ou pendant la session), ou à la demande
@@ -49,12 +52,17 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
   const savedTranslation = () => (original.id ? original.translations?.[language] ?? cachedTranslation(original.id, language) ?? null : null);
   const [translation, setTranslation] = useState<RecipeText | null>(savedTranslation);
   const [showOriginal, setShowOriginal] = useState(false);
+  // Image dépassée : barre d'en-tête opaque (retour, titre, favori) qui couvre aussi la barre d'état
+  const [pastHero, setPastHero] = useState(false);
+  const heroLimit = sizes.recipeHero - safe.insets.top - sizes.touch - spacing.xl;
   const [translating, setTranslating] = useState(false);
   useEffect(() => {
     setTranslation(savedTranslation());
     setShowOriginal(false);
   }, [original.id, language]);
   const recipe = canTranslate && translation && !showOriginal ? translatedRecipe(original, translation) : original;
+  // Langue du texte affiché (unités des quantités accordées dans cette langue)
+  const textLanguage = canTranslate && translation && !showOriginal ? language : original.language ?? language;
 
   const translate = async () => {
     if (translation) return setShowOriginal(false);
@@ -96,7 +104,7 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
   const amountOf = (name: string) => {
     const item = recipe.ingredients_used.find((used) => normalize(used.name) === normalize(name))
       ?? recipe.ingredients_used.find((used) => normalize(used.name).includes(normalize(name)) || normalize(name).includes(normalize(used.name)));
-    return item ? [item.quantity, item.unit].filter(Boolean).join(' ') : '';
+    return item ? recipeAmount(item.quantity, item.unit, textLanguage) : '';
   };
   // Ingrédients qui ne sont ni « du garde-manger » ni « à acheter » (sel, huile…, anciennes recettes)
   const listed = [...recipe.ingredients_from_list, ...missing].map(normalize);
@@ -105,7 +113,15 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
   return (
     <Modal visible animationType="slide" statusBarTranslucent navigationBarTranslucent onRequestClose={onClose}>
       <View style={styles.container}>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scroll}
+          scrollEventThrottle={16}
+          onScroll={(event) => {
+            const past = event.nativeEvent.contentOffset.y > heroLimit;
+            if (past !== pastHero) setPastHero(past);
+          }}
+        >
           {/* Image, ou illustration tant qu'il n'y en a pas (génération en cours comprise) */}
           <View style={styles.hero}>
             {recipe.image_url ? (
@@ -138,10 +154,10 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
               <Text style={styles.times}>{t('home.prepAndCook', { prep: recipe.prep_time, cook: recipe.cook_time })}</Text>
             ) : null}
 
-            {recipe.dietary_tags.length > 0 && (
+            {dietLabels.length > 0 && (
               <View style={styles.tags}>
-                {recipe.dietary_tags.map((tag, index) => (
-                  <Badge key={index} label={dietLabel(t, tag)} tone="leftover" />
+                {dietLabels.map((label, index) => (
+                  <Badge key={index} label={label} tone="leftover" />
                 ))}
               </View>
             )}
@@ -190,7 +206,7 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
                   <Text style={styles.cardTitle}>{t('recipe.otherIngredients')}</Text>
                 </View>
                 {others.map((item, index) => (
-                  <IngredientRow key={index} name={item.name} amount={[item.quantity, item.unit].filter(Boolean).join(' ')} />
+                  <IngredientRow key={index} name={item.name} amount={recipeAmount(item.quantity, item.unit, textLanguage)} />
                 ))}
               </Card>
             )}
@@ -221,11 +237,12 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
           </View>
         </ScrollView>
 
-        {/* Retour et favori posés sur l'image */}
-        <View style={[styles.topBar, safe.top(spacing.md)]} pointerEvents="box-none">
+        {/* Retour et favori posés sur l'image ; une fois l'image dépassée, barre opaque avec le titre */}
+        <View style={[styles.topBar, safe.top(pastHero ? spacing.sm : spacing.md), pastHero && styles.topBarSolid]} pointerEvents="box-none">
           <RoundButton onPress={onClose} label={t('common.back')}>
             <ChevronLeft size={sizes.iconLarge} color={colors.text} />
           </RoundButton>
+          {pastHero ? <Text style={styles.topBarTitle} numberOfLines={1}>{recipe.title}</Text> : null}
           <RoundButton onPress={onToggleFavorite} label={isFavorite ? t('saved.removeFavorite') : t('recipe.saveToFavorites')} selected={isFavorite}>
             <Heart size={sizes.icon} color={colors.expired.text} fill={isFavorite ? colors.expired.text : colors.transparent} />
           </RoundButton>
@@ -425,6 +442,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.screen,
+  },
+  topBarSolid: {
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingBottom: spacing.sm,
+    backgroundColor: colors.surface,
+    borderBottomWidth: sizes.borderWidth,
+    borderBottomColor: colors.border,
+  },
+  topBarTitle: {
+    ...typography.button,
+    flex: 1,
+    textAlign: 'center',
   },
   round: {
     width: sizes.touch + spacing.xs,

@@ -1,0 +1,1195 @@
+[
+  {
+    "name": "Ceviche",
+    "country": "Pérou, Équateur",
+    "ingredients": [
+      "poisson blanc cru",
+      "citron vert",
+      "oignon rouge",
+      "piment (ají limo ou rocoto)",
+      "coriandre",
+      "patate douce et maïs (accompagnement)"
+    ],
+    "techniques": [
+      "couper le poisson en dés",
+      "le mariner quelques minutes dans le citron"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Lomo saltado",
+    "country": "Pérou",
+    "ingredients": [
+      "bœuf en lanières",
+      "oignon rouge",
+      "tomate",
+      "sauce soja et vinaigre",
+      "piment jaune (ají amarillo)",
+      "frites et riz"
+    ],
+    "techniques": [
+      "sauter à feu très vif au wok",
+      "mélanger aux frites au dernier moment"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Ají de gallina",
+    "country": "Pérou",
+    "ingredients": [
+      "poulet effiloché",
+      "piment jaune (ají amarillo)",
+      "pain de mie trempé dans le lait",
+      "oignon et ail",
+      "fromage ou noix",
+      "pommes de terre, œuf dur et riz"
+    ],
+    "techniques": [
+      "mixer une sauce crémeuse au pain et au piment",
+      "y réchauffer le poulet effiloché"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Papa a la huancaína",
+    "country": "Pérou",
+    "ingredients": [
+      "pommes de terre",
+      "fromage frais",
+      "piment jaune (ají amarillo)",
+      "lait",
+      "biscuits salés (pour lier)",
+      "œuf dur et olives"
+    ],
+    "techniques": [
+      "cuire les pommes de terre",
+      "mixer la sauce au fromage et piment",
+      "napper"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Causa limeña",
+    "country": "Pérou",
+    "ingredients": [
+      "pommes de terre jaunes",
+      "piment jaune (ají amarillo)",
+      "citron vert",
+      "garniture (thon ou poulet à la mayonnaise)",
+      "avocat"
+    ],
+    "techniques": [
+      "écraser les pommes de terre assaisonnées",
+      "monter en couches avec la garniture"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Tacu tacu",
+    "country": "Pérou",
+    "ingredients": [
+      "riz cuit de la veille",
+      "haricots (canarios) cuits",
+      "oignon et ail",
+      "piment jaune"
+    ],
+    "techniques": [
+      "mélanger riz et haricots écrasés",
+      "dorer à la poêle en galette"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Pan con chicharrón",
+    "country": "Pérou",
+    "ingredients": [
+      "pain",
+      "porc confit puis frit",
+      "patate douce frite",
+      "salsa criolla (oignon rouge, citron, piment)"
+    ],
+    "techniques": [
+      "cuire le porc dans sa graisse jusqu'à dorure",
+      "garnir le pain"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Tamal peruano",
+    "country": "Pérou",
+    "ingredients": [
+      "maïs moulu",
+      "saindoux",
+      "piment (ají panca ou amarillo)",
+      "poulet ou porc",
+      "œuf dur et olive",
+      "feuilles de bananier"
+    ],
+    "techniques": [
+      "assaisonner la pâte de maïs",
+      "envelopper la garniture",
+      "cuire à la vapeur"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Sopa de quinua",
+    "country": "Pérou, Bolivie, Équateur",
+    "ingredients": [
+      "quinoa",
+      "pomme de terre",
+      "carotte",
+      "oignon",
+      "fromage frais ou viande (facultatif)"
+    ],
+    "techniques": [
+      "rincer la quinoa",
+      "mijoter avec les légumes en soupe"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Arepas",
+    "country": "Venezuela, Colombie",
+    "ingredients": [
+      "farine de maïs précuite",
+      "eau",
+      "sel",
+      "garniture (fromage, haricots noirs, poulet-avocat, œufs)"
+    ],
+    "techniques": [
+      "former des galettes",
+      "cuire sur une plaque puis au four",
+      "ouvrir et garnir"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Huevos pericos (perico)",
+    "country": "Colombie, Venezuela",
+    "ingredients": [
+      "œufs",
+      "tomate",
+      "oignon vert ou oignon"
+    ],
+    "techniques": [
+      "revenir tomate et oignon",
+      "brouiller les œufs dedans"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Changua",
+    "country": "Colombie (Andes)",
+    "ingredients": [
+      "lait",
+      "eau",
+      "œufs",
+      "oignon vert",
+      "coriandre",
+      "pain rassis (calado)"
+    ],
+    "techniques": [
+      "pocher les œufs dans le lait chaud",
+      "verser sur le pain"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Calentado",
+    "country": "Colombie",
+    "ingredients": [
+      "riz de la veille",
+      "haricots de la veille",
+      "restes de viande",
+      "œuf au plat",
+      "arepa"
+    ],
+    "techniques": [
+      "réchauffer ensemble les restes à la poêle"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Ajiaco santafereño",
+    "country": "Colombie (Bogotá)",
+    "ingredients": [
+      "poulet",
+      "trois sortes de pommes de terre (dont la papa criolla)",
+      "maïs en épi",
+      "guascas (herbe)",
+      "crème et câpres",
+      "avocat"
+    ],
+    "techniques": [
+      "mijoter jusqu'à ce que les pommes de terre se défassent et épaississent la soupe"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Sancocho",
+    "country": "Colombie, Venezuela, Équateur",
+    "ingredients": [
+      "poulet, poisson ou bœuf",
+      "manioc",
+      "banane plantain verte",
+      "pomme de terre",
+      "maïs en épi",
+      "coriandre"
+    ],
+    "techniques": [
+      "mijoter longuement viande et tubercules en soupe épaisse"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Frijoles antioqueños",
+    "country": "Colombie",
+    "ingredients": [
+      "haricots rouges (cargamanto)",
+      "lard ou couenne de porc",
+      "banane plantain verte",
+      "carotte",
+      "hogao (tomate et oignon vert revenus)"
+    ],
+    "techniques": [
+      "cuire les haricots avec le porc",
+      "ajouter le hogao et râper le plantain pour épaissir"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Bandeja paisa",
+    "country": "Colombie (Antioquia)",
+    "ingredients": [
+      "haricots rouges",
+      "riz",
+      "viande hachée ou chicharrón",
+      "chorizo",
+      "œuf au plat",
+      "banane plantain mûre",
+      "avocat et arepa"
+    ],
+    "techniques": [
+      "préparer chaque élément séparément",
+      "dresser en une grande assiette"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Patacones",
+    "country": "Colombie, Venezuela, Équateur",
+    "ingredients": [
+      "bananes plantains vertes",
+      "huile de friture",
+      "sel",
+      "hogao ou guacamole (facultatif)"
+    ],
+    "techniques": [
+      "frire",
+      "aplatir",
+      "refrire"
+    ],
+    "moments": [
+      "lunch",
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Pandebono",
+    "country": "Colombie",
+    "ingredients": [
+      "amidon de manioc",
+      "fromage frais émietté",
+      "farine de maïs",
+      "œuf"
+    ],
+    "techniques": [
+      "pétrir",
+      "façonner en boules ou anneaux",
+      "cuire au four"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Pabellón criollo",
+    "country": "Venezuela",
+    "ingredients": [
+      "bœuf effiloché (carne mechada)",
+      "haricots noirs",
+      "riz blanc",
+      "banane plantain mûre frite",
+      "tomate, oignon, poivron"
+    ],
+    "techniques": [
+      "cuire et effilocher la viande",
+      "la mijoter en sofrito",
+      "servir avec haricots, riz et plantain"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Cachapas",
+    "country": "Venezuela",
+    "ingredients": [
+      "maïs frais",
+      "sucre",
+      "lait ou œuf",
+      "fromage frais (queso de mano)"
+    ],
+    "techniques": [
+      "mixer le maïs en pâte",
+      "cuire en crêpes épaisses sur une plaque",
+      "garnir de fromage"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Tequeños",
+    "country": "Venezuela",
+    "ingredients": [
+      "pâte de blé",
+      "fromage blanc à pâte ferme",
+      "huile de friture"
+    ],
+    "techniques": [
+      "enrouler la pâte autour de bâtonnets de fromage",
+      "frire"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Hallacas",
+    "country": "Venezuela",
+    "ingredients": [
+      "pâte de maïs au rocou",
+      "ragoût de viandes (porc, poulet, bœuf)",
+      "olives, raisins secs, câpres",
+      "feuilles de bananier"
+    ],
+    "techniques": [
+      "préparer le ragoût la veille",
+      "garnir et envelopper",
+      "cuire à l'eau"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Encebollado",
+    "country": "Équateur",
+    "ingredients": [
+      "thon (albacore)",
+      "manioc",
+      "oignon rouge mariné",
+      "tomate",
+      "cumin",
+      "coriandre"
+    ],
+    "techniques": [
+      "cuire le manioc et le poisson dans un bouillon épicé",
+      "garnir d'oignon mariné"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Locro de papa",
+    "country": "Équateur",
+    "ingredients": [
+      "pommes de terre",
+      "lait",
+      "fromage frais",
+      "oignon",
+      "rocou (achiote)",
+      "avocat"
+    ],
+    "techniques": [
+      "cuire les pommes de terre jusqu'à ce qu'elles se défassent",
+      "lier avec le lait et le fromage"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Llapingachos",
+    "country": "Équateur",
+    "ingredients": [
+      "pommes de terre",
+      "fromage",
+      "oignon",
+      "rocou (achiote)",
+      "sauce cacahuète (facultatif)"
+    ],
+    "techniques": [
+      "écraser les pommes de terre",
+      "farcir de fromage",
+      "dorer à la poêle"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Bolón de verde",
+    "country": "Équateur",
+    "ingredients": [
+      "bananes plantains vertes",
+      "fromage ou chicharrón",
+      "beurre ou saindoux"
+    ],
+    "techniques": [
+      "cuire et piler le plantain",
+      "farcir en boule",
+      "dorer à la poêle"
+    ],
+    "moments": [
+      "breakfast"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Menestra",
+    "country": "Équateur",
+    "ingredients": [
+      "lentilles ou haricots",
+      "oignon",
+      "poivron",
+      "ail",
+      "cumin",
+      "coriandre"
+    ],
+    "techniques": [
+      "revenir un refrito",
+      "mijoter les légumineuses jusqu'à texture épaisse"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Humitas",
+    "country": "Équateur, Pérou, Bolivie, Chili, Argentine",
+    "ingredients": [
+      "maïs frais râpé",
+      "oignon",
+      "fromage (ou sucre selon la région)",
+      "beurre ou saindoux",
+      "feuilles de maïs"
+    ],
+    "techniques": [
+      "mixer le maïs avec l'assaisonnement",
+      "envelopper dans les feuilles",
+      "cuire à la vapeur ou à l'eau"
+    ],
+    "moments": [
+      "breakfast",
+      "snack",
+      "lunch"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Salteñas",
+    "country": "Bolivie",
+    "ingredients": [
+      "pâte de blé légèrement sucrée",
+      "viande (bœuf ou poulet) en ragoût juteux",
+      "pomme de terre et petits pois",
+      "piment (ají)",
+      "œuf dur et olive"
+    ],
+    "techniques": [
+      "préparer un ragoût gélifié",
+      "refermer en chausson",
+      "cuire au four"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Silpancho",
+    "country": "Bolivie (Cochabamba)",
+    "ingredients": [
+      "bœuf aplati et pané",
+      "riz",
+      "pommes de terre",
+      "œuf au plat",
+      "salsa de tomate et oignon"
+    ],
+    "techniques": [
+      "aplatir et paner la viande",
+      "frire",
+      "dresser en couches"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Sopa de maní",
+    "country": "Bolivie",
+    "ingredients": [
+      "arachides crues mixées",
+      "bœuf avec os",
+      "pommes de terre",
+      "macaronis",
+      "carotte et petits pois"
+    ],
+    "techniques": [
+      "mixer les arachides",
+      "les cuire longuement dans le bouillon",
+      "garnir de frites ou de persil"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Api con pastel",
+    "country": "Bolivie",
+    "ingredients": [
+      "maïs violet moulu",
+      "cannelle et clou de girofle",
+      "sucre",
+      "beignet au fromage (pastel)"
+    ],
+    "techniques": [
+      "cuire la boisson épaisse au maïs",
+      "frire le beignet au fromage"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Arroz e feijão",
+    "country": "Brésil",
+    "ingredients": [
+      "riz",
+      "haricots (noirs ou carioca)",
+      "ail",
+      "oignon",
+      "laurier",
+      "lard (facultatif)"
+    ],
+    "techniques": [
+      "cuire les haricots",
+      "les relever d'ail et d'oignon revenus (tempero)",
+      "servir avec le riz"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Feijoada",
+    "country": "Brésil",
+    "ingredients": [
+      "haricots noirs",
+      "viandes de porc salées et fumées",
+      "saucisse (linguiça)",
+      "orange",
+      "chou (couve) et farofa en accompagnement"
+    ],
+    "techniques": [
+      "mijoter longuement les haricots avec les viandes"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Farofa",
+    "country": "Brésil",
+    "ingredients": [
+      "farine de manioc",
+      "beurre",
+      "oignon",
+      "lard, œuf ou banane (facultatif)"
+    ],
+    "techniques": [
+      "revenir l'oignon",
+      "griller la farine dans le beurre"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Couve refogada",
+    "country": "Brésil",
+    "ingredients": [
+      "chou cavalier (couve) en fines lanières",
+      "ail",
+      "huile"
+    ],
+    "techniques": [
+      "émincer très finement",
+      "sauter rapidement à l'ail"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Moqueca",
+    "country": "Brésil (Bahia, Espírito Santo)",
+    "ingredients": [
+      "poisson ou crevettes",
+      "tomate",
+      "oignon et poivron",
+      "coriandre",
+      "lait de coco et huile de palme (Bahia)",
+      "citron vert"
+    ],
+    "techniques": [
+      "mariner le poisson au citron",
+      "étager poisson et légumes",
+      "mijoter à couvert"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Baião de dois",
+    "country": "Brésil (Nordeste)",
+    "ingredients": [
+      "riz",
+      "haricots (feijão de corda)",
+      "fromage coalho",
+      "viande séchée ou bacon",
+      "oignon et coriandre"
+    ],
+    "techniques": [
+      "cuire riz et haricots ensemble",
+      "ajouter le fromage en dés"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pão de queijo",
+    "country": "Brésil (Minas Gerais)",
+    "ingredients": [
+      "amidon de manioc (polvilho)",
+      "fromage râpé",
+      "lait",
+      "huile",
+      "œufs"
+    ],
+    "techniques": [
+      "échauder l'amidon",
+      "incorporer fromage et œufs",
+      "cuire au four en boules"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Tapioca",
+    "country": "Brésil (Nordeste)",
+    "ingredients": [
+      "fécule de manioc hydratée",
+      "garniture (fromage, coco, beurre, œuf)"
+    ],
+    "techniques": [
+      "étaler la fécule à la poêle sèche",
+      "garnir et plier"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Cuscuz nordestino",
+    "country": "Brésil (Nordeste)",
+    "ingredients": [
+      "semoule de maïs en flocons (flocão)",
+      "eau",
+      "sel",
+      "beurre",
+      "œuf ou fromage (facultatif)"
+    ],
+    "techniques": [
+      "humidifier la semoule",
+      "cuire à la vapeur dans un cuscuzeiro"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Coxinha",
+    "country": "Brésil",
+    "ingredients": [
+      "poulet effiloché",
+      "pâte de farine cuite dans le bouillon",
+      "fromage frais (catupiry, facultatif)",
+      "chapelure"
+    ],
+    "techniques": [
+      "façonner en goutte autour de la farce",
+      "paner",
+      "frire"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Bolo de fubá",
+    "country": "Brésil",
+    "ingredients": [
+      "farine de maïs (fubá)",
+      "œufs",
+      "lait",
+      "sucre",
+      "huile",
+      "fenouil (facultatif)"
+    ],
+    "techniques": [
+      "mélanger la pâte",
+      "cuire au four"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Empanadas",
+    "country": "Argentine, Chili, Uruguay, Colombie",
+    "ingredients": [
+      "pâte de blé",
+      "viande hachée ou au couteau",
+      "oignon",
+      "œuf dur",
+      "olives (Chili) ou cumin et paprika (Argentine)"
+    ],
+    "techniques": [
+      "préparer une farce à l'oignon",
+      "refermer en chausson",
+      "cuire au four ou frire"
+    ],
+    "moments": [
+      "lunch",
+      "dinner",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Milanesa",
+    "country": "Argentine, Uruguay, Paraguay",
+    "ingredients": [
+      "escalope de bœuf ou poulet",
+      "œuf",
+      "chapelure",
+      "ail et persil",
+      "purée ou frites"
+    ],
+    "techniques": [
+      "aplatir",
+      "paner",
+      "frire ou cuire au four"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Locro",
+    "country": "Argentine, Bolivie, Paraguay",
+    "ingredients": [
+      "maïs blanc concassé",
+      "haricots blancs",
+      "potiron",
+      "viandes (porc, bœuf, chorizo)",
+      "sauce rouge au paprika (grasita colorada)"
+    ],
+    "techniques": [
+      "mijoter très longuement jusqu'à texture crémeuse"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Guiso de lentejas",
+    "country": "Argentine, Uruguay",
+    "ingredients": [
+      "lentilles",
+      "oignon et poivron",
+      "carotte et pomme de terre",
+      "potiron",
+      "chorizo ou lard (facultatif)",
+      "tomate"
+    ],
+    "techniques": [
+      "revenir les légumes",
+      "mijoter avec les lentilles"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Tarta de verdura (pascualina)",
+    "country": "Argentine, Uruguay",
+    "ingredients": [
+      "pâte brisée",
+      "blettes ou épinards",
+      "oignon",
+      "œufs",
+      "fromage"
+    ],
+    "techniques": [
+      "étuver les légumes",
+      "garnir la pâte",
+      "cuire au four"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Torta frita",
+    "country": "Uruguay, Argentine",
+    "ingredients": [
+      "farine",
+      "graisse (saindoux) ou beurre",
+      "sel",
+      "eau",
+      "sucre (facultatif)"
+    ],
+    "techniques": [
+      "étaler une pâte simple",
+      "frire en galettes"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Polenta",
+    "country": "Argentine, Uruguay, Brésil (sud)",
+    "ingredients": [
+      "semoule de maïs",
+      "eau ou bouillon",
+      "fromage",
+      "sauce tomate (tuco) ou ragoût"
+    ],
+    "techniques": [
+      "cuire la semoule en remuant",
+      "servir avec une sauce"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Sopa paraguaya",
+    "country": "Paraguay",
+    "ingredients": [
+      "farine de maïs",
+      "fromage",
+      "oignon",
+      "lait",
+      "œufs",
+      "graisse ou beurre"
+    ],
+    "techniques": [
+      "revenir l'oignon",
+      "mélanger la pâte",
+      "cuire au four comme un gâteau salé"
+    ],
+    "moments": [
+      "lunch",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Chipa",
+    "country": "Paraguay, Argentine (nord-est)",
+    "ingredients": [
+      "amidon de manioc",
+      "fromage",
+      "œufs",
+      "graisse ou beurre",
+      "anis (facultatif)"
+    ],
+    "techniques": [
+      "pétrir",
+      "façonner en anneaux ou boules",
+      "cuire au four"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Mbejú",
+    "country": "Paraguay",
+    "ingredients": [
+      "amidon de manioc",
+      "fromage",
+      "graisse ou beurre",
+      "lait"
+    ],
+    "techniques": [
+      "sabler l'amidon avec la graisse",
+      "cuire en galette à la poêle"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Vorí vorí",
+    "country": "Paraguay",
+    "ingredients": [
+      "poulet",
+      "boulettes de farine de maïs et fromage",
+      "oignon et poivron",
+      "carotte",
+      "persil"
+    ],
+    "techniques": [
+      "préparer un bouillon de poulet",
+      "y cuire les boulettes de maïs"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pastel de choclo",
+    "country": "Chili",
+    "ingredients": [
+      "maïs frais mixé",
+      "basilic",
+      "viande hachée à l'oignon (pino)",
+      "poulet",
+      "œuf dur et olive",
+      "sucre"
+    ],
+    "techniques": [
+      "préparer le pino",
+      "couvrir de pâte de maïs",
+      "gratiner au four"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Cazuela",
+    "country": "Chili",
+    "ingredients": [
+      "poulet ou bœuf",
+      "pomme de terre",
+      "potiron",
+      "maïs en épi",
+      "riz ou haricots verts"
+    ],
+    "techniques": [
+      "cuire la viande",
+      "ajouter un gros morceau de chaque légume au bouillon"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Porotos granados",
+    "country": "Chili",
+    "ingredients": [
+      "haricots frais écossés",
+      "maïs frais râpé (pilco)",
+      "potiron",
+      "oignon",
+      "basilic",
+      "paprika"
+    ],
+    "techniques": [
+      "mijoter les haricots avec le potiron",
+      "lier avec le maïs râpé"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Charquicán",
+    "country": "Chili",
+    "ingredients": [
+      "viande (bœuf haché ou séché)",
+      "pomme de terre",
+      "potiron",
+      "oignon",
+      "maïs et petits pois",
+      "œuf au plat"
+    ],
+    "techniques": [
+      "revenir la viande",
+      "cuire les légumes et écraser grossièrement"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Sopaipillas",
+    "country": "Chili, Argentine",
+    "ingredients": [
+      "farine",
+      "potiron cuit (Chili)",
+      "graisse ou beurre",
+      "levure chimique",
+      "pebre (sauce tomate-coriandre) ou sirop (chancaca)"
+    ],
+    "techniques": [
+      "pétrir avec le potiron",
+      "frire en disques"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": "vegetarian"
+  }
+]

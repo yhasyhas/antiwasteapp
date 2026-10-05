@@ -89,6 +89,7 @@ Modèle sans valeurs : `.env.example`. Toutes ces valeurs sont **publiques par n
 | `GEMINI_MODEL` | Nom du modèle Gemini (configuration, pas un secret) | — |
 | `GROQ_API_KEY` | Groq : secours du scan et de la génération | console.groq.com → API Keys |
 | `GROQ_MODEL`, `GROQ_VISION_MODEL` | Noms des modèles Groq (configuration) | — |
+| `RECIPE_PROMPT_VERSION` | Version du prompt de `generate-recipes` (configuration, pas un secret ; facultatif). Réglée à `v4.1` depuis le 02/10/2026 ; absente : la version par défaut du code (v4.1 depuis la phase 9) ; `v4` : sans la limite d'achats ni la règle des types de plats ; `v1` : retour à l'ancienne version sans contrôle de sécurité, sans redéployer | — |
 | `CLOUDFLARE_ACCOUNT_ID` | Compte Cloudflare pour Workers AI (images des recettes) | dash.cloudflare.com (identifiant, pas un secret) |
 | `CLOUDFLARE_API_TOKEN` | Jeton Workers AI (génération d'images) | dash.cloudflare.com → My Profile → API Tokens ; droits : Workers AI seulement (à vérifier en phase 14) |
 | `CRON_SECRET` | En-tête `x-cron-secret` de l'appel planifié de `daily-digest` | Voir ci-dessous (deux endroits à changer ensemble) |
@@ -102,6 +103,8 @@ Modèle sans valeurs : `.env.example`. Toutes ces valeurs sont **publiques par n
 - le secret Vault `daily_digest_cron_secret`, lu par la tâche `pg_cron` « daily-digest » (toutes les 15 minutes).
 
 Pour le renouveler : générer une valeur aléatoire, la poser dans les fonctions (`secrets set`), puis dans Vault (`select vault.update_secret(…)`, depuis le SQL Editor du Dashboard).
+
+**Clé secrète Supabase dans un en-tête** (aucun secret en plus) : les tests de quotas simulés (en-tête `x-simulate-key`) et la copie d'évaluation des recettes `generate-recipes-eval` (en-tête `x-eval-key`, phase 9) n'acceptent que la clé secrète. Les scripts la lisent avec `npx supabase projects api-keys --reveal` et la gardent en mémoire. L'app n'appelle jamais `generate-recipes-eval`.
 
 ---
 
@@ -155,7 +158,7 @@ Pour le renouveler : générer une valeur aléatoire, la poser dans les fonction
 |---|---|---|
 | Supabase | Base, authentification, fonctions, stockage | `SUPABASE_ACCESS_TOKEN`, `SUPABASE_DB_PASSWORD`, Dashboard (utilisateur) |
 | Google AI Studio | Clé Gemini (offre gratuite : données utilisées par Google, passage payant en phase 13) | `GEMINI_API_KEY` (secret Supabase) |
-| Groq | Clé du fournisseur de secours | `GROQ_API_KEY` (secret Supabase) |
+| Groq | Génération des recettes (fournisseur principal, `gpt-oss-120b`) et secours du scan. **Offre Developer** depuis le 02/10/2026, avec un **plafond de dépenses de 5 $ par mois** (exception à la règle « services payants en phase 13 » : coût négligeable, nécessaire pour l'évaluation). Limites vérifiées le 02/10/2026 : 250 000 tokens par minute et 500 000 requêtes par jour par modèle. Plafond et moyen de paiement : console.groq.com → Settings → Billing, limite de dépenses (chemin du menu à confirmer à la prochaine visite) ; consommation : console.groq.com → Usage. Les évaluations (`scripts/recipe-eval`) partagent ce compte avec l'app | `GROQ_API_KEY` (secret Supabase) ; compte Groq (utilisateur) |
 | Sentry | Erreurs de l'app et des fonctions (organisation `yhasral`, région UE) | DSN (`.env`, `SENTRY_DSN`), `SENTRY_ACCESS_TOKEN` (lecture) |
 | Expo / EAS | Builds, identifiants, notifications push | `EXPO_TOKEN` ; compte propriétaire de l'équipe EAS |
 | Firebase | FCM (push Android) | Console Firebase (utilisateur) ; clé de compte de service (section 5) |

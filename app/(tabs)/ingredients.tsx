@@ -215,7 +215,7 @@ export default function IngredientsScreen() {
     const lots = ingredients.filter((ingredient) => !removal.hiddenIds.has(ingredient.id));
     return groupLots(lots)
       .filter((group) => !removal.hiddenIds.has(group.key))
-      .map((group) => ({ ...group, total: totalLabel(group.lots, language) }));
+      .map((group) => ({ ...group, total: totalLabel(group.lots, language, true) }));
   }, [ingredients, removal.hiddenIds, language]);
   const query = searchQuery.trim().toLowerCase();
   const searched = query

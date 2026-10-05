@@ -1,0 +1,1201 @@
+[
+  {
+    "name": "Tartines beurre-confiture",
+    "country": "France",
+    "ingredients": [
+      "pain (baguette, pain de campagne, rassis grillé possible)",
+      "beurre",
+      "confiture ou miel"
+    ],
+    "techniques": [
+      "griller le pain (facultatif)",
+      "tartiner"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Pain perdu",
+    "country": "France",
+    "ingredients": [
+      "pain rassis (ou brioche)",
+      "lait",
+      "œufs",
+      "sucre",
+      "beurre"
+    ],
+    "techniques": [
+      "tremper le pain dans le mélange lait-œufs",
+      "dorer au beurre à la poêle"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Crêpes",
+    "country": "France (Bretagne d'origine, tout le pays)",
+    "ingredients": [
+      "farine de blé",
+      "œufs",
+      "lait",
+      "beurre",
+      "sucre, confiture ou pâte à tartiner (garniture)"
+    ],
+    "techniques": [
+      "laisser reposer la pâte",
+      "cuire fines à la poêle"
+    ],
+    "moments": [
+      "breakfast",
+      "snack",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Œufs à la coque et mouillettes",
+    "country": "France",
+    "ingredients": [
+      "œufs",
+      "pain",
+      "beurre",
+      "sel"
+    ],
+    "techniques": [
+      "cuire 3 minutes à l'eau bouillante",
+      "couper le pain beurré en bâtonnets"
+    ],
+    "moments": [
+      "breakfast",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Gâteau au yaourt",
+    "country": "France",
+    "ingredients": [
+      "yaourt nature (le pot sert de mesure)",
+      "farine",
+      "sucre",
+      "œufs",
+      "huile",
+      "levure chimique"
+    ],
+    "techniques": [
+      "mélanger au pot de yaourt",
+      "cuire au four"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Quatre-quarts",
+    "country": "France (Bretagne)",
+    "ingredients": [
+      "œufs",
+      "beurre (demi-sel en Bretagne)",
+      "sucre",
+      "farine (même poids pour les quatre)"
+    ],
+    "techniques": [
+      "peser les œufs pour doser le reste",
+      "cuire au four"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Pain d'épices",
+    "country": "France (Bourgogne, Alsace, Reims)",
+    "ingredients": [
+      "miel",
+      "farine (seigle ou blé)",
+      "épices (cannelle, anis, gingembre, girofle)",
+      "lait",
+      "bicarbonate ou levure"
+    ],
+    "techniques": [
+      "chauffer le miel avec le lait",
+      "cuire longuement à four doux"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Kouglof",
+    "country": "France (Alsace)",
+    "ingredients": [
+      "farine",
+      "levure de boulanger",
+      "beurre",
+      "œufs",
+      "lait",
+      "raisins secs et amandes"
+    ],
+    "techniques": [
+      "pétrir une pâte briochée",
+      "cuire dans un moule à kouglof"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Madeleines",
+    "country": "France (Lorraine)",
+    "ingredients": [
+      "œufs",
+      "sucre",
+      "farine",
+      "beurre fondu",
+      "zeste de citron ou miel",
+      "levure chimique"
+    ],
+    "techniques": [
+      "refroidir la pâte",
+      "cuire à four chaud dans des moules à coquilles"
+    ],
+    "moments": [
+      "snack",
+      "breakfast"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Gaufres",
+    "country": "France (Nord), Belgique",
+    "ingredients": [
+      "farine",
+      "œufs",
+      "lait",
+      "beurre",
+      "sucre",
+      "levure"
+    ],
+    "techniques": [
+      "cuire dans un gaufrier"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Far breton",
+    "country": "France (Bretagne)",
+    "ingredients": [
+      "lait",
+      "œufs",
+      "farine",
+      "sucre",
+      "beurre",
+      "pruneaux (souvent)"
+    ],
+    "techniques": [
+      "mélanger une pâte liquide",
+      "cuire au four"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Clafoutis aux cerises",
+    "country": "France (Limousin)",
+    "ingredients": [
+      "cerises (ou autres fruits)",
+      "œufs",
+      "lait",
+      "farine",
+      "sucre",
+      "beurre"
+    ],
+    "techniques": [
+      "napper les fruits d'une pâte à flan",
+      "cuire au four"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Riz au lait",
+    "country": "France (dont la teurgoule en Normandie)",
+    "ingredients": [
+      "riz rond",
+      "lait entier",
+      "sucre",
+      "vanille ou cannelle"
+    ],
+    "techniques": [
+      "cuire doucement le riz dans le lait (ou au four, pour la teurgoule)"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Compote de pommes",
+    "country": "France",
+    "ingredients": [
+      "pommes (abîmées possibles)",
+      "un peu d'eau",
+      "sucre (facultatif)",
+      "cannelle ou vanille (facultatif)"
+    ],
+    "techniques": [
+      "cuire les fruits en morceaux à couvert",
+      "écraser ou mixer"
+    ],
+    "moments": [
+      "snack",
+      "breakfast"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Tarte aux pommes",
+    "country": "France",
+    "ingredients": [
+      "pâte brisée ou sablée",
+      "pommes",
+      "sucre",
+      "beurre",
+      "compote (en fond, souvent)"
+    ],
+    "techniques": [
+      "foncer le moule",
+      "disposer les pommes en rosace",
+      "cuire au four"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Soupe de légumes (potage)",
+    "country": "France",
+    "ingredients": [
+      "légumes de saison (poireau, carotte, pomme de terre, navet, courge)",
+      "oignon",
+      "beurre ou crème (facultatif)",
+      "eau ou bouillon"
+    ],
+    "techniques": [
+      "mijoter les légumes",
+      "mixer ou laisser en morceaux"
+    ],
+    "moments": [
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Soupe à l'oignon gratinée",
+    "country": "France (Paris, Lyon)",
+    "ingredients": [
+      "oignons",
+      "beurre",
+      "bouillon (bœuf ou volaille)",
+      "pain rassis",
+      "fromage râpé (comté, gruyère)"
+    ],
+    "techniques": [
+      "caraméliser longuement les oignons",
+      "gratiner au four avec pain et fromage"
+    ],
+    "moments": [
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pot-au-feu",
+    "country": "France",
+    "ingredients": [
+      "bœuf à bouillir (paleron, plat de côtes, jarret)",
+      "os à moelle",
+      "carottes",
+      "poireaux",
+      "navets",
+      "oignon piqué de clous de girofle"
+    ],
+    "techniques": [
+      "pocher longuement la viande",
+      "ajouter les légumes en cours de cuisson",
+      "servir le bouillon à part"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Hachis parmentier",
+    "country": "France",
+    "ingredients": [
+      "viande cuite hachée (restes de pot-au-feu ou bœuf haché)",
+      "pommes de terre en purée",
+      "oignon",
+      "beurre et lait",
+      "fromage râpé (facultatif)"
+    ],
+    "techniques": [
+      "monter en couches viande puis purée",
+      "gratiner au four"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Blanquette de veau",
+    "country": "France",
+    "ingredients": [
+      "veau (tendron, épaule)",
+      "carottes",
+      "champignons de Paris",
+      "oignons",
+      "crème",
+      "jaune d'œuf et citron"
+    ],
+    "techniques": [
+      "pocher la viande dans un bouillon aromatique",
+      "lier la sauce au roux, à la crème et au jaune"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Bœuf bourguignon",
+    "country": "France (Bourgogne)",
+    "ingredients": [
+      "bœuf à braiser (paleron, joue)",
+      "vin rouge",
+      "lardons",
+      "champignons",
+      "petits oignons",
+      "carottes"
+    ],
+    "techniques": [
+      "mariner (facultatif)",
+      "dorer la viande",
+      "mijoter plusieurs heures au vin"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Coq au vin",
+    "country": "France (Bourgogne)",
+    "ingredients": [
+      "coq ou poulet en morceaux",
+      "vin rouge",
+      "lardons",
+      "champignons",
+      "petits oignons"
+    ],
+    "techniques": [
+      "dorer la volaille",
+      "mijoter au vin",
+      "lier la sauce"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Poulet rôti",
+    "country": "France",
+    "ingredients": [
+      "poulet entier",
+      "beurre",
+      "ail",
+      "thym",
+      "pommes de terre (en accompagnement)"
+    ],
+    "techniques": [
+      "rôtir au four en arrosant",
+      "déglacer les sucs pour le jus"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Poule au pot",
+    "country": "France (Béarn, Sud-Ouest)",
+    "ingredients": [
+      "poule",
+      "farce (pain rassis, jambon, foies, œuf, ail, persil)",
+      "carottes",
+      "poireaux",
+      "navets",
+      "riz ou vermicelles (pour le bouillon)"
+    ],
+    "techniques": [
+      "farcir la volaille",
+      "pocher longuement avec les légumes"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Navarin d'agneau",
+    "country": "France",
+    "ingredients": [
+      "agneau (épaule, collier)",
+      "carottes",
+      "navets",
+      "petits pois",
+      "pommes de terre",
+      "tomate et bouquet garni"
+    ],
+    "techniques": [
+      "dorer la viande",
+      "mijoter en ragoût avec les légumes de printemps"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Lapin à la moutarde",
+    "country": "France",
+    "ingredients": [
+      "lapin en morceaux",
+      "moutarde de Dijon",
+      "crème",
+      "vin blanc",
+      "échalotes",
+      "thym"
+    ],
+    "techniques": [
+      "badigeonner de moutarde",
+      "dorer puis mijoter",
+      "lier à la crème"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Petit salé aux lentilles",
+    "country": "France (Auvergne, Centre)",
+    "ingredients": [
+      "lentilles vertes (du Puy)",
+      "petit salé (poitrine ou palette de porc demi-sel)",
+      "saucisse (souvent)",
+      "carotte",
+      "oignon"
+    ],
+    "techniques": [
+      "dessaler la viande",
+      "mijoter avec les lentilles"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Tomates farcies",
+    "country": "France (Provence et tout le pays)",
+    "ingredients": [
+      "tomates",
+      "chair à saucisse ou restes de viande hachée",
+      "pain rassis ou riz",
+      "oignon et ail",
+      "persil"
+    ],
+    "techniques": [
+      "évider les tomates",
+      "farcir",
+      "cuire au four, souvent sur un lit de riz"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Gratin dauphinois",
+    "country": "France (Dauphiné)",
+    "ingredients": [
+      "pommes de terre",
+      "lait",
+      "crème",
+      "ail",
+      "muscade"
+    ],
+    "techniques": [
+      "trancher finement sans rincer",
+      "cuire lentement au four"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Endives au jambon",
+    "country": "France (Nord), Belgique",
+    "ingredients": [
+      "endives",
+      "jambon blanc",
+      "béchamel",
+      "fromage râpé"
+    ],
+    "techniques": [
+      "braiser les endives",
+      "rouler dans le jambon",
+      "gratiner sous béchamel"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Carbonade flamande",
+    "country": "France (Nord), Belgique",
+    "ingredients": [
+      "bœuf à braiser",
+      "bière brune",
+      "oignons",
+      "pain d'épices tartiné de moutarde",
+      "cassonade",
+      "thym et laurier"
+    ],
+    "techniques": [
+      "dorer la viande",
+      "mijoter longuement à la bière"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Moules marinières",
+    "country": "France (Nord, Normandie, Bretagne, Charente)",
+    "ingredients": [
+      "moules",
+      "vin blanc",
+      "échalotes",
+      "persil",
+      "beurre",
+      "frites (en accompagnement, dans le Nord)"
+    ],
+    "techniques": [
+      "cuire à couvert à feu vif jusqu'à ouverture"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Quiche lorraine",
+    "country": "France (Lorraine)",
+    "ingredients": [
+      "pâte brisée",
+      "lardons",
+      "œufs",
+      "crème",
+      "lait",
+      "muscade"
+    ],
+    "techniques": [
+      "foncer le moule",
+      "verser l'appareil œufs-crème",
+      "cuire au four"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Flamiche aux poireaux",
+    "country": "France (Picardie, Nord)",
+    "ingredients": [
+      "poireaux",
+      "pâte brisée ou feuilletée",
+      "œufs",
+      "crème",
+      "beurre"
+    ],
+    "techniques": [
+      "fondre les poireaux au beurre",
+      "cuire en tourte ou tarte au four"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Omelette aux fines herbes",
+    "country": "France",
+    "ingredients": [
+      "œufs",
+      "fines herbes (ciboulette, persil, cerfeuil)",
+      "beurre"
+    ],
+    "techniques": [
+      "battre les œufs",
+      "cuire baveuse et rouler"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Croque-monsieur",
+    "country": "France",
+    "ingredients": [
+      "pain de mie",
+      "jambon blanc",
+      "fromage râpé (emmental, comté)",
+      "beurre",
+      "béchamel (facultatif)"
+    ],
+    "techniques": [
+      "garnir les tranches",
+      "dorer à la poêle, au four ou à l'appareil"
+    ],
+    "moments": [
+      "lunch",
+      "dinner",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Poireaux vinaigrette",
+    "country": "France",
+    "ingredients": [
+      "poireaux",
+      "moutarde",
+      "vinaigre",
+      "huile",
+      "échalote"
+    ],
+    "techniques": [
+      "cuire les poireaux à l'eau",
+      "napper de vinaigrette tiède"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Ratatouille",
+    "country": "France (Provence, Nice)",
+    "ingredients": [
+      "aubergines",
+      "courgettes",
+      "poivrons",
+      "tomates",
+      "oignons",
+      "ail, thym et huile d'olive"
+    ],
+    "techniques": [
+      "revenir chaque légume séparément",
+      "mijoter ensemble"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Tian provençal",
+    "country": "France (Provence)",
+    "ingredients": [
+      "courgettes",
+      "tomates",
+      "aubergines",
+      "oignon",
+      "herbes de Provence",
+      "huile d'olive"
+    ],
+    "techniques": [
+      "disposer les légumes en rondelles alternées",
+      "cuire longuement au four"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Soupe au pistou",
+    "country": "France (Provence)",
+    "ingredients": [
+      "haricots (blancs, rouges, verts)",
+      "courgettes",
+      "pommes de terre",
+      "petites pâtes",
+      "pistou (basilic, ail, huile d'olive, parmesan ou gruyère)"
+    ],
+    "techniques": [
+      "mijoter les légumes et haricots",
+      "ajouter le pistou hors du feu"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Daube provençale",
+    "country": "France (Provence)",
+    "ingredients": [
+      "bœuf à braiser",
+      "vin rouge",
+      "zeste d'orange",
+      "carottes et oignons",
+      "ail, herbes de Provence",
+      "olives noires (souvent)"
+    ],
+    "techniques": [
+      "mariner la viande au vin",
+      "mijoter très longuement"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Brandade de morue",
+    "country": "France (Nîmes, Languedoc, Provence)",
+    "ingredients": [
+      "morue dessalée",
+      "huile d'olive",
+      "lait",
+      "ail",
+      "pommes de terre (version ménagère)"
+    ],
+    "techniques": [
+      "pocher la morue",
+      "monter en émulsion avec huile et lait",
+      "gratiner (facultatif)"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Salade niçoise",
+    "country": "France (Nice)",
+    "ingredients": [
+      "tomates",
+      "œufs durs",
+      "thon ou anchois",
+      "olives noires",
+      "poivron, oignon nouveau, radis",
+      "huile d'olive"
+    ],
+    "techniques": [
+      "assembler en salade composée"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pissaladière",
+    "country": "France (Nice)",
+    "ingredients": [
+      "pâte à pain",
+      "oignons fondus",
+      "anchois (ou pissalat)",
+      "olives noires"
+    ],
+    "techniques": [
+      "fondre longuement les oignons",
+      "cuire au four sur la pâte"
+    ],
+    "moments": [
+      "snack",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Socca",
+    "country": "France (Nice)",
+    "ingredients": [
+      "farine de pois chiches",
+      "eau",
+      "huile d'olive",
+      "sel et poivre"
+    ],
+    "techniques": [
+      "cuire en couche très fine à four très chaud"
+    ],
+    "moments": [
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Bouillabaisse",
+    "country": "France (Marseille)",
+    "ingredients": [
+      "poissons de roche variés",
+      "tomates",
+      "oignon, fenouil, ail",
+      "safran",
+      "huile d'olive",
+      "rouille et croûtons"
+    ],
+    "techniques": [
+      "bouillir vivement pour émulsionner",
+      "servir le bouillon puis les poissons"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Cassoulet",
+    "country": "France (Castelnaudary, Toulouse, Carcassonne)",
+    "ingredients": [
+      "haricots blancs (lingots)",
+      "confit de canard",
+      "saucisse de Toulouse",
+      "porc (couenne, épaule)",
+      "ail, tomate (selon la version)"
+    ],
+    "techniques": [
+      "mijoter les haricots",
+      "cuire longuement au four en cassant la croûte"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Garbure",
+    "country": "France (Béarn, Gascogne)",
+    "ingredients": [
+      "chou",
+      "haricots",
+      "pommes de terre",
+      "carottes, navets, poireaux",
+      "confit ou jambon (os de jambon)"
+    ],
+    "techniques": [
+      "mijoter longuement une soupe épaisse"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Piperade",
+    "country": "France (Pays basque)",
+    "ingredients": [
+      "poivrons",
+      "tomates",
+      "oignons",
+      "ail",
+      "piment d'Espelette",
+      "œufs (souvent brouillés dedans) ou jambon de Bayonne"
+    ],
+    "techniques": [
+      "fondre les légumes à l'huile",
+      "mijoter"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Axoa",
+    "country": "France (Pays basque)",
+    "ingredients": [
+      "veau haché ou coupé au couteau",
+      "piments doux ou poivrons",
+      "oignons",
+      "piment d'Espelette",
+      "ail"
+    ],
+    "techniques": [
+      "fondre les légumes",
+      "mijoter la viande avec"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Choucroute garnie",
+    "country": "France (Alsace)",
+    "ingredients": [
+      "chou fermenté (choucroute)",
+      "saucisses (Strasbourg, Montbéliard)",
+      "lard et porc salé ou fumé",
+      "pommes de terre",
+      "vin blanc",
+      "baies de genièvre"
+    ],
+    "techniques": [
+      "rincer et braiser la choucroute",
+      "cuire les viandes dessus"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Tarte flambée (flammekueche)",
+    "country": "France (Alsace)",
+    "ingredients": [
+      "pâte à pain très fine",
+      "fromage blanc et crème",
+      "oignons",
+      "lardons"
+    ],
+    "techniques": [
+      "étaler très finement",
+      "cuire quelques minutes à four très chaud"
+    ],
+    "moments": [
+      "dinner",
+      "snack"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Baeckeoffe",
+    "country": "France (Alsace)",
+    "ingredients": [
+      "trois viandes (bœuf, porc, agneau)",
+      "pommes de terre",
+      "oignons, poireaux, carottes",
+      "vin blanc d'Alsace"
+    ],
+    "techniques": [
+      "mariner les viandes au vin",
+      "cuire en terrine lutée plusieurs heures au four"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Galette complète",
+    "country": "France (Bretagne)",
+    "ingredients": [
+      "farine de sarrasin (blé noir)",
+      "eau",
+      "sel",
+      "œuf",
+      "jambon",
+      "fromage râpé"
+    ],
+    "techniques": [
+      "laisser reposer la pâte",
+      "cuire sur une crêpière (bilig)",
+      "garnir et replier"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Kig ha farz",
+    "country": "France (Bretagne, Léon)",
+    "ingredients": [
+      "farine de sarrasin (farz)",
+      "jarret et lard de porc, bœuf",
+      "chou",
+      "carottes, navets, poireaux"
+    ],
+    "techniques": [
+      "cuire le farz en sac dans le bouillon",
+      "pocher viandes et légumes"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Tartiflette",
+    "country": "France (Savoie, Haute-Savoie)",
+    "ingredients": [
+      "pommes de terre",
+      "reblochon",
+      "lardons",
+      "oignons",
+      "crème (facultatif)"
+    ],
+    "techniques": [
+      "revenir pommes de terre, lardons et oignons",
+      "gratiner au four sous le reblochon"
+    ],
+    "moments": [
+      "dinner",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Aligot",
+    "country": "France (Aubrac, Auvergne)",
+    "ingredients": [
+      "pommes de terre",
+      "tome fraîche de l'Aubrac (ou tome de Cantal)",
+      "crème",
+      "beurre",
+      "ail"
+    ],
+    "techniques": [
+      "écraser en purée",
+      "incorporer la tome en filant énergiquement"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Truffade",
+    "country": "France (Auvergne)",
+    "ingredients": [
+      "pommes de terre",
+      "tome fraîche de Cantal",
+      "ail",
+      "lard ou graisse de porc"
+    ],
+    "techniques": [
+      "rissoler les pommes de terre en tranches",
+      "faire fondre la tome dedans"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Salade lyonnaise",
+    "country": "France (Lyon)",
+    "ingredients": [
+      "frisée (ou pissenlit)",
+      "lardons",
+      "croûtons de pain",
+      "œuf poché",
+      "vinaigrette moutardée"
+    ],
+    "techniques": [
+      "rissoler lardons et croûtons",
+      "déglacer au vinaigre",
+      "pocher l'œuf"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Cervelle de canut",
+    "country": "France (Lyon)",
+    "ingredients": [
+      "fromage blanc",
+      "échalote",
+      "ciboulette et fines herbes",
+      "ail",
+      "huile et vinaigre"
+    ],
+    "techniques": [
+      "battre le fromage blanc avec les herbes"
+    ],
+    "moments": [
+      "snack",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  }
+]

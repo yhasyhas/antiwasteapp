@@ -1,0 +1,1236 @@
+[
+  {
+    "name": "Pasta e fagioli",
+    "country": "Italie",
+    "ingredients": [
+      "pâtes courtes",
+      "haricots borlotti (ou cannellini)",
+      "oignon, carotte, céleri",
+      "tomate (concentré ou pelées)",
+      "huile d'olive",
+      "lardons ou couenne (pancetta, souvent)"
+    ],
+    "techniques": [
+      "faire un soffritto",
+      "mijoter les haricots",
+      "écraser une partie des haricots pour lier"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pasta e ceci",
+    "country": "Italie (Rome, Sud)",
+    "ingredients": [
+      "pois chiches",
+      "pâtes courtes (ou spaghetti cassés)",
+      "ail",
+      "romarin",
+      "huile d'olive",
+      "tomate (facultative)"
+    ],
+    "techniques": [
+      "mijoter les pois chiches",
+      "mixer une partie pour lier",
+      "cuire les pâtes dans le bouillon"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Minestrone",
+    "country": "Italie",
+    "ingredients": [
+      "légumes de saison (courgette, carotte, céleri, chou, pomme de terre)",
+      "haricots",
+      "oignon",
+      "tomate",
+      "petites pâtes ou riz",
+      "parmesan (ou croûte de parmesan)"
+    ],
+    "techniques": [
+      "faire un soffritto",
+      "mijoter longuement les légumes en dés"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Ribollita",
+    "country": "Italie (Toscane)",
+    "ingredients": [
+      "pain rassis",
+      "chou noir (cavolo nero, ou chou vert)",
+      "haricots cannellini",
+      "oignon, carotte, céleri",
+      "tomate",
+      "huile d'olive"
+    ],
+    "techniques": [
+      "mijoter une soupe de légumes et haricots",
+      "ajouter le pain rassis",
+      "réchauffer le lendemain"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Pappa al pomodoro",
+    "country": "Italie (Toscane)",
+    "ingredients": [
+      "pain rassis",
+      "tomates",
+      "ail",
+      "basilic",
+      "huile d'olive",
+      "bouillon de légumes"
+    ],
+    "techniques": [
+      "mijoter tomate et pain jusqu'à consistance de bouillie"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Panzanella",
+    "country": "Italie (Toscane)",
+    "ingredients": [
+      "pain rassis",
+      "tomates",
+      "oignon rouge",
+      "concombre",
+      "basilic",
+      "huile d'olive et vinaigre"
+    ],
+    "techniques": [
+      "tremper le pain et l'essorer",
+      "mélanger en salade"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Spaghetti aglio, olio e peperoncino",
+    "country": "Italie",
+    "ingredients": [
+      "spaghetti",
+      "ail",
+      "huile d'olive",
+      "piment",
+      "persil (facultatif)"
+    ],
+    "techniques": [
+      "dorer l'ail à feu doux dans l'huile",
+      "lier avec l'eau de cuisson des pâtes"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Pasta alla Norma",
+    "country": "Italie (Sicile)",
+    "ingredients": [
+      "pâtes (maccheroni, rigatoni)",
+      "aubergine",
+      "sauce tomate",
+      "ail",
+      "basilic",
+      "ricotta salata"
+    ],
+    "techniques": [
+      "frire l'aubergine en dés",
+      "mijoter la sauce tomate"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Spaghetti alla carbonara",
+    "country": "Italie (Rome)",
+    "ingredients": [
+      "spaghetti (ou rigatoni)",
+      "guanciale (ou pancetta)",
+      "jaunes d'œufs (ou œufs entiers)",
+      "pecorino romano",
+      "poivre noir"
+    ],
+    "techniques": [
+      "rissoler le guanciale",
+      "lier hors du feu œufs et fromage avec l'eau de cuisson"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Tagliatelle al ragù (ragù alla bolognese)",
+    "country": "Italie (Émilie-Romagne)",
+    "ingredients": [
+      "viande hachée (bœuf, porc)",
+      "oignon, carotte, céleri",
+      "tomate (concentré ou passata)",
+      "vin",
+      "lait",
+      "tagliatelle"
+    ],
+    "techniques": [
+      "faire un soffritto",
+      "mijoter plusieurs heures à feu doux"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Risotto alla milanese",
+    "country": "Italie (Lombardie)",
+    "ingredients": [
+      "riz à risotto (arborio, carnaroli)",
+      "safran",
+      "oignon",
+      "beurre",
+      "parmesan",
+      "bouillon"
+    ],
+    "techniques": [
+      "nacrer le riz",
+      "mouiller au bouillon louche par louche",
+      "lier au beurre et au parmesan"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Frittata",
+    "country": "Italie",
+    "ingredients": [
+      "œufs",
+      "légumes (courgette, oignon, pomme de terre) ou restes de pâtes",
+      "parmesan",
+      "huile d'olive"
+    ],
+    "techniques": [
+      "cuire à la poêle à feu doux",
+      "retourner à l'aide d'une assiette"
+    ],
+    "moments": [
+      "lunch",
+      "dinner",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Parmigiana di melanzane",
+    "country": "Italie (Sud)",
+    "ingredients": [
+      "aubergines",
+      "sauce tomate",
+      "mozzarella (ou scamorza)",
+      "parmesan",
+      "basilic"
+    ],
+    "techniques": [
+      "frire les tranches d'aubergine",
+      "monter en couches",
+      "cuire au four"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Polenta",
+    "country": "Italie (Nord)",
+    "ingredients": [
+      "farine de maïs",
+      "eau salée",
+      "beurre",
+      "fromage (parmesan, fontina)"
+    ],
+    "techniques": [
+      "verser la farine en pluie",
+      "remuer longuement",
+      "servir molle ou grillée en tranches"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Gnocchi di patate",
+    "country": "Italie",
+    "ingredients": [
+      "pommes de terre farineuses",
+      "farine",
+      "œuf (facultatif)",
+      "sauce (tomate, beurre-sauge)"
+    ],
+    "techniques": [
+      "écraser les pommes de terre cuites",
+      "façonner les gnocchi",
+      "pocher jusqu'à ce qu'ils remontent"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Polpette al sugo",
+    "country": "Italie",
+    "ingredients": [
+      "viande hachée",
+      "pain rassis trempé dans le lait",
+      "œuf",
+      "parmesan",
+      "sauce tomate",
+      "persil"
+    ],
+    "techniques": [
+      "façonner les boulettes",
+      "dorer puis mijoter dans la sauce tomate"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pollo alla cacciatora",
+    "country": "Italie",
+    "ingredients": [
+      "poulet en morceaux",
+      "tomate",
+      "oignon",
+      "ail",
+      "romarin",
+      "vin (blanc ou rouge)",
+      "olives (selon les régions)"
+    ],
+    "techniques": [
+      "dorer le poulet",
+      "mijoter en cocotte"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pesce all'acqua pazza",
+    "country": "Italie (Campanie)",
+    "ingredients": [
+      "poisson blanc entier ou en filets (daurade, bar, cabillaud)",
+      "tomates cerises",
+      "ail",
+      "persil",
+      "huile d'olive"
+    ],
+    "techniques": [
+      "pocher le poisson dans un fond court d'eau, tomate et huile"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Caponata",
+    "country": "Italie (Sicile)",
+    "ingredients": [
+      "aubergines",
+      "céleri",
+      "oignon",
+      "tomate",
+      "olives et câpres",
+      "vinaigre et sucre"
+    ],
+    "techniques": [
+      "frire l'aubergine",
+      "mijoter en aigre-doux"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Fave e cicoria",
+    "country": "Italie (Pouilles)",
+    "ingredients": [
+      "fèves sèches décortiquées",
+      "chicorée sauvage (ou blettes, épinards)",
+      "huile d'olive",
+      "ail"
+    ],
+    "techniques": [
+      "cuire et écraser les fèves en purée",
+      "blanchir puis faire sauter la chicorée"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Arancini",
+    "country": "Italie (Sicile)",
+    "ingredients": [
+      "riz cuit (souvent au safran)",
+      "farce (ragù et petits pois, ou jambon et mozzarella)",
+      "œuf",
+      "chapelure"
+    ],
+    "techniques": [
+      "façonner des boules de riz farcies",
+      "paner",
+      "frire"
+    ],
+    "moments": [
+      "snack",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Focaccia genovese",
+    "country": "Italie (Ligurie)",
+    "ingredients": [
+      "farine",
+      "levure",
+      "huile d'olive",
+      "eau",
+      "gros sel"
+    ],
+    "techniques": [
+      "pétrir une pâte souple",
+      "marquer d'alvéoles avec les doigts",
+      "cuire au four"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Ciambellone",
+    "country": "Italie",
+    "ingredients": [
+      "farine",
+      "œufs",
+      "sucre",
+      "huile ou beurre",
+      "lait",
+      "zeste de citron"
+    ],
+    "techniques": [
+      "fouetter œufs et sucre",
+      "cuire au four dans un moule en couronne"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Tortilla española (tortilla de patatas)",
+    "country": "Espagne",
+    "ingredients": [
+      "pommes de terre",
+      "œufs",
+      "oignon (selon les goûts)",
+      "huile d'olive"
+    ],
+    "techniques": [
+      "confire les pommes de terre dans l'huile",
+      "cuire à la poêle et retourner"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Pan con tomate (pa amb tomàquet)",
+    "country": "Espagne (Catalogne, puis tout le pays)",
+    "ingredients": [
+      "pain",
+      "tomate bien mûre",
+      "huile d'olive",
+      "sel",
+      "ail (facultatif)"
+    ],
+    "techniques": [
+      "griller le pain",
+      "frotter ou râper la tomate dessus"
+    ],
+    "moments": [
+      "breakfast",
+      "snack",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Gazpacho",
+    "country": "Espagne (Andalousie)",
+    "ingredients": [
+      "tomates mûres",
+      "concombre",
+      "poivron vert",
+      "ail",
+      "pain rassis",
+      "huile d'olive et vinaigre"
+    ],
+    "techniques": [
+      "mixer cru",
+      "servir très frais"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Salmorejo",
+    "country": "Espagne (Cordoue, Andalousie)",
+    "ingredients": [
+      "tomates",
+      "pain rassis",
+      "ail",
+      "huile d'olive",
+      "œuf dur et jambon cru en garniture"
+    ],
+    "techniques": [
+      "mixer tomate et pain en crème épaisse",
+      "servir frais"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Paella valenciana",
+    "country": "Espagne (Valence)",
+    "ingredients": [
+      "riz rond (bomba)",
+      "poulet et lapin",
+      "haricots plats (ferraura) et haricots blancs (garrofó)",
+      "tomate",
+      "safran",
+      "huile d'olive"
+    ],
+    "techniques": [
+      "dorer les viandes dans la paellera",
+      "cuire le riz sans remuer",
+      "laisser attacher (socarrat)"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Lentejas estofadas",
+    "country": "Espagne",
+    "ingredients": [
+      "lentilles",
+      "chorizo",
+      "pomme de terre",
+      "carotte",
+      "oignon",
+      "paprika (pimentón)"
+    ],
+    "techniques": [
+      "mijoter en ragoût"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Cocido madrileño",
+    "country": "Espagne (Madrid)",
+    "ingredients": [
+      "pois chiches",
+      "bœuf (jarret)",
+      "chorizo et morcilla",
+      "lard (tocino)",
+      "chou",
+      "carotte et pomme de terre"
+    ],
+    "techniques": [
+      "mijoter longuement",
+      "servir en plusieurs services (bouillon aux vermicelles, puis légumes et viandes)"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Garbanzos con espinacas",
+    "country": "Espagne (Séville, Andalousie)",
+    "ingredients": [
+      "pois chiches cuits",
+      "épinards",
+      "ail",
+      "pain frit",
+      "cumin",
+      "paprika (pimentón)",
+      "vinaigre"
+    ],
+    "techniques": [
+      "piler pain frit, ail et épices",
+      "mijoter avec les pois chiches et les épinards"
+    ],
+    "moments": [
+      "lunch",
+      "dinner",
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Pisto manchego",
+    "country": "Espagne (La Manche)",
+    "ingredients": [
+      "tomates",
+      "poivrons",
+      "courgette",
+      "oignon",
+      "huile d'olive",
+      "œuf au plat (souvent en accompagnement)"
+    ],
+    "techniques": [
+      "mijoter lentement les légumes en dés"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Migas",
+    "country": "Espagne (Estrémadure, La Manche, Aragon), Portugal",
+    "ingredients": [
+      "pain rassis émietté et humidifié",
+      "ail",
+      "chorizo ou lard",
+      "paprika (pimentón)",
+      "huile d'olive"
+    ],
+    "techniques": [
+      "humidifier le pain la veille",
+      "faire revenir longuement à la poêle en remuant"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Croquetas",
+    "country": "Espagne",
+    "ingredients": [
+      "béchamel épaisse",
+      "restes (jambon, poulet, viande du cocido, morue)",
+      "œuf",
+      "chapelure"
+    ],
+    "techniques": [
+      "faire une béchamel ferme et la refroidir",
+      "façonner et paner",
+      "frire"
+    ],
+    "moments": [
+      "snack",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Merluza en salsa verde",
+    "country": "Espagne (Pays basque)",
+    "ingredients": [
+      "merlu (ou autre poisson blanc)",
+      "ail",
+      "persil",
+      "huile d'olive",
+      "vin blanc ou fumet",
+      "palourdes (facultatif)"
+    ],
+    "techniques": [
+      "cuire doucement en sauteuse",
+      "lier la sauce en remuant la poêle"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Churros con chocolate",
+    "country": "Espagne",
+    "ingredients": [
+      "farine",
+      "eau",
+      "sel",
+      "huile de friture",
+      "chocolat chaud épais (chocolat, lait, maïzena)"
+    ],
+    "techniques": [
+      "pocher la pâte à la douille cannelée",
+      "frire"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Torrijas",
+    "country": "Espagne",
+    "ingredients": [
+      "pain rassis",
+      "lait (ou vin)",
+      "œufs",
+      "sucre",
+      "cannelle",
+      "huile de friture"
+    ],
+    "techniques": [
+      "tremper le pain",
+      "passer dans l'œuf et frire"
+    ],
+    "moments": [
+      "snack",
+      "breakfast"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Caldo verde",
+    "country": "Portugal",
+    "ingredients": [
+      "pommes de terre",
+      "chou vert (couve galega) en fines lanières",
+      "oignon et ail",
+      "huile d'olive",
+      "chouriço en rondelles"
+    ],
+    "techniques": [
+      "mixer la base pomme de terre",
+      "ajouter le chou émincé en fin de cuisson"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Bacalhau à Brás",
+    "country": "Portugal",
+    "ingredients": [
+      "morue dessalée effilochée",
+      "pommes de terre en allumettes frites",
+      "œufs",
+      "oignon",
+      "olives noires",
+      "persil"
+    ],
+    "techniques": [
+      "faire revenir morue et oignon",
+      "lier aux œufs brouillés"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pastéis de bacalhau (bolinhos de bacalhau)",
+    "country": "Portugal",
+    "ingredients": [
+      "morue dessalée",
+      "pommes de terre",
+      "œufs",
+      "oignon",
+      "persil"
+    ],
+    "techniques": [
+      "façonner des quenelles à deux cuillères",
+      "frire"
+    ],
+    "moments": [
+      "snack",
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Açorda alentejana",
+    "country": "Portugal (Alentejo)",
+    "ingredients": [
+      "pain rassis",
+      "ail",
+      "coriandre fraîche",
+      "huile d'olive",
+      "œufs pochés",
+      "eau bouillante"
+    ],
+    "techniques": [
+      "piler ail, coriandre et sel",
+      "verser l'eau bouillante sur le pain",
+      "pocher les œufs"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Pastel de nata",
+    "country": "Portugal",
+    "ingredients": [
+      "pâte feuilletée",
+      "jaunes d'œufs",
+      "lait",
+      "sucre",
+      "farine",
+      "cannelle"
+    ],
+    "techniques": [
+      "foncer de petits moules",
+      "cuire à four très chaud"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Fasolada",
+    "country": "Grèce, Chypre",
+    "ingredients": [
+      "haricots blancs secs",
+      "carotte",
+      "céleri",
+      "oignon",
+      "tomate",
+      "huile d'olive"
+    ],
+    "techniques": [
+      "mijoter longuement en soupe épaisse"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Fakes (soupe de lentilles)",
+    "country": "Grèce",
+    "ingredients": [
+      "lentilles brunes",
+      "oignon",
+      "ail",
+      "tomate (concentré)",
+      "laurier",
+      "huile d'olive et vinaigre"
+    ],
+    "techniques": [
+      "mijoter",
+      "finir avec un trait de vinaigre"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Gemista",
+    "country": "Grèce",
+    "ingredients": [
+      "tomates et poivrons",
+      "riz",
+      "oignon",
+      "herbes (menthe, persil, aneth)",
+      "huile d'olive",
+      "pommes de terre en quartiers"
+    ],
+    "techniques": [
+      "évider les légumes et farcir de riz cru assaisonné",
+      "cuire au four"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Briam",
+    "country": "Grèce",
+    "ingredients": [
+      "courgettes",
+      "aubergines",
+      "pommes de terre",
+      "tomates",
+      "oignon",
+      "huile d'olive"
+    ],
+    "techniques": [
+      "rôtir longuement au four les légumes en morceaux"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Spanakopita",
+    "country": "Grèce",
+    "ingredients": [
+      "épinards (ou blettes, herbes sauvages)",
+      "feta",
+      "œufs",
+      "oignon nouveau",
+      "aneth",
+      "pâte filo"
+    ],
+    "techniques": [
+      "monter en couches de filo huilées",
+      "cuire au four"
+    ],
+    "moments": [
+      "lunch",
+      "dinner",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Tiropita",
+    "country": "Grèce",
+    "ingredients": [
+      "feta",
+      "œufs",
+      "yaourt ou lait",
+      "pâte filo",
+      "beurre ou huile"
+    ],
+    "techniques": [
+      "monter en couches ou rouler",
+      "cuire au four"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Moussaka",
+    "country": "Grèce",
+    "ingredients": [
+      "aubergines",
+      "viande hachée (agneau ou bœuf)",
+      "tomate",
+      "cannelle",
+      "béchamel",
+      "pommes de terre (souvent)"
+    ],
+    "techniques": [
+      "frire ou rôtir les aubergines",
+      "monter en couches",
+      "gratiner au four"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Avgolemono (soupe)",
+    "country": "Grèce, Chypre",
+    "ingredients": [
+      "bouillon de poulet",
+      "riz (ou orzo)",
+      "œufs",
+      "citron",
+      "poulet (facultatif)"
+    ],
+    "techniques": [
+      "tempérer l'œuf battu au citron avec le bouillon chaud",
+      "lier sans faire bouillir"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Horiatiki (salade grecque)",
+    "country": "Grèce",
+    "ingredients": [
+      "tomates",
+      "concombre",
+      "oignon rouge",
+      "poivron vert",
+      "olives",
+      "feta",
+      "origan et huile d'olive"
+    ],
+    "techniques": [
+      "couper gros, sans laitue",
+      "assaisonner à l'huile et à l'origan"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Strapatsada (kagianas)",
+    "country": "Grèce",
+    "ingredients": [
+      "œufs",
+      "tomates mûres râpées",
+      "feta",
+      "huile d'olive"
+    ],
+    "techniques": [
+      "réduire la tomate à la poêle",
+      "brouiller les œufs dedans"
+    ],
+    "moments": [
+      "breakfast",
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Bougatsa",
+    "country": "Grèce (Thessalonique, Macédoine)",
+    "ingredients": [
+      "pâte filo",
+      "crème à la semoule (lait, semoule, œufs, sucre) ou feta",
+      "beurre",
+      "cannelle et sucre glace"
+    ],
+    "techniques": [
+      "monter la filo beurrée autour de la crème",
+      "cuire au four"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Koulouri Thessalonikis",
+    "country": "Grèce",
+    "ingredients": [
+      "farine",
+      "levure",
+      "eau",
+      "graines de sésame",
+      "mélasse ou miel dilué (pour dorer)"
+    ],
+    "techniques": [
+      "façonner des couronnes",
+      "tremper dans le sirop puis le sésame",
+      "cuire au four"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Yaourt au miel (giaourti me meli)",
+    "country": "Grèce",
+    "ingredients": [
+      "yaourt grec égoutté",
+      "miel",
+      "noix (facultatif)"
+    ],
+    "techniques": [
+      "napper de miel au moment de servir"
+    ],
+    "moments": [
+      "breakfast",
+      "snack"
+    ],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Louvi me lahana",
+    "country": "Chypre",
+    "ingredients": [
+      "haricots cornille (black-eyed peas)",
+      "blettes (ou autres verdures)",
+      "huile d'olive",
+      "citron"
+    ],
+    "techniques": [
+      "cuire les haricots et les verdures ensemble",
+      "assaisonner à l'huile et au citron"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Burek",
+    "country": "Croatie, Bosnie-Herzégovine, Serbie (Balkans)",
+    "ingredients": [
+      "pâte filo (ou pâte étirée)",
+      "viande hachée, fromage frais ou épinards",
+      "oignon",
+      "huile"
+    ],
+    "techniques": [
+      "rouler ou superposer la pâte garnie",
+      "cuire au four"
+    ],
+    "moments": [
+      "breakfast",
+      "snack",
+      "lunch"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Blitva",
+    "country": "Croatie (Dalmatie)",
+    "ingredients": [
+      "blettes",
+      "pommes de terre",
+      "ail",
+      "huile d'olive"
+    ],
+    "techniques": [
+      "cuire à l'eau",
+      "écraser grossièrement avec l'huile et l'ail"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": "vegan"
+  },
+  {
+    "name": "Brudet (brodetto)",
+    "country": "Croatie (côte adriatique), Italie (Adriatique)",
+    "ingredients": [
+      "poissons variés en morceaux",
+      "oignon",
+      "tomate (concentré)",
+      "vin",
+      "vinaigre",
+      "huile d'olive"
+    ],
+    "techniques": [
+      "mijoter sans remuer en secouant la cocotte"
+    ],
+    "moments": [
+      "lunch",
+      "dinner"
+    ],
+    "diet": ""
+  },
+  {
+    "name": "Pašticada",
+    "country": "Croatie (Dalmatie)",
+    "ingredients": [
+      "bœuf (gîte) piqué de lard et d'ail",
+      "vinaigre de vin",
+      "vin rouge (ou prošek)",
+      "pruneaux",
+      "carotte et oignon",
+      "gnocchis (en accompagnement)"
+    ],
+    "techniques": [
+      "mariner la viande la veille",
+      "braiser longuement"
+    ],
+    "moments": [
+      "lunch"
+    ],
+    "diet": ""
+  }
+]

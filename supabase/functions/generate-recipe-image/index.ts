@@ -176,10 +176,11 @@ function buildImagePrompt(recipe: Pick<RecipeRow, 'title' | 'description' | 'ima
   return `Professional food photography of ${recipe.title}${recipe.description ? `, ${recipe.description}` : ''}. Appetizing, natural light, served on a plate.`.slice(0, 1000);
 }
 
-async function generateImage(prompt: string, simulate?: 'quota' | 'error'): Promise<Uint8Array> {
+async function generateImage(prompt: string, simulate?: 'quota' | 'error' | 'refused'): Promise<Uint8Array> {
   // Tests : échec simulé, sans appel à Cloudflare
   if (simulate === 'quota') throw new CloudflareError(429, 'Cloudflare 429 (simulé) : you have used up your daily free allocation of 10,000 neurons');
   if (simulate === 'error') throw new CloudflareError(500, 'Cloudflare 500 (simulé) : panne du fournisseur');
+  if (simulate === 'refused') throw new CloudflareError(400, 'Cloudflare 400 (simulé) : requête refusée');
   const response = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/ai/run/${CLOUDFLARE_IMAGE_MODEL}`,
     {

@@ -18,6 +18,6 @@ Deno.test('simulation ignorée sans la clé secrète, ou avec une autre clé', (
 });
 
 Deno.test('simulation lue avec la clé secrète ; valeurs inconnues écartées', () => {
-  assertEquals(readSimulation(request('sb_secret_test'), body), { user_quota: true, providers: { gemini: 'quota', groq: 'error' } });
+  assertEquals(readSimulation(request('sb_secret_test'), body), { user_quota: true, safety_drop_all: false, providers: { gemini: 'quota', groq: 'error' } });
   assertEquals(readSimulation(request('sb_secret_test'), {}), null);
 });

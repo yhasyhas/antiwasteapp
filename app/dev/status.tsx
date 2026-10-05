@@ -26,16 +26,34 @@ interface ProviderEvent {
   occurrences: number;
   last_at: string;
   last_error: string | null;
+  alert: 'provider_quota' | 'provider_failure' | 'push_failure';
 }
 
-// Développement seulement : compteurs du jour de l'utilisateur et derniers quotas de fournisseurs épuisés,
-// pour ne jamais perdre de temps à déboguer un quota épuisé
+interface UsageRow {
+  provider: string;
+  fallback: boolean;
+  recipes: number;
+}
+
+// Part des recettes servies par le secours, et détail par fournisseur
+function fallbackSummary(rows: UsageRow[]) {
+  const total = rows.reduce((sum, row) => sum + row.recipes, 0);
+  const fallback = rows.filter((row) => row.fallback).reduce((sum, row) => sum + row.recipes, 0);
+  const byProvider = new Map<string, number>();
+  for (const row of rows) byProvider.set(row.provider, (byProvider.get(row.provider) ?? 0) + row.recipes);
+  return { total, fallback, share: total === 0 ? 0 : Math.round((fallback / total) * 100), byProvider: [...byProvider] };
+}
+
+// Développement seulement : compteurs du jour de l'utilisateur, part des recettes servies par le secours sur
+// 7 jours, et derniers incidents des fournisseurs (quota épuisé, réponse refusée), pour ne jamais perdre de
+// temps à déboguer un quota épuisé ou un secours qui masque une panne
 export default function ServiceStatusScreen() {
   const { user } = useAuth();
   const { t, language } = useLanguage();
   const safe = useSafeSpacing();
   const [counters, setCounters] = useState<Counters>({ scans: 0, generations: 0, images: 0 });
   const [events, setEvents] = useState<ProviderEvent[]>([]);
+  const [usage, setUsage] = useState<UsageRow[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
@@ -43,12 +61,16 @@ export default function ServiceStatusScreen() {
     setRefreshing(true);
     // Jour UTC, comme les quotas côté serveur
     const today = new Date().toISOString().slice(0, 10);
-    const [{ data: usage }, { data: providerEvents }] = await Promise.all([
+    const weekStart = new Date(Date.now() - 6 * 86_400_000).toISOString().slice(0, 10);
+    const [{ data: counts }, { data: providerEvents }, { data: served }] = await Promise.all([
       supabase.from('usage_counters').select('scans, generations, images').eq('user_id', user.id).eq('day', today).maybeSingle(),
       supabase.from('provider_quota_events').select('*').order('last_at', { ascending: false }).limit(15),
+      // Essais (simulation, évaluation) à part
+      supabase.from('provider_usage_daily').select('provider, fallback, recipes').eq('function_name', 'generate-recipes').eq('simulated', false).gte('day', weekStart),
     ]);
-    setCounters(usage ?? { scans: 0, generations: 0, images: 0 });
+    setCounters(counts ?? { scans: 0, generations: 0, images: 0 });
     setEvents((providerEvents as ProviderEvent[]) ?? []);
+    setUsage((served as UsageRow[]) ?? []);
     setRefreshing(false);
   }, [user]);
 
@@ -57,6 +79,7 @@ export default function ServiceStatusScreen() {
   }, [load]));
 
   if (!__DEV__) return <Redirect href="/" />;
+  const summary = fallbackSummary(usage);
 
   return (
     <View style={styles.container}>
@@ -76,6 +99,20 @@ export default function ServiceStatusScreen() {
           ))}
         </View>
 
+        <Text style={styles.sectionTitle}>{t('devStatus.fallbackTitle')}</Text>
+        <Card style={styles.event}>
+          {summary.total === 0 ? (
+            <Text style={styles.empty}>{t('devStatus.fallbackNone')}</Text>
+          ) : (
+            <>
+              <Text style={styles.counterValue}>{t('devStatus.fallbackShare', { share: summary.share, fallback: summary.fallback, total: summary.total })}</Text>
+              <Text style={styles.eventMeta}>
+                {summary.byProvider.map(([provider, recipes]) => t('devStatus.fallbackByProvider', { provider, recipes })).join(' · ')}
+              </Text>
+            </>
+          )}
+        </Card>
+
         <Text style={styles.sectionTitle}>{t('devStatus.providers')}</Text>
         {events.length === 0 ? (
           <Text style={styles.empty}>{t('devStatus.none')}</Text>
@@ -84,6 +121,7 @@ export default function ServiceStatusScreen() {
             <Card key={event.id} style={styles.event}>
               <View style={styles.eventHeader}>
                 <Text style={styles.provider}>{event.provider}</Text>
+                <Badge label={t(`devStatus.alert_${event.alert}`)} tone={event.alert === 'provider_failure' ? 'soon' : 'neutral'} />
                 {event.simulated && <Badge label={t('devStatus.simulated')} tone="neutral" />}
                 <Text style={styles.eventMeta}>
                   {event.day} · {event.function_name} · {t('devStatus.occurrences', { count: event.occurrences })}

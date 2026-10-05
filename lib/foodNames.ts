@@ -39,6 +39,13 @@ export function rememberFoodNames(foodKey: string, fact: Record<Language, { name
   notify();
 }
 
+// Noms des fiches dans les trois langues (chargés à la demande) : correspondance entre un nom de recette (« beef ») et
+// un aliment du garde-manger (« bœuf »)
+export async function loadFoodNames(keys: string[]): Promise<void> {
+  await loadNames(keys);
+}
+export const foodNamesOf = (key: string): string[] => Object.values(names.get(key) ?? {}).filter((name): name is string => !!name);
+
 async function loadNames(keys: string[]) {
   const missing = [...new Set(keys)].filter((key) => !names.has(key) && !loading.has(key));
   if (missing.length === 0) return;
@@ -102,7 +109,14 @@ export function useFoodNaming(items: NamedFood[] | null | undefined) {
     return value && !same(value, item.name) ? capitalize(value) : null;
   }, [factName]);
 
-  return { name, generic };
+  // Nom dans une langue donnée (celle d'une recette) : fiche dans cette langue pour un aliment brut, nom du produit
+  // pour un code-barres, nom enregistré pour un reste ou sans fiche
+  const nameIn = useCallback((item: NamedFood, target: string): string => {
+    if (item.barcode || item.kind === 'dish' || !item.food_key) return item.name;
+    return names.get(item.food_key)?.[target as Language] ?? item.name;
+  }, [current]);
+
+  return { name, generic, nameIn };
 }
 
 export function useFoodNames(items: NamedFood[] | null | undefined): (item: NamedFood) => string {

@@ -96,7 +96,8 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - `usage_counters` (user_id, day UTC, scans, generations, images) : écrite seulement par les fonctions
 - `household_invites` (code, household_id, expires_at) : lue et écrite seulement par les fonctions du foyer ; `profiles.display_name` : nom affiché aux membres
 - `push_tokens` (token, user_id, timezone, language) et `daily_digests` (user_id, local_date, status, ticket_ids) : résumé de 9 h
-- `provider_quota_events` : quotas épuisés et échecs d'envoi (`expo_push`), une alerte par jour
+- `provider_quota_events` : quotas épuisés, échecs d'envoi (`expo_push`) et dysfonctionnements des fournisseurs (`alert` : `provider_quota`, `push_failure`, `provider_failure`), une alerte par jour et par type
+- `provider_usage_daily` : recettes servies par jour et par fournisseur, secours distingué (« État des services »)
 - Storage : bucket `recipe-images`, public en lecture, écriture réservée à la fonction (clé secrète)
 
 ### Configuration requise
@@ -182,7 +183,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 
 ### Quotas visibles (branche `quota-alerts`)
 - Raison précise des échecs (`user_quota`, `provider_quota`, `provider_error`) dans les trois fonctions, journaux `[quota]`, message traduit dans l'app (à l'emplacement de l'image pour les images).
-- Alerte Sentry une fois par jour et par fournisseur quand un quota de fournisseur est épuisé (`provider_quota_events`, secret `SENTRY_DSN`).
+- Alerte Sentry une fois par jour et par fournisseur quand un quota de fournisseur est épuisé (`provider_quota_events`, secret `SENTRY_DSN`), et quand un fournisseur dysfonctionne (`alert:provider_failure` : réponse refusée, schéma invalide, réponse illisible) même si le secours a répondu.
 - Écran « État des services » (développement) ; simulation des erreurs réservée à la clé secrète ; 45 tests Deno.
 
 ### Cartes de recettes (branche `recipe-cards`)
@@ -255,6 +256,19 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Unités courantes traduites selon la langue (`translateUnit`, `lib/quantity.ts`) ; scan : exemples et sortie du modèle dans la langue de l'app.
 - Tests : `supabase/tests/phase8_pantry.sql`.
 
+### Phase 9 — recettes (validée, fusionnée le 05/10/2026)
+- Prompt de `generate-recipes` dans `supabase/functions/generate-recipes/prompt.ts` (`buildPrompts`, versions `PROMPT_VERSIONS`) ; v4.1 déployée le 02/10/2026 (`RECIPE_PROMPT_VERSION`, retour possible à v4 ou v1 sans redéployer).
+- Contrôle de sécurité après la génération : `generate-recipes/safety.ts` (recette renvoyée pour correction, puis écartée) ; plats de référence tirés au hasard avec une cuisine précise : `generate-recipes/library/` et `library.ts` (validation par des personnes qui les cuisinent en phase 9b) ; titres récents (anti-répétition) : `history.ts` ; découpage plus précis des cuisines : `cuisines.ts`, sur la copie d'évaluation seulement (décision attendue, phase 9b).
+- Après la génération (`safetyPass.ts`) : correction et recettes de remplacement demandées en parallèle, échéance de 45 s (`GENERATION_BUDGET_MS`) qui sert les recettes déjà valides ; défauts non bloquants (four sans °C, signe visible pour bœuf, porc, poisson à la température à cœur). Noms des aliments écrits dans la langue de la recette ; repères internes et niveau de feu au four retirés des textes (`recipes.ts`).
+- Étiquettes de régime vérifiées par le serveur (`verifiedDietTags`, `recipes.ts`) : `diet:vegan`, `diet:vegetarian`, `diet:gluten-free`, `diet:dairy-free`, seules affichées (`verifiedDietLabels`, `lib/labels.ts`). Mots interdits revus en trois langues, au singulier et au pluriel (grille `dietWords.test.ts`) ; un ingrédient de base ne disculpe que s'il est accolé au mot interdit (« lait de riz », pas « riz au lait »).
+- « Mes recettes » 2.0 (`app/(tabs)/saved.tsx`, logique dans `lib/savedRecipes.ts`) : onglets Favoris · Pour plus tard (`recipes.later_at`) · Toutes, recherche, filtres (faisable maintenant avec `feasibility` de `hooks/usePantryUrgency.ts`, aliments urgents, moins de 30 min, cuisine `recipes.cuisine`, régime vérifié, repas), vue compacte, sections par période.
+- Noms du garde-manger dans la langue de la recette : nom de la fiche envoyé par l'app (`nameIn`, `lib/foodNames.ts`), alias des fiches côté serveur (`generate-recipes/pantryNames.ts`).
+- Secours des fournisseurs : dysfonctionnement (réponse refusée, schéma invalide, réponse illisible) signalé à Sentry (`alert:provider_failure`, `isProviderMalfunction` dans `_shared/ai.ts`) ; recettes servies par fournisseur (`provider_usage_daily`) et part du secours sur 7 jours dans « État des services » ; consigne propre à Gemini (`providerNotes`, `geminiRecipeNote`) ; noms au pluriel retrouvés par le singulier des fiches.
+- « Faisable maintenant » : « Il manque : … » sur la carte, avec l'ajout aux courses (`RecipeListCard`).
+- App : conseils de conservation selon l'emplacement et la langue (`lib/storageTip.ts`) ; message des recettes écartées selon les critères choisis.
+- Migration en attente (non appliquée) : `supabase/migrations-pending/` (`cuisine_requests`).
+- Évaluation rejouable : `scripts/recipe-eval` (cas fixes `cases.json` dont 4 en langues mélangées, `cases-regions.json` et `cases-proteins.json`, `run.mjs`, `checks.mjs`, `compare.mjs`, `summary.mjs`, `variety.mjs`, résultats dans `results/`) et la copie `generate-recipes-eval` (génération et juge, clé secrète seulement).
+
 ## 5. État actuel et problèmes connus
 
 ### Sécurité
@@ -271,7 +285,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 
 ## 6. Prochaine étape
-Phase 9 Recettes (branche `phase-9`), puis 10 Premier contact, 11 Point de décision, 12 Natif (un seul build), 13 Services et abonnements, 14 Audit, 15 Lancement. Détails dans `PLAN.md`.
+Phase 9b Mode cuisine (branche à créer), puis 10 Premier contact, 11 Point de décision, 12 Natif (un seul build), 13 Services et abonnements, 14 Audit, 15 Lancement. Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash

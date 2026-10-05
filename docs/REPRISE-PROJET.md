@@ -34,7 +34,7 @@ Garde-manger partagé en temps réel (invitation par code ou lien) · conseils d
 | Caméra | `react-native-vision-camera` 5.2.3 (mobile), `expo-camera` (web) | TextureView, photo 960 × 1280 |
 | Code-barres | Open Food Facts | Nom, nom générique, marque, NOVA, Nutri-Score, catégories |
 | Notifications | Expo Push + Firebase, pg_cron | Résumé quotidien |
-| Erreurs | Sentry (projet `yhasral/react-native`, région UE) | Alertes email `provider_quota`, `push_failure` ; lecture par Claude Code via `SENTRY_ACCESS_TOKEN` |
+| Erreurs | Sentry (projet `yhasral/react-native`, région UE) | Alertes email `provider_quota`, `push_failure`, `provider_failure` ; lecture par Claude Code via `SENTRY_ACCESS_TOKEN` |
 | Traductions | i18next | Français (tutoiement), anglais, espagnol |
 | Code | GitHub privé `yhasyhas/antiwasteapp` | Branches supprimées après fusion |
 

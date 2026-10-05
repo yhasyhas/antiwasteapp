@@ -2,7 +2,7 @@
 // Lancement : deno test --no-config supabase/functions/
 
 import { assert, assertEquals } from 'jsr:@std/assert@1';
-import { type AiProvider, type AiRequest, type AttemptLog, classifyProviderFailure, orderProviders, type ParseResult, type ProviderResult, runWithFallback } from './ai.ts';
+import { type AiProvider, type AiRequest, type AttemptLog, classifyProviderFailure, isProviderMalfunction, orderProviders, type ParseResult, type ProviderResult, runWithFallback } from './ai.ts';
 
 const REQUEST: AiRequest = { prompt: 'test', schema: {}, schemaName: 'test', temperature: 0, maxOutputTokens: 100 };
 
@@ -169,4 +169,47 @@ Deno.test('simulation : aucun appel réel au fournisseur simulé', async () => {
   assertEquals(result.value, 'b');
   assertEquals(primary.state.calls, 0);
   assertEquals(result.quotaHits.map((hit) => hit.provider), ['gemini']);
+});
+
+Deno.test('dysfonctionnement : réponse refusée, schéma invalide, clé refusée ou réponse illisible ; ni quota ni surcharge', () => {
+  assert(isProviderMalfunction(400, 'Groq 400: {"error":{"code":"json_validate_failed"}}'));
+  assert(isProviderMalfunction(400, 'Groq 400: {"error":{"message":"invalid JSON schema for response_format"}}'));
+  assert(isProviderMalfunction(401, 'Groq 401: invalid api key'));
+  assert(isProviderMalfunction(undefined, 'Groq: réponse vide ou tronquée (length)'));
+  assert(!isProviderMalfunction(429, 'Groq 429: {"error":{"code":"rate_limit_exceeded"}}'));
+  assert(!isProviderMalfunction(503, 'Gemini 503: {"status":"UNAVAILABLE","message":"The model is overloaded"}'));
+  assert(!isProviderMalfunction(498, 'Groq 498: capacity exceeded'));
+  assert(!isProviderMalfunction(500, 'Groq 500: internal error'));
+  assert(!isProviderMalfunction(undefined, 'Groq: TimeoutError: Signal timed out.'));
+});
+
+Deno.test('le principal refuse sa réponse, le secours répond : succès, dysfonctionnement signalé', async () => {
+  const primary = fakeProvider('groq', 5, httpError(400));
+  const backup = fakeProvider('gemini', 5, ok('{"value":"b"}'));
+  const { result } = await run([primary.provider, backup.provider]);
+  assert(result.ok);
+  assertEquals(result.failureHits.map((hit) => hit.provider), ['groq']);
+  assertEquals(result.quotaHits, []);
+});
+
+Deno.test('réponse illisible du principal : dysfonctionnement ; surcharge ou quota : pas de dysfonctionnement', async () => {
+  const unreadable = await run([fakeProvider('groq', 5, ok('INVALIDE')).provider, fakeProvider('gemini', 5, ok('{"value":"b"}')).provider]);
+  assertEquals(unreadable.result.failureHits.map((hit) => hit.provider), ['groq']);
+  const overloaded = await run([fakeProvider('groq', 5, httpError(503)).provider, fakeProvider('gemini', 5, httpError(429)).provider]);
+  assertEquals(overloaded.result.failureHits, []);
+});
+
+Deno.test('lancement en parallèle : le principal annulé après la réponse du secours n\'est pas un dysfonctionnement', async () => {
+  const primary = fakeProvider('groq', 200, ok('{"value":"a"}'));
+  const backup = fakeProvider('gemini', 5, ok('{"value":"b"}'));
+  const { result } = await run([primary.provider, backup.provider], 20);
+  assert(result.ok);
+  assertEquals(result.failureHits, []);
+});
+
+Deno.test('simulation : réponse refusée signalée comme dysfonctionnement', async () => {
+  const log: AttemptLog[] = [];
+  const result = await runWithFallback([fakeProvider('groq', 5, ok('{"value":"a"}')).provider, fakeProvider('gemini', 5, ok('{"value":"b"}')).provider], REQUEST, parse, { label: 'test', log, t0: Date.now(), simulate: { groq: 'refused' } });
+  assert(result.ok);
+  assertEquals(result.failureHits.map((hit) => hit.provider), ['groq']);
 });

@@ -104,11 +104,14 @@ export function lotsStock(lots: Lot[]): Quantity | null {
   return { value: Number((base / factor).toFixed(3)), unit: reference.unit, dimension: reference.dimension, base };
 }
 
-// Texte de la quantité totale : « 5 tomates », « 1,5 l » ; sinon les quantités des lots (« 2 + 1 paquet »)
-export function totalLabel(lots: Lot[], language: string): string {
+// Texte de la quantité totale : « 5 tomates », « 1,5 l » ; sinon les quantités des lots (« 2 + 1 paquet »).
+// compact (liste du garde-manger) : rien quand les unités diffèrent (« 1 L + 1 bottle, 1 glass » illisible) ; la carte
+// affiche alors le nombre de lots, le détail reste dans la feuille de l'aliment
+export function totalLabel(lots: Lot[], language: string, compact = false): string {
   if (lots.length === 1) return displayQuantity(lots[0].quantity, language);
   const stock = lotsStock(lots);
   if (stock) return formatQuantity(stock.value, stock.unit, language);
+  if (compact) return '';
   return lots.map((lot) => displayQuantity(lot.quantity, language)).filter(Boolean).join(' + ');
 }
 

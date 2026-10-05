@@ -1,0 +1,3800 @@
+{
+ "summary": {
+  "version": "v4.1",
+  "date": "2026-10-02T22:30:12.119Z",
+  "model": "openai/gpt-oss-120b",
+  "judge_model": null,
+  "cases": 7,
+  "failed_cases": 0,
+  "recipes": 21,
+  "judge": {
+   "quantities": null,
+   "cooking_cues": null,
+   "order": null,
+   "ingredients_used": null,
+   "authenticity": null,
+   "safety": null,
+   "diet": null
+  },
+  "diversity_judge": null,
+  "auto": {
+   "ingredients_in_steps": 0.9861111111111113,
+   "quantities_in_steps": 0.6460317460317461,
+   "timed_cooking": 0.7235827664399094,
+   "oven_temperature": 1,
+   "reheat_cue": 1,
+   "uses_urgent": 0.8095238095238095,
+   "rules_respected": 1,
+   "units_language": 1,
+   "safety_rules": 1,
+   "no_heat_without_cooking": 1,
+   "no_celsius_without_meat": 1,
+   "diversity": 0.7408496443602591
+  },
+  "rejected_first": 0,
+  "median_ms": 6769,
+  "judge_mean": null
+ },
+ "results": [
+  {
+   "id": "es-latino-vegetariano",
+   "note": "Español, latinoamericana, vegetariano",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 6418,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [],
+    "corrected": [],
+    "replaced": [],
+    "dropped": []
+   },
+   "examples": [
+    {
+     "name": "Diri ak pwa (riz collé aux haricots)",
+     "region": "Caraïbes"
+    },
+    {
+     "name": "Sopa paraguaya",
+     "region": "Amérique du Sud"
+    },
+    {
+     "name": "Guacamole",
+     "region": "Mexique et Amérique centrale"
+    },
+    {
+     "name": "Curry channa and aloo",
+     "region": "Caraïbes"
+    },
+    {
+     "name": "Polenta",
+     "region": "Amérique du Sud"
+    }
+   ],
+   "diversity_auto": 0.6883876357560568,
+   "diversity_judge": null,
+   "diversity_comment": null,
+   "judge_model": null,
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [],
+     "corrected": [],
+     "replaced": [],
+     "dropped": []
+    },
+    "examples": [
+     {
+      "name": "Diri ak pwa (riz collé aux haricots)",
+      "region": "Caraïbes"
+     },
+     {
+      "name": "Sopa paraguaya",
+      "region": "Amérique du Sud"
+     },
+     {
+      "name": "Guacamole",
+      "region": "Mexique et Amérique centrale"
+     },
+     {
+      "name": "Curry channa and aloo",
+      "region": "Caraïbes"
+     },
+     {
+      "name": "Polenta",
+      "region": "Amérique du Sud"
+     }
+    ],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "es-latino-vegetariano-3",
+      "name": "Aguacates",
+      "quantity": "2",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "es-latino-vegetariano-1",
+      "name": "Frijoles negros",
+      "quantity": "1 lata",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "es-latino-vegetariano-2",
+      "name": "Maíz",
+      "quantity": "1 lata",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "es-latino-vegetariano-4",
+      "name": "Tomates",
+      "quantity": "3",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "es-latino-vegetariano-5",
+      "name": "Arroz",
+      "quantity": "500 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "es-latino-vegetariano-6",
+      "name": "Huevos",
+      "quantity": "6",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "es-latino-vegetariano-7",
+      "name": "Queso fresco",
+      "quantity": "200 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p8",
+      "id": "es-latino-vegetariano-8",
+      "name": "Tortillas de maíz",
+      "quantity": "10",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p9",
+      "id": "es-latino-vegetariano-9",
+      "name": "Cebolla morada",
+      "quantity": "1",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p10",
+      "id": "es-latino-vegetariano-10",
+      "name": "Limas",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 6418,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 2,
+      "ms": 6399,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.302205618,
+       "prompt_tokens": 2909,
+       "prompt_time": 0.134229929,
+       "completion_tokens": 2837,
+       "completion_time": 5.919389511,
+       "total_tokens": 5746,
+       "total_time": 6.05361944,
+       "completion_tokens_details": {
+        "reasoning_tokens": 179
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "471438",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "243984"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Tacos de frijoles negros con aguacate y queso fresco",
+     "recipe": {
+      "title": "Tacos de frijoles negros con aguacate y queso fresco",
+      "description": "Tacos rápidos y nutritivos con frijoles negros sazonados, rodajas de aguacate fresco y queso fresco desmenuzado, ideales para el almuerzo.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 15,
+      "total_time": 25,
+      "servings": 2,
+      "meal_type": "lunch",
+      "cuisine": "latin",
+      "dietary_tags": [
+       "diet:vegetarian",
+       "diet:gluten-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "frijoles negros",
+        "quantity": "1",
+        "unit": "lata",
+        "pantry_id": "es-latino-vegetariano-1"
+       },
+       {
+        "name": "aguacates",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-3"
+       },
+       {
+        "name": "tortillas de maíz",
+        "quantity": "4",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-8"
+       },
+       {
+        "name": "queso fresco",
+        "quantity": "100",
+        "unit": "g",
+        "pantry_id": "es-latino-vegetariano-7"
+       },
+       {
+        "name": "cebolla morada",
+        "quantity": "1/2",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-9"
+       },
+       {
+        "name": "limas",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-10"
+       },
+       {
+        "name": "comino molido",
+        "quantity": "1",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "chile en polvo",
+        "quantity": "1/2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "aceite vegetal",
+        "quantity": "1",
+        "unit": "cda",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "frijoles negros",
+       "aguacates",
+       "tortillas de maíz",
+       "queso fresco",
+       "cebolla morada",
+       "limas"
+      ],
+      "missing_ingredients": [
+       "comino molido",
+       "chile en polvo"
+      ],
+      "instructions": [
+       "Escurre y enjuaga los frijoles negros de la lata.",
+       "Pica finamente la mitad de la cebolla morada.",
+       "Calienta la cda de aceite en una sartén a fuego medio y sofríe la cebolla 3 minutos, hasta que esté translúcida.",
+       "Añade los frijoles, el comino, el chile en polvo y la pizca de sal; cocina 5 minutos, removiendo, hasta que estén bien calientes.",
+       "Mientras tanto, corta el aguacate en rebanadas y exprime el jugo de media lima sobre él.",
+       "Calienta las tortillas en otra sartén a fuego medio 30 segundos por lado, hasta que estén flexibles.",
+       "Para servir, coloca una porción de frijoles en cada tortilla, añade aguacate, queso fresco desmenuzado y un chorrito de jugo de lima restante."
+      ],
+      "tips": [
+       "Si te sobra aguacate, úsalo para preparar guacamole rápido como acompañamiento.",
+       "Puedes agregar cilantro picado al final para más frescura."
+      ],
+      "image_prompt": "Professional food photography, four corn tacos filled with black beans, creamy avocado slices, crumbled fresh cheese, red onion, lime wedge, bright kitchen lighting"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 0.875,
+      "missing_in_steps": [
+       "aguacates"
+      ],
+      "quantities_in_steps": 0,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 7,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Arroz con maíz, huevo frito y salsa de tomate",
+     "recipe": {
+      "title": "Arroz con maíz, huevo frito y salsa de tomate",
+      "description": "Un plato completo de arroz amarillo con maíz dulce, huevo frito y una ligera salsa de tomate, perfecto para preparar con antelación y recalentar.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 20,
+      "total_time": 30,
+      "servings": 2,
+      "meal_type": "lunch",
+      "cuisine": "latin",
+      "dietary_tags": [
+       "diet:vegetarian",
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "arroz",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "es-latino-vegetariano-5"
+       },
+       {
+        "name": "maíz",
+        "quantity": "1",
+        "unit": "lata",
+        "pantry_id": "es-latino-vegetariano-2"
+       },
+       {
+        "name": "huevos",
+        "quantity": "2",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-6"
+       },
+       {
+        "name": "tomates",
+        "quantity": "2",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-4"
+       },
+       {
+        "name": "cebolla morada",
+        "quantity": "1/4",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-9"
+       },
+       {
+        "name": "limas",
+        "quantity": "1/2",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-10"
+       },
+       {
+        "name": "aceite vegetal",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta negra",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "arroz",
+       "maíz",
+       "huevos",
+       "tomates",
+       "cebolla morada",
+       "limas"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Enjuaga el arroz bajo agua fría hasta que el agua salga clara.",
+       "En una olla mediana, calienta 1 cda de aceite a fuego medio, añade el arroz y sofríe 2 minutos, hasta que los granos estén ligeramente translúcidos.",
+       "Agrega 400 ml de agua y una pizca de sal; lleva a ebullición, reduce a fuego bajo, tapa y cocina 15 minutos, hasta que el arroz absorba el agua y esté tierno.",
+       "Mientras el arroz se cocina, corta los tomates en cubos y pica finamente la cebolla.",
+       "En una sartén separada, calienta 1 cda de aceite a fuego medio, sofríe la cebolla 3 minutos, luego incorpora los tomates y cocina 5 minutos, hasta que se forme una salsa ligera. Salpimienta al gusto y exprime medio jugo de lima.",
+       "Escurre el maíz de la lata y añádelo a la salsa de tomate, cocina 2 minutos más.",
+       "En otra sartén, calienta 1 cda de aceite a fuego medio-alto y fríe los huevos 3 minutos por cada lado, hasta que la clara esté firme y la yema ligeramente cuajada (punto \"huevo frito\"), sin quemar.",
+       "Sirve el arroz en platos, cubre con la salsa de maíz‑tomate y coloca un huevo frito encima."
+      ],
+      "tips": [
+       "Puedes preparar el arroz con antelación y guardarlo en el refrigerador; recalienta al vapor antes de servir.",
+       "Si prefieres menos grasa, usa aceite en spray para freír el huevo."
+      ],
+      "image_prompt": "Bright plate of fluffy yellow rice topped with sweet corn tomato sauce and a sunny-side-up egg, lime wedge on the side, rustic wooden table, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.4,
+      "timed_cooking": 0.7142857142857143,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 0,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Sopa de tomate con queso fresco y crujientes de tortilla",
+     "recipe": {
+      "title": "Sopa de tomate con queso fresco y crujientes de tortilla",
+      "description": "Sopa ligera de tomate al estilo mexicano, enriquecida con trozos de queso fresco y tiras de tortilla fritas para dar textura.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 20,
+      "total_time": 30,
+      "servings": 2,
+      "meal_type": "lunch",
+      "cuisine": "latin",
+      "dietary_tags": [
+       "diet:vegetarian",
+       "diet:gluten-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "tomates",
+        "quantity": "3",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-4"
+       },
+       {
+        "name": "cebolla morada",
+        "quantity": "1/2",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-9"
+       },
+       {
+        "name": "limas",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-10"
+       },
+       {
+        "name": "queso fresco",
+        "quantity": "80",
+        "unit": "g",
+        "pantry_id": "es-latino-vegetariano-7"
+       },
+       {
+        "name": "tortillas de maíz",
+        "quantity": "2",
+        "unit": "pieza",
+        "pantry_id": "es-latino-vegetariano-8"
+       },
+       {
+        "name": "aceite vegetal",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta negra",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "tomates",
+       "cebolla morada",
+       "limas",
+       "queso fresco",
+       "tortillas de maíz"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Pela los tomates (puedes escaldarlos 30 s en agua hirviendo y pelarlos) y córtalos en cuartos.",
+       "Pica finamente la mitad de la cebolla morada.",
+       "En una olla mediana, calienta 1 cda de aceite a fuego medio, añade la cebolla y sofríe 4 minutos, hasta que esté dorada.",
+       "Agrega los tomates y cocina 6 minutos, removiendo, hasta que se deshagan ligeramente.",
+       "Vierte 500 ml de agua, lleva a ebullición, baja el fuego y cocina 8 minutos. Usa una licuadora de inmersión para obtener una sopa homogénea.",
+       "Sazona con sal, pimienta y el jugo de la lima; mezcla bien.",
+       "Corta las tortillas en tiras finas y fríelas en 1 cda de aceite a fuego medio-alto 3 minutos, hasta que estén doradas y crujientes; escúrrelas sobre papel absorbente.",
+       "Sirve la sopa caliente, espolvorea el queso fresco desmenuzado y añade las tiras de tortilla crujiente encima."
+      ],
+      "tips": [
+       "Para una versión más cremosa, agrega 2 cda de crema de leche al final (opcional, cuenta como ingrediente extra).",
+       "Guarda las tiras de tortilla crujientes en un recipiente hermético para mantener su textura."
+      ],
+      "image_prompt": "Steaming bowl of bright red tomato soup with crumbled fresh cheese and golden crispy corn tortilla strips on top, lime wedge beside, rustic ceramic bowl, soft natural lighting"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.25,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 0,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    }
+   ]
+  },
+  {
+   "id": "en-med-vegan",
+   "note": "English, Mediterranean, vegan",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 12488,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [
+     {
+      "title": "Mediterranean Stuffed Eggplant with Quinoa & Chickpeas",
+      "issues": [
+       {
+        "code": "dry_legumes",
+        "ingredient": "chickpeas",
+        "message": "« chickpeas » : légumineuses sèches, il faut un trempage (une nuit) puis une longue cuisson (au moins 45 minutes, durée écrite) ; sinon utiliser et écrire « en conserve » (égouttées, rincées) dans la liste et les étapes."
+       }
+      ]
+     },
+     {
+      "title": "Hearty Spinach & Chickpea Tomato Soup",
+      "issues": [
+       {
+        "code": "dry_legumes",
+        "ingredient": "chickpeas",
+        "message": "« chickpeas » : légumineuses sèches, il faut un trempage (une nuit) puis une longue cuisson (au moins 45 minutes, durée écrite) ; sinon utiliser et écrire « en conserve » (égouttées, rincées) dans la liste et les étapes."
+       },
+       {
+        "code": "too_many_purchases",
+        "ingredient": "onion, garlic, vegetable broth, ground coriander",
+        "message": "La recette demande 4 ingrédients à acheter (onion, garlic, vegetable broth, ground coriander) : au plus 3, hors sel, poivre, huile et eau. Remplace les autres par des ingrédients du garde-manger, ou retire-les si la recette s'en passe."
+       }
+      ]
+     }
+    ],
+    "corrected": [
+     "Mediterranean Stuffed Eggplant with Quinoa & Chickpeas",
+     "Hearty Spinach & Chickpea Tomato Soup"
+    ],
+    "replaced": [],
+    "dropped": []
+   },
+   "examples": [
+    {
+     "name": "Musaqa'a",
+     "region": "Proche-Orient et Turquie"
+    },
+    {
+     "name": "Fasolada",
+     "region": "Europe du Sud"
+    },
+    {
+     "name": "Yaprak sarma zeytinyağlı (warak enab bi zeit)",
+     "region": "Proche-Orient et Turquie"
+    },
+    {
+     "name": "Blitva",
+     "region": "Europe du Sud"
+    },
+    {
+     "name": "Hummus bi tahini",
+     "region": "Proche-Orient et Turquie"
+    }
+   ],
+   "diversity_auto": 0.6360294117647058,
+   "diversity_judge": null,
+   "diversity_comment": null,
+   "judge_model": null,
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [
+      {
+       "title": "Mediterranean Stuffed Eggplant with Quinoa & Chickpeas",
+       "issues": [
+        {
+         "code": "dry_legumes",
+         "ingredient": "chickpeas",
+         "message": "« chickpeas » : légumineuses sèches, il faut un trempage (une nuit) puis une longue cuisson (au moins 45 minutes, durée écrite) ; sinon utiliser et écrire « en conserve » (égouttées, rincées) dans la liste et les étapes."
+        }
+       ]
+      },
+      {
+       "title": "Hearty Spinach & Chickpea Tomato Soup",
+       "issues": [
+        {
+         "code": "dry_legumes",
+         "ingredient": "chickpeas",
+         "message": "« chickpeas » : légumineuses sèches, il faut un trempage (une nuit) puis une longue cuisson (au moins 45 minutes, durée écrite) ; sinon utiliser et écrire « en conserve » (égouttées, rincées) dans la liste et les étapes."
+        },
+        {
+         "code": "too_many_purchases",
+         "ingredient": "onion, garlic, vegetable broth, ground coriander",
+         "message": "La recette demande 4 ingrédients à acheter (onion, garlic, vegetable broth, ground coriander) : au plus 3, hors sel, poivre, huile et eau. Remplace les autres par des ingrédients du garde-manger, ou retire-les si la recette s'en passe."
+        }
+       ]
+      }
+     ],
+     "corrected": [
+      "Mediterranean Stuffed Eggplant with Quinoa & Chickpeas",
+      "Hearty Spinach & Chickpea Tomato Soup"
+     ],
+     "replaced": [],
+     "dropped": []
+    },
+    "examples": [
+     {
+      "name": "Musaqa'a",
+      "region": "Proche-Orient et Turquie"
+     },
+     {
+      "name": "Fasolada",
+      "region": "Europe du Sud"
+     },
+     {
+      "name": "Yaprak sarma zeytinyağlı (warak enab bi zeit)",
+      "region": "Proche-Orient et Turquie"
+     },
+     {
+      "name": "Blitva",
+      "region": "Europe du Sud"
+     },
+     {
+      "name": "Hummus bi tahini",
+      "region": "Proche-Orient et Turquie"
+     }
+    ],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "en-med-vegan-6",
+      "name": "Spinach",
+      "quantity": "200 g",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "en-med-vegan-2",
+      "name": "Aubergine",
+      "quantity": "2",
+      "daysLeft": 2,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "en-med-vegan-1",
+      "name": "Chickpeas",
+      "quantity": "400 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "en-med-vegan-3",
+      "name": "Tomatoes",
+      "quantity": "4",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "en-med-vegan-4",
+      "name": "Quinoa",
+      "quantity": "300 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "en-med-vegan-5",
+      "name": "Lemon",
+      "quantity": "1",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "en-med-vegan-7",
+      "name": "Tahini",
+      "quantity": "1 jar",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p8",
+      "id": "en-med-vegan-8",
+      "name": "Feta",
+      "quantity": "200 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 12488,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 2,
+      "ms": 7020,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.024273103,
+       "prompt_tokens": 2892,
+       "prompt_time": 0.122358787,
+       "completion_tokens": 3194,
+       "completion_time": 6.83581449,
+       "total_tokens": 6086,
+       "total_time": 6.958173277,
+       "prompt_tokens_details": {
+        "cached_tokens": 512
+       },
+       "completion_tokens_details": {
+        "reasoning_tokens": 284
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "471505",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244003"
+       }
+      }
+     },
+     {
+      "provider": "groq",
+      "started_at_ms": 7058,
+      "ms": 4556,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.053997506,
+       "prompt_tokens": 4302,
+       "prompt_time": 0.180274459,
+       "completion_tokens": 2049,
+       "completion_time": 4.277995014,
+       "total_tokens": 6351,
+       "total_time": 4.458269473,
+       "completion_tokens_details": {
+        "reasoning_tokens": 161
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "471543",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "236158"
+       }
+      }
+     },
+     {
+      "provider": "groq",
+      "started_at_ms": 7059,
+      "ms": 5410,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.211567041,
+       "prompt_tokens": 2950,
+       "prompt_time": 0.125380473,
+       "completion_tokens": 2408,
+       "completion_time": 5.043236658,
+       "total_tokens": 5358,
+       "total_time": 5.168617131,
+       "completion_tokens_details": {
+        "reasoning_tokens": 421
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "471544",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "243593"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Mediterranean Stuffed Eggplant with Quinoa & Chickpeas",
+     "recipe": {
+      "title": "Mediterranean Stuffed Eggplant with Quinoa & Chickpeas",
+      "description": "Baked eggplant halves filled with a savory quinoa‑chickpea mixture, brightened with lemon and tahini, inspired by traditional Levantine musaqa'a.",
+      "difficulty": "medium",
+      "prep_time": 15,
+      "cook_time": 35,
+      "total_time": 50,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "mediterranean",
+      "dietary_tags": [
+       "diet:vegan",
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "eggplant",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-med-vegan-2"
+       },
+       {
+        "name": "quinoa",
+        "quantity": "150",
+        "unit": "g",
+        "pantry_id": "en-med-vegan-4"
+       },
+       {
+        "name": "chickpeas",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": null
+       },
+       {
+        "name": "tomatoes",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-med-vegan-3"
+       },
+       {
+        "name": "spinach",
+        "quantity": "100",
+        "unit": "g",
+        "pantry_id": "en-med-vegan-6"
+       },
+       {
+        "name": "lemon juice",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": "en-med-vegan-5"
+       },
+       {
+        "name": "tahini",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": "en-med-vegan-7"
+       },
+       {
+        "name": "olive oil",
+        "quantity": "3",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "garlic",
+        "quantity": "2",
+        "unit": "clove",
+        "pantry_id": null
+       },
+       {
+        "name": "ground cumin",
+        "quantity": "1",
+        "unit": "tsp",
+        "pantry_id": null
+       },
+       {
+        "name": "salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "black pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "eggplant",
+       "quinoa",
+       "tomatoes",
+       "spinach",
+       "lemon juice",
+       "tahini"
+      ],
+      "missing_ingredients": [
+       "chickpeas",
+       "garlic",
+       "ground cumin"
+      ],
+      "instructions": [
+       "Preheat the oven to 200 °C.",
+       "Slice each eggplant lengthwise in half, scoop out a thin layer of flesh to create a boat, and brush the interior with 1 tbsp olive oil; place on a baking sheet, skin side up.",
+       "Dice the scooped eggplant flesh and the tomatoes; set aside.",
+       "Rinse the quinoa, then add 150 g quinoa and 300 ml water to a saucepan; bring to a boil, reduce to low heat, cover and simmer 12 minutes until water is absorbed; remove from heat and let stand 5 minutes.",
+       "While quinoa cooks, heat 1 tbsp olive oil in a skillet over medium heat, add 2 minced garlic cloves and sauté 1 minute until fragrant.",
+       "Add the diced eggplant flesh and tomatoes, season with 1 tsp ground cumin, 1 pinch salt, and 1 pinch black pepper; cook 6 minutes, stirring, until vegetables soften.",
+       "Stir in the spinach (100 g) and cook 2 minutes until wilted.",
+       "Add the cooked quinoa and the canned chickpeas (200 g); mix well and heat 3 minutes.",
+       "Remove the skillet from heat, drizzle lemon juice (2 tbsp) and tahini (2 tbsp); toss to combine.",
+       "Fill each eggplant half with the quinoa‑chickpea mixture, drizzle the remaining 1 tbsp olive oil over the tops, and bake 20 minutes until the eggplant is tender and the filling is golden.",
+       "Serve hot, optionally garnished with a squeeze of fresh lemon."
+      ],
+      "tips": [
+       "If the eggplant boats are large, you can halve the filling to avoid over‑stuffing.",
+       "For extra freshness, sprinkle chopped parsley just before serving."
+      ],
+      "image_prompt": "Professional food photography, baked eggplant halves stuffed with fluffy quinoa and golden chickpeas, drizzled with lemon‑tahini sauce, rustic wooden board, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.8571428571428571,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 11,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Hearty Spinach & Chickpea Tomato Soup",
+     "recipe": {
+      "title": "Hearty Spinach & Chickpea Tomato Soup",
+      "description": "A comforting, protein‑rich soup blending chickpeas, tomatoes, and spinach, reminiscent of Greek fasolada but lighter for dinner.",
+      "difficulty": "medium",
+      "prep_time": 10,
+      "cook_time": 30,
+      "total_time": 40,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "mediterranean",
+      "dietary_tags": [
+       "diet:vegan",
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "spinach",
+        "quantity": "150",
+        "unit": "g",
+        "pantry_id": "en-med-vegan-6"
+       },
+       {
+        "name": "chickpeas",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": null
+       },
+       {
+        "name": "tomatoes",
+        "quantity": "4",
+        "unit": "piece",
+        "pantry_id": "en-med-vegan-3"
+       },
+       {
+        "name": "lemon zest",
+        "quantity": "1",
+        "unit": "tsp",
+        "pantry_id": "en-med-vegan-5"
+       },
+       {
+        "name": "olive oil",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "onion",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": null
+       },
+       {
+        "name": "garlic",
+        "quantity": "2",
+        "unit": "clove",
+        "pantry_id": null
+       },
+       {
+        "name": "water",
+        "quantity": "800",
+        "unit": "ml",
+        "pantry_id": null
+       },
+       {
+        "name": "salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "black pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "spinach",
+       "tomatoes",
+       "lemon zest"
+      ],
+      "missing_ingredients": [
+       "chickpeas",
+       "onion",
+       "garlic"
+      ],
+      "instructions": [
+       "Dice the tomatoes and set aside.",
+       "Finely chop the onion.",
+       "Heat 2 tbsp olive oil in a large pot over medium heat; add the onion and sauté 4 minutes until translucent.",
+       "Add 2 minced garlic cloves and cook 1 minute more.",
+       "Stir in the diced tomatoes, salt, and pepper; cook 5 minutes, stirring occasionally, until the tomatoes begin to break down.",
+       "Add 800 ml water and bring to a gentle boil.",
+       "Add the canned chickpeas (300 g) and simmer 12 minutes on low heat.",
+       "Add the spinach (150 g) and lemon zest (1 tsp); cook 2 minutes until the spinach wilts.",
+       "Adjust seasoning if needed, then ladle into bowls and serve hot."
+      ],
+      "tips": [
+       "For a smoother texture, blend half of the soup with an immersion blender before adding the spinach.",
+       "A drizzle of extra‑virgin olive oil at the end adds richness."
+      ],
+      "image_prompt": "Warm bowl of bright red tomato soup with chickpeas and vibrant green spinach leaves, rustic ceramic bowl, steam rising, natural daylight"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.8333333333333334,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Lemon‑Tahini Quinoa Bowl with Roasted Eggplant & Tomatoes",
+     "recipe": {
+      "title": "Lemon‑Tahini Quinoa Bowl with Roasted Eggplant & Tomatoes",
+      "description": "A quick, light dinner bowl combining fluffy quinoa, tangy lemon‑tahini dressing, and roasted vegetables, echoing Turkish zeytinyağlı flavors.",
+      "difficulty": "medium",
+      "prep_time": 10,
+      "cook_time": 30,
+      "total_time": 40,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "mediterranean",
+      "dietary_tags": [
+       "diet:vegan",
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "quinoa",
+        "quantity": "150",
+        "unit": "g",
+        "pantry_id": "en-med-vegan-4"
+       },
+       {
+        "name": "eggplant",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-med-vegan-2"
+       },
+       {
+        "name": "tomatoes",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-med-vegan-3"
+       },
+       {
+        "name": "spinach",
+        "quantity": "100",
+        "unit": "g",
+        "pantry_id": "en-med-vegan-6"
+       },
+       {
+        "name": "lemon juice",
+        "quantity": "3",
+        "unit": "tbsp",
+        "pantry_id": "en-med-vegan-5"
+       },
+       {
+        "name": "tahini",
+        "quantity": "3",
+        "unit": "tbsp",
+        "pantry_id": "en-med-vegan-7"
+       },
+       {
+        "name": "olive oil",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "garlic",
+        "quantity": "1",
+        "unit": "clove",
+        "pantry_id": null
+       },
+       {
+        "name": "ground sumac",
+        "quantity": "1/2",
+        "unit": "tsp",
+        "pantry_id": null
+       },
+       {
+        "name": "salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "black pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "quinoa",
+       "eggplant",
+       "tomatoes",
+       "spinach",
+       "lemon juice",
+       "tahini"
+      ],
+      "missing_ingredients": [
+       "garlic",
+       "ground sumac"
+      ],
+      "instructions": [
+       "Preheat the oven to 190 °C.",
+       "Rinse the quinoa; place 150 g quinoa with 300 ml water in a saucepan, bring to a boil, then reduce to low heat, cover and simmer 12 minutes until water is absorbed. Remove from heat and let stand 5 minutes.",
+       "Cube the eggplant (about 200 g) and halve the tomatoes.",
+       "Toss the eggplant cubes and tomato halves with 1 tbsp olive oil, 1 minced garlic clove, salt, and pepper; spread on a baking tray.",
+       "Roast in the oven 20 minutes, turning halfway, until the eggplant is golden and the tomatoes are slightly caramelized.",
+       "While vegetables roast, whisk together lemon juice (3 tbsp), tahini (3 tbsp), 1 tbsp olive oil, ground sumac (1/2 tsp), and a pinch of salt to form a smooth dressing; add a splash of water if needed for consistency.",
+       "In a large bowl combine the cooked quinoa, roasted eggplant, roasted tomatoes, and fresh spinach (100 g).",
+       "Drizzle the lemon‑tahini dressing over the bowl, toss gently, and serve warm."
+      ],
+      "tips": [
+       "Sumac adds a characteristic tangy note; if unavailable, substitute with a pinch of lemon zest.",
+       "For extra protein, stir in the remaining canned chickpeas (optional, not counted toward the 3‑buy limit)."
+      ],
+      "image_prompt": "Bright Mediterranean quinoa bowl with golden roasted eggplant cubes, cherry‑red tomatoes, fresh spinach, drizzled with creamy lemon‑tahini sauce, top view, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.5,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    }
+   ]
+  },
+  {
+   "id": "es-sin-gluten-lactosa",
+   "note": "Español, sin gluten y sin lactosa, salmón",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 5367,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [],
+    "corrected": [],
+    "replaced": [],
+    "dropped": []
+   },
+   "examples": [],
+   "diversity_auto": 0.6121212121212121,
+   "diversity_judge": null,
+   "diversity_comment": null,
+   "judge_model": null,
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [],
+     "corrected": [],
+     "replaced": [],
+     "dropped": []
+    },
+    "examples": [],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "es-sin-gluten-lactosa-1",
+      "name": "Salmón",
+      "quantity": "2 lomos",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "es-sin-gluten-lactosa-3",
+      "name": "Judías verdes",
+      "quantity": "300 g",
+      "daysLeft": 2,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "es-sin-gluten-lactosa-2",
+      "name": "Patatas",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "es-sin-gluten-lactosa-4",
+      "name": "Arroz",
+      "quantity": "500 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "es-sin-gluten-lactosa-5",
+      "name": "Limón",
+      "quantity": "1",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "es-sin-gluten-lactosa-6",
+      "name": "Pasta de trigo",
+      "quantity": "500 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "es-sin-gluten-lactosa-7",
+      "name": "Mantequilla",
+      "quantity": "250 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 5367,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 2,
+      "ms": 5348,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.099550323,
+       "prompt_tokens": 2404,
+       "prompt_time": 0.096368861,
+       "completion_tokens": 2321,
+       "completion_time": 4.896802999,
+       "total_tokens": 4725,
+       "total_time": 4.99317186,
+       "completion_tokens_details": {
+        "reasoning_tokens": 152
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "471604",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244166"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Salmón al horno con judías verdes y limón",
+     "recipe": {
+      "title": "Salmón al horno con judías verdes y limón",
+      "description": "Filetes de salmón horneados con jugo de limón y acompañados de judías verdes al vapor, una cena ligera y sin gluten.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 20,
+      "total_time": 30,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "salmón",
+        "quantity": "2",
+        "unit": "lomos",
+        "pantry_id": "es-sin-gluten-lactosa-1"
+       },
+       {
+        "name": "judías verdes",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-3"
+       },
+       {
+        "name": "limón",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-sin-gluten-lactosa-5"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta negra",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "salmón",
+       "judías verdes",
+       "limón"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Precalienta el horno a 200°C.",
+       "Coloca los 2 lomos de salmón en una bandeja y rocíalos con 1 cda de aceite de oliva.",
+       "Exprime el jugo del 1 limón sobre el salmón y espolvorea 1 pizca de sal y 1 pizca de pimienta negra.",
+       "Hornea durante 12 minutos, hasta que el interior alcance 63°C y el pescado se deshaga fácilmente con un tenedor.",
+       "Mientras tanto, corta las 300 g de judías verdes en trozos de 3‑4 cm.",
+       "Cocina las judías al vapor durante 8 minutos, hasta que estén tiernas pero crujientes.",
+       "Sirve el salmón caliente acompañado de las judías verdes al vapor."
+      ],
+      "tips": [
+       "Para más aroma, añade ralladura del medio limón al final.",
+       "Si prefieres una textura más dorada, sube el horno a 220°C los últimos 2 minutos."
+      ],
+      "image_prompt": "Professional food photography, baked salmon fillets with lemon slices, steamed green beans on the side, white plate, natural light, fresh herbs"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.6666666666666666,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 7,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Sopa ligera de arroz y verduras",
+     "recipe": {
+      "title": "Sopa ligera de arroz y verduras",
+      "description": "Una sopa reconfortante con arroz, patata y judías verdes, perfecta para una cena ligera y sin gluten.",
+      "difficulty": "easy",
+      "prep_time": 5,
+      "cook_time": 25,
+      "total_time": 30,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:vegan",
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "arroz",
+        "quantity": "150",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-4"
+       },
+       {
+        "name": "patatas",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-2"
+       },
+       {
+        "name": "judías verdes",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-3"
+       },
+       {
+        "name": "limón",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-sin-gluten-lactosa-5"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "1",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta negra",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "arroz",
+       "patatas",
+       "judías verdes",
+       "limón"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Pela y corta las 300 g de patatas en cubos de 1 cm.",
+       "Corta 200 g de judías verdes en trozos de 2 cm.",
+       "En una olla grande, calienta 1 cda de aceite de oliva a fuego medio.",
+       "Añade las patatas y sofríe 4 minutos, hasta que empiecen a dorarse ligeramente.",
+       "Agrega las judías verdes y cocina 2 minutos más, revolviendo.",
+       "Vierte 1,2 l de agua, lleva a ebullición y añade 150 g de arroz.",
+       "Reduce a fuego medio y cocina 12 minutos, hasta que el arroz esté tierno.",
+       "Exprime el jugo del 1 limón, mezcla y sazona con 1 pizca de sal y 1 pizca de pimienta negra.",
+       "Retira del fuego y sirve caliente."
+      ],
+      "tips": [
+       "Si la sopa queda muy espesa, añade un poco más de agua antes de servir.",
+       "Puedes decorar con un chorrito de aceite de oliva virgen extra al servir."
+      ],
+      "image_prompt": "Professional food photography, bowl of light rice and vegetable soup with green beans and potato cubes, steam rising, rustic kitchen setting, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.75,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Ensalada tibia de patata, salmón y limón",
+     "recipe": {
+      "title": "Ensalada tibia de patata, salmón y limón",
+      "description": "Patatas cocidas y trozos de salmón al vapor, mezclados con judías verdes y aliño de limón, una ensalada fresca y sin gluten para la cena.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 20,
+      "total_time": 30,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "patatas",
+        "quantity": "400",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-2"
+       },
+       {
+        "name": "salmón",
+        "quantity": "1",
+        "unit": "lomo",
+        "pantry_id": "es-sin-gluten-lactosa-1"
+       },
+       {
+        "name": "judías verdes",
+        "quantity": "100",
+        "unit": "g",
+        "pantry_id": "es-sin-gluten-lactosa-3"
+       },
+       {
+        "name": "limón",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-sin-gluten-lactosa-5"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta negra",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "patatas",
+       "salmón",
+       "judías verdes",
+       "limón"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Lava y corta las 400 g de patatas en cubos de 2 cm.",
+       "Pon las patatas en una olla con agua fría, lleva a ebullición y cocina 12 minutos a fuego medio, hasta que estén tiernas al pinchar con un tenedor.",
+       "Mientras tanto, corta las 100 g de judías verdes en trozos de 3 cm.",
+       "Cocina al vapor las judías verdes 6 minutos, hasta que estén crujientes‑tiernas.",
+       "Coloca el 1 lomo de salmón en una vaporera y cocina 8 minutos a fuego medio, hasta que alcance 63°C y la carne se deshaga fácilmente.",
+       "Escurre las patatas y, aún calientes, mézclalas con 1 cda de aceite de oliva, 1 pizca de sal y 1 pizca de pimienta negra.",
+       "En una ensaladera, combina las patatas tibias, el salmón desmenuzado, las judías verdes y el jugo del 1 limón.",
+       "Añade 1 cda de aceite de oliva extra y mezcla suavemente.",
+       "Sirve la ensalada tibia inmediatamente."
+      ],
+      "tips": [
+       "Para un toque extra, agrega un puñado de perejil fresco picado.",
+       "Si deseas una textura más crujiente, añade almendras laminadas tostadas (compra opcional)."
+      ],
+      "image_prompt": "Professional food photography, warm potato and salmon salad with green beans, lemon dressing, rustic wooden bowl, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    }
+   ]
+  },
+  {
+   "id": "es-mixte-noms-fr",
+   "note": "Langues mélangées : noms en français, receta en español ; pollo urgente y salmón",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 7999,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [
+     {
+      "title": "Salmón a la plancha con salsa de limón y arroz blanco",
+      "issues": [
+       {
+        "code": "doneness_hint",
+        "ingredient": "salmón",
+        "message": "« salmón » : ajouter un signe visible de cuisson (poisson : 63 °C à cœur, chair opaque qui se détache en lamelles)."
+       }
+      ]
+     }
+    ],
+    "corrected": [
+     "Salmón a la plancha con salsa de limón y arroz blanco"
+    ],
+    "replaced": [],
+    "dropped": []
+   },
+   "examples": [],
+   "diversity_auto": 0.7611111111111111,
+   "diversity_judge": null,
+   "diversity_comment": null,
+   "judge_model": null,
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [
+      {
+       "title": "Salmón a la plancha con salsa de limón y arroz blanco",
+       "issues": [
+        {
+         "code": "doneness_hint",
+         "ingredient": "salmón",
+         "message": "« salmón » : ajouter un signe visible de cuisson (poisson : 63 °C à cœur, chair opaque qui se détache en lamelles)."
+        }
+       ]
+      }
+     ],
+     "corrected": [
+      "Salmón a la plancha con salsa de limón y arroz blanco"
+     ],
+     "replaced": [],
+     "dropped": []
+    },
+    "examples": [],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "es-mixte-noms-fr-1",
+      "name": "cuisses de poulet",
+      "quantity": "4",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "es-mixte-noms-fr-2",
+      "name": "saumon",
+      "quantity": "2 pavés",
+      "daysLeft": 2,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "es-mixte-noms-fr-3",
+      "name": "riz",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "es-mixte-noms-fr-4",
+      "name": "oignons",
+      "quantity": "3",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "es-mixte-noms-fr-5",
+      "name": "poivrons",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "es-mixte-noms-fr-6",
+      "name": "tomates",
+      "quantity": "4",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "es-mixte-noms-fr-7",
+      "name": "ail",
+      "quantity": "1 tête",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p8",
+      "id": "es-mixte-noms-fr-8",
+      "name": "citron",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 7999,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 3,
+      "ms": 5902,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.020857034,
+       "prompt_tokens": 2280,
+       "prompt_time": 0.111058466,
+       "completion_tokens": 2750,
+       "completion_time": 5.731649131,
+       "total_tokens": 5030,
+       "total_time": 5.842707597,
+       "completion_tokens_details": {
+        "reasoning_tokens": 353
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "471664",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244584"
+       }
+      }
+     },
+     {
+      "provider": "groq",
+      "started_at_ms": 5934,
+      "ms": 2058,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.053263754,
+       "prompt_tokens": 2879,
+       "prompt_time": 0.140324724,
+       "completion_tokens": 885,
+       "completion_time": 1.842229366,
+       "total_tokens": 3764,
+       "total_time": 1.98255409,
+       "completion_tokens_details": {
+        "reasoning_tokens": 81
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "471697",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "243954"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Muslos de pollo al horno con pimientos y cebolla",
+     "recipe": {
+      "title": "Muslos de pollo al horno con pimientos y cebolla",
+      "description": "Jugosos muslos de pollo asados al horno con pimientos y cebolla caramelizada, perfumados con ajo y limón. Un plato completo y ligero para la cena.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 35,
+      "total_time": 45,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "muslo de pollo",
+        "quantity": "4",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-1"
+       },
+       {
+        "name": "pimiento",
+        "quantity": "2",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-5"
+       },
+       {
+        "name": "cebolla",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-4"
+       },
+       {
+        "name": "ajo",
+        "quantity": "2",
+        "unit": "diente",
+        "pantry_id": "es-mixte-noms-fr-7"
+       },
+       {
+        "name": "limón",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-8"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta negra",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "muslo de pollo",
+       "pimiento",
+       "cebolla",
+       "ajo",
+       "limón"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Precalienta el horno a 200 °C.",
+       "Enjuaga los muslos de pollo y sécalos con papel de cocina.",
+       "Ralla la cáscara del limón y exprime el jugo; reserva.",
+       "Corta los pimientos en tiras y la cebolla en aros gruesos.",
+       "En una bandeja para horno, coloca los muslos, los pimientos y la cebolla.",
+       "Rocía con 2 cda de aceite de oliva, agrega el ajo picado, la ralladura y el jugo de limón, y sazona con sal y pimienta.",
+       "Hornea 35 minutos, hasta que la piel esté dorada y el interior alcance 74 °C (jugos claros).",
+       "Sirve caliente, acompañado de una ensalada verde si lo deseas."
+      ],
+      "tips": [
+       "Para una piel más crujiente, sube la temperatura a 220 °C los últimos 5 minutos.",
+       "Puedes usar hierbas secas como tomillo o romero (añadir al final)."
+      ],
+      "image_prompt": "Professional food photography, roasted chicken thighs with colorful bell peppers and caramelized onions, rustic oven dish, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.25,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Salmón a la plancha con salsa de limón y arroz blanco",
+     "recipe": {
+      "title": "Salmón a la plancha con salsa de limón y arroz blanco",
+      "description": "Filetes de salmón frescos, cocidos a la plancha y bañados en una ligera salsa de limón, servidos sobre arroz blanco esponjoso.",
+      "difficulty": "easy",
+      "prep_time": 5,
+      "cook_time": 20,
+      "total_time": 25,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "salmón",
+        "quantity": "2",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-2"
+       },
+       {
+        "name": "arroz",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "es-mixte-noms-fr-3"
+       },
+       {
+        "name": "limón",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-8"
+       },
+       {
+        "name": "ajo",
+        "quantity": "1",
+        "unit": "diente",
+        "pantry_id": "es-mixte-noms-fr-7"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "1",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta negra",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "salmón",
+       "arroz",
+       "limón",
+       "ajo"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Enjuaga el arroz bajo agua fría hasta que el agua salga clara.",
+       "Colócalo en una olla con 400 ml de agua, lleva a fuego medio y, cuando hierva, reduce a fuego bajo y cocina 15 minutos tapado, hasta que el agua se absorba y el arroz esté tierno.",
+       "Mientras se cuece el arroz, calienta 1 cda de aceite de oliva en una sartén a fuego medio‑alto.",
+       "Sazona los filetes de salmón con sal y pimienta; colócalos en la sartén y cocina 4 minutos por cada lado, hasta que alcancen 63 °C en el centro y la carne se vuelva opaca y se deshaga fácilmente en láminas.",
+       "Retira el salmón y reserva caliente.",
+       "En la misma sartén, añade el ajo picado y sofríe 30 segundos a fuego medio.",
+       "Agrega el jugo de medio limón y una pizca de sal; cocina 2 minutos, sin que hierva, hasta que la salsa espese ligeramente.",
+       "Sirve el arroz en platos, coloca encima el salmón y vierte la salsa de limón por encima."
+      ],
+      "tips": [
+       "No sobrecargues la sartén; cocina los filetes en tandas si es necesario.",
+       "Para más frescura, decora con ralladura de limón adicional."
+      ],
+      "image_prompt": "Professional food photography, pan-seared salmon fillets on a bed of fluffy white rice, drizzle of lemon sauce, bright plate, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.5,
+      "timed_cooking": 0.8,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Sopa reconfortante de tomate, pimiento y arroz con trozos de pollo",
+     "recipe": {
+      "title": "Sopa reconfortante de tomate, pimiento y arroz con trozos de pollo",
+      "description": "Una sopa ligera pero sustanciosa, con base de tomate y pimiento, arroz y tiernos trozos de muslo de pollo, perfecta para una cena rápida.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 30,
+      "total_time": 40,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "muslo de pollo",
+        "quantity": "2",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-1"
+       },
+       {
+        "name": "tomate",
+        "quantity": "4",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-6"
+       },
+       {
+        "name": "pimiento",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-5"
+       },
+       {
+        "name": "cebolla",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-fr-4"
+       },
+       {
+        "name": "ajo",
+        "quantity": "2",
+        "unit": "diente",
+        "pantry_id": "es-mixte-noms-fr-7"
+       },
+       {
+        "name": "arroz",
+        "quantity": "100",
+        "unit": "g",
+        "pantry_id": "es-mixte-noms-fr-3"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "1",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta negra",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "muslo de pollo",
+       "tomate",
+       "pimiento",
+       "cebolla",
+       "ajo",
+       "arroz"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Corta los muslos de pollo en cubos de 2 cm.",
+       "Pela y pica la cebolla; corta el pimiento en tiras y los tomates en cuartos.",
+       "Calienta 1 cda de aceite de oliva en una olla grande a fuego medio.",
+       "Añade la cebolla y el ajo picado; sofríe 3 minutos, hasta que la cebolla esté translúcida.",
+       "Incorpora los cubos de pollo y dóralos 5 minutos, removiendo, hasta que alcancen 74 °C en el centro.",
+       "Agrega el pimiento y los tomates; cocina 4 minutos más, hasta que los tomates empiecen a deshacerse.",
+       "Vierte 1 l de agua, lleva a ebullición y reduce a fuego bajo.",
+       "Añade el arroz y cocina 15 minutos, removiendo ocasionalmente, hasta que el arroz esté tierno.",
+       "Sazona con sal y pimienta al gusto.",
+       "Retira del fuego y sirve caliente."
+      ],
+      "tips": [
+       "Si prefieres una textura más cremosa, tritura una parte de la sopa con una batidora de mano antes de añadir el arroz.",
+       "Puedes agregar una hoja de laurel al caldo para más aroma."
+      ],
+      "image_prompt": "Professional food photography, hearty tomato and pepper soup with rice and chicken pieces, steaming bowl, rustic kitchen setting, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 0.8333333333333334,
+      "missing_in_steps": [
+       "tomate"
+      ],
+      "quantities_in_steps": 0.75,
+      "timed_cooking": 0.8,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 10,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    }
+   ]
+  },
+  {
+   "id": "es-mixte-noms-en",
+   "note": "Langues mélangées : noms en anglais, receta en español ; cerdo urgente y gambas",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 6508,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [],
+    "corrected": [],
+    "replaced": [],
+    "dropped": []
+   },
+   "examples": [],
+   "diversity_auto": 0.7897435897435897,
+   "diversity_judge": null,
+   "diversity_comment": null,
+   "judge_model": null,
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [],
+     "corrected": [],
+     "replaced": [],
+     "dropped": []
+    },
+    "examples": [],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "es-mixte-noms-en-1",
+      "name": "pork chops",
+      "quantity": "4",
+      "daysLeft": 0,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "es-mixte-noms-en-2",
+      "name": "shrimp",
+      "quantity": "300 g",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "es-mixte-noms-en-3",
+      "name": "potatoes",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "es-mixte-noms-en-4",
+      "name": "onion",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "es-mixte-noms-en-5",
+      "name": "bell peppers",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "es-mixte-noms-en-6",
+      "name": "rice",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "es-mixte-noms-en-7",
+      "name": "garlic",
+      "quantity": "1 head",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 6508,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 1,
+      "ms": 6494,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.30022685,
+       "prompt_tokens": 2272,
+       "prompt_time": 0.098600332,
+       "completion_tokens": 2893,
+       "completion_time": 6.053106973,
+       "total_tokens": 5165,
+       "total_time": 6.151707305,
+       "completion_tokens_details": {
+        "reasoning_tokens": 168
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "471738",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244565"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Chuletas de cerdo al horno con papas y pimientos asados",
+     "recipe": {
+      "title": "Chuletas de cerdo al horno con papas y pimientos asados",
+      "description": "Jugosas chuletas de cerdo acompañadas de papas doradas y pimientos tiernos, todo al horno. Ideal para un almuerzo equilibrado y fácil de preparar con antelación.",
+      "difficulty": "easy",
+      "prep_time": 15,
+      "cook_time": 30,
+      "total_time": 45,
+      "servings": 4,
+      "meal_type": "lunch",
+      "cuisine": "any",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "chuletas de cerdo",
+        "quantity": "4",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-en-1"
+       },
+       {
+        "name": "papas",
+        "quantity": "600",
+        "unit": "g",
+        "pantry_id": "es-mixte-noms-en-3"
+       },
+       {
+        "name": "pimientos",
+        "quantity": "2",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-en-5"
+       },
+       {
+        "name": "cebolla",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-en-4"
+       },
+       {
+        "name": "ajo",
+        "quantity": "2",
+        "unit": "diente",
+        "pantry_id": "es-mixte-noms-en-7"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "chuletas de cerdo",
+       "papas",
+       "pimientos",
+       "cebolla",
+       "ajo"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Precalienta el horno a 200°C.",
+       "Corta las papas en cubos de 2 cm y los pimientos en tiras. Pela y corta la cebolla en juliana.",
+       "Pela los 2 dientes de ajo y pícalos finamente.",
+       "En una bandeja para horno, mezcla las papas, los pimientos y la cebolla con 1 cda de aceite de oliva, la sal y la pimienta. Distribúyelos en una sola capa.",
+       "Hornea durante 15 minutos.",
+       "Mientras tanto, sazona las chuletas de cerdo con una pizca de sal, pimienta y el ajo picado.",
+       "Retira la bandeja del horno, abre espacio y coloca las chuletas encima de las verduras.",
+       "Rocía las chuletas con la segunda cda de aceite de oliva.",
+       "Hornea otros 20 minutos, o hasta que la temperatura interna de la carne alcance 63°C y los jugos salgan claros.",
+       "Deja reposar 3 minutos antes de servir."
+      ],
+      "tips": [
+       "Puedes preparar las verduras con antelación y guardarlas en la nevera; solo añade la carne al horno cuando vayas a cocinar.",
+       "Si te gustan las verduras más crujientes, aumenta la temperatura a 220°C los últimos 5 minutos."
+      ],
+      "image_prompt": "Professional food photography, baked pork chops with golden roasted potatoes and colorful bell peppers, rustic oven dish, natural light, garnish of fresh parsley"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.5,
+      "timed_cooking": 0.4,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 10,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Arroz frito con camarones, cebolla y pimiento",
+     "recipe": {
+      "title": "Arroz frito con camarones, cebolla y pimiento",
+      "description": "Un arroz frito rápido y sabroso con camarones jugosos, cebolla caramelizada y pimiento crujiente. Perfecto para un almuerzo listo en menos de una hora.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 20,
+      "total_time": 30,
+      "servings": 4,
+      "meal_type": "lunch",
+      "cuisine": "any",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "camarones",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "es-mixte-noms-en-2"
+       },
+       {
+        "name": "arroz",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "es-mixte-noms-en-6"
+       },
+       {
+        "name": "cebolla",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-en-4"
+       },
+       {
+        "name": "pimientos",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-en-5"
+       },
+       {
+        "name": "ajo",
+        "quantity": "2",
+        "unit": "diente",
+        "pantry_id": "es-mixte-noms-en-7"
+       },
+       {
+        "name": "aceite de sésamo",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "salsa de soja sin gluten",
+        "quantity": "3",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "camarones",
+       "arroz",
+       "cebolla",
+       "pimientos",
+       "ajo"
+      ],
+      "missing_ingredients": [
+       "salsa de soja sin gluten"
+      ],
+      "instructions": [
+       "Enjuaga el arroz y escúrrelo bien.",
+       "Cocina el arroz en una olla con 600 ml de agua a fuego medio hasta que absorba todo el líquido, unos 15 minutos. Extiende el arroz en una bandeja para que se enfríe rápidamente.",
+       "Pela y pica finamente los 2 dientes de ajo.",
+       "Corta la cebolla en cubos pequeños y el pimiento en tiras finas.",
+       "En una sartén grande o wok, calienta 1 cda de aceite de sésamo a fuego medio‑alto.",
+       "Añade la cebolla y sofríe 3 minutos, hasta que esté transparente.",
+       "Incorpora el ajo y el pimiento; cocina 2 minutos más, manteniendo el color crujiente del pimiento.",
+       "Agrega los camarones y saltea 4 minutos, hasta que cambien a color rosa y alcancen 63°C en el centro.",
+       "Empuja la mezcla a un lado de la sartén, añade la segunda cda de aceite de sésamo y vierte el arroz frío.",
+       "Saltea el arroz 5 minutos, mezclando con los vegetales y camarones, hasta que esté bien caliente y ligeramente dorado.",
+       "Añade la salsa de soja, la sal y la pimienta; mezcla bien y cocina 1 minuto más.",
+       "Sirve inmediatamente."
+      ],
+      "tips": [
+       "Usa arroz del día anterior para que quede más suelto al freír.",
+       "Si deseas un toque picante, agrega una pizca de chile en polvo al final."
+      ],
+      "image_prompt": "Professional food photography, wok with bright yellow fried rice, pink shrimp, orange bell pepper strips and green onion, high contrast, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.5,
+      "timed_cooking": 0.8571428571428571,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 12,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Sopa reconfortante de papa, cebolla y camarones",
+     "recipe": {
+      "title": "Sopa reconfortante de papa, cebolla y camarones",
+      "description": "Una sopa cremosa de papas y cebolla con camarones al final, perfecta para los días más fríos y fácil de preparar en menos de una hora.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 35,
+      "total_time": 45,
+      "servings": 4,
+      "meal_type": "lunch",
+      "cuisine": "any",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "camarones",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "es-mixte-noms-en-2"
+       },
+       {
+        "name": "papas",
+        "quantity": "500",
+        "unit": "g",
+        "pantry_id": "es-mixte-noms-en-3"
+       },
+       {
+        "name": "cebolla",
+        "quantity": "1",
+        "unit": "pieza",
+        "pantry_id": "es-mixte-noms-en-4"
+       },
+       {
+        "name": "ajo",
+        "quantity": "2",
+        "unit": "diente",
+        "pantry_id": "es-mixte-noms-en-7"
+       },
+       {
+        "name": "caldo de verduras",
+        "quantity": "1",
+        "unit": "l",
+        "pantry_id": null
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "camarones",
+       "papas",
+       "cebolla",
+       "ajo"
+      ],
+      "missing_ingredients": [
+       "caldo de verduras"
+      ],
+      "instructions": [
+       "Pela las papas y córtalas en cubos de 2 cm.",
+       "Pela y pica finamente los 2 dientes de ajo.",
+       "Corta la cebolla en cubos medianos.",
+       "En una olla grande, calienta 2 cda de aceite de oliva a fuego medio.",
+       "Añade la cebolla y sofríe 5 minutos, hasta que esté translúcida.",
+       "Incorpora el ajo y cocina 1 minuto más.",
+       "Agrega los cubos de papa y vierte el caldo de verduras.",
+       "Lleva a ebullición, reduce a fuego medio‑bajo y cocina 20 minutos, hasta que la papa esté tierna (pincha y la broca entra sin resistencia).",
+       "Mientras la sopa hierve, limpia los camarones y sécalos.",
+       "Cuando la papa esté cocida, usa una licuadora de inmersión para triturar la sopa hasta obtener una textura cremosa; si queda muy espesa, añade 100 ml de agua caliente.",
+       "Regresa la sopa a la olla, lleva a fuego medio y añade los camarones.",
+       "Cocina 4 minutos, hasta que los camarones alcancen 63°C y la carne sea opaca.",
+       "Sazona con sal y pimienta al gusto.",
+       "Sirve caliente, acompañada de pan crujiente si lo deseas."
+      ],
+      "tips": [
+       "Para una versión más cremosa, agrega 50 ml de leche de coco al final (no cuenta como ingrediente extra).",
+       "Esta sopa se conserva bien refrigerada y se puede recalentar rápidamente."
+      ],
+      "image_prompt": "Professional food photography, creamy potato and shrimp soup in a white bowl, steam rising, garnish of chopped parsley, rustic wooden table, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.3333333333333333,
+      "timed_cooking": 0.6666666666666666,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 14,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    }
+   ]
+  },
+  {
+   "id": "en-mixte-noms-es",
+   "note": "Langues mélangées : noms en espagnol, recipe in English ; viande hachée urgente et merlu",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 8899,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [
+     {
+      "title": "Beef and Potato Hash with Fried Egg",
+      "issues": [
+       {
+        "code": "core_temperature",
+        "ingredient": "ground beef",
+        "message": "« ground beef » : écrire la température à cœur (viande hachée ou saucisse : 71 °C à cœur et plus rosée au centre)."
+       }
+      ]
+     }
+    ],
+    "corrected": [
+     "Beef and Potato Hash with Fried Egg"
+    ],
+    "replaced": [],
+    "dropped": []
+   },
+   "examples": [],
+   "diversity_auto": 0.8070512820512821,
+   "diversity_judge": null,
+   "diversity_comment": null,
+   "judge_model": null,
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [
+      {
+       "title": "Beef and Potato Hash with Fried Egg",
+       "issues": [
+        {
+         "code": "core_temperature",
+         "ingredient": "ground beef",
+         "message": "« ground beef » : écrire la température à cœur (viande hachée ou saucisse : 71 °C à cœur et plus rosée au centre)."
+        }
+       ]
+      }
+     ],
+     "corrected": [
+      "Beef and Potato Hash with Fried Egg"
+     ],
+     "replaced": [],
+     "dropped": []
+    },
+    "examples": [],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "en-mixte-noms-es-1",
+      "name": "carne picada",
+      "quantity": "500 g",
+      "daysLeft": 0,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "en-mixte-noms-es-2",
+      "name": "merluza",
+      "quantity": "2 filetes",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "en-mixte-noms-es-3",
+      "name": "patatas",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "en-mixte-noms-es-4",
+      "name": "cebolla",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "en-mixte-noms-es-5",
+      "name": "zanahorias",
+      "quantity": "3",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "en-mixte-noms-es-6",
+      "name": "arroz",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "en-mixte-noms-es-7",
+      "name": "huevos",
+      "quantity": "6",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 8899,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 2,
+      "ms": 5955,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.101839838,
+       "prompt_tokens": 2257,
+       "prompt_time": 0.010667054,
+       "completion_tokens": 2656,
+       "completion_time": 5.798410891,
+       "total_tokens": 4913,
+       "total_time": 5.809077945,
+       "prompt_tokens_details": {
+        "cached_tokens": 2048
+       },
+       "completion_tokens_details": {
+        "reasoning_tokens": 434
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "471811",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244339"
+       }
+      }
+     },
+     {
+      "provider": "groq",
+      "started_at_ms": 5987,
+      "ms": 2287,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.207322149,
+       "prompt_tokens": 2785,
+       "prompt_time": 0.157005127,
+       "completion_tokens": 910,
+       "completion_time": 1.884955087,
+       "total_tokens": 3695,
+       "total_time": 2.041960214,
+       "completion_tokens_details": {
+        "reasoning_tokens": 126
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "471844",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "243811"
+       }
+      }
+     },
+     {
+      "provider": "groq",
+      "started_at_ms": 5988,
+      "ms": 2900,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.020086698,
+       "prompt_tokens": 2263,
+       "prompt_time": 0.08364965,
+       "completion_tokens": 1286,
+       "completion_time": 2.758895247,
+       "total_tokens": 3549,
+       "total_time": 2.842544897,
+       "prompt_tokens_details": {
+        "cached_tokens": 256
+       },
+       "completion_tokens_details": {
+        "reasoning_tokens": 170
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "471844",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244333"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Beef and Potato Hash with Fried Egg",
+     "recipe": {
+      "title": "Beef and Potato Hash with Fried Egg",
+      "description": "A quick skillet dish that turns ground beef, potatoes, and carrots into a hearty hash, topped with a perfectly fried egg.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 20,
+      "total_time": 30,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "ground beef",
+        "quantity": "500",
+        "unit": "g",
+        "pantry_id": "en-mixte-noms-es-1"
+       },
+       {
+        "name": "potatoes",
+        "quantity": "400",
+        "unit": "g",
+        "pantry_id": "en-mixte-noms-es-3"
+       },
+       {
+        "name": "carrot",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-mixte-noms-es-5"
+       },
+       {
+        "name": "onion",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-mixte-noms-es-4"
+       },
+       {
+        "name": "egg",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-mixte-noms-es-7"
+       },
+       {
+        "name": "olive oil",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "black pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "ground beef",
+       "potatoes",
+       "carrot",
+       "onion",
+       "egg"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Dice the potatoes into 1 cm cubes and the carrots into similar‑size pieces; mince the onion.",
+       "Heat 1 tbsp olive oil in a large skillet over medium heat; add the onion and sauté 3 minutes, until translucent.",
+       "Add the ground beef, break it up, and cook 5 minutes, stirring, until browned and no longer pink. Continue cooking until the internal temperature reaches 71 °C, ensuring no pink remains in the centre.",
+       "Stir in the diced potatoes and carrots, season with salt and pepper, and spread evenly.",
+       "Cover and cook on medium heat for 12 minutes, stirring halfway, until the potatoes are tender and golden‑brown on the edges.",
+       "In a separate small pan, heat the remaining 1 tbsp olive oil over medium‑high heat; crack the eggs and fry 3 minutes, until whites are set and edges are crisp, yolk still runny.",
+       "Slide the hash onto plates, top each with a fried egg, and serve immediately."
+      ],
+      "tips": [
+       "Cut potatoes uniformly so they cook evenly.",
+       "If you prefer a fully set yolk, cook the egg an extra minute longer."
+      ],
+      "image_prompt": "Professional food photography, rustic skillet beef and potato hash topped with a golden fried egg, wooden board, natural light, close‑up"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.5,
+      "timed_cooking": 0.8,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 7,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Baked Merluza with Herbed Veggie Rice",
+     "recipe": {
+      "title": "Baked Merluza with Herbed Veggie Rice",
+      "description": "Oven‑baked white fish fillets paired with fluffy rice cooked with carrots and onions, a light and digestible dinner.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 35,
+      "total_time": 45,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "merluza fillet",
+        "quantity": "2",
+        "unit": "piece",
+        "pantry_id": "en-mixte-noms-es-2"
+       },
+       {
+        "name": "rice",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "en-mixte-noms-es-6"
+       },
+       {
+        "name": "carrot",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-mixte-noms-es-5"
+       },
+       {
+        "name": "onion",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-mixte-noms-es-4"
+       },
+       {
+        "name": "olive oil",
+        "quantity": "3",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "black pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "fresh parsley (optional)",
+        "quantity": "1",
+        "unit": "tbsp",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "merluza fillet",
+       "rice",
+       "carrot",
+       "onion"
+      ],
+      "missing_ingredients": [
+       "fresh parsley (optional)"
+      ],
+      "instructions": [
+       "Preheat the oven to 200°C.",
+       "Rinse the rice under cold water until the water runs clear; set aside.",
+       "Finely dice the onion and grate the carrot.",
+       "In a saucepan, heat 2 tbsp olive oil over medium heat; add the onion and sauté 4 minutes, until softened.",
+       "Add the grated carrot and rice, stir 1 minute to coat the grains.",
+       "Pour 400 ml water, add a pinch of salt, bring to a boil, then reduce to low heat, cover, and simmer 15 minutes, until rice is tender and water absorbed.",
+       "While the rice cooks, place the merluza fillets on a baking tray lined with parchment.",
+       "Drizzle the remaining 1 tbsp olive oil over the fish, season with salt and pepper.",
+       "Bake in the preheated oven for 12 minutes, until the flesh flakes easily with a fork and is opaque (internal temperature ~63°C).",
+       "Fluff the rice with a fork, sprinkle chopped parsley if using, plate the rice, and top with the baked merluza."
+      ],
+      "tips": [
+       "Do not over‑cook the fish; it stays moist when removed promptly at 63°C.",
+       "For extra flavor, add a squeeze of lemon just before serving."
+      ],
+      "image_prompt": "Professional food photography, baked white fish fillet on a white plate beside fluffy herb‑infused rice, bright natural light, minimalistic style"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.6,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 10,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Creamy Carrot‑Potato Soup",
+     "recipe": {
+      "title": "Creamy Carrot‑Potato Soup",
+      "description": "A smooth, comforting soup made from carrots, potatoes, and onion, blended to a velvety texture and finished with a drizzle of olive oil.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 30,
+      "total_time": 40,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:vegetarian",
+       "diet:gluten-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "potatoes",
+        "quantity": "500",
+        "unit": "g",
+        "pantry_id": "en-mixte-noms-es-3"
+       },
+       {
+        "name": "carrot",
+        "quantity": "3",
+        "unit": "piece",
+        "pantry_id": "en-mixte-noms-es-5"
+       },
+       {
+        "name": "onion",
+        "quantity": "1",
+        "unit": "piece",
+        "pantry_id": "en-mixte-noms-es-4"
+       },
+       {
+        "name": "olive oil",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "water",
+        "quantity": "800",
+        "unit": "ml",
+        "pantry_id": null
+       },
+       {
+        "name": "salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "black pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "potatoes",
+       "carrot",
+       "onion"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Peel and dice the potatoes into 1‑cm cubes; peel and slice the carrots; finely chop the onion.",
+       "In a large pot, heat 2 tbsp olive oil over medium heat; add the onion and sauté 4 minutes, until translucent.",
+       "Add the diced potatoes and carrot slices, stir for 1 minute.",
+       "Pour in 800 ml water, season with salt and pepper, and bring to a boil over medium‑high heat.",
+       "Reduce heat to a gentle simmer and cook 20 minutes, until the vegetables are very tender and a fork slides easily.",
+       "Remove the pot from heat; using an immersion blender, purée the soup until completely smooth, the surface should be glossy and no large pieces remain.",
+       "Return the pot to low heat for 2 minutes to re‑warm, then ladle into bowls and drizzle a thin swirl of olive oil on each serving."
+      ],
+      "tips": [
+       "For extra creaminess without dairy, add a splash of oat milk at the end (optional).",
+       "Adjust thickness by adding more water if the soup is too dense."
+      ],
+      "image_prompt": "Professional food photography, creamy orange carrot‑potato soup in a white bowl, drizzle of olive oil, fresh parsley garnish, soft natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0,
+      "timed_cooking": 0.6,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 0,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 7,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    }
+   ]
+  },
+  {
+   "id": "fr-mixte-noms-en-es",
+   "note": "Langues mélangées : noms en anglais et en espagnol, recette en français ; poulet urgent et thon frais",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 6769,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [],
+    "corrected": [],
+    "replaced": [],
+    "dropped": []
+   },
+   "examples": [],
+   "diversity_auto": 0.8915032679738562,
+   "diversity_judge": null,
+   "diversity_comment": null,
+   "judge_model": null,
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [],
+     "corrected": [],
+     "replaced": [],
+     "dropped": []
+    },
+    "examples": [],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "fr-mixte-noms-en-es-1",
+      "name": "chicken thighs",
+      "quantity": "4",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "fr-mixte-noms-en-es-2",
+      "name": "atún fresco",
+      "quantity": "2 filetes",
+      "daysLeft": 2,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "fr-mixte-noms-en-es-3",
+      "name": "papas",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "fr-mixte-noms-en-es-4",
+      "name": "onions",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "fr-mixte-noms-en-es-5",
+      "name": "tomatoes",
+      "quantity": "4",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "fr-mixte-noms-en-es-6",
+      "name": "pasta",
+      "quantity": "500 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "fr-mixte-noms-en-es-7",
+      "name": "queso",
+      "quantity": "200 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 6769,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 3,
+      "ms": 6732,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.209341624,
+       "prompt_tokens": 2259,
+       "prompt_time": 0.153918075,
+       "completion_tokens": 3003,
+       "completion_time": 6.331253729,
+       "total_tokens": 5262,
+       "total_time": 6.485171804,
+       "completion_tokens_details": {
+        "reasoning_tokens": 553
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "471889",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244363"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Poulet mijoté aux tomates et pommes de terre",
+     "recipe": {
+      "title": "Poulet mijoté aux tomates et pommes de terre",
+      "description": "Un plat réconfortant où les cuisses de poulet fondent dans une sauce tomate parfumée, accompagnées de pommes de terre fondantes.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 35,
+      "total_time": 45,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "cuisses de poulet",
+        "quantity": "4",
+        "unit": "pièces",
+        "pantry_id": "fr-mixte-noms-en-es-1"
+       },
+       {
+        "name": "tomates",
+        "quantity": "4",
+        "unit": "pièces",
+        "pantry_id": "fr-mixte-noms-en-es-5"
+       },
+       {
+        "name": "pommes de terre",
+        "quantity": "600",
+        "unit": "g",
+        "pantry_id": "fr-mixte-noms-en-es-3"
+       },
+       {
+        "name": "oignon",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-mixte-noms-en-es-4"
+       },
+       {
+        "name": "persil frais",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "huile d'olive",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "cuisses de poulet",
+       "tomates",
+       "pommes de terre",
+       "oignon"
+      ],
+      "missing_ingredients": [
+       "persil frais"
+      ],
+      "instructions": [
+       "Émince l'oignon.",
+       "Dans une cocotte, fais chauffer 2 c. à soupe d'huile d'olive à feu moyen, puis fais dorer les 4 cuisses de poulet 4 minutes de chaque côté, jusqu'à ce qu'elles soient bien colorées.",
+       "Retire le poulet et réserve-le.",
+       "Ajoute l'oignon émincé dans la cocotte et fais-le suer 3 minutes, jusqu'à ce qu'il devienne translucide.",
+       "Coupe les tomates en dés et ajoute-les, puis laisse cuire 5 minutes à feu moyen, jusqu'à ce qu'elles commencent à se décomposer.",
+       "Coupe les pommes de terre en cubes de 2 cm, ajoute-les dans la cocotte, puis remets le poulet dessus.",
+       "Couvre d'eau à hauteur des ingrédients, porte à ébullition, puis baisse le feu à doux et laisse mijoter 25 minutes, jusqu'à ce que les pommes de terre soient tendres et le poulet cuit à cœur (atteindre 74 °C).",
+       "Assaisonne avec sel et poivre, parsème de persil frais haché et sers chaud."
+      ],
+      "tips": [
+       "Pour un goût plus profond, ajoute une feuille de laurier avec les tomates.",
+       "Si tu aimes les sauces plus épaisses, retire le couvercle les 5 dernières minutes pour réduire le jus."
+      ],
+      "image_prompt": "Professional food photography, rustic chicken stew with red tomatoes and golden potatoes, simmering pot, warm natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.75,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Filets de thon au four, pommes de terre rôties et fromage gratiné",
+     "recipe": {
+      "title": "Filets de thon au four, pommes de terre rôties et fromage gratiné",
+      "description": "Des filets de thon frais cuits au four, accompagnés de pommes de terre croustillantes et d'une couche de fromage fondant.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 30,
+      "total_time": 40,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "filets de thon frais",
+        "quantity": "2",
+        "unit": "pièces",
+        "pantry_id": "fr-mixte-noms-en-es-2"
+       },
+       {
+        "name": "pommes de terre",
+        "quantity": "400",
+        "unit": "g",
+        "pantry_id": "fr-mixte-noms-en-es-3"
+       },
+       {
+        "name": "fromage",
+        "quantity": "100",
+        "unit": "g",
+        "pantry_id": "fr-mixte-noms-en-es-7"
+       },
+       {
+        "name": "citron",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": null
+       },
+       {
+        "name": "huile d'olive",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "filets de thon frais",
+       "pommes de terre",
+       "fromage"
+      ],
+      "missing_ingredients": [
+       "citron"
+      ],
+      "instructions": [
+       "Préchauffe le four à 200 °C.",
+       "Lave les pommes de terre, coupe-les en quartiers et dépose-les sur une plaque de cuisson.",
+       "Arrose les pommes de terre avec 1 c. à soupe d'huile d'olive, sale et poivre, puis mélange pour bien les enrober.",
+       "Enfourne les pommes de terre 20 minutes, jusqu'à ce qu'elles soient dorées et tendres à cœur.",
+       "Pendant ce temps, place les filets de thon sur une deuxième plaque, arrose-les avec le reste d'huile d'olive, sale, poivre et presse le jus du citron dessus.",
+       "Après les 20 minutes, ajoute le thon dans le four et poursuis la cuisson 10 minutes, jusqu'à ce que le centre atteigne 63 °C (chair opaque).",
+       "Sors la plaque, répartis le fromage râpé sur les filets de thon et les pommes de terre, puis remets au four 3 minutes supplémentaires, jusqu'à ce que le fromage soit fondu et légèrement doré.",
+       "Sers immédiatement, accompagné d'un filet de citron si désiré."
+      ],
+      "tips": [
+       "Utilise du fromage à pâte dure comme le gruyère pour un gratin plus croustillant.",
+       "Pour plus de saveur, ajoute des herbes de Provence aux pommes de terre avant la cuisson."
+      ],
+      "image_prompt": "Professional food photography, baked tuna fillets with golden roasted potatoes and melted cheese, crisp edges, bright plate, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.3333333333333333,
+      "timed_cooking": 0.6,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Salade de pâtes froide au fromage, tomates et oignons",
+     "recipe": {
+      "title": "Salade de pâtes froide au fromage, tomates et oignons",
+      "description": "Une salade de pâtes estivale, rafraîchissante, agrémentée de dés de tomates, d'oignon rouge et de dés de fromage, parfaite pour un dîner léger.",
+      "difficulty": "easy",
+      "prep_time": 15,
+      "cook_time": 12,
+      "total_time": 27,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:vegetarian"
+      ],
+      "ingredients_used": [
+       {
+        "name": "pâtes",
+        "quantity": "250",
+        "unit": "g",
+        "pantry_id": "fr-mixte-noms-en-es-6"
+       },
+       {
+        "name": "tomates",
+        "quantity": "3",
+        "unit": "pièces",
+        "pantry_id": "fr-mixte-noms-en-es-5"
+       },
+       {
+        "name": "oignon",
+        "quantity": "1",
+        "unit": "pièce",
+        "pantry_id": "fr-mixte-noms-en-es-4"
+       },
+       {
+        "name": "fromage",
+        "quantity": "80",
+        "unit": "g",
+        "pantry_id": "fr-mixte-noms-en-es-7"
+       },
+       {
+        "name": "vinaigre de vin rouge",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "huile d'olive",
+        "quantity": "3",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "pâtes",
+       "tomates",
+       "oignon",
+       "fromage"
+      ],
+      "missing_ingredients": [
+       "vinaigre de vin rouge"
+      ],
+      "instructions": [
+       "Porte une grande casserole d'eau salée à ébullition, ajoute les 250 g de pâtes et cuis 9 minutes à feu moyen, jusqu'à ce qu'elles soient al dente.",
+       "Égoutte les pâtes, rince-les à l'eau froide pour les refroidir rapidement, puis étale-les sur un plat pour les laisser sécher légèrement.",
+       "Pendant que les pâtes cuisent, coupe les tomates en dés et l'oignon en fines rondelles.",
+       "Coupe le fromage en petits cubes.",
+       "Dans un grand saladier, mélange les pâtes refroidies, les dés de tomates, les rondelles d'oignon et les cubes de fromage.",
+       "Prépare la vinaigrette en fouettant 3 c. à soupe d'huile d'olive, 2 c. à soupe de vinaigre de vin rouge, sel et poivre.",
+       "Verse la vinaigrette sur la salade, mélange bien et laisse reposer 5 minutes avant de servir."
+      ],
+      "tips": [
+       "Pour plus de fraîcheur, ajoute des feuilles de basilic ou de la menthe hachée.",
+       "Si tu veux une version sans gluten, remplace les pâtes par du quinoa ou du riz complet."
+      ],
+      "suggestion": "Idéal aussi en déjeuner léger",
+      "image_prompt": "Professional food photography, cold pasta salad with colorful tomato cubes, red onion rings, white cheese cubes, bright vinaigrette, summer outdoor setting"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.75,
+      "timed_cooking": 0.5,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 0,
+      "rules_respected": 1,
+      "forbidden": [],
+      "steps": 7,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,402 @@
+[
+  {
+    "name": "Ndolé",
+    "country": "Cameroun (Littoral)",
+    "ingredients": ["feuilles de ndolé (vernonia) lavées", "arachides crues pilées", "crevettes séchées ou fraîches", "viande de bœuf ou poisson fumé", "oignon", "ail et gingembre"],
+    "techniques": ["laver et presser les feuilles pour l'amertume", "mijoter dans la pâte d'arachide"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Eru",
+    "country": "Cameroun (Sud-Ouest)",
+    "ingredients": ["feuilles d'eru (gnetum) émincées", "feuilles de waterleaf ou épinards", "huile de palme", "viande, peau de bœuf (kanda) et poisson fumé", "écrevisses séchées", "piment"],
+    "techniques": ["émincer très finement les feuilles", "cuire les feuilles d'eru dans l'huile de palme"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Okok sucré ou salé",
+    "country": "Cameroun (Centre, Sud), Gabon (nkoumou)",
+    "ingredients": ["feuilles de gnetum (okok) émincées", "pâte d'arachide ou jus de noix de palme", "sucre (version sucrée) ou poisson fumé (version salée)", "bâtons de manioc"],
+    "techniques": ["piler ou émincer les feuilles", "mijoter avec l'arachide"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Koki",
+    "country": "Cameroun",
+    "ingredients": ["niébé décortiqué mixé", "huile de palme rouge", "piment", "sel", "feuilles de bananier (cuisson)", "feuilles de taro ou macabo (souvent)"],
+    "techniques": ["mixer les haricots en pâte", "envelopper en feuilles et cuire à la vapeur"],
+    "moments": ["lunch", "dinner", "breakfast"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Beignets-haricots-bouillie (BHB)",
+    "country": "Cameroun",
+    "ingredients": ["farine", "levure", "sucre", "haricots rouges en sauce", "bouillie de maïs"],
+    "techniques": ["frire des beignets levés", "mijoter les haricots", "cuire la bouillie de maïs"],
+    "moments": ["breakfast"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Bouillie de maïs",
+    "country": "Cameroun, Congo, RDC, Centrafrique",
+    "ingredients": ["farine de maïs (ou maïs fermenté)", "eau", "sucre", "jus de citron ou lait (selon les maisons)"],
+    "techniques": ["délayer la farine", "cuire en remuant"],
+    "moments": ["breakfast"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Puff-puff (beignets, mikate)",
+    "country": "Cameroun, Congo, RDC, Gabon, Centrafrique",
+    "ingredients": ["farine", "levure", "sucre", "eau", "huile de friture"],
+    "techniques": ["laisser lever la pâte", "frire en boules"],
+    "moments": ["breakfast", "snack"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Accra banane (beignets de plantain mûr)",
+    "country": "Cameroun",
+    "ingredients": ["bananes plantains très mûres ou bananes douces", "farine de maïs ou de blé", "sucre", "huile de friture"],
+    "techniques": ["écraser les bananes avec la farine", "frire en petits beignets"],
+    "moments": ["snack", "breakfast"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Omelette spaghetti",
+    "country": "Cameroun",
+    "ingredients": ["spaghetti cuits", "œufs", "oignon", "tomate", "piment", "pain (souvent)"],
+    "techniques": ["mélanger pâtes et œufs battus", "cuire en omelette à la poêle"],
+    "moments": ["breakfast", "snack"],
+    "diet": "vegetarian"
+  },
+  {
+    "name": "Corn chaff",
+    "country": "Cameroun (Nord-Ouest, Ouest)",
+    "ingredients": ["maïs sec", "haricots", "huile de palme", "oignon", "tomate", "piment"],
+    "techniques": ["cuire longuement maïs et haricots", "mijoter avec huile de palme et tomate"],
+    "moments": ["breakfast", "lunch", "dinner"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Achu et sauce jaune",
+    "country": "Cameroun (Nord-Ouest)",
+    "ingredients": ["taro pilé (achu)", "huile de palme", "eau de cendres (potasse)", "épices (nkui, poivre de Penja)", "viande ou tripes", "feuilles vertes (huckleberry)"],
+    "techniques": ["piler le taro bouilli", "émulsionner l'huile de palme avec la potasse"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Taro sauce jaune",
+    "country": "Cameroun (Ouest, Bamiléké)",
+    "ingredients": ["taro pilé", "huile de palme", "sel gemme ou potasse", "épices (njansang, poivre blanc)", "viande, peau de bœuf ou poisson fumé", "feuilles de taro"],
+    "techniques": ["piler le taro", "émulsionner l'huile de palme dans la sauce"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Mbongo tchobi",
+    "country": "Cameroun (Bassa)",
+    "ingredients": ["épices mbongo grillées (graines noircies)", "poisson (carpe, maquereau) ou viande", "oignon", "ail et gingembre", "tomate", "plantain ou bâtons de manioc"],
+    "techniques": ["griller et piler les épices", "mijoter le poisson dans la sauce noire"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Mintumba",
+    "country": "Cameroun (Centre, Sud)",
+    "ingredients": ["pâte de manioc fermentée", "huile de palme", "sel", "sucre ou piment", "feuilles de bananier"],
+    "techniques": ["mélanger la pâte à l'huile de palme", "envelopper et cuire à la vapeur"],
+    "moments": ["snack", "lunch"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Sanga",
+    "country": "Cameroun (Centre)",
+    "ingredients": ["maïs frais", "feuilles de morelle noire (zom) ou épinards", "jus de noix de palme", "sucre (souvent)"],
+    "techniques": ["mixer le maïs", "cuire avec les feuilles et le jus de palme"],
+    "moments": ["lunch", "dinner"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Folong (sauce aux feuilles)",
+    "country": "Cameroun (Centre, Sud)",
+    "ingredients": ["feuilles de folong (amarante)", "pâte d'arachide ou jus de palme", "poisson fumé ou crevettes", "oignon", "piment"],
+    "techniques": ["hacher les feuilles", "mijoter avec l'arachide"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Kpwem (feuilles de manioc à l'arachide)",
+    "country": "Cameroun (Est)",
+    "ingredients": ["feuilles de manioc pilées", "pâte d'arachide ou jus de noix de palme", "poisson fumé ou viande", "piment"],
+    "techniques": ["piler les feuilles", "cuire longuement avec l'arachide"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Ekwang",
+    "country": "Cameroun (Sud-Ouest)",
+    "ingredients": ["macabo (malanga) râpé", "feuilles de taro ou de macabo", "huile de palme", "poisson fumé et écrevisses", "piment"],
+    "techniques": ["rouler le macabo râpé dans les feuilles", "cuire en couches dans la sauce à l'huile de palme"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Kondrè",
+    "country": "Cameroun (Ouest)",
+    "ingredients": ["plantain vert", "viande (chèvre, bœuf)", "tomate", "oignon", "épices (njansang, gingembre, ail)", "huile de palme"],
+    "techniques": ["mijoter plantain et viande dans la sauce épicée"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Poulet DG",
+    "country": "Cameroun",
+    "ingredients": ["poulet", "bananes plantains mûres frites", "carotte", "haricots verts", "poivron", "tomate et oignon"],
+    "techniques": ["frire le poulet et le plantain", "faire sauter avec les légumes"],
+    "moments": ["dinner", "lunch"],
+    "diet": ""
+  },
+  {
+    "name": "Poisson braisé",
+    "country": "Cameroun, Gabon, Congo",
+    "ingredients": ["poisson entier (bar, maquereau, tilapia)", "ail", "gingembre", "oignon", "piment", "persil ou céleri"],
+    "techniques": ["mariner aux épices pilées", "griller à la braise"],
+    "moments": ["dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Soya (brochettes de bœuf)",
+    "country": "Cameroun, Tchad",
+    "ingredients": ["bœuf en fines lamelles", "poudre d'arachide", "épices (piment, gingembre, poivre)", "oignon"],
+    "techniques": ["enrober d'épices", "griller en brochettes"],
+    "moments": ["snack", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Plantain mûr frit et haricots",
+    "country": "Cameroun, Gabon",
+    "ingredients": ["bananes plantains mûres", "haricots rouges", "huile de palme ou huile", "oignon", "tomate"],
+    "techniques": ["frire le plantain", "mijoter les haricots en sauce"],
+    "moments": ["lunch", "dinner", "breakfast"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Sauce d'arachide (poulet ou poisson)",
+    "country": "Cameroun, Centrafrique, Tchad, Congo",
+    "ingredients": ["pâte d'arachide", "poulet, viande ou poisson fumé", "tomate", "oignon", "piment"],
+    "techniques": ["délayer la pâte d'arachide", "mijoter jusqu'à ce que l'huile remonte"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Bâtons de manioc (miondo, chikwangue, kwanga)",
+    "country": "Cameroun, Gabon, Congo, RDC, Centrafrique",
+    "ingredients": ["manioc roui (fermenté)", "feuilles de marantacée ou de bananier"],
+    "techniques": ["rouir et piler le manioc", "envelopper et cuire à la vapeur"],
+    "moments": ["lunch", "dinner", "breakfast"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Poulet nyembwe",
+    "country": "Gabon",
+    "ingredients": ["poulet", "nyembwe (crème de noix de palme)", "oignon", "ail", "tomate", "piment"],
+    "techniques": ["dorer le poulet", "mijoter dans la crème de palme"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Sauce odika (chocolat indigène)",
+    "country": "Gabon, Cameroun (sud)",
+    "ingredients": ["pain d'odika (amandes de mangue sauvage)", "poisson fumé ou viande", "piment", "oignon"],
+    "techniques": ["râper et faire fondre l'odika", "mijoter la viande ou le poisson dedans"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Atanga (safou) bouilli ou braisé",
+    "country": "Gabon, Cameroun, Congo, RDC",
+    "ingredients": ["safous (prunes africaines)", "sel", "pain ou bâton de manioc"],
+    "techniques": ["ramollir à l'eau chaude ou sur la braise"],
+    "moments": ["snack", "breakfast"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Saka-saka (pondu, ngunza)",
+    "country": "Congo, RDC, Centrafrique, Gabon",
+    "ingredients": ["feuilles de manioc pilées", "huile de palme", "oignon et ail", "poisson salé ou fumé (souvent)", "poireau ou aubergine", "pâte d'arachide (selon la région)"],
+    "techniques": ["piler les feuilles", "cuire longuement (plusieurs heures)"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Poulet à la moambe",
+    "country": "RDC, Congo, Gabon",
+    "ingredients": ["poulet", "moambe (sauce de noix de palme)", "oignon", "ail", "tomate", "piment"],
+    "techniques": ["dorer le poulet", "mijoter dans la sauce de palme"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Liboké de poisson",
+    "country": "Congo, RDC",
+    "ingredients": ["poisson (capitaine, tilapia, silure)", "tomate", "oignon", "ail", "piment", "feuilles de bananier ou de marantacée"],
+    "techniques": ["envelopper le poisson assaisonné en papillote", "cuire à la braise ou à la vapeur"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Madesu (haricots en sauce)",
+    "country": "RDC, Congo",
+    "ingredients": ["haricots rouges ou blancs", "huile de palme ou huile", "oignon", "tomate", "ail"],
+    "techniques": ["cuire les haricots", "mijoter en sauce tomate"],
+    "moments": ["lunch", "dinner"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Loso na madesu (riz et haricots)",
+    "country": "RDC, Congo",
+    "ingredients": ["riz blanc", "haricots en sauce (madesu)", "oignon", "tomate", "huile"],
+    "techniques": ["cuire le riz", "servir avec les haricots en sauce"],
+    "moments": ["lunch", "dinner"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Fufu (fufu de manioc ou de maïs)",
+    "country": "RDC, Congo, Centrafrique (gozo), Cameroun",
+    "ingredients": ["farine de manioc et/ou de maïs", "eau"],
+    "techniques": ["verser la farine dans l'eau bouillante", "remuer vigoureusement jusqu'à pâte ferme"],
+    "moments": ["lunch", "dinner"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Fumbwa",
+    "country": "RDC, Congo",
+    "ingredients": ["feuilles de fumbwa (gnetum) émincées", "pâte d'arachide", "huile de palme", "poisson fumé ou salé", "oignon", "tomate"],
+    "techniques": ["émincer finement les feuilles", "mijoter avec l'arachide"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Makayabu (poisson salé en sauce)",
+    "country": "RDC, Congo",
+    "ingredients": ["morue ou poisson salé", "tomate", "oignon", "huile de palme ou huile", "piment"],
+    "techniques": ["dessaler le poisson", "mijoter en sauce tomate"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Lenga-lenga (amarante en sauce)",
+    "country": "RDC, Congo",
+    "ingredients": ["feuilles d'amarante", "oignon", "tomate", "huile de palme ou pâte d'arachide", "poisson fumé (facultatif)"],
+    "techniques": ["hacher les feuilles", "faire revenir et mijoter brièvement"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Ngai-ngai (oseille de Guinée en sauce)",
+    "country": "RDC, Congo",
+    "ingredients": ["feuilles d'oseille de Guinée (bissap)", "riz ou fufu", "oignon", "huile de palme", "poisson salé ou fumé"],
+    "techniques": ["cuire les feuilles acidulées", "mijoter avec le poisson"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Mbika (pâte de graines de courge)",
+    "country": "RDC, Congo",
+    "ingredients": ["graines de courge moulues (mbika)", "poisson fumé ou crevettes", "oignon", "piment", "feuilles de bananier"],
+    "techniques": ["mélanger la pâte de graines aux condiments", "cuire en papillote ou en sauce"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Ntaba (chèvre grillée)",
+    "country": "RDC, Congo",
+    "ingredients": ["viande de chèvre", "oignon", "piment", "sel", "plantain frit ou kwanga (accompagnement)"],
+    "techniques": ["mariner", "griller à la braise"],
+    "moments": ["dinner", "snack"],
+    "diet": ""
+  },
+  {
+    "name": "Makemba (plantain frit)",
+    "country": "RDC, Congo",
+    "ingredients": ["banane plantain mûre", "huile de friture", "sel"],
+    "techniques": ["frire en tranches"],
+    "moments": ["snack", "lunch", "breakfast"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Koko (gnetum à l'arachide)",
+    "country": "Centrafrique",
+    "ingredients": ["feuilles de koko (gnetum) émincées", "pâte d'arachide", "viande fumée ou poisson fumé", "oignon", "piment", "gozo (boule de manioc)"],
+    "techniques": ["émincer finement les feuilles", "mijoter avec la pâte d'arachide"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Kanda (boulettes de viande ou de poisson)",
+    "country": "Centrafrique",
+    "ingredients": ["viande hachée ou poisson pilé", "graines de courge moulues", "oignon", "piment", "sauce tomate"],
+    "techniques": ["façonner des boulettes avec les graines", "les cuire dans une sauce"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Boule (aïch) et sauce gombo",
+    "country": "Tchad",
+    "ingredients": ["farine de mil, sorgho ou maïs", "gombo séché ou frais", "viande séchée ou fraîche", "oignon", "tomate séchée", "piment"],
+    "techniques": ["cuire la farine en pâte ferme", "préparer une sauce gluante"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Daraba",
+    "country": "Tchad, Centrafrique",
+    "ingredients": ["gombo", "aubergine", "patate douce ou courge", "pâte d'arachide", "tomate", "oignon"],
+    "techniques": ["mijoter les légumes", "lier à la pâte d'arachide"],
+    "moments": ["lunch", "dinner"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Kissar (galette fermentée de sorgho)",
+    "country": "Tchad",
+    "ingredients": ["farine de sorgho ou de mil", "eau", "levain (pâte fermentée)", "sauce (viande, gombo ou lait caillé) en accompagnement"],
+    "techniques": ["laisser fermenter la pâte", "étaler en fines crêpes sur une plaque chaude"],
+    "moments": ["breakfast", "dinner"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Mouloukhiya (sauce de corète)",
+    "country": "Tchad",
+    "ingredients": ["feuilles de corète séchées en poudre", "viande", "oignon", "ail", "tomate"],
+    "techniques": ["délayer la poudre de feuilles", "mijoter avec la viande"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Bouillie de mil (madida)",
+    "country": "Tchad, Cameroun (Nord)",
+    "ingredients": ["farine de mil ou de sorgho", "eau", "sucre", "citron, tamarin ou lait caillé"],
+    "techniques": ["délayer la farine", "cuire en remuant"],
+    "moments": ["breakfast"],
+    "diet": "vegan"
+  },
+  {
+    "name": "Calulu",
+    "country": "São Tomé-et-Principe",
+    "ingredients": ["poisson fumé et frais (ou poulet)", "huile de palme", "légumes-feuilles et herbes locales", "gombo", "aubergine", "tomate et oignon"],
+    "techniques": ["mijoter longuement poisson et feuilles à l'huile de palme"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  },
+  {
+    "name": "Pepesup (soupe de poisson pimentée)",
+    "country": "Guinée équatoriale",
+    "ingredients": ["poisson", "piment", "oignon", "tomate", "feuilles odorantes (basilic)"],
+    "techniques": ["pocher le poisson dans un bouillon pimenté"],
+    "moments": ["lunch", "dinner"],
+    "diet": ""
+  }
+]

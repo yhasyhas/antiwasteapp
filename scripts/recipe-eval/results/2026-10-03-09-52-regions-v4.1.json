@@ -1,0 +1,2823 @@
+{
+ "summary": {
+  "version": "v4.1",
+  "date": "2026-10-03T09:52:22.062Z",
+  "model": "openai/gpt-oss-120b",
+  "judge_model": null,
+  "cases": 5,
+  "failed_cases": 0,
+  "recipes": 15,
+  "judge": {
+   "quantities": null,
+   "cooking_cues": null,
+   "order": null,
+   "ingredients_used": null,
+   "authenticity": null,
+   "safety": null,
+   "diet": null
+  },
+  "diversity_judge": null,
+  "auto": {
+   "ingredients_in_steps": 0.9511111111111111,
+   "quantities_in_steps": 0.8722222222222222,
+   "timed_cooking": 0.7119047619047619,
+   "oven_temperature": 1,
+   "reheat_cue": 1,
+   "uses_urgent": 1,
+   "rules_respected": 1,
+   "units_language": 1,
+   "safety_rules": 1,
+   "no_heat_without_cooking": 1,
+   "no_celsius_without_meat": 1,
+   "diversity": 0.8186963323341032
+  },
+  "rejected_first": 0,
+  "median_ms": 8513,
+  "judge_mean": null
+ },
+ "results": [
+  {
+   "id": "en-steak-mixte",
+   "note": "Garde-manger réel du 02/10 (noms en français et en anglais), recette en anglais, steak à utiliser vite, sans préférence : 3 recettes attendues",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 5624,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [],
+    "corrected": [],
+    "replaced": [],
+    "dropped": []
+   },
+   "examples": [],
+   "diversity_auto": 0.93781328320802,
+   "diversity_judge": null,
+   "diversity_comment": null,
+   "judge_model": null,
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [],
+     "corrected": [],
+     "replaced": [],
+     "dropped": []
+    },
+    "examples": [],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "en-steak-mixte-1",
+      "name": "beef steak",
+      "quantity": "4",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "en-steak-mixte-2",
+      "name": "aubergine",
+      "quantity": "1",
+      "daysLeft": 2,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "en-steak-mixte-3",
+      "name": "lait",
+      "quantity": "1 l",
+      "daysLeft": 2,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "en-steak-mixte-4",
+      "name": "poivron",
+      "quantity": "3",
+      "daysLeft": 4,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "en-steak-mixte-5",
+      "name": "milk",
+      "quantity": "1 bottle, 1 glass",
+      "daysLeft": 5,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "en-steak-mixte-6",
+      "name": "rosemary",
+      "quantity": "1 sprig",
+      "daysLeft": 7,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "en-steak-mixte-7",
+      "name": "pomme de terre",
+      "quantity": "2",
+      "daysLeft": 17,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p8",
+      "id": "en-steak-mixte-8",
+      "name": "œufs",
+      "quantity": "4",
+      "daysLeft": 27,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p9",
+      "id": "en-steak-mixte-9",
+      "name": "cooked rice",
+      "quantity": "1 bowl",
+      "daysLeft": null,
+      "kind": "dish",
+      "priority": false
+     },
+     {
+      "alias": "p10",
+      "id": "en-steak-mixte-10",
+      "name": "yaourt grec",
+      "quantity": "880 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p11",
+      "id": "en-steak-mixte-11",
+      "name": "poisson",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p12",
+      "id": "en-steak-mixte-12",
+      "name": "baguette",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p13",
+      "id": "en-steak-mixte-13",
+      "name": "poulet",
+      "quantity": "1 morceau",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p14",
+      "id": "en-steak-mixte-14",
+      "name": "bœuf",
+      "quantity": "2 morceaux",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p15",
+      "id": "en-steak-mixte-15",
+      "name": "citrouille",
+      "quantity": "1",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 5624,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 1,
+      "ms": 5604,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.053856807,
+       "prompt_tokens": 2619,
+       "prompt_time": 0.109068102,
+       "completion_tokens": 2581,
+       "completion_time": 5.398590532,
+       "total_tokens": 5200,
+       "total_time": 5.507658634,
+       "completion_tokens_details": {
+        "reasoning_tokens": 125
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "499999",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244570"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Beef Steak and Egg Stir‑Fry with Bell Peppers",
+     "recipe": {
+      "title": "Beef Steak and Egg Stir‑Fry with Bell Peppers",
+      "description": "A quick, protein‑packed stir‑fry that uses urgent beef steak and eggs, paired with sweet bell peppers and rosemary for flavor.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 15,
+      "total_time": 25,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "beef steak",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "en-steak-mixte-1"
+       },
+       {
+        "name": "eggs",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "en-steak-mixte-8"
+       },
+       {
+        "name": "bell pepper",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "en-steak-mixte-4"
+       },
+       {
+        "name": "rosemary",
+        "quantity": "1",
+        "unit": "sprig",
+        "pantry_id": "en-steak-mixte-6"
+       },
+       {
+        "name": "olive oil",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "black pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "beef steak",
+       "eggs",
+       "bell pepper",
+       "rosemary"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Slice the 2 beef steaks into thin strips.",
+       "Core and thinly slice the 2 bell peppers.",
+       "Heat 2 tbsp olive oil in a large wok over medium‑high heat.",
+       "Add the beef strips, season with 1 pinch salt and 1 pinch black pepper, and stir‑fry for 3 minutes, until browned but not fully cooked.",
+       "Add the sliced bell peppers and the rosemary sprig, continue stir‑frying for another 3 minutes, until peppers are tender‑crisp.",
+       "Push the beef and peppers to the side of the wok, crack the 2 eggs into the empty space, scramble quickly, and mix with the meat and vegetables.",
+       "Cook everything together for 2 more minutes, ensuring the beef reaches an internal temperature of 63 °C (check with a thermometer).",
+       "Remove the rosemary sprig, taste and adjust seasoning if needed, then serve immediately."
+      ],
+      "tips": [
+       "Slice the beef thinly against the grain for maximum tenderness.",
+       "If you prefer a lighter dish, use only 1 tsp olive oil and finish with a splash of lemon juice."
+      ],
+      "image_prompt": "Professional food photography, thinly sliced beef steak and scrambled eggs stir‑fried with colorful bell peppers, rosemary sprig, sizzling wok, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.5,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "names_in_language": 1,
+      "foreign_names_copied": [],
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Baked Aubergine Boats Stuffed with Chicken and Greek Yogurt Sauce",
+     "recipe": {
+      "title": "Baked Aubergine Boats Stuffed with Chicken and Greek Yogurt Sauce",
+      "description": "Oven‑roasted aubergine halves filled with tender chicken, herbs, and a cool Greek yogurt drizzle – a comforting yet light dinner.",
+      "difficulty": "easy",
+      "prep_time": 15,
+      "cook_time": 30,
+      "total_time": 45,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "aubergine",
+        "quantity": "1",
+        "unit": "",
+        "pantry_id": "en-steak-mixte-2"
+       },
+       {
+        "name": "chicken",
+        "quantity": "1",
+        "unit": "",
+        "pantry_id": "en-steak-mixte-13"
+       },
+       {
+        "name": "Greek yogurt",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "en-steak-mixte-10"
+       },
+       {
+        "name": "rosemary",
+        "quantity": "1",
+        "unit": "sprig",
+        "pantry_id": "en-steak-mixte-6"
+       },
+       {
+        "name": "olive oil",
+        "quantity": "1",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "black pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "lemon juice",
+        "quantity": "1",
+        "unit": "tbsp",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "aubergine",
+       "chicken",
+       "Greek yogurt",
+       "rosemary"
+      ],
+      "missing_ingredients": [
+       "lemon juice"
+      ],
+      "instructions": [
+       "Preheat the oven to 190 °C.",
+       "Cut the aubergine in half lengthwise and scoop out a shallow well in each half, leaving about 1 cm of flesh around the edges.",
+       "Brush the aubergine halves with 1 tbsp olive oil, sprinkle with 1 pinch salt and 1 pinch black pepper, and place them cut‑side up on a baking sheet.",
+       "Bake for 12 minutes, until the flesh begins to soften and the edges turn golden.",
+       "While the aubergine bakes, season the chicken piece with a pinch of salt, pepper, and the rosemary sprig.",
+       "Place the chicken on a separate baking tray and bake for 18 minutes, or until the internal temperature reaches 74 °C and the juices run clear.",
+       "Remove the chicken, let it rest 3 minutes, then shred it with two forks.",
+       "In a small bowl, combine the 200 g Greek yogurt, 1 tbsp lemon juice, a pinch of salt, and a pinch of black pepper; stir until smooth.",
+       "When the aubergine halves are done, fill each well with the shredded chicken, then drizzle the yogurt sauce over the top.",
+       "Return the stuffed aubergine to the oven for a final 5 minutes, just to warm the filling.",
+       "Serve hot, garnished with the remaining rosemary leaves."
+      ],
+      "tips": [
+       "If the aubergine looks dry, add a splash of water to the baking sheet before roasting.",
+       "For extra freshness, sprinkle chopped fresh mint over the yogurt sauce just before serving."
+      ],
+      "image_prompt": "Professional food photography, aubergine halves baked until caramelized, filled with shredded chicken, drizzled with creamy Greek yogurt sauce, rosemary garnish, rustic plate, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.6666666666666666,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "names_in_language": 1,
+      "foreign_names_copied": [],
+      "forbidden": [],
+      "steps": 11,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Creamy Pumpkin and Fish Soup",
+     "recipe": {
+      "title": "Creamy Pumpkin and Fish Soup",
+      "description": "A velvety soup blending sweet pumpkin with delicate white fish, finished with a hint of milk for richness – perfect for a light evening meal.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 30,
+      "total_time": 40,
+      "servings": 3,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "pumpkin",
+        "quantity": "1",
+        "unit": "",
+        "pantry_id": "en-steak-mixte-15"
+       },
+       {
+        "name": "fish",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "en-steak-mixte-11"
+       },
+       {
+        "name": "milk",
+        "quantity": "250",
+        "unit": "ml",
+        "pantry_id": "en-steak-mixte-3"
+       },
+       {
+        "name": "rosemary",
+        "quantity": "1",
+        "unit": "sprig",
+        "pantry_id": "en-steak-mixte-6"
+       },
+       {
+        "name": "olive oil",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "black pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "water",
+        "quantity": "600",
+        "unit": "ml",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "pumpkin",
+       "fish",
+       "milk",
+       "rosemary"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Peel, seed, and cut the pumpkin into 2‑cm cubes.",
+       "Heat 2 tbsp olive oil in a large pot over medium heat.",
+       "Add the pumpkin cubes, stir and sauté for 5 minutes, until they start to turn golden at the edges.",
+       "Pour in 600 ml water, add the rosemary sprig, and bring to a gentle boil.",
+       "Reduce to a simmer and cook for 15 minutes, until the pumpkin is very tender (test with a fork).",
+       "Remove the rosemary sprig, then blend the pumpkin mixture with an immersion blender until smooth.",
+       "Stir in 250 ml milk, season with 1 pinch salt and 1 pinch black pepper, and bring back to a gentle simmer.",
+       "Season the fish pieces with a pinch of salt and pepper.",
+       "Gently slide the fish into the simmering soup, cover, and cook for 6 minutes, or until the fish reaches an internal temperature of 63 °C and flakes easily.",
+       "Remove the fish with a slotted spoon, break into bite‑size pieces, and return to the pot.",
+       "Taste and adjust seasoning if needed, then ladle the soup into bowls and serve hot."
+      ],
+      "tips": [
+       "For a smoother texture, strain the soup through a fine sieve after blending.",
+       "Add a drizzle of extra‑virgin olive oil or a few toasted pumpkin seeds just before serving for extra flavor and crunch."
+      ],
+      "image_prompt": "Professional food photography, creamy orange pumpkin soup with flaked white fish, drizzle of milk, garnish of rosemary, shallow bowl, steam rising, soft natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.5,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "names_in_language": 1,
+      "foreign_names_copied": [],
+      "forbidden": [],
+      "steps": 11,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    }
+   ]
+  },
+  {
+   "id": "en-selection-viandes",
+   "note": "Sélection réelle du 02/10 (riz cuit, baguette, bœuf, poulet, potiron), noms en français, recette en anglais",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 9949,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [
+     {
+      "title": "Hearty Beef and Pumpkin Stew",
+      "issues": [
+       {
+        "code": "core_temperature",
+        "ingredient": "beef",
+        "message": "« beef » : écrire la température à cœur (bœuf, veau, agneau en morceaux : 63 °C à cœur puis 3 minutes de repos (ou viande tendre qui se détache, en mijoté))."
+       },
+       {
+        "code": "leftover_reheat",
+        "ingredient": "cooked rice",
+        "message": "« cooked rice » (reste ou riz déjà cuit) : le réchauffer une seule fois, jusqu'à ce qu'il soit fumant à cœur, et servir aussitôt (l'écrire dans l'étape)."
+       }
+      ]
+     },
+     {
+      "title": "Pumpkin Rice Soup with Baguette Croutons",
+      "issues": [
+       {
+        "code": "leftover_reheat",
+        "ingredient": "cooked rice",
+        "message": "« cooked rice » (reste ou riz déjà cuit) : le réchauffer une seule fois, jusqu'à ce qu'il soit fumant à cœur, et servir aussitôt (l'écrire dans l'étape)."
+       }
+      ]
+     }
+    ],
+    "corrected": [
+     "Hearty Beef and Pumpkin Stew",
+     "Pumpkin Rice Soup with Baguette Croutons"
+    ],
+    "replaced": [],
+    "dropped": []
+   },
+   "examples": [],
+   "diversity_auto": 0.8092592592592592,
+   "diversity_judge": null,
+   "diversity_comment": null,
+   "judge_model": null,
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [
+      {
+       "title": "Hearty Beef and Pumpkin Stew",
+       "issues": [
+        {
+         "code": "core_temperature",
+         "ingredient": "beef",
+         "message": "« beef » : écrire la température à cœur (bœuf, veau, agneau en morceaux : 63 °C à cœur puis 3 minutes de repos (ou viande tendre qui se détache, en mijoté))."
+        },
+        {
+         "code": "leftover_reheat",
+         "ingredient": "cooked rice",
+         "message": "« cooked rice » (reste ou riz déjà cuit) : le réchauffer une seule fois, jusqu'à ce qu'il soit fumant à cœur, et servir aussitôt (l'écrire dans l'étape)."
+        }
+       ]
+      },
+      {
+       "title": "Pumpkin Rice Soup with Baguette Croutons",
+       "issues": [
+        {
+         "code": "leftover_reheat",
+         "ingredient": "cooked rice",
+         "message": "« cooked rice » (reste ou riz déjà cuit) : le réchauffer une seule fois, jusqu'à ce qu'il soit fumant à cœur, et servir aussitôt (l'écrire dans l'étape)."
+        }
+       ]
+      }
+     ],
+     "corrected": [
+      "Hearty Beef and Pumpkin Stew",
+      "Pumpkin Rice Soup with Baguette Croutons"
+     ],
+     "replaced": [],
+     "dropped": []
+    },
+    "examples": [],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "en-selection-viandes-1",
+      "name": "cooked rice",
+      "quantity": "1 bowl",
+      "daysLeft": null,
+      "kind": "dish",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "en-selection-viandes-2",
+      "name": "baguette",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "en-selection-viandes-3",
+      "name": "bœuf",
+      "quantity": "2 morceaux",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "en-selection-viandes-4",
+      "name": "poulet",
+      "quantity": "1 morceau",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "en-selection-viandes-5",
+      "name": "citrouille",
+      "quantity": "1",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 9949,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 2,
+      "ms": 4781,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.050909829,
+       "prompt_tokens": 2544,
+       "prompt_time": 0.113249847,
+       "completion_tokens": 2184,
+       "completion_time": 4.57827991,
+       "total_tokens": 4728,
+       "total_time": 4.691529757,
+       "completion_tokens_details": {
+        "reasoning_tokens": 124
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "499999",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244645"
+       }
+      }
+     },
+     {
+      "provider": "groq",
+      "started_at_ms": 4812,
+      "ms": 3700,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.022929009,
+       "prompt_tokens": 3637,
+       "prompt_time": 0.174472178,
+       "completion_tokens": 1605,
+       "completion_time": 3.449631887,
+       "total_tokens": 5242,
+       "total_time": 3.624104065,
+       "prompt_tokens_details": {
+        "cached_tokens": 256
+       },
+       "completion_tokens_details": {
+        "reasoning_tokens": 67
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "499999",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "243552"
+       }
+      }
+     },
+     {
+      "provider": "groq",
+      "started_at_ms": 4813,
+      "ms": 5125,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.053548708,
+       "prompt_tokens": 2599,
+       "prompt_time": 0.10798565,
+       "completion_tokens": 1847,
+       "completion_time": 4.909775419,
+       "total_tokens": 4446,
+       "total_time": 5.017761069,
+       "prompt_tokens_details": {
+        "cached_tokens": 256
+       },
+       "completion_tokens_details": {
+        "reasoning_tokens": 432
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "499999",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "237533"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Hearty Beef and Pumpkin Stew",
+     "recipe": {
+      "title": "Hearty Beef and Pumpkin Stew",
+      "description": "A comforting one‑pot stew with tender beef, sweet pumpkin, and aromatic herbs, perfect for a light dinner.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 45,
+      "total_time": 55,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "beef",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "en-selection-viandes-3"
+       },
+       {
+        "name": "pumpkin",
+        "quantity": "1",
+        "unit": "",
+        "pantry_id": "en-selection-viandes-5"
+       },
+       {
+        "name": "cooked rice",
+        "quantity": "1",
+        "unit": "bowl",
+        "pantry_id": "en-selection-viandes-1"
+       },
+       {
+        "name": "salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "oil",
+        "quantity": "2",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "water",
+        "quantity": "400",
+        "unit": "ml",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "beef",
+       "pumpkin",
+       "cooked rice"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Cut the pumpkin into 2‑cm cubes.",
+       "Season the beef pieces with a pinch of salt and pepper.",
+       "Heat 2 tbsp oil in a pot over medium heat; brown the beef pieces for 4 minutes, until a deep golden crust forms.",
+       "Add the pumpkin cubes, stir, and cook 3 minutes more.",
+       "Pour in 400 ml water, bring to a gentle boil, then reduce to a low simmer.",
+       "Simmer uncovered for 30 minutes, until the pumpkin is soft and the broth has reduced slightly.",
+       "Check the internal temperature of the beef pieces: they must reach 63 °C at the centre; once reached, remove the pot from heat and let the stew rest for 3 minutes so the meat becomes tender and the juices settle.",
+       "Reheat the cooked rice: add the bowl of rice to the pot and stir, allowing it to heat through for about 2 minutes until the rice is steaming hot throughout (fumant at the centre).",
+       "Adjust seasoning with a pinch of salt and pepper, then serve immediately."
+      ],
+      "tips": [
+       "If the stew looks too thick, add a splash more water.",
+       "Use the broth to make a quick sauce for the baguette slices."
+      ],
+      "image_prompt": "Professional food photography, rustic beef and pumpkin stew in a shallow pot, steam rising, wooden table, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.8333333333333334,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "names_in_language": 1,
+      "foreign_names_copied": [],
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Baked Chicken with Roasted Pumpkin and Crusty Baguette",
+     "recipe": {
+      "title": "Baked Chicken with Roasted Pumpkin and Crusty Baguette",
+      "description": "Oven‑roasted chicken piece served with caramelised pumpkin wedges and toasted baguette slices, a light yet satisfying dinner.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 35,
+      "total_time": 45,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "chicken",
+        "quantity": "1",
+        "unit": "",
+        "pantry_id": "en-selection-viandes-4"
+       },
+       {
+        "name": "pumpkin",
+        "quantity": "1",
+        "unit": "",
+        "pantry_id": "en-selection-viandes-5"
+       },
+       {
+        "name": "baguette",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "en-selection-viandes-2"
+       },
+       {
+        "name": "salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "oil",
+        "quantity": "3",
+        "unit": "tbsp",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "chicken",
+       "pumpkin",
+       "baguette"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Preheat the oven to 200°C.",
+       "Slice the pumpkin into 2‑cm thick wedges.",
+       "Place the chicken piece and pumpkin wedges on a baking tray; drizzle with 2 tbsp oil, then season with a pinch of salt and pepper.",
+       "Bake for 25 minutes, until the chicken reaches an internal temperature of 74°C (juices run clear) and the pumpkin is golden and tender.",
+       "While the chicken cooks, cut the baguette into 1‑cm thick slices.",
+       "Heat 1 tbsp oil in a skillet over medium heat; toast the baguette slices 2 minutes per side, until crisp and lightly browned.",
+       "Remove the chicken and pumpkin from the oven, let rest 3 minutes, then plate with toasted baguette slices."
+      ],
+      "tips": [
+       "If the pumpkin browns too quickly, cover the tray loosely with foil.",
+       "Slice the chicken against the grain for a more tender bite."
+      ],
+      "image_prompt": "Professional food photography, baked chicken breast beside caramelised pumpkin wedges and golden toasted baguette slices on a white plate, soft natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.75,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "names_in_language": 1,
+      "foreign_names_copied": [],
+      "forbidden": [],
+      "steps": 7,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Pumpkin Rice Soup with Baguette Croutons",
+     "recipe": {
+      "title": "Pumpkin Rice Soup with Baguette Croutons",
+      "description": "A smooth, velvety soup made from pumpkin and rice, finished with crunchy baguette croutons – light, warm and perfect for an evening starter.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 35,
+      "total_time": 45,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:vegetarian"
+      ],
+      "ingredients_used": [
+       {
+        "name": "pumpkin",
+        "quantity": "1",
+        "unit": "",
+        "pantry_id": "en-selection-viandes-5"
+       },
+       {
+        "name": "cooked rice",
+        "quantity": "1",
+        "unit": "bowl",
+        "pantry_id": "en-selection-viandes-1"
+       },
+       {
+        "name": "baguette",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "en-selection-viandes-2"
+       },
+       {
+        "name": "salt",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "pepper",
+        "quantity": "1",
+        "unit": "pinch",
+        "pantry_id": null
+       },
+       {
+        "name": "oil",
+        "quantity": "1",
+        "unit": "tbsp",
+        "pantry_id": null
+       },
+       {
+        "name": "water",
+        "quantity": "500",
+        "unit": "ml",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "pumpkin",
+       "cooked rice",
+       "baguette"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Peel and dice the pumpkin into 2‑cm cubes.",
+       "In a pot, heat 1 tbsp oil over medium heat; add the pumpkin cubes and sauté 5 minutes, until they start to turn golden at the edges.",
+       "Add 500 ml water, bring to a gentle boil, then reduce to a low simmer.",
+       "Cook the pumpkin for 15 minutes, until very soft and the liquid is fragrant and slightly thickened.",
+       "Add the cooked rice to the pot and stir; simmer for 3 minutes, allowing the rice to heat through until it is steaming hot throughout (fumant at the centre).",
+       "Using an immersion blender, puree the soup until smooth; the texture should be creamy with no visible pumpkin pieces.",
+       "Season with a pinch of salt and pepper, then keep warm on low heat.",
+       "While the soup simmers, cut the baguette into 1‑cm cubes, toss with a drizzle of oil, and spread on a baking sheet.",
+       "Bake at 180°C for 8 minutes, until the croutons are crisp and golden.",
+       "Ladle the soup into bowls, top with a handful of croutons, and serve immediately."
+      ],
+      "tips": [
+       "For extra depth, add a splash of water after blending and re‑heat briefly.",
+       "If the soup is too thick, thin with a little more hot water."
+      ],
+      "image_prompt": "Professional food photography, creamy pumpkin rice soup in a shallow bowl, topped with golden baguette croutons, steam rising, rustic wooden table"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.5714285714285714,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "names_in_language": 1,
+      "foreign_names_copied": [],
+      "forbidden": [],
+      "steps": 10,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    }
+   ]
+  },
+  {
+   "id": "fr-poisson-urgent",
+   "note": "Poisson entier à utiliser aujourd'hui, garde-manger complet, sans préférence",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 8855,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [
+     {
+      "title": "Salade de riz aux dés de dorade, persil, œuf dur et tomates",
+      "issues": [
+       {
+        "code": "doneness_hint",
+        "ingredient": "dorades",
+        "message": "« dorades » : ajouter un signe visible de cuisson (poisson : 63 °C à cœur, chair opaque qui se détache en lamelles)."
+       }
+      ]
+     }
+    ],
+    "corrected": [
+     "Salade de riz aux dés de dorade, persil, œuf dur et tomates"
+    ],
+    "replaced": [],
+    "dropped": []
+   },
+   "examples": [],
+   "diversity_auto": 0.8052287581699347,
+   "diversity_judge": null,
+   "diversity_comment": null,
+   "judge_model": null,
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [
+      {
+       "title": "Salade de riz aux dés de dorade, persil, œuf dur et tomates",
+       "issues": [
+        {
+         "code": "doneness_hint",
+         "ingredient": "dorades",
+         "message": "« dorades » : ajouter un signe visible de cuisson (poisson : 63 °C à cœur, chair opaque qui se détache en lamelles)."
+        }
+       ]
+      }
+     ],
+     "corrected": [
+      "Salade de riz aux dés de dorade, persil, œuf dur et tomates"
+     ],
+     "replaced": [],
+     "dropped": []
+    },
+    "examples": [],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "fr-poisson-urgent-1",
+      "name": "Dorades",
+      "quantity": "2",
+      "daysLeft": 0,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "fr-poisson-urgent-9",
+      "name": "Persil",
+      "quantity": "1 botte",
+      "daysLeft": 2,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "fr-poisson-urgent-2",
+      "name": "Courgettes",
+      "quantity": "2",
+      "daysLeft": 3,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "fr-poisson-urgent-3",
+      "name": "Tomates",
+      "quantity": "4",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "fr-poisson-urgent-4",
+      "name": "Citron",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "fr-poisson-urgent-5",
+      "name": "Riz",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "fr-poisson-urgent-6",
+      "name": "Oignons",
+      "quantity": "3",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p8",
+      "id": "fr-poisson-urgent-7",
+      "name": "Ail",
+      "quantity": "1 tête",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p9",
+      "id": "fr-poisson-urgent-8",
+      "name": "Pommes de terre",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p10",
+      "id": "fr-poisson-urgent-10",
+      "name": "Œufs",
+      "quantity": "6",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 8855,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 2,
+      "ms": 6333,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.022791408,
+       "prompt_tokens": 2507,
+       "prompt_time": 0.100684798,
+       "completion_tokens": 2951,
+       "completion_time": 6.159851278,
+       "total_tokens": 5458,
+       "total_time": 6.260536076,
+       "completion_tokens_details": {
+        "reasoning_tokens": 223
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "499999",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244682"
+       }
+      }
+     },
+     {
+      "provider": "groq",
+      "started_at_ms": 6359,
+      "ms": 2492,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.052656392,
+       "prompt_tokens": 3211,
+       "prompt_time": 0.06852814,
+       "completion_tokens": 1057,
+       "completion_time": 2.3360689629999998,
+       "total_tokens": 4268,
+       "total_time": 2.404597103,
+       "prompt_tokens_details": {
+        "cached_tokens": 1792
+       },
+       "completion_tokens_details": {
+        "reasoning_tokens": 96
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "499999",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "243365"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Dorade rôtie au citron et persil avec pommes de terre dorées",
+     "recipe": {
+      "title": "Dorade rôtie au citron et persil avec pommes de terre dorées",
+      "description": "Filets de dorade frais cuits au four, parfumés au citron et au persil, servis avec des pommes de terre croustillantes. Un plat léger et savoureux pour le dîner.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 30,
+      "total_time": 40,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "dorades",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "fr-poisson-urgent-1"
+       },
+       {
+        "name": "persil",
+        "quantity": "1",
+        "unit": "botte",
+        "pantry_id": "fr-poisson-urgent-9"
+       },
+       {
+        "name": "pommes de terre",
+        "quantity": "400",
+        "unit": "g",
+        "pantry_id": "fr-poisson-urgent-8"
+       },
+       {
+        "name": "citron",
+        "quantity": "1",
+        "unit": "",
+        "pantry_id": "fr-poisson-urgent-4"
+       },
+       {
+        "name": "ail",
+        "quantity": "1",
+        "unit": "gousse",
+        "pantry_id": "fr-poisson-urgent-7"
+       },
+       {
+        "name": "huile d'olive",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "dorades",
+       "persil",
+       "pommes de terre",
+       "citron",
+       "ail"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Préchauffe le four à 200 °C.",
+       "Épluche les pommes de terre et coupe-les en dés de 2 cm.",
+       "Mélange les dés de pommes de terre avec 1 c. à soupe d'huile d'olive, du sel, du poivre et la moitié de l'ail écrasé. Étale-les sur une plaque de cuisson et enfourne 25 minutes, en remuant à mi-cuisson, jusqu'à ce qu'ils soient dorés et tendres.",
+       "Pendant ce temps, rince les filets de dorade et sèche-les avec du papier absorbant.",
+       "Dispose les filets sur une plaque recouverte de papier cuisson, arrose avec 1 c. à soupe d'huile d'olive, ajoute le reste d'ail émincé, le jus du citron, du sel, du poivre et parseme de persil haché.",
+       "Enfourne les filets de dorade 12 minutes à 200 °C, jusqu'à ce que la chair se détache facilement à la fourchette (température interne ≈ 63 °C).",
+       "Sers les filets de dorade avec les pommes de terre rôties, décorés de quelques brins de persil et de rondelles de citron."
+      ],
+      "tips": [
+       "Pour une chair encore plus moelleuse, couvre les filets d'un papier aluminium pendant les 5 premières minutes de cuisson.",
+       "Utilise les restes de pommes de terre le lendemain pour préparer une salade tiède."
+      ],
+      "image_prompt": "Professional food photography, whole dorade fillets baked with lemon slices and fresh parsley, golden roasted potatoes on the side, rustic wooden board, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 0.8,
+      "missing_in_steps": [
+       "dorades"
+      ],
+      "quantities_in_steps": 0.5,
+      "timed_cooking": 0.3333333333333333,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "names_in_language": 1,
+      "foreign_names_copied": [],
+      "forbidden": [],
+      "steps": 7,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Soupe veloutée de courgettes, tomates et œuf poché",
+     "recipe": {
+      "title": "Soupe veloutée de courgettes, tomates et œuf poché",
+      "description": "Une soupe légère à base de courgettes et tomates, relevée d'un œuf poché qui apporte onctuosité et protéine. Idéale pour un dîner rapide et digeste.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 20,
+      "total_time": 30,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:vegetarian",
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "courgettes",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "fr-poisson-urgent-2"
+       },
+       {
+        "name": "tomates",
+        "quantity": "4",
+        "unit": "",
+        "pantry_id": "fr-poisson-urgent-3"
+       },
+       {
+        "name": "oignons",
+        "quantity": "1",
+        "unit": "",
+        "pantry_id": "fr-poisson-urgent-6"
+       },
+       {
+        "name": "ail",
+        "quantity": "1",
+        "unit": "gousse",
+        "pantry_id": "fr-poisson-urgent-7"
+       },
+       {
+        "name": "œufs",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "fr-poisson-urgent-10"
+       },
+       {
+        "name": "persil",
+        "quantity": "1",
+        "unit": "c. à soupe",
+        "pantry_id": "fr-poisson-urgent-9"
+       },
+       {
+        "name": "huile d'olive",
+        "quantity": "1",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "courgettes",
+       "tomates",
+       "oignons",
+       "ail",
+       "œufs",
+       "persil"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Émince l'oignon et hache l'ail.",
+       "Dans une casserole, fais chauffer 1 c. à soupe d'huile d'olive à feu moyen, ajoute l'oignon et l'ail, fais revenir 3 minutes jusqu'à ce qu'ils soient translucides.",
+       "Coupe les courgettes en rondelles et les tomates en quartiers.",
+       "Ajoute les courgettes et les tomates dans la casserole, sale, poivre, puis couvre d'eau (environ 600 ml). Porte à ébullition, puis réduis le feu à moyen et laisse mijoter 12 minutes, jusqu'à ce que les légumes soient tendres.",
+       "Retire la casserole du feu, mixe la soupe à l'aide d'un mixeur plongeant jusqu'à obtenir un velouté lisse.",
+       "Remets la soupe sur feu doux pour la garder chaude.",
+       "Prépare les œufs pochés: porte une petite casserole d'eau à frémissement, ajoute une pincée de sel, crée un tourbillon avec une cuillère et glisse délicatement chaque œuf. Laisse cuire 3 minutes, jusqu'à ce que le blanc soit ferme et le jaune encore coulant.",
+       "Verse la soupe dans deux bols, dépose un œuf poché sur chaque, saupoudre de persil haché et ajuste l'assaisonnement si besoin."
+      ],
+      "tips": [
+       "Pour un goût plus profond, ajoute une feuille de laurier pendant la cuisson des légumes, puis retire avant le mixage.",
+       "Si tu préfères une soupe plus épaisse, utilise seulement 400 ml d'eau."
+      ],
+      "image_prompt": "Professional food photography, creamy green zucchini and tomato soup in a bowl, topped with a perfectly poached egg, fresh parsley garnish, soft lighting"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.6666666666666666,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "names_in_language": 1,
+      "foreign_names_copied": [],
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Salade de riz aux dés de dorade, persil, œuf dur et tomates",
+     "recipe": {
+      "title": "Salade de riz aux dés de dorade, persil, œuf dur et tomates",
+      "description": "Salade fraîche et protéinée à base de riz, morceaux de dorade grillée, œuf dur, tomates croquantes et persil parfumé. Parfait pour un dîner léger.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 20,
+      "total_time": 30,
+      "servings": 2,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "riz",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "fr-poisson-urgent-5"
+       },
+       {
+        "name": "dorades",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "fr-poisson-urgent-1"
+       },
+       {
+        "name": "œufs",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "fr-poisson-urgent-10"
+       },
+       {
+        "name": "tomates",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "fr-poisson-urgent-3"
+       },
+       {
+        "name": "persil",
+        "quantity": "1",
+        "unit": "c. à soupe",
+        "pantry_id": "fr-poisson-urgent-9"
+       },
+       {
+        "name": "citron",
+        "quantity": "1",
+        "unit": "",
+        "pantry_id": "fr-poisson-urgent-4"
+       },
+       {
+        "name": "huile d'olive",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "sel",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "poivre",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "riz",
+       "dorades",
+       "œufs",
+       "tomates",
+       "persil",
+       "citron"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Rince le riz à l'eau froide, puis fais-le cuire dans 400 ml d'eau bouillante salée pendant 10 minutes à feu moyen, jusqu'à ce qu'il soit tendre mais encore ferme. Égoutte et étale le riz sur un plat pour le refroidir rapidement, puis place-le au réfrigérateur.",
+       "Sale les filets de dorade, puis fais-les griller à feu moyen dans une poêle avec 1 c. à soupe d'huile d'olive, 3 minutes de chaque côté, jusqu'à ce que la chair atteigne 63 °C à cœur, devienne opaque et se détache en lamelles. Laisse reposer 2 minutes, puis coupe-les en dés.",
+       "Fais cuire les œufs dans l'eau bouillante pendant 9 minutes, puis plonge-les dans de l'eau glacée, écale et coupe-les en quartiers.",
+       "Coupe les tomates en quartiers.",
+       "Dans un grand saladier, mélange le riz froid, les dés de dorade, les quartiers de tomates, les œufs et le persil haché.",
+       "Prépare la vinaigrette en émulsionnant le jus du citron, 1 c. à soupe d'huile d'olive, du sel et du poivre. Verse la vinaigrette sur la salade et mélange bien.",
+       "Sers la salade immédiatement ou garde-la au frais jusqu'au moment de servir."
+      ],
+      "tips": [
+       "Pour plus de croquant, ajoute une poignée de noix ou de graines de tournesol (à acheter si besoin).",
+       "Cette salade se conserve 1 jour au réfrigérateur, idéale pour les restes."
+      ],
+      "image_prompt": "Professional food photography, cold rice salad with grilled dorade chunks, cherry tomato halves, sliced hard-boiled egg, fresh parsley, bright colors, outdoor picnic setting"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 0.8333333333333334,
+      "missing_in_steps": [
+       "dorades"
+      ],
+      "quantities_in_steps": 0.75,
+      "timed_cooking": 0.75,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "names_in_language": 1,
+      "foreign_names_copied": [],
+      "forbidden": [],
+      "steps": 7,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    }
+   ]
+  },
+  {
+   "id": "es-cerdo-pollo-urgentes",
+   "note": "Cerdo y pollo crudos a usar pronto, despensa completa",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 8513,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [
+     {
+      "title": "Ensalada de pollo a la parrilla con tomate y limón",
+      "issues": [
+       {
+        "code": "doneness_sign",
+        "ingredient": "pechugas de pollo",
+        "message": "« pechugas de pollo » : ajouter un signe visible de cuisson (volaille : 74 °C à cœur et jus clair, plus aucune trace rose)."
+       }
+      ]
+     }
+    ],
+    "corrected": [
+     "Ensalada de pollo a la parrilla con tomate y limón"
+    ],
+    "replaced": [],
+    "dropped": []
+   },
+   "examples": [],
+   "diversity_auto": 0.8244047619047619,
+   "diversity_judge": null,
+   "diversity_comment": null,
+   "judge_model": null,
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [
+      {
+       "title": "Ensalada de pollo a la parrilla con tomate y limón",
+       "issues": [
+        {
+         "code": "doneness_sign",
+         "ingredient": "pechugas de pollo",
+         "message": "« pechugas de pollo » : ajouter un signe visible de cuisson (volaille : 74 °C à cœur et jus clair, plus aucune trace rose)."
+        }
+       ]
+      }
+     ],
+     "corrected": [
+      "Ensalada de pollo a la parrilla con tomate y limón"
+     ],
+     "replaced": [],
+     "dropped": []
+    },
+    "examples": [],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "es-cerdo-pollo-urgentes-1",
+      "name": "Chuletas de cerdo",
+      "quantity": "4",
+      "daysLeft": 1,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "es-cerdo-pollo-urgentes-2",
+      "name": "Pechugas de pollo",
+      "quantity": "2",
+      "daysLeft": 2,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "es-cerdo-pollo-urgentes-3",
+      "name": "Patatas",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "es-cerdo-pollo-urgentes-4",
+      "name": "Cebollas",
+      "quantity": "3",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "es-cerdo-pollo-urgentes-5",
+      "name": "Pimientos",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "es-cerdo-pollo-urgentes-6",
+      "name": "Arroz",
+      "quantity": "1 kg",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "es-cerdo-pollo-urgentes-7",
+      "name": "Tomates",
+      "quantity": "4",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p8",
+      "id": "es-cerdo-pollo-urgentes-8",
+      "name": "Ajo",
+      "quantity": "1 cabeza",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p9",
+      "id": "es-cerdo-pollo-urgentes-9",
+      "name": "Limones",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 8513,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 1,
+      "ms": 5467,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.020597989,
+       "prompt_tokens": 2513,
+       "prompt_time": 0.120528209,
+       "completion_tokens": 2533,
+       "completion_time": 5.28388953,
+       "total_tokens": 5046,
+       "total_time": 5.404417739,
+       "completion_tokens_details": {
+        "reasoning_tokens": 214
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "499999",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244063"
+       }
+      }
+     },
+     {
+      "provider": "groq",
+      "started_at_ms": 5485,
+      "ms": 2286,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.020075816,
+       "prompt_tokens": 3073,
+       "prompt_time": 0.04759124,
+       "completion_tokens": 852,
+       "completion_time": 2.093357823,
+       "total_tokens": 3925,
+       "total_time": 2.140949063,
+       "prompt_tokens_details": {
+        "cached_tokens": 2304
+       },
+       "completion_tokens_details": {
+        "reasoning_tokens": 72
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "499998",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "237952"
+       }
+      }
+     },
+     {
+      "provider": "groq",
+      "started_at_ms": 5486,
+      "ms": 3020,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.021044724,
+       "prompt_tokens": 2527,
+       "prompt_time": 0.016046845,
+       "completion_tokens": 1263,
+       "completion_time": 2.954102473,
+       "total_tokens": 3790,
+       "total_time": 2.970149318,
+       "prompt_tokens_details": {
+        "cached_tokens": 2304
+       },
+       "completion_tokens_details": {
+        "reasoning_tokens": 119
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "499999",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244049"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Chuletas de cerdo al horno con patatas y pimientos",
+     "recipe": {
+      "title": "Chuletas de cerdo al horno con patatas y pimientos",
+      "description": "Chuletas de cerdo jugosas horneadas con patatas doradas y pimientos asados, una comida completa y reconfortante para el almuerzo.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 35,
+      "total_time": 45,
+      "servings": 4,
+      "meal_type": "lunch",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "chuletas de cerdo",
+        "quantity": "4",
+        "unit": "",
+        "pantry_id": "es-cerdo-pollo-urgentes-1"
+       },
+       {
+        "name": "patatas",
+        "quantity": "800",
+        "unit": "g",
+        "pantry_id": "es-cerdo-pollo-urgentes-3"
+       },
+       {
+        "name": "pimientos",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "es-cerdo-pollo-urgentes-5"
+       },
+       {
+        "name": "cebollas",
+        "quantity": "1",
+        "unit": "",
+        "pantry_id": "es-cerdo-pollo-urgentes-4"
+       },
+       {
+        "name": "ajo",
+        "quantity": "2",
+        "unit": "dientes",
+        "pantry_id": "es-cerdo-pollo-urgentes-8"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "chuletas de cerdo",
+       "patatas",
+       "pimientos",
+       "cebollas",
+       "ajo"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Precalienta el horno a 200 °C.",
+       "Corta las patatas en cubos de 2 cm y los pimientos en tiras; pela y corta la cebolla en juliana.",
+       "En una bandeja, coloca las chuletas de cerdo, los cubos de patata, los pimientos y la cebolla.",
+       "Pica finamente los 2 dientes de ajo y espárcelos sobre todo con 2 cda de aceite de oliva, sal y pimienta.",
+       "Hornea 35 minutos, hasta que las chuletas alcancen 63 °C en el centro y las patatas estén doradas y tiernas.",
+       "Sirve caliente, acompañado de una ensalada verde si lo deseas."
+      ],
+      "tips": [
+       "Para una piel más crujiente, sube la temperatura a 220 °C los últimos 5 min.",
+       "Puedes añadir una ramita de romero al final para aromatizar."
+      ],
+      "image_prompt": "Professional food photography, oven-roasted pork chops with golden potatoes and roasted red peppers, rustic tray, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.5,
+      "timed_cooking": 0.5,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "names_in_language": 1,
+      "foreign_names_copied": [],
+      "forbidden": [],
+      "steps": 6,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Sopa de pollo con arroz y verduras",
+     "recipe": {
+      "title": "Sopa de pollo con arroz y verduras",
+      "description": "Una sopa ligera pero sustanciosa con pechugas de pollo, arroz, zanahoria y las verduras del garde-manger, perfecta para preparar con antelación.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 30,
+      "total_time": 40,
+      "servings": 4,
+      "meal_type": "lunch",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "pechugas de pollo",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "es-cerdo-pollo-urgentes-2"
+       },
+       {
+        "name": "arroz",
+        "quantity": "150",
+        "unit": "g",
+        "pantry_id": "es-cerdo-pollo-urgentes-6"
+       },
+       {
+        "name": "cebollas",
+        "quantity": "1",
+        "unit": "",
+        "pantry_id": "es-cerdo-pollo-urgentes-4"
+       },
+       {
+        "name": "pimientos",
+        "quantity": "1",
+        "unit": "",
+        "pantry_id": "es-cerdo-pollo-urgentes-5"
+       },
+       {
+        "name": "tomates",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "es-cerdo-pollo-urgentes-7"
+       },
+       {
+        "name": "ajo",
+        "quantity": "1",
+        "unit": "diente",
+        "pantry_id": "es-cerdo-pollo-urgentes-8"
+       },
+       {
+        "name": "caldo de pollo",
+        "quantity": "1",
+        "unit": "l",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "pechugas de pollo",
+       "arroz",
+       "cebollas",
+       "pimientos",
+       "tomates",
+       "ajo"
+      ],
+      "missing_ingredients": [
+       "caldo de pollo"
+      ],
+      "instructions": [
+       "Corta las pechugas de pollo en cubos de 2 cm.",
+       "Pica la cebolla, el pimiento y los tomates en trozos medianos; machaca el diente de ajo.",
+       "En una olla grande, calienta 1 l de caldo de pollo a fuego medio.",
+       "Añade la cebolla y el ajo; cocina 3 minutos hasta que la cebolla esté translúcida.",
+       "Incorpora el pollo, el pimiento y los tomates; cocina 5 minutos, removiendo.",
+       "Agrega el arroz y lleva a ebullición; reduce a fuego medio‑bajo y cocina 15 minutos, hasta que el arroz esté tierno.",
+       "Verifica que el pollo alcance 74 °C en el centro; ajusta sal y pimienta al gusto.",
+       "Sirve caliente; la sopa se conserva bien refrigerada y se puede recalentar en minutos."
+      ],
+      "tips": [
+       "Para mayor sabor, puedes añadir una hoja de laurel al caldo al inicio.",
+       "Si prefieres una sopa más cremosa, mezcla 2 cda de yogur natural al servir (omitido en la lista para mantener la anti‑gaspi)."
+      ],
+      "image_prompt": "Professional food photography, bowl of chicken and rice soup with bright vegetables, steam rising, rustic kitchen background"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 0.6666666666666666,
+      "timed_cooking": 0.75,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "names_in_language": 1,
+      "foreign_names_copied": [],
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Ensalada de pollo a la parrilla con tomate y limón",
+     "recipe": {
+      "title": "Ensalada de pollo a la parrilla con tomate y limón",
+      "description": "Pechuga de pollo a la parrilla, trozos de tomate fresco y aderezo de limón, una ensalada ligera y nutritiva que se puede preparar con antelación.",
+      "difficulty": "easy",
+      "prep_time": 15,
+      "cook_time": 10,
+      "total_time": 25,
+      "servings": 4,
+      "meal_type": "lunch",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free",
+       "diet:dairy-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "pechugas de pollo",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "es-cerdo-pollo-urgentes-2"
+       },
+       {
+        "name": "tomates",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "es-cerdo-pollo-urgentes-7"
+       },
+       {
+        "name": "limones",
+        "quantity": "1",
+        "unit": "",
+        "pantry_id": "es-cerdo-pollo-urgentes-9"
+       },
+       {
+        "name": "ajo",
+        "quantity": "1",
+        "unit": "diente",
+        "pantry_id": "es-cerdo-pollo-urgentes-8"
+       },
+       {
+        "name": "aceite de oliva",
+        "quantity": "2",
+        "unit": "cda",
+        "pantry_id": null
+       },
+       {
+        "name": "sal",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "pimienta",
+        "quantity": "1",
+        "unit": "pizca",
+        "pantry_id": null
+       },
+       {
+        "name": "hojas de lechuga",
+        "quantity": "1",
+        "unit": "manojo",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "pechugas de pollo",
+       "tomates",
+       "limones",
+       "ajo"
+      ],
+      "missing_ingredients": [
+       "hojas de lechuga"
+      ],
+      "instructions": [
+       "Exprime el jugo del 1 limón y mézclalo con 2 cda de aceite de oliva, el diente de ajo picado, sal y pimienta.",
+       "Corta las pechugas de pollo en filetes finos y úntalos con el aderezo; deja marinar 5 minutos.",
+       "Calienta una sartén a fuego medio‑alto y cocina el pollo 4 minutos por lado, hasta que alcance 74 °C en el centro y los jugos salgan claros, sin rastro de rosado.",
+       "Mientras el pollo reposa, lava y corta los tomates en gajos.",
+       "En una fuente grande, coloca el manojo de lechuga, los tomates y el pollo cortado en tiras.",
+       "Rocía con el resto del aderezo de limón y mezcla suavemente antes de servir."
+      ],
+      "tips": [
+       "Esta ensalada es ideal para llevar al trabajo; guarda el aderezo aparte y mezcla al momento de consumir.",
+       "Puedes añadir unas aceitunas negras (compradas) para más sabor sin superar el límite de 3 ingredientes externos."
+      ],
+      "suggestion": "Ideal también como cena ligera",
+      "image_prompt": "Professional food photography, grilled chicken salad with fresh tomatoes, lemon dressing, bright green lettuce, sunny outdoor setting"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "names_in_language": 1,
+      "foreign_names_copied": [],
+      "forbidden": [],
+      "steps": 6,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    }
+   ]
+  },
+  {
+   "id": "fr-hache-anglais",
+   "note": "Viande hachée à utiliser aujourd'hui, garde-manger aux noms anglais, recette en français",
+   "provider": "groq",
+   "model": "openai/gpt-oss-120b",
+   "ms": 7087,
+   "requested": 3,
+   "rejected_first": 0,
+   "rejections": [],
+   "retried": false,
+   "safety": {
+    "checked": true,
+    "first": [],
+    "corrected": [],
+    "replaced": [],
+    "dropped": []
+   },
+   "examples": [],
+   "diversity_auto": 0.7167755991285403,
+   "diversity_judge": null,
+   "diversity_comment": null,
+   "judge_model": null,
+   "generation": {
+    "version": "v4.1",
+    "requested": 3,
+    "invalid": [],
+    "dietary_rejections": [],
+    "refusal": "",
+    "retried": false,
+    "safety": {
+     "checked": true,
+     "first": [],
+     "corrected": [],
+     "replaced": [],
+     "dropped": []
+    },
+    "examples": [],
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "pantry": [
+     {
+      "alias": "p1",
+      "id": "fr-hache-anglais-1",
+      "name": "ground beef",
+      "quantity": "500 g",
+      "daysLeft": 0,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p2",
+      "id": "fr-hache-anglais-2",
+      "name": "pasta",
+      "quantity": "500 g",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p3",
+      "id": "fr-hache-anglais-3",
+      "name": "tomatoes",
+      "quantity": "5",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p4",
+      "id": "fr-hache-anglais-4",
+      "name": "onion",
+      "quantity": "2",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p5",
+      "id": "fr-hache-anglais-5",
+      "name": "carrots",
+      "quantity": "3",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p6",
+      "id": "fr-hache-anglais-6",
+      "name": "cheese",
+      "quantity": "1 block",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     },
+     {
+      "alias": "p7",
+      "id": "fr-hache-anglais-7",
+      "name": "milk",
+      "quantity": "1 l",
+      "daysLeft": null,
+      "kind": "ingredient",
+      "priority": false
+     }
+    ],
+    "ms": 7087,
+    "attempts": [
+     {
+      "provider": "groq",
+      "started_at_ms": 1,
+      "ms": 7064,
+      "ok": true,
+      "usage": {
+       "queue_time": 0.023310635,
+       "prompt_tokens": 2451,
+       "prompt_time": 0.11015235,
+       "completion_tokens": 3250,
+       "completion_time": 6.895493206,
+       "total_tokens": 5701,
+       "total_time": 7.005645556,
+       "completion_tokens_details": {
+        "reasoning_tokens": 304
+       },
+       "rate_limits": {
+        "requests_per_day": "500000",
+        "remaining_requests": "499999",
+        "tokens_per_minute": "250000",
+        "remaining_tokens": "244598"
+       }
+      }
+     }
+    ]
+   },
+   "recipes": [
+    {
+     "title": "Spaghetti bolognaise rapide",
+     "recipe": {
+      "title": "Spaghetti bolognaise rapide",
+      "description": "Spaghetti accompagnés d'une sauce bolognaise savoureuse à base de bœuf haché, tomates, oignons et carottes, gratinés d'un peu de fromage.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 30,
+      "total_time": 40,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "ground beef",
+        "quantity": "500",
+        "unit": "g",
+        "pantry_id": "fr-hache-anglais-1"
+       },
+       {
+        "name": "pasta",
+        "quantity": "400",
+        "unit": "g",
+        "pantry_id": "fr-hache-anglais-2"
+       },
+       {
+        "name": "tomatoes",
+        "quantity": "4",
+        "unit": "",
+        "pantry_id": "fr-hache-anglais-3"
+       },
+       {
+        "name": "onion",
+        "quantity": "1",
+        "unit": "",
+        "pantry_id": "fr-hache-anglais-4"
+       },
+       {
+        "name": "carrots",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "fr-hache-anglais-5"
+       },
+       {
+        "name": "cheese",
+        "quantity": "100",
+        "unit": "g",
+        "pantry_id": "fr-hache-anglais-6"
+       },
+       {
+        "name": "oil",
+        "quantity": "2",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "salt",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "pepper",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "water",
+        "quantity": "1",
+        "unit": "l",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "ground beef",
+       "pasta",
+       "tomatoes",
+       "onion",
+       "carrots",
+       "cheese"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Fais bouillir 1 l d'eau salée dans une grande casserole, ajoute les 400 g de pasta et fais cuire 9 minutes à feu moyen, jusqu'à ce qu'ils soient al dente; égoutte et réserve.",
+       "Pendant ce temps, émince l'1 onion et coupe les 2 carottes en dés petits.",
+       "Dans une poêle, fais chauffer 2 c. à soupe d'huile à feu moyen, ajoute l'1 onion et fais revenir 3 minutes, jusqu'à ce qu'il devienne translucide.",
+       "Ajoute les 2 carottes, fais sauter 4 minutes, jusqu'à ce qu'elles commencent à s'attendrir.",
+       "Incorpore les 500 g de ground beef, émiette-le et fais cuire 6 minutes à feu moyen, jusqu'à ce qu'il n'y ait plus de partie rosée.",
+       "Ajoute les 4 tomatoes coupées en dés, sale 1 pincée de sel, poivre 1 pincée, puis laisse mijoter 12 minutes à feu doux, en remuant de temps en temps, jusqu'à ce que la sauce épaississe et que la viande atteigne 71 °C (température interne sécuritaire).",
+       "Mélange les pasta cuits avec la sauce, verse le tout dans un plat de service et parsème les 100 g de cheese râpé sur le dessus.",
+       "Place le plat sous le gril du four préchauffé à 200 °C pendant 3 minutes, jusqu'à ce que le fromage soit doré et légèrement gratiné."
+      ],
+      "tips": [
+       "Utilise les tomates fraîches ou des tomates en conserve selon ce que tu as sous la main.",
+       "Pour un goût plus riche, ajoute une feuille de basilic frais juste avant de servir."
+      ],
+      "image_prompt": "Professional food photography, steaming plate of spaghetti bolognaise with red sauce, grated cheese melted on top, rustic bowl, natural light"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 0.8333333333333334,
+      "missing_in_steps": [
+       "carrots"
+      ],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.8571428571428571,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "names_in_language": 0,
+      "foreign_names_copied": [
+       "ground beef",
+       "pasta",
+       "tomatoes",
+       "onion",
+       "carrots",
+       "cheese"
+      ],
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Gratin de pâtes au fromage et bœuf",
+     "recipe": {
+      "title": "Gratin de pâtes au fromage et bœuf",
+      "description": "Gratin onctueux de pâtes, béchamel au lait, fromage fondu et morceaux de bœuf haché, parfait pour un dîner réconfortant.",
+      "difficulty": "easy",
+      "prep_time": 15,
+      "cook_time": 25,
+      "total_time": 40,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [],
+      "ingredients_used": [
+       {
+        "name": "ground beef",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "fr-hache-anglais-1"
+       },
+       {
+        "name": "pasta",
+        "quantity": "300",
+        "unit": "g",
+        "pantry_id": "fr-hache-anglais-2"
+       },
+       {
+        "name": "cheese",
+        "quantity": "150",
+        "unit": "g",
+        "pantry_id": "fr-hache-anglais-6"
+       },
+       {
+        "name": "milk",
+        "quantity": "300",
+        "unit": "ml",
+        "pantry_id": "fr-hache-anglais-7"
+       },
+       {
+        "name": "onion",
+        "quantity": "1",
+        "unit": "",
+        "pantry_id": "fr-hache-anglais-4"
+       },
+       {
+        "name": "butter",
+        "quantity": "30",
+        "unit": "g",
+        "pantry_id": null
+       },
+       {
+        "name": "flour",
+        "quantity": "30",
+        "unit": "g",
+        "pantry_id": null
+       },
+       {
+        "name": "salt",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "pepper",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "water",
+        "quantity": "1",
+        "unit": "l",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "ground beef",
+       "pasta",
+       "cheese",
+       "milk",
+       "onion"
+      ],
+      "missing_ingredients": [
+       "butter",
+       "flour"
+      ],
+      "instructions": [
+       "Préchauffe le four à 180 °C.",
+       "Fais cuire les 300 g de pasta dans 1 l d'eau bouillante salée 8 minutes à feu moyen, jusqu'à ce qu'ils soient légèrement al dente; égoutte et réserve.",
+       "Émince l'1 onion.",
+       "Dans une poêle, fais chauffer 1 c. à soupe d'huile à feu moyen, ajoute l'1 onion et fais revenir 3 minutes, jusqu'à ce qu'il soit translucide.",
+       "Ajoute les 300 g de ground beef, émiette-le et cuis 6 minutes, jusqu'à ce qu'il ne soit plus rosé et atteigne 71 °C.",
+       "Sale 1 pincée de sel, poivre 1 pincée, puis retire du feu.",
+       "Prépare la béchamel: dans une casserole, fais fondre 30 g de butter à feu moyen, ajoute 30 g de flour et mélange 1 minute sans coloration. Verse progressivement les 300 ml de milk en fouettant, porte à ébullition douce 3 minutes, jusqu'à épaississement, puis retire du feu.",
+       "Dans un plat à gratin, mélange les pasta cuits, le mélange bœuf‑onion et la béchamel. Saupoudre les 150 g de cheese râpé sur le dessus.",
+       "Enfourne 20 minutes à four moyen, jusqu'à ce que le fromage soit fondu et doré."
+      ],
+      "tips": [
+       "Pour un gratin plus léger, utilise moitié fromage, moitié mozzarella allégée.",
+       "Ajoute une pincée de muscade dans la béchamel pour plus de profondeur."
+      ],
+      "image_prompt": "Professional food photography, golden baked pasta gratin with bubbling cheese crust, creamy interior, rustic casserole dish, warm lighting"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 1,
+      "missing_in_steps": [],
+      "quantities_in_steps": 1,
+      "timed_cooking": 0.6666666666666666,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "names_in_language": 0,
+      "foreign_names_copied": [
+       "ground beef",
+       "pasta",
+       "onion",
+       "cheese",
+       "milk"
+      ],
+      "forbidden": [],
+      "steps": 9,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    },
+    {
+     "title": "Soupe rustique à la viande et aux légumes",
+     "recipe": {
+      "title": "Soupe rustique à la viande et aux légumes",
+      "description": "Soupe nourrissante à base de bœuf haché, tomates, carottes et oignons, légèrement crémeuse grâce à un filet de lait.",
+      "difficulty": "easy",
+      "prep_time": 10,
+      "cook_time": 30,
+      "total_time": 40,
+      "servings": 4,
+      "meal_type": "dinner",
+      "cuisine": "any",
+      "dietary_tags": [
+       "diet:gluten-free"
+      ],
+      "ingredients_used": [
+       {
+        "name": "ground beef",
+        "quantity": "200",
+        "unit": "g",
+        "pantry_id": "fr-hache-anglais-1"
+       },
+       {
+        "name": "tomatoes",
+        "quantity": "3",
+        "unit": "",
+        "pantry_id": "fr-hache-anglais-3"
+       },
+       {
+        "name": "carrots",
+        "quantity": "2",
+        "unit": "",
+        "pantry_id": "fr-hache-anglais-5"
+       },
+       {
+        "name": "onion",
+        "quantity": "1",
+        "unit": "",
+        "pantry_id": "fr-hache-anglais-4"
+       },
+       {
+        "name": "milk",
+        "quantity": "100",
+        "unit": "ml",
+        "pantry_id": "fr-hache-anglais-7"
+       },
+       {
+        "name": "oil",
+        "quantity": "1",
+        "unit": "c. à soupe",
+        "pantry_id": null
+       },
+       {
+        "name": "salt",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "pepper",
+        "quantity": "1",
+        "unit": "pincée",
+        "pantry_id": null
+       },
+       {
+        "name": "water",
+        "quantity": "1",
+        "unit": "l",
+        "pantry_id": null
+       }
+      ],
+      "ingredients_from_list": [
+       "ground beef",
+       "tomatoes",
+       "carrots",
+       "onion",
+       "milk"
+      ],
+      "missing_ingredients": [],
+      "instructions": [
+       "Émince l'1 onion et coupe les 2 carottes en rondelles.",
+       "Coupe les 3 tomatoes en dés.",
+       "Dans une grande casserole, fais chauffer 1 c. à soupe d'huile à feu moyen, ajoute l'1 onion et fais revenir 3 minutes, jusqu'à ce qu'il devienne translucide.",
+       "Ajoute les 2 carottes, fais revenir 4 minutes, jusqu'à ce qu'elles s'attendissent légèrement.",
+       "Incorpore les 200 g de ground beef, émiette-le et fais cuire 6 minutes, jusqu'à ce qu'il n'y ait plus de partie rosée et atteigne 71 °C.",
+       "Ajoute les 3 tomatoes, 1 l d'eau, sale 1 pincée, poivre 1 pincée, porte à ébullition, puis réduis le feu à doux et laisse mijoter 15 minutes, jusqu'à ce que les légumes soient tendres.",
+       "Juste avant de servir, verse les 100 ml de milk, mélange 1 minute, et chauffe 2 minutes supplémentaires sans laisser bouillir, pour obtenir une texture légèrement crémeuse.",
+       "Verse la soupe dans des bols et sers immédiatement."
+      ],
+      "tips": [
+       "Pour plus de corps, ajoute une cuillère à café de farine diluée dans un peu d'eau avant le lait.",
+       "Garnis chaque bol d'une petite feuille de persil frais ou de ciboulette."
+      ],
+      "image_prompt": "Professional food photography, steaming bowl of rustic beef vegetable soup, carrots and tomato chunks, creamy swirl, wooden table, natural daylight"
+     },
+     "checks": {
+      "safety_rules": 1,
+      "safety_issues": [],
+      "no_heat_without_cooking": 1,
+      "no_celsius_without_meat": 1,
+      "no_internal_codes": 1,
+      "no_oven_heat_level": 1,
+      "ingredients_in_steps": 0.8,
+      "missing_in_steps": [
+       "carrots"
+      ],
+      "quantities_in_steps": 1,
+      "timed_cooking": 1,
+      "oven_temperature": 1,
+      "reheat_cue": 1,
+      "uses_urgent": 1,
+      "rules_respected": 1,
+      "names_in_language": 0,
+      "foreign_names_copied": [
+       "ground beef",
+       "tomatoes",
+       "onion",
+       "carrots",
+       "milk"
+      ],
+      "forbidden": [],
+      "steps": 8,
+      "units_language": 1
+     },
+     "scores": null,
+     "issues": [],
+     "strengths": []
+    }
+   ]
+  }
+ ]
+}

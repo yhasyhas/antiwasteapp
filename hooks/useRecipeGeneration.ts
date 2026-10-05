@@ -23,6 +23,9 @@ import { showDialog } from '@/lib/dialog';
 // standard : toutes les recettes ; leftovers : « Transformer mes restes » (plats cuisinés du garde-manger)
 export type GenerationMode = 'standard' | 'leftovers';
 
+// Délai maximum d'une génération côté app (le serveur sert ses recettes en 45 s au plus)
+const GENERATION_TIMEOUT_MS = 75_000;
+
 // État et actions de l'écran de génération : garde-manger, filtres, génération, historique, favoris, images.
 // Sélection : si l'utilisateur choisit des ingrédients (ou en reçoit d'une notification), seuls ceux-là sont
 // envoyés au modèle ; sans sélection, tout le garde-manger, avec la priorité aux dates les plus proches.
@@ -39,6 +42,8 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
   const [resultNote, setResultNote] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  // Limite du jour atteinte (réponse du serveur) : les boutons restent grisés avec la raison affichée
+  const [quotaReached, setQuotaReached] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   // Images générées en arrière-plan dès l'affichage des recettes : cartes et fiche se remplissent à leur arrivée
   const images = useRecipeImages();
@@ -76,9 +81,12 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
   // Nom envoyé au modèle : un produit scanné garde son nom, suivi de son nom générique (« Palmito L'original
   // (Biscuits feuilletés) »)
   const naming = useFoodNaming(ingredients);
+  // Nom envoyé au modèle : celui de la fiche dans la langue de la recette (« eggs » pour « œufs » dans une recette en
+  // anglais), le nom du produit pour un code-barres (avec son nom générique) ; la recette le garde tel quel
   const modelName = (food: PantryIngredient) => {
+    const name = naming.nameIn(food, filters.language);
     const generic = naming.generic(food);
-    return generic ? `${food.name} (${generic})` : food.name;
+    return generic ? `${name} (${generic})` : name;
   };
 
   const toggleSelected = (id: string) => {
@@ -137,6 +145,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
     setGeneratingMode(mode);
 
     try {
+      // Le serveur sert ses recettes en 45 s au plus : au-delà de 75 s, la requête est abandonnée
       const { data } = await callEdgeFunction('generate-recipes', {
         // Avec leur identifiant : le modèle indique quel ingrédient du garde-manger chaque recette utilise.
         // days_left (fuseau du téléphone) et kind : les plus urgents passent en premier.
@@ -164,7 +173,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
           excluded: filters.excluded,
           ...(filters.servings && { servings: filters.servings }),
         },
-      });
+      }, GENERATION_TIMEOUT_MS);
 
       if (data?.recipes) {
         // Enregistrées dans l'historique avant l'affichage, pour que chaque recette ait déjà son id
@@ -172,13 +181,17 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
         const saved = await saveRecipesToHistory(data.recipes);
         setRecipes(saved);
         // Moins de recettes que d'habitude : recettes écartées par le serveur, ou peu d'aliments
-        setResultNote(data.rejected > 0 ? t('generate.rejectedNote', { count: data.rejected })
+        // Recettes écartées : « tes critères » seulement si des critères ont été choisis (régimes, exclusions,
+        // sélection), sinon les contrôles de qualité du serveur
+        const criteria = filters.dietary.length > 0 || (filters.excluded?.length ?? 0) > 0 || selected.length > 0;
+        setResultNote(data.rejected > 0 ? t(criteria ? 'generate.rejectedNote' : 'generate.rejectedQualityNote', { count: data.rejected })
           : data.fewIngredients ? t('generate.fewIngredientsNote') : null);
         // Nouvelle génération seulement : images demandées en arrière-plan dès l'affichage des résultats,
         // elles apparaissent sur les cartes à leur arrivée (les autres listes n'en demandent jamais)
         images.requestAll(saved);
       } else if (data?.error) {
         // Quota personnel, quota des fournisseurs (secours compris) ou panne
+        if (failureReasonOf(data) === 'user_quota') setQuotaReached(true);
         showDialog(failureTitle(t, failureReasonOf(data), t('common.error')), data.message || t('generate.failed'));
       } else {
         showDialog(t('common.error'), t('generate.failed'));
@@ -206,6 +219,8 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
     total_time: recipe.total_time,
     difficulty: recipe.difficulty,
     meal_type: recipe.meal_type,
+    // Cuisine choisie à la génération (filtre de « Mes recettes »)
+    cuisine: recipe.cuisine ?? filters.cuisine,
     dietary_tags: recipe.dietary_tags,
     servings: recipe.servings,
     tips: recipe.tips || [],
@@ -317,6 +332,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
     recipes: recipes.map(images.withImage),
     loading,
     generating,
+    quotaReached,
     generatingMode,
     selectedRecipe: selectedRecipe && images.withImage(selectedRecipe),
     setSelectedRecipe,
