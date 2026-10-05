@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import type { Cuisine } from '@/components/recipe/types';
+import { cuisineId, OTHER_CUISINE, OTHER_MAX_LENGTH } from './cuisines';
 
 // Préférences de génération de l'utilisateur (table user_preferences) : appliquées par défaut à chaque
 // génération, modifiables ponctuellement dans les filtres.
@@ -9,11 +10,13 @@ export interface Preferences {
   excluded: string[];
   maxCookTime: number;
   cuisine: Cuisine;
+  // Texte de « Autre cuisine… » (cuisine « other »)
+  cuisineOther: string | null;
   // Nombre de personnes ; null : pas de préférence
   servings: number | null;
 }
 
-export const DEFAULT_PREFERENCES: Preferences = { dietary: [], excluded: [], maxCookTime: 60, cuisine: 'any', servings: null };
+export const DEFAULT_PREFERENCES: Preferences = { dietary: [], excluded: [], maxCookTime: 60, cuisine: 'any', cuisineOther: null, servings: null };
 
 // Temps maximum proposés (minutes)
 export const COOK_TIME_OPTIONS = [15, 30, 45, 60, 90, 120] as const;
@@ -31,7 +34,9 @@ export async function loadPreferences(userId: string): Promise<Preferences & { d
     dietary: data.dietary_preferences ?? [],
     excluded: data.excluded_ingredients ?? [],
     maxCookTime: data.max_cook_time ?? 60,
-    cuisine: (data.default_cuisine ?? 'any') as Cuisine,
+    // Anciennes valeurs (« african »…) ramenées au découpage actuel
+    cuisine: cuisineId(data.default_cuisine),
+    cuisineOther: data.default_cuisine_other ?? null,
     servings: data.servings ?? null,
     difficulty: data.default_difficulty ?? undefined,
     mealType: data.default_meal_type ?? undefined,
@@ -45,7 +50,8 @@ export async function savePreferences(userId: string, preferences: Preferences):
     dietary_preferences: preferences.dietary,
     excluded_ingredients: preferences.excluded.slice(0, MAX_EXCLUDED),
     max_cook_time: preferences.maxCookTime,
-    default_cuisine: preferences.cuisine,
+    default_cuisine: preferences.cuisine === OTHER_CUISINE && !preferences.cuisineOther?.trim() ? 'any' : preferences.cuisine,
+    default_cuisine_other: preferences.cuisine === OTHER_CUISINE ? preferences.cuisineOther?.trim().slice(0, OTHER_MAX_LENGTH) || null : null,
     servings: preferences.servings,
     updated_at: new Date().toISOString(),
   }, { onConflict: 'user_id' });

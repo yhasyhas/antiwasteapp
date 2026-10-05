@@ -1,6 +1,5 @@
 import { Coffee, Sun, Moon, Cookie } from 'lucide-react-native';
 import type { TFunction } from 'i18next';
-import type { Cuisine } from './types';
 
 // Types de repas avec icônes et libellés traduits
 export const mealTypes = [
@@ -28,15 +27,6 @@ export const dietaryOptions = [
 
 export const difficultyOptions = ['easy', 'medium', 'expert'] as const;
 
-export const cuisineOptions = [
-  { value: 'any', labelKey: 'cuisine.any' },
-  { value: 'african', labelKey: 'cuisine.african' },
-  { value: 'maghreb', labelKey: 'cuisine.maghreb' },
-  { value: 'asian', labelKey: 'cuisine.asian' },
-  { value: 'latin', labelKey: 'cuisine.latin' },
-  { value: 'mediterranean', labelKey: 'cuisine.mediterranean' },
-  { value: 'french', labelKey: 'cuisine.french' },
-] as const satisfies ReadonlyArray<{ value: Cuisine; labelKey: string }>;
 
 export const getMealTypeLabel = (t: TFunction, value: string) => {
   const meal = mealTypes.find(m => m.value === value);

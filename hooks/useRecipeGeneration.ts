@@ -19,6 +19,7 @@ import { useFoodNaming } from '@/lib/foodNames';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
 import type { Filters, Recipe } from '@/components/recipe/types';
 import { showDialog } from '@/lib/dialog';
+import { OTHER_CUISINE, recipeCuisine } from '@/lib/cuisines';
 
 // standard : toutes les recettes ; leftovers : « Transformer mes restes » (plats cuisinés du garde-manger)
 export type GenerationMode = 'standard' | 'leftovers';
@@ -53,6 +54,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
     maxCookTime: 60,
     mealType: 'lunch',
     cuisine: 'any',
+    cuisineOther: null,
     // Recettes dans la langue de l'app, sauf préférence enregistrée
     language,
     servings: null,
@@ -126,7 +128,9 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
         dietary: preferences.dietary,
         excluded: preferences.excluded,
         maxCookTime: preferences.maxCookTime,
+        // Cuisine préférée présélectionnée (modifiable pour une génération)
         cuisine: preferences.cuisine,
+        cuisineOther: preferences.cuisineOther,
         servings: preferences.servings,
         difficulty: (preferences.difficulty as Filters['difficulty']) || current.difficulty,
         mealType: (preferences.mealType as Filters['mealType']) || current.mealType,
@@ -169,6 +173,7 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
           maxCookTime: filters.maxCookTime,
           mealType: filters.mealType,
           cuisine: filters.cuisine,
+          ...(filters.cuisine === OTHER_CUISINE && filters.cuisineOther?.trim() && { cuisineOther: filters.cuisineOther.trim() }),
           language: filters.language,
           excluded: filters.excluded,
           ...(filters.servings && { servings: filters.servings }),
@@ -220,7 +225,8 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
     difficulty: recipe.difficulty,
     meal_type: recipe.meal_type,
     // Cuisine choisie à la génération (filtre de « Mes recettes »)
-    cuisine: recipe.cuisine ?? filters.cuisine,
+    // « Autre cuisine… » : son texte (le serveur renvoie seulement « other »)
+    cuisine: recipeCuisine(recipe.cuisine ?? filters.cuisine, filters.cuisineOther),
     dietary_tags: recipe.dietary_tags,
     servings: recipe.servings,
     tips: recipe.tips || [],

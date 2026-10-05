@@ -12,7 +12,8 @@ import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { SkeletonRow } from '@/components/ui/Skeleton';
 import { colors, sizes, spacing, typography } from '@/constants/theme';
 import { CookTimeChoice, ExcludedEditor, ServingsStepper } from '@/components/recipe/PreferenceControls';
-import { cuisineOptions, dietaryOptions } from '@/components/recipe/options';
+import { dietaryOptions } from '@/components/recipe/options';
+import { CuisinePicker } from '@/components/recipe/CuisinePicker';
 import { DEFAULT_PREFERENCES, loadPreferences, savePreferences, type Preferences } from '@/lib/preferences';
 import { showDialog } from '@/lib/dialog';
 
@@ -88,11 +89,7 @@ export default function PreferencesScreen() {
             </Section>
 
             <Section title={t('preferences.cuisine')}>
-              <View style={styles.grid}>
-                {cuisineOptions.map((option) => (
-                  <Chip key={option.value} label={t(option.labelKey)} showCheck selected={preferences.cuisine === option.value} onPress={() => update({ cuisine: option.value })} />
-                ))}
-              </View>
+              <CuisinePicker value={preferences.cuisine} other={preferences.cuisineOther} onChange={(cuisine, cuisineOther) => update({ cuisine, cuisineOther })} />
             </Section>
 
             <Section title={t('preferences.servings')}>

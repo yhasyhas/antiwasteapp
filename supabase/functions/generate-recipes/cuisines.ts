@@ -1,6 +1,6 @@
 // Découpage des cuisines décidé en phase 9 (docs/cuisines-proposition.md) : familles, régions, « Autre cuisine… ».
-// Préparé sur phase-9, utilisé seulement par la copie d'évaluation et la version candidate v4 du prompt ; l'app
-// garde ses 7 choix jusqu'à la validation de la phase 8 et de la bibliothèque.
+// Utilisé par generate-recipes et sa copie d'évaluation (v4 et suivantes) ; l'app a les mêmes identifiants
+// (lib/cuisines.ts) et ramène les anciennes valeurs au découpage actuel.
 
 export type Language = 'fr' | 'en' | 'es';
 type Labels = Record<Language, string>;

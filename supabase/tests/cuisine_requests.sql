@@ -1,6 +1,9 @@
--- Test de la migration en attente, dans une transaction annulée (même commande que supabase/tests, depuis la racine)
+-- Tests des demandes « Autre cuisine… » (cuisine_requests) : contraintes, résumé, aucun accès depuis l'app.
+-- Lancement (base liée, mot de passe dans SUPABASE_DB_PASSWORD) :
+--   PGPASSWORD="$SUPABASE_DB_PASSWORD" psql "$(cat supabase/.temp/pooler-url)" -v ON_ERROR_STOP=1 -f supabase/tests/cuisine_requests.sql
+-- Tout se passe dans une transaction annulée à la fin : aucune donnée ne reste en base.
+
 BEGIN;
-\i supabase/migrations-pending/20261002120000_cuisine_requests.sql
 INSERT INTO cuisine_requests (cuisine, language) VALUES ('géorgienne', 'fr'), ('Géorgienne', 'fr'), ('Peruvian', 'en');
 DO $$ BEGIN
   IF (SELECT requests FROM cuisine_requests_summary WHERE cuisine = 'géorgienne') <> 2 THEN RAISE EXCEPTION 'résumé faux'; END IF;

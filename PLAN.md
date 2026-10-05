@@ -328,7 +328,7 @@ Partie restante de la phase 9.
 
 - [ ] Mode cuisine étape par étape avec minuteurs (si garder l'écran allumé demande un module natif, cette partie va en phase 12)
 - [ ] Bibliothèque de plats de référence (`generate-recipes/library/`, `docs/bibliotheque-plats.md`) : inspiration tirée au hasard, seulement avec une cuisine précise ; à faire valider par des personnes qui cuisinent ces plats avant de l'utiliser dans l'app
-- [ ] Découpage plus précis des cuisines (`docs/cuisines-proposition.md`) : décision prise, à intégrer dans l'app (choix en deux niveaux, famille puis région, dans les Préférences et sur l'écran de génération ; « Autre cuisine… » ; migration `cuisine_requests`)
+- [x] Découpage plus précis des cuisines (`docs/cuisines-proposition.md`) : décision prise, intégrée dans l'app (choix en deux niveaux, famille puis région, dans les Préférences et sur l'écran de génération ; « Autre cuisine… » ; migration `cuisine_requests`)
 - [ ] Évaluation : 3 garde-manger par région dans les cas fixes, une fois la bibliothèque relue
 
 **Terminé quand** : une recette peut être suivie étape par étape avec ses minuteurs.
