@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, ScrollView, StyleSheet, Text, useWindowDimensions, Vibration, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import { Image } from 'expo-image';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { ChevronLeft, ChevronRight, ChefHat, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,6 +15,7 @@ import { TimerStrip } from '@/components/cook/TimerStrip';
 import { CookedButton } from '@/components/recipe/CookedButton';
 import { colors, fontFamilies, radius, sizes, spacing, typography } from '@/constants/theme';
 import { recipeAmount } from '@/lib/quantity';
+import { useRecipeImages } from '@/hooks/useRecipeImages';
 import { endCooking, loadCookingSession, markTimersAlerted, updateCooking, useCookingSession } from '@/lib/cookingSession';
 
 const KEEP_AWAKE_TAG = 'cooking-mode';
@@ -29,6 +31,8 @@ export default function CookScreen() {
   const safe = useSafeSpacing();
   const { width } = useWindowDimensions();
   const session = useCookingSession();
+  // Photo du plat : celle de la séance, ou celle arrivée depuis (image générée pendant la cuisine)
+  const images = useRecipeImages();
   const [ready, setReady] = useState(false);
   const [now, setNow] = useState(Date.now());
   const listRef = useRef<FlatList<number>>(null);
@@ -153,12 +157,20 @@ export default function CookScreen() {
   if (session.phase === 'done') {
     // « J'ai cuisiné ça » : seulement si la recette utilise des aliments du garde-manger
     const fromPantry = recipe.ingredients_used.some((item) => item.pantry_id);
+    const photo = images.withImage({ id: recipe.id, image_url: recipe.image_url }).image_url;
     return (
       <View style={styles.container}>
         {header}
         <TimerStrip timers={timers} now={now} />
         <ScrollView contentContainerStyle={styles.doneContent}>
-          <ChefHat size={72} color={colors.primary} />
+          {photo ? (
+            <View style={styles.photoBlock}>
+              <Image source={{ uri: photo }} style={styles.photo} contentFit="cover" cachePolicy="memory-disk" accessibilityIgnoresInvertColors />
+              <Text style={styles.photoCaption}>{t('recipe.imageCaption')}</Text>
+            </View>
+          ) : (
+            <ChefHat size={72} color={colors.primary} />
+          )}
           <Text style={styles.doneTitle}>{t('cook.doneTitle')}</Text>
           <Text style={styles.doneText}>{fromPantry ? t('cook.doneText') : t('cook.enjoy')}</Text>
           {fromPantry ? (
@@ -371,6 +383,20 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xxl,
     paddingBottom: spacing.xxl,
     gap: spacing.lg,
+  },
+  photoBlock: {
+    alignSelf: 'stretch',
+    gap: spacing.xs,
+  },
+  photo: {
+    width: '100%',
+    aspectRatio: 4 / 3,
+    borderRadius: radius.card,
+    backgroundColor: colors.surface,
+  },
+  photoCaption: {
+    ...typography.secondary,
+    textAlign: 'center',
   },
   doneTitle: {
     ...typography.hero,

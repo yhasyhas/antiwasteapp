@@ -1,5 +1,7 @@
-// Parcours de bout en bout, version web : choix des cuisines (Préférences) et mode cuisine (séance préparée dans
-// le stockage local : mise en place, étapes, minuteurs simultanés, température à cœur, reprise, « C'est prêt ! »).
+// Parcours de bout en bout, version web : choix des cuisines (Préférences), « Mes recettes » sur l'accueil (favori
+// ancien en tête, « Tout voir » sur l'onglet Favoris) et mode cuisine (séance préparée dans le stockage local : mise
+// en place, étapes avec icônes des ingrédients, minuteurs simultanés, température à cœur, reprise, « C'est prêt ! »
+// avec la photo du plat).
 // Compte de test créé par l'API admin (aucun e-mail envoyé), supprimé à la fin ; aucun secret affiché.
 // Prérequis : app web lancée (npx expo start --web --port 8082), Chrome installé, puppeteer-core disponible
 // (npm i --no-save puppeteer-core). Lancement depuis la racine : node scripts/e2e/cooking-web.mjs [dossier des captures]
@@ -17,8 +19,10 @@ const admin = { apikey: SECRET, Authorization: `Bearer ${SECRET}`, 'Content-Type
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const check = (label, ok) => console.log(`${ok ? 'OK' : 'ÉCHEC'} : ${label}`);
 
+// Photo du plat : petite image intégrée (aucun appel à Cloudflare)
+const PHOTO = `data:image/svg+xml;base64,${Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="40" height="30"><rect width="40" height="30" fill="#c8963e"/></svg>').toString('base64')}`;
 const recipe = {
-  title: 'Poulet yassa', servings: 4, language: 'fr', instructions: [
+  title: 'Poulet yassa', servings: 4, language: 'fr', image_url: PHOTO, instructions: [
     "Émincez les oignons et faites-les revenir dans l'huile 8 à 10 minutes à feu moyen.",
     'Ajoutez le poulet et faites-le dorer 5 minutes de chaque côté.',
     "Couvrez et laissez mijoter 25 minutes, jusqu'à 74 °C à cœur (le jus doit être clair).",
@@ -92,6 +96,25 @@ try {
   const saved = await (await fetch(`${URL_}/rest/v1/user_preferences?user_id=eq.${userId}&select=default_cuisine,default_cuisine_other`, { headers: admin })).json();
   check(`préférence enregistrée (${JSON.stringify(saved)})`, saved[0]?.default_cuisine === 'other' && saved[0]?.default_cuisine_other === 'Géorgienne');
 
+  // Accueil, « Mes recettes » : un favori plus ancien que les 30 dernières recettes passe en tête
+  const asUser = { apikey: PUB, Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' };
+  const rows = [{ user_id: userId, title: 'Favori ancien', created_at: '2026-01-01T12:00:00Z', ingredients_used: [], instructions: ['Servez.'] }]
+    .concat(Array.from({ length: 30 }, (_, i) => ({ user_id: userId, title: `Recette récente ${i + 1}`, created_at: new Date(Date.now() - i * 60_000).toISOString(), ingredients_used: [], instructions: ['Servez.'] })));
+  const inserted = await (await fetch(`${URL_}/rest/v1/recipes?select=id,title`, { method: 'POST', headers: { ...asUser, Prefer: 'return=representation' }, body: JSON.stringify(rows) })).json();
+  const favorite = inserted.find((row) => row.title === 'Favori ancien');
+  await fetch(`${URL_}/rest/v1/favorites`, { method: 'POST', headers: asUser, body: JSON.stringify({ user_id: userId, recipe_id: favorite.id }) });
+  await page.goto('http://localhost:8082/', { waitUntil: 'networkidle2', timeout: 180_000 });
+  await sleep(3500);
+  const homeText = await page.evaluate(() => document.body.innerText);
+  const favoriteAt = homeText.indexOf('Favori ancien'), recentAt = homeText.indexOf('Recette récente 1');
+  check('accueil : favori ancien affiché, en tête de « Mes recettes »', favoriteAt >= 0 && (recentAt < 0 || favoriteAt < recentAt));
+  await shot('1b-accueil-favoris.png');
+  await tap('Tout voir');
+  await sleep(2000);
+  // Onglet Favoris : seul le favori est listé (l'onglet Toutes montrerait les 31 recettes)
+  check('« Tout voir » : onglet Favoris', await has('Favoris · 1') && await has('Favori ancien') && !(await has('Recette récente 2')));
+  await shot('1c-tout-voir.png');
+
   // Mode cuisine
   await page.goto('http://localhost:8082/', { waitUntil: 'networkidle2', timeout: 180_000 });
   await sleep(3000);
@@ -105,6 +128,10 @@ try {
   check('étape 1 sur 4', await has('Étape 1 sur 4'));
   check('minuteur proposé : 10 min (fourchette 8 à 10)', await has('Minuteur 10 min'));
   check("ingrédients de l'étape rappelés", await has('POUR CETTE ÉTAPE') && await has('Oignons'));
+  check("icônes des ingrédients de l'étape", await page.evaluate(() => {
+    const title = [...document.querySelectorAll('div')].find((el) => el.innerText === 'POUR CETTE ÉTAPE' && el.children.length === 0);
+    return !!title && title.parentElement.querySelectorAll('svg').length >= 2;
+  }));
   await shot('4-etape-1.png');
   await tap('Minuteur 10 min');
   await tap('Une minute de plus');
@@ -131,6 +158,7 @@ try {
   await tap('Suivant');
   await tap("C'est prêt");
   check("écran « C'est prêt ! »", await has('Bon appétit'));
+  check('photo du plat et légende', await page.evaluate(() => [...document.querySelectorAll('img')].some((img) => img.src.startsWith('data:image/svg'))) && await has('Illustration générée, à titre indicatif'));
   await shot('8-pret.png');
   await tap('Fermer', { last: true });
   await sleep(1500);

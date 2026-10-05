@@ -16,7 +16,8 @@ const STORAGE_KEY = 'cooking_session';
 const CHANNEL_ID = 'cook-timers';
 const NOTIFICATION_PREFIX = 'cook-timer-';
 
-export type CookingRecipe = Pick<Recipe, 'title' | 'ingredients_used' | 'instructions' | 'servings'> & { id?: string; language?: string };
+// image_url : photo du plat, montrée sur l'écran « C'est prêt ! »
+export type CookingRecipe = Pick<Recipe, 'title' | 'ingredients_used' | 'instructions' | 'servings' | 'image_url'> & { id?: string; language?: string };
 
 export interface CookingTimer {
   id: string;
@@ -102,7 +103,7 @@ export async function startCooking(recipe: CookingRecipe): Promise<CookingSessio
   await loadCookingSession();
   if (session) await cancelAllTimers(session);
   const next: CookingSession = {
-    recipe: { id: recipe.id, title: recipe.title, ingredients_used: recipe.ingredients_used, instructions: recipe.instructions, servings: recipe.servings, language: recipe.language },
+    recipe: { id: recipe.id, title: recipe.title, ingredients_used: recipe.ingredients_used, instructions: recipe.instructions, servings: recipe.servings, language: recipe.language, image_url: recipe.image_url },
     key: recipeKey(recipe),
     phase: 'prep',
     step: 0,

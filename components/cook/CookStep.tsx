@@ -8,6 +8,8 @@ import { colors, fontFamilies, radius, sizes, spacing, typography } from '@/cons
 import { coreTemperature, formatTimer, stepDurations, stepIngredients } from '@/lib/cookingSteps';
 import { startTimer } from '@/lib/cookingSession';
 import { recipeAmount } from '@/lib/quantity';
+import { ingredientCategory, usePantryUrgency } from '@/hooks/usePantryUrgency';
+import { FoodIcon } from '@/components/pantry/FoodIcon';
 import type { CookingRecipe } from '@/lib/cookingSession';
 
 interface Props {
@@ -37,6 +39,7 @@ export const CookStep = memo(function CookStep({ recipe, index, width, textLangu
   const durations = useMemo(() => stepDurations(text), [text]);
   const core = useMemo(() => coreTemperature(text), [text]);
   const ingredients = useMemo(() => stepIngredients(text, recipe.ingredients_used), [text, recipe.ingredients_used]);
+  const pantry = usePantryUrgency();
   // Minuteur en cours de réglage (avant « Lancer »)
   const [adjusting, setAdjusting] = useState<number | null>(null);
 
@@ -87,8 +90,10 @@ export const CookStep = memo(function CookStep({ recipe, index, width, textLangu
           <Text style={styles.ingredientsTitle}>{t('cook.stepIngredients')}</Text>
           {ingredients.map((item, i) => {
             const amount = recipeAmount(item.quantity, item.unit, textLanguage);
+            const { category, kind } = ingredientCategory(item, pantry, textLanguage);
             return (
               <View key={`${item.name}-${i}`} style={styles.ingredient}>
+                <FoodIcon category={category} kind={kind} />
                 <Text style={styles.ingredientName}>{item.name}</Text>
                 {amount ? <Text style={styles.ingredientAmount}>{amount}</Text> : null}
               </View>
@@ -161,7 +166,7 @@ const styles = StyleSheet.create({
   },
   ingredient: {
     flexDirection: 'row',
-    alignItems: 'baseline',
+    alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing.md,
   },
