@@ -268,10 +268,10 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - App : conseils de conservation selon l'emplacement et la langue (`lib/storageTip.ts`) ; message des recettes écartées selon les critères choisis.
 - Évaluation rejouable : `scripts/recipe-eval` (cas fixes `cases.json` dont 4 en langues mélangées, `cases-regions.json` et `cases-proteins.json`, `run.mjs`, `checks.mjs`, `compare.mjs`, `summary.mjs`, `variety.mjs`, résultats dans `results/`) et la copie `generate-recipes-eval` (génération et juge, clé secrète seulement).
 
-### Phase 9b — mode cuisine (branche `phase-9b`, en cours)
+### Phase 9b — mode cuisine (validée, fusionnée le 06/10/2026)
 - Cuisines : `lib/cuisines.ts` (familles, régions, France, « Autre cuisine… », anciennes valeurs ramenées au découpage actuel), `components/recipe/CuisinePicker.tsx` (Préférences, filtres de la génération) ; `user_preferences.default_cuisine_other` ; demandes « Autre cuisine… » dans `cuisine_requests` (sans donnée personnelle, `generate-recipes/cuisineRequests.ts`).
 - Mode cuisine : écran `app/cook.tsx` (mise en place, étapes, « C'est prêt ! » avec `CookedButton` ouvert d'office), `components/cook/` (`CookStep`, `TimerStrip`, `CookStartButton` sur la fiche recette, `CookingBanner` sur l'accueil) ; séance gardée dans le stockage local (`lib/cookingSession.ts`, une à la fois, 24 h au plus) ; minuteurs à heure de fin et notification locale (canal dédié `cook-timers` « Minuteurs de cuisine », importance haute, distinct du canal du résumé quotidien) ; lecture des étapes (`lib/cookingSteps.ts` : durées, température à cœur, ingrédients) ; écran allumé (`expo-keep-awake`). Icône de catégorie des ingrédients de chaque étape (`lib/foodCategory.ts` : catégorie devinée d'après le nom en trois langues, sinon celle du lot du garde-manger) ; photo du plat sur « C'est prêt ! ».
-- Images : consigne réglable par `IMAGE_PROMPT_VERSION` (`generate-recipe-image/imagePrompt.ts` : v1 par défaut, v2 « cuisine maison ») ; « Capacity temporarily exceeded » (429) et 5xx de Cloudflare traités comme une surcharge passagère (un nouvel essai), délai de 60 s ; l'app redemande une image en échec dès qu'une autre réussit ou au bout d'une heure (`lib/recipeImage.ts`). Cloudflare en offre Workers Paid depuis le 05/10/2026. Comparaison des consignes : `scripts/image-compare/compare.mjs`.
+- Images : consigne réglable par `IMAGE_PROMPT_VERSION` (`generate-recipe-image/imagePrompt.ts` : v1 par défaut ; v1.1 « poissons en morceaux » et v2 « cuisine maison » essayées et non retenues, gardées dans le code) ; « Capacity temporarily exceeded » (429) et 5xx de Cloudflare traités comme une surcharge passagère (un nouvel essai), délai de 60 s ; l'app redemande une image en échec dès qu'une autre réussit ou au bout d'une heure (`lib/recipeImage.ts`). Cloudflare en offre Workers Paid depuis le 05/10/2026. Comparaison des consignes : `scripts/image-compare/compare.mjs`.
 - Accueil : « Mes recettes » montre les favoris d'abord (faisables maintenant en tête), quel que soit leur âge ; « Tout voir » ouvre l'onglet Favoris s'il y en a. Le mot « urgent » n'apparaît plus dans les recettes (prompt et retrait côté serveur, `withoutUrgencyWords`). Tests : `lib/*.test.ts` lancés avec les tests Deno, parcours web `scripts/e2e/cooking-web.mjs`.
 
 ## 5. État actuel et problèmes connus
@@ -287,10 +287,11 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Rappels locaux (secours sans jeton push) calculés sur le téléphone ; avec le temps réel, un changement fait par un autre membre les recalcule dès que l'app est ouverte.
 - « J'ai cuisiné ça » : quantité utilisée réglable seulement quand l'unité de la recette correspond à celle du garde-manger (sinon « Tout », « La moitié » ou « Un peu ») ; l'action est enregistrée tout de suite, « Annuler » (10 secondes) ou « Récemment retirés » (24 heures) la rétablissent.
 - Développement avec le build « Antigaspi (dev) » (`npx expo start --dev-client`) ; nouveau build seulement après un changement natif (bibliothèque native, `app.json`, `app.config.js`, `eas.json`). Expo Go reste utilisable, sans notifications push (rappels locaux).
-- Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
+- Tests : Deno (`supabase/functions/**/*.test.ts` et `lib/*.test.ts`), SQL (`supabase/tests/*.sql`) et parcours web (`scripts/e2e/`).
+- Images FLUX schnell : anatomie des poissons parfois bizarre ; la consigne n'y change rien (essai v1.1 du 06/10/2026). Autres modèles à comparer en phase 11.
 
 ## 6. Prochaine étape
-Phase 9b Mode cuisine (branche `phase-9b`, tests sur téléphone), puis 10 Premier contact, 10b Petit groupe de testeurs, 11 Point de décision, 12 Natif (un seul build), 13 Services et abonnements, 14 Audit, 15 Lancement. Détails dans `PLAN.md`.
+Phase 10 Premier contact, puis 10b Petit groupe de testeurs, 11 Point de décision, 12 Natif (un seul build ; en tête : alarmes exactes des minuteurs), 13 Services et abonnements, 14 Audit, 15 Lancement. Restent ouverts de la phase 9b : validation de la bibliothèque de plats par des personnes qui les cuisinent, cas d'évaluation par région. Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash
