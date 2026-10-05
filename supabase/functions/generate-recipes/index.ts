@@ -22,6 +22,7 @@ import {
 import { buildPrompts, CUISINES, geminiRecipeNote, type Cuisine, MAX_PURCHASES, PROMPT_VERSIONS, type PromptVersion } from './prompt.ts';
 import { sampleDishes } from './library.ts';
 import { recentTitles } from './history.ts';
+import { basicsForPrompt, cleanBasics } from './basics.ts';
 import { safetyPass } from './safetyPass.ts';
 import { factNamesFor, translatePantryNames } from './pantryNames.ts';
 import { resolveCuisine } from './cuisines.ts';
@@ -79,6 +80,8 @@ interface GenerateRecipeRequest {
     // Préférences : aliments exclus (allergies, goûts) et nombre de personnes
     excluded?: string[];
     servings?: number;
+    // « Mes basiques » : identifiants (basics.ts) ou noms libres ; absent : sel, poivre, huile, eau
+    basics?: unknown[];
   };
   // true : ajoute le détail des appels (durées, tokens) ; permet aussi d'imposer l'ordre des fournisseurs (mesures)
   debug?: boolean;
@@ -228,7 +231,9 @@ Deno.serve(withCors(async (req: Request) => {
     const count = recipeCount(pantry.items.length);
     const excluded = cleanExcluded(preferences.excluded);
     const servings = cleanServings(preferences.servings);
-    const context = { mealType: preferences.mealType, cuisine: resolved.kind === 'regions' ? resolved.id : resolved.kind === 'other' ? 'other' : cuisine, difficulty, dietary, maxRecipes: count, mode, otherPantry, excluded, servings };
+    // « Mes basiques » (préférences) : disponibles, jamais comptés comme achats ; absents : sel, poivre, huile, eau
+    const basics = cleanBasics(preferences.basics);
+    const context = { mealType: preferences.mealType, cuisine: resolved.kind === 'regions' ? resolved.id : resolved.kind === 'other' ? 'other' : cuisine, difficulty, dietary, maxRecipes: count, mode, otherPantry, excluded, servings, basics };
 
     if (V4_FAMILY) translatePantryNames(pantry, await namesPromise, language);
     const promptOptions = {
@@ -256,6 +261,7 @@ Deno.serve(withCors(async (req: Request) => {
       ...(resolved.kind === 'regions' && { cuisineChoice: { label: resolved.prompt } }),
       ...(resolved.kind === 'other' && { cuisineChoice: { other: resolved.text } }),
       recentTitles: await recentPromise,
+      basicsText: basicsForPrompt(basics),
     };
     const { system, prompt } = buildPrompts(promptOptions);
     const schema = buildRecipeSchema(pantry, diets, UNIT_HINT);

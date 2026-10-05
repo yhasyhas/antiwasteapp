@@ -2,6 +2,7 @@
 // schéma de sortie, alias des ingrédients du garde-manger, lecture de la réponse du modèle, régimes.
 
 import { withoutOvenHeatLevel } from './safety.ts';
+import { DEFAULT_BASICS, isBasicFor } from './basics.ts';
 
 // ---------- Garde-manger ----------
 
@@ -319,9 +320,8 @@ export function verifiedDietTags(raw: any, pantry: Pantry): string[] {
 
 // ---------- Sélection d'ingrédients ----------
 
-// Basiques (sel, poivre, huile, eau) : disponibles partout, jamais « à acheter » ; avec une sélection, jamais
-// considérés comme « un autre ingrédient du garde-manger » (même liste dans l'app : lib/basics.ts)
-export const BASICS = ['sel', 'poivre', 'huile', 'eau', 'salt', 'pepper', 'oil', 'water', 'sal', 'pimienta', 'aceite', 'agua'];
+// Basiques (« Mes basiques », par défaut sel, poivre, huile, eau) : disponibles partout, jamais « à acheter » ; avec
+// une sélection, jamais considérés comme « un autre ingrédient du garde-manger » (basics.ts, même liste dans l'app)
 export const MAX_OTHER_PANTRY = 100;
 
 // Nom comparable : minuscules, sans accents, mots au singulier (« tomates » → « tomate »)
@@ -332,9 +332,8 @@ function matchKey(name: string): string {
     .join(' ');
 }
 
-export function isBasic(name: string): boolean {
-  const padded = ` ${matchKey(name)} `;
-  return BASICS.some((basic) => padded.includes(` ${basic} `));
+export function isBasic(name: string, basics: string[] = DEFAULT_BASICS): boolean {
+  return isBasicFor(name, basics);
 }
 
 // Reste du garde-manger (ingrédients non sélectionnés), noms nettoyés
@@ -348,11 +347,11 @@ export function buildOtherPantry(raw: unknown): string[] {
 
 // Ingrédient de la recette qui est en fait un ingrédient non sélectionné du garde-manger (le modèle l'a
 // marqué « missing »), ou null. « tomates cerises » correspond à « tomates » ; les basiques sont permis.
-export function otherPantryUsed(raw: any, otherPantry: string[]): string | null {
+export function otherPantryUsed(raw: any, otherPantry: string[], basics: string[] = DEFAULT_BASICS): string | null {
   if (otherPantry.length === 0) return null;
   const others = otherPantry.map(matchKey).filter((key) => key !== '');
   for (const ingredient of raw.ingredients || []) {
-    if (ingredient?.pantry_id !== MISSING || typeof ingredient.name !== 'string' || isBasic(ingredient.name)) continue;
+    if (ingredient?.pantry_id !== MISSING || typeof ingredient.name !== 'string' || isBasic(ingredient.name, basics)) continue;
     const padded = ` ${matchKey(ingredient.name)} `;
     const match = others.find((other) => padded.includes(` ${other} `));
     if (match) return ingredient.name;
@@ -580,7 +579,7 @@ export function withoutStyleMentions(title: string): string {
   return cleaned.length >= 4 ? cleaned.charAt(0).toUpperCase() + cleaned.slice(1) : title;
 }
 
-export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; cuisine: string; difficulty: string; dietary: string[]; servings?: number | null }): Recipe {
+export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; cuisine: string; difficulty: string; dietary: string[]; servings?: number | null; basics?: string[] }): Recipe {
   const ingredients: RecipeIngredient[] = raw.ingredients.map((ingredient: any) => {
     const pantryItem = ingredient.pantry_id === MISSING ? undefined : pantry.aliasOf.get(ingredient.pantry_id);
     return {
@@ -612,7 +611,7 @@ export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; 
     ingredients_used: ingredients,
     ingredients_from_list: unique(ingredients.filter((i) => i.pantry_id).map((i) => i.name)),
     // À acheter : sans les basiques (sel, poivre, huile, eau), toujours disponibles
-    missing_ingredients: unique(ingredients.filter((i) => !i.pantry_id && !isBasic(i.name)).map((i) => i.name)),
+    missing_ingredients: unique(ingredients.filter((i) => !i.pantry_id && !isBasic(i.name, context.basics)).map((i) => i.name)),
     // Au four, la température suffit : le niveau de feu (« on medium heat ») est retiré
     instructions: raw.instructions.map((step: string) => withoutOvenHeatLevel(displayText(step))),
     tips: isStringArray(raw.tips) ? raw.tips.map(displayText).filter(Boolean) : [],
@@ -642,6 +641,8 @@ export function parseRecipes(
     // Aliments exclus (allergies, goûts) et nombre de personnes (préférences)
     excluded?: string[];
     servings?: number | null;
+    // « Mes basiques » de l'utilisateur (disponibles, jamais achetés) ; absent : sel, poivre, huile, eau
+    basics?: string[];
   },
 ): ParseOutcome {
   let parsed: any;
@@ -673,7 +674,7 @@ export function parseRecipes(
     if (excludedIngredient) {
       return invalid.push(`n°${index} "${raw.title}" contient « ${excludedIngredient} », exclu par l'utilisateur`);
     }
-    const outsideSelection = otherPantryUsed(raw, context.otherPantry ?? []);
+    const outsideSelection = otherPantryUsed(raw, context.otherPantry ?? [], context.basics);
     if (outsideSelection) {
       return invalid.push(`n°${index} "${raw.title}" utilise « ${outsideSelection} », hors de la sélection`);
     }

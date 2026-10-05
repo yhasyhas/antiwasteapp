@@ -124,6 +124,6 @@ export function purchaseIssues(recipe: Recipe, max: number | undefined): SafetyI
   return [{
     code: 'too_many_purchases',
     ingredient: recipe.missing_ingredients.join(', '),
-    message: `La recette demande ${recipe.missing_ingredients.length} ingrédients à acheter (${recipe.missing_ingredients.join(', ')}) : au plus ${max}, hors sel, poivre, huile et eau. Remplace les autres par des ingrédients du garde-manger, ou retire-les si la recette s'en passe.`,
+    message: `La recette demande ${recipe.missing_ingredients.length} ingrédients à acheter (${recipe.missing_ingredients.join(', ')}) : au plus ${max}, hors basiques. Remplace les autres par des ingrédients du garde-manger, ou retire-les si la recette s'en passe.`,
   }];
 }
