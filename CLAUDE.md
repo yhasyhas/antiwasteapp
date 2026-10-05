@@ -15,7 +15,8 @@ Application mobile anti-gaspi (Expo / React Native, Supabase) : on remplit son g
 - **Branches** :
   - une branche par phase ;
   - fusion dans `master` seulement après validation des tests par l'utilisateur ;
-  - branche supprimée juste après la fusion (locale et GitHub).
+  - branche supprimée juste après la fusion (locale et GitHub) ;
+  - ne jamais enchaîner une action destructrice (suppression de branche, effacement de données) dans la même commande qu'une autre ; la lancer seulement après avoir vérifié que l'étape précédente a réussi.
 - **Commits** :
   - un commit par tâche, message en français ;
   - `npm run typecheck` avant chaque commit.

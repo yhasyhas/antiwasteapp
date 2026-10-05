@@ -13,6 +13,7 @@ Dernière mise à jour : 30/09/2026
 
 - **Une branche par phase** : `phase-0`, `phase-1`, etc. Fusion dans `master` quand la phase est terminée.
 - **Une branche est supprimée juste après sa fusion** (localement et sur GitHub).
+- **Ne jamais enchaîner une action destructrice (suppression de branche, effacement de données) dans la même commande qu'une autre ; la lancer seulement après avoir vérifié que l'étape précédente a réussi.**
 - **Un commit par tâche**, avec un message clair en français.
 - **`npm run typecheck` doit passer avant chaque commit** (à partir de la fin de la phase 0).
 - **Tous les tests passent avant chaque fusion, sans exception connue** : tests SQL (`supabase/tests/`), tests des fonctions (Deno) et typecheck.
@@ -327,7 +328,7 @@ Partie restante de la phase 9.
 
 - [ ] Mode cuisine étape par étape avec minuteurs (si garder l'écran allumé demande un module natif, cette partie va en phase 12)
 - [ ] Bibliothèque de plats de référence (`generate-recipes/library/`, `docs/bibliotheque-plats.md`) : inspiration tirée au hasard, seulement avec une cuisine précise ; à faire valider par des personnes qui cuisinent ces plats avant de l'utiliser dans l'app
-- [ ] Découpage plus précis des cuisines (`docs/cuisines-proposition.md`) : décision de l'utilisateur attendue, rien de changé dans l'app avant
+- [ ] Découpage plus précis des cuisines (`docs/cuisines-proposition.md`) : décision prise, à intégrer dans l'app (choix en deux niveaux, famille puis région, dans les Préférences et sur l'écran de génération ; « Autre cuisine… » ; migration `cuisine_requests`)
 - [ ] Évaluation : 3 garde-manger par région dans les cas fixes, une fois la bibliothèque relue
 
 **Terminé quand** : une recette peut être suivie étape par étape avec ses minuteurs.
@@ -347,6 +348,10 @@ Partie restante de la phase 9.
 - [ ] Les épices déclarées dans « Mes basiques » ne comptent pas comme achats (limite de 3 ingrédients à acheter par recette)
 
 **Terminé quand** : un nouvel utilisateur est guidé jusqu'à son premier scan, voit son impact du mois, et l'app reste utilisable avec les plus grandes tailles de texte et un lecteur d'écran.
+
+## Phase 10b — Petit groupe de testeurs
+
+- [ ] Partage avec un petit groupe de testeurs (3 à 5 amis, Android) : build preview avec un paquet provisoire .preview, ajouté au projet Firebase, lien d'installation, groupe de retours
 
 ## Phase 11 — Point de décision
 
