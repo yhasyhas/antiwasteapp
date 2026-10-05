@@ -54,6 +54,8 @@ function RootNavigator() {
         <Stack.Screen name="recipe/generate" />
         <Stack.Screen name="household" />
         <Stack.Screen name="preferences" />
+        {/* Mode cuisine : plein écran, glissement vers le haut */}
+        <Stack.Screen name="cook" options={{ animation: 'slide_from_bottom', gestureEnabled: false }} />
         <Stack.Screen name="language" />
         <Stack.Screen name="auth/upgrade" />
         {/* Développement seulement (l'écran redirige ailleurs hors développement) */}

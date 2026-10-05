@@ -536,6 +536,27 @@ export function withoutInternalCodes(text: string): string {
   return INTERNAL_CODES.reduce((current, pattern) => current.replace(pattern, ''), String(text ?? ''))
     .replace(/\s+([,.;:!?)])/g, '$1').replace(/\s{2,}/g, ' ').trim();
 }
+// « Urgent » et ses équivalents ne s'affichent jamais (« urgent bell peppers », « les poivrons urgents ») : le
+// prompt marque les aliments [URGENT] et le modèle recopie parfois le mot. Retiré avec « le plus », « most »,
+// « más » qui le précèdent, et les parenthèses laissées vides
+const NOT_LETTER_BEFORE = String.raw`(?<![\p{L}\p{N}])`;
+const NOT_LETTER_AFTER = String.raw`(?![\p{L}\p{N}])`;
+const URGENCY_WORDS = [
+  new RegExp(String.raw`\s*${NOT_LETTER_BEFORE}(?:(?:le|la|les)\s+plus\s+|most\s+|más\s+)?(?:urgent(?:e|s|es|ly)?|urgemment|urgente(?:s|mente)?|urgency|(?:d['’]|en\s+|de\s+|con\s+)?urgen(?:ce|cia))${NOT_LETTER_AFTER}`, 'giu'),
+];
+export function withoutUrgencyWords(text: string): string {
+  const source = String(text ?? '');
+  const cleaned = URGENCY_WORDS.reduce((current, pattern) => current.replace(pattern, ''), source)
+    .replace(/\(\s*\)|\[\s*\]/g, '').replace(/\s+([,.)])/g, '$1').replace(/\(\s+/g, '(').replace(/\s{2,}/g, ' ').replace(/^[\s,;:]+/, '').trim();
+  if (cleaned === source.trim()) return cleaned;
+  // Mot retiré en tête de phrase : majuscule rétablie
+  return /^\p{Lu}/u.test(source.trim()) ? cleaned.charAt(0).toUpperCase() + cleaned.slice(1) : cleaned;
+}
+export const hasUrgencyWords = (text: string) => URGENCY_WORDS.some((pattern) => new RegExp(pattern.source, pattern.flags.replace('g', '')).test(text));
+
+// Texte affiché : sans repères internes ni mot « urgent »
+export const displayText = (text: string) => withoutUrgencyWords(withoutInternalCodes(text));
+
 export const hasInternalCodes = (text: string) => INTERNAL_CODES.some((pattern) => new RegExp(pattern.source, pattern.flags.replace('g', '')).test(text));
 
 const PIECE_UNITS = new Set(['piece', 'pieces', 'pc', 'pcs', 'unite', 'unites', 'unit', 'units', 'pieza', 'piezas', 'unidad', 'unidades', 'x']);
@@ -565,7 +586,7 @@ export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; 
     return {
       // Nom écrit par le modèle, dans la langue de la recette (« eggs » pour « œufs » du garde-manger) ; le nom du
       // garde-manger seulement si le modèle n'en donne pas
-      name: withoutInternalCodes(ingredient.name) || pantryItem?.name || '',
+      name: displayText(ingredient.name) || pantryItem?.name || '',
       quantity: String(ingredient.quantity ?? '').replace(/[a-zA-ZÀ-ÿ\s]/g, '').trim() || '1',
       // Ce qui se compte n'a pas d'unité : « 4 œufs », jamais « 4 pièces d'œufs »
       unit: typeof ingredient.unit === 'string' && !PIECE_UNITS.has(normalizeName(ingredient.unit)) ? ingredient.unit.trim() : '',
@@ -574,11 +595,11 @@ export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; 
   });
 
   const unique = (names: string[]) => names.filter((name, i) => names.findIndex((other) => normalizeName(other) === normalizeName(name)) === i);
-  const suggestion = typeof raw.suggestion === 'string' ? withoutInternalCodes(raw.suggestion) : '';
+  const suggestion = typeof raw.suggestion === 'string' ? displayText(raw.suggestion) : '';
 
   return {
-    title: withoutStyleMentions(withoutInternalCodes(raw.title)),
-    description: typeof raw.description === 'string' ? withoutInternalCodes(raw.description) : '',
+    title: withoutStyleMentions(displayText(raw.title)),
+    description: typeof raw.description === 'string' ? displayText(raw.description) : '',
     difficulty: DIFFICULTIES.includes(raw.difficulty) ? raw.difficulty : context.difficulty,
     prep_time: isCount(raw.prep_time) ? Math.round(raw.prep_time) : 15,
     cook_time: isCount(raw.cook_time) ? Math.round(raw.cook_time) : 20,
@@ -593,8 +614,8 @@ export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; 
     // À acheter : sans les basiques (sel, poivre, huile, eau), toujours disponibles
     missing_ingredients: unique(ingredients.filter((i) => !i.pantry_id && !isBasic(i.name)).map((i) => i.name)),
     // Au four, la température suffit : le niveau de feu (« on medium heat ») est retiré
-    instructions: raw.instructions.map((step: string) => withoutOvenHeatLevel(withoutInternalCodes(step))),
-    tips: isStringArray(raw.tips) ? raw.tips.map(withoutInternalCodes).filter(Boolean) : [],
+    instructions: raw.instructions.map((step: string) => withoutOvenHeatLevel(displayText(step))),
+    tips: isStringArray(raw.tips) ? raw.tips.map(displayText).filter(Boolean) : [],
     ...(suggestion && { suggestion }),
     image_prompt: typeof raw.image_prompt === 'string' && raw.image_prompt.trim() !== ''
       ? raw.image_prompt

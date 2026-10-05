@@ -6,7 +6,8 @@ import { BottomSheet, SheetHeader } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { spacing, typography, colors } from '@/constants/theme';
-import { cuisineOptions, dietaryOptions, difficultyOptions, languages, mealTypes } from './options';
+import { CuisinePicker } from './CuisinePicker';
+import { dietaryOptions, difficultyOptions, languages, mealTypes } from './options';
 import { CookTimeChoice, ServingsStepper } from './PreferenceControls';
 import type { Filters } from './types';
 
@@ -39,17 +40,10 @@ export function FiltersModal({ visible, filters, onChange, onToggleDietary, onCl
           ))}
         </Group>
 
-        <Group title={t('cuisine.title')}>
-          {cuisineOptions.map((option) => (
-            <Chip
-              key={option.value}
-              label={t(option.labelKey)}
-              showCheck
-              selected={filters.cuisine === option.value}
-              onPress={() => onChange({ ...filters, cuisine: option.value })}
-            />
-          ))}
-        </Group>
+        <View style={styles.group}>
+          <Text style={styles.groupTitle}>{t('cuisine.title')}</Text>
+          <CuisinePicker value={filters.cuisine} other={filters.cuisineOther} onChange={(cuisine, cuisineOther) => onChange({ ...filters, cuisine, cuisineOther })} />
+        </View>
 
         <Group title={t('preferences.maxTime')}>
           <CookTimeChoice value={filters.maxCookTime} onChange={(maxCookTime) => onChange({ ...filters, maxCookTime })} />

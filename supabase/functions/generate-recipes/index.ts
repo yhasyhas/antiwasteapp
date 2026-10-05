@@ -24,6 +24,8 @@ import { sampleDishes } from './library.ts';
 import { recentTitles } from './history.ts';
 import { safetyPass } from './safetyPass.ts';
 import { factNamesFor, translatePantryNames } from './pantryNames.ts';
+import { resolveCuisine } from './cuisines.ts';
+import { recordCuisineRequest } from './cuisineRequests.ts';
 
 // Modèles configurables par secret : les fournisseurs retirent régulièrement des modèles
 const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') || '';
@@ -70,7 +72,9 @@ interface GenerateRecipeRequest {
     difficulty?: 'easy' | 'medium' | 'expert';
     maxCookTime?: number;
     mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+    // Ancienne valeur (« african »…), famille, région, « france » ou « other » (texte dans cuisineOther)
     cuisine?: string;
+    cuisineOther?: string;
     language: string;
     // Préférences : aliments exclus (allergies, goûts) et nombre de personnes
     excluded?: string[];
@@ -214,12 +218,17 @@ Deno.serve(withCors(async (req: Request) => {
 
     const dietary = Array.isArray(preferences.dietary) ? preferences.dietary : [];
     const diets = strictDietsOf(dietary);
-    const cuisine: Cuisine = (CUISINES as readonly string[]).includes(preferences.cuisine || '') ? preferences.cuisine as Cuisine : 'any';
+    const legacyCuisine = (CUISINES as readonly string[]).includes(preferences.cuisine || '');
+    const cuisine: Cuisine = legacyCuisine ? preferences.cuisine as Cuisine : 'any';
+    // Découpage de la phase 9b (v4 et suivantes) : région, famille ou « Autre cuisine… » ; les anciennes valeurs
+    // gardent leur traitement
+    const resolved = legacyCuisine || !V4_FAMILY ? { kind: 'any' as const } : resolveCuisine(preferences.cuisine, preferences.cuisineOther);
+    if (resolved.kind === 'other' && simulation === null && debug !== true) reportInBackground(recordCuisineRequest(resolved.text, language));
     const difficulty = preferences.difficulty || 'easy';
     const count = recipeCount(pantry.items.length);
     const excluded = cleanExcluded(preferences.excluded);
     const servings = cleanServings(preferences.servings);
-    const context = { mealType: preferences.mealType, cuisine, difficulty, dietary, maxRecipes: count, mode, otherPantry, excluded, servings };
+    const context = { mealType: preferences.mealType, cuisine: resolved.kind === 'regions' ? resolved.id : resolved.kind === 'other' ? 'other' : cuisine, difficulty, dietary, maxRecipes: count, mode, otherPantry, excluded, servings };
 
     if (V4_FAMILY) translatePantryNames(pantry, await namesPromise, language);
     const promptOptions = {
@@ -241,7 +250,11 @@ Deno.serve(withCors(async (req: Request) => {
       servings,
       version: PROMPT_VERSION,
       // Quelques plats de référence tirés au hasard, seulement avec une cuisine précise
-      examples: V4_FAMILY ? sampleDishes(cuisine, { mealType: preferences.mealType, diets }) : [],
+      examples: V4_FAMILY && resolved.kind !== 'other'
+        ? sampleDishes(cuisine, { mealType: preferences.mealType, diets, ...(resolved.kind === 'regions' && { regions: resolved.regions }) })
+        : [],
+      ...(resolved.kind === 'regions' && { cuisineChoice: { label: resolved.prompt } }),
+      ...(resolved.kind === 'other' && { cuisineChoice: { other: resolved.text } }),
       recentTitles: await recentPromise,
     };
     const { system, prompt } = buildPrompts(promptOptions);
@@ -347,7 +360,7 @@ Deno.serve(withCors(async (req: Request) => {
 
     // Part des recettes servies par le secours (« État des services ») ; essais (debug, simulation) à part
     reportInBackground(recordProviderUsage('generate-recipes', result.provider.name, result.provider !== providers[0], recipes.length, simulation !== null || debug === true));
-    console.log(`[generate-recipes] ${result.provider.name} (${result.provider.model}) : ${recipes.length}/${count} recette(s) en ${Date.now() - t0} ms, prompt ${PROMPT_VERSION}, cuisine ${cuisine}, langue ${language}`);
+    console.log(`[generate-recipes] ${result.provider.name} (${result.provider.model}) : ${recipes.length}/${count} recette(s) en ${Date.now() - t0} ms, prompt ${PROMPT_VERSION}, cuisine ${resolved.kind === 'regions' ? resolved.id : resolved.kind === 'other' ? 'autre' : cuisine}, langue ${language}`);
     return jsonResponse({
       recipes,
       totalGenerated: recipes.length,

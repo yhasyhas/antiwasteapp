@@ -21,6 +21,7 @@ import { Touchable } from '@/components/ui/Touchable';
 import { colors, motion, radius, sizes, spacing, typography } from '@/constants/theme';
 import { CookedButton } from './CookedButton';
 import { AddMissingButton } from './AddMissingButton';
+import { CookStartButton } from '@/components/cook/CookStartButton';
 import { translatedRecipe, type Recipe, type RecipeText } from './types';
 import { showDialog } from '@/lib/dialog';
 
@@ -169,6 +170,11 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
               </View>
             ) : null}
 
+            {/* Mode cuisine : dans la langue affichée (traduction comprise) */}
+            {recipe.instructions.length > 0 ? (
+              <CookStartButton recipe={{ ...recipe, language: textLanguage }} onBeforeOpen={onClose} style={styles.cookStart} />
+            ) : null}
+
             {recipe.ingredients_from_list.length > 0 && (
               <Card style={styles.card}>
                 <View style={styles.cardHeader}>
@@ -291,6 +297,9 @@ function RoundButton({ onPress, label, selected, children }: { onPress: () => vo
 }
 
 const styles = StyleSheet.create({
+  cookStart: {
+    marginTop: spacing.xs,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,

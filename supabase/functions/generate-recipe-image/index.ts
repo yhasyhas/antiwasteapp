@@ -4,9 +4,10 @@ import { consumeQuota, DAILY_LIMITS, dailyLimit, refundQuota } from '../_shared/
 import { withCors } from '../_shared/cors.ts';
 import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_SECRET_KEY, SUPABASE_URL } from '../_shared/keys.ts';
 import { compressRecipeImage } from '../_shared/image.ts';
-import { classifyProviderFailure } from '../_shared/ai.ts';
+import { classifyProviderFailure, isTransientOverload } from '../_shared/ai.ts';
 import { logUserQuota, reportInBackground, reportProviderQuota } from '../_shared/quotaAlerts.ts';
 import { readSimulation } from '../_shared/simulate.ts';
+import { buildImagePrompt, imagePromptVersion, type ImagePromptVersion } from './imagePrompt.ts';
 
 // Image d'une recette : générée par Cloudflare Workers AI (FLUX), stockée dans le bucket recipe-images,
 // URL enregistrée dans recipes.image_url (historique). Appelée par l'app en arrière-plan dès l'affichage
@@ -20,7 +21,14 @@ const CLOUDFLARE_ACCOUNT_ID = Deno.env.get('CLOUDFLARE_ACCOUNT_ID') || '';
 const CLOUDFLARE_API_TOKEN = Deno.env.get('CLOUDFLARE_API_TOKEN') || '';
 // Modèle configurable par secret : les fournisseurs retirent régulièrement des modèles
 const CLOUDFLARE_IMAGE_MODEL = Deno.env.get('CLOUDFLARE_IMAGE_MODEL') || '@cf/black-forest-labs/flux-1-schnell';
-const CLOUDFLARE_TIMEOUT_MS = 40_000;
+// 60 s : le 05/10/2026, des images ont mis 25 à 31 s et d'autres ont dépassé 40 s (Cloudflare lent, sans incident
+// déclaré) ; l'app n'impose pas de délai à cet appel, et la fonction a 150 s au plus
+const CLOUDFLARE_TIMEOUT_MS = 60_000;
+// Consigne d'image (voir imagePrompt.ts) : v1 par défaut, v2 « cuisine maison » ; réglable sans redéployer
+const IMAGE_PROMPT_VERSION = imagePromptVersion(Deno.env.get('IMAGE_PROMPT_VERSION'));
+// Surcharge passagère de Cloudflare (« Capacity temporarily exceeded », 5xx) : un seul nouvel essai, après
+// une courte pause (décalée au hasard pour ne pas relancer ensemble les images d'une même génération)
+const OVERLOAD_RETRY_DELAY_MS = 1500;
 // FLUX schnell : 4 étapes suffisent (8 au maximum) ; plus d'étapes coûtent plus de neurones Cloudflare
 const FLUX_STEPS = 4;
 
@@ -39,7 +47,7 @@ const MESSAGES: Record<string, Record<ErrorCode, string>> = {
     quota_exceeded: 'Tu as atteint la limite de {limit} images de recettes par jour. Réessaie demain.',
     ai_error: 'Le service d\'images est momentanément indisponible. Réessaie plus tard.',
     storage_error: 'L\'image n\'a pas pu être enregistrée. Réessaie plus tard.',
-    provider_quota: 'Images du jour épuisées, elles reviennent demain.',
+    provider_quota: 'Le service d\'images est saturé. Nouvel essai dans une heure.',
   },
   en: {
     unauthorized: 'You must be signed in to generate an image.',
@@ -49,7 +57,7 @@ const MESSAGES: Record<string, Record<ErrorCode, string>> = {
     quota_exceeded: 'You have reached the limit of {limit} recipe images per day. Try again tomorrow.',
     ai_error: 'The image service is temporarily unavailable. Please try again later.',
     storage_error: 'The image could not be saved. Please try again later.',
-    provider_quota: 'Today\'s images have run out; they will be back tomorrow.',
+    provider_quota: 'The image service is busy. Trying again in an hour.',
   },
   es: {
     unauthorized: 'Debes iniciar sesión para generar una imagen.',
@@ -59,7 +67,7 @@ const MESSAGES: Record<string, Record<ErrorCode, string>> = {
     quota_exceeded: 'Has alcanzado el límite de {limit} imágenes de recetas por día. Vuelve a intentarlo mañana.',
     ai_error: 'El servicio de imágenes no está disponible en este momento. Inténtalo más tarde.',
     storage_error: 'No se pudo guardar la imagen. Inténtalo más tarde.',
-    provider_quota: 'Se acabaron las imágenes de hoy; vuelven mañana.',
+    provider_quota: 'El servicio de imágenes está saturado. Nuevo intento en una hora.',
   },
 };
 
@@ -170,12 +178,6 @@ async function releaseClaim(recipeId: string, claim: string, authorization: stri
   await updateImageUrl(recipeId, { eq: claim }, null, authorization);
 }
 
-// FLUX comprend mieux l'anglais : image_prompt est écrit en anglais par generate-recipes
-function buildImagePrompt(recipe: Pick<RecipeRow, 'title' | 'description' | 'image_prompt'>): string {
-  if (recipe.image_prompt && recipe.image_prompt.trim() !== '') return recipe.image_prompt.trim().slice(0, 1000);
-  return `Professional food photography of ${recipe.title}${recipe.description ? `, ${recipe.description}` : ''}. Appetizing, natural light, served on a plate.`.slice(0, 1000);
-}
-
 async function generateImage(prompt: string, simulate?: 'quota' | 'error' | 'refused'): Promise<Uint8Array> {
   // Tests : échec simulé, sans appel à Cloudflare
   if (simulate === 'quota') throw new CloudflareError(429, 'Cloudflare 429 (simulé) : you have used up your daily free allocation of 10,000 neurons');
@@ -205,6 +207,17 @@ async function generateImage(prompt: string, simulate?: 'quota' | 'error' | 'ref
   return bytes;
 }
 
+async function generateImageWithRetry(prompt: string, simulate?: 'quota' | 'error' | 'refused'): Promise<Uint8Array> {
+  try {
+    return await generateImage(prompt, simulate);
+  } catch (error) {
+    if (!(error instanceof CloudflareError) || !isTransientOverload(error.status, error.message)) throw error;
+    console.warn(`[generate-recipe-image] surcharge passagère, nouvel essai : ${error.message.slice(0, 160)}`);
+    await new Promise((resolve) => setTimeout(resolve, OVERLOAD_RETRY_DELAY_MS + Math.random() * 1500));
+    return await generateImage(prompt, simulate);
+  }
+}
+
 // Dépôt avec la clé secrète : le bucket n'a aucune politique d'écriture pour les utilisateurs
 async function uploadImage(path: string, bytes: Uint8Array): Promise<string> {
   const response = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${path}`, {
@@ -232,6 +245,10 @@ Deno.serve(withCors(async (req: Request) => {
     const simulation = readSimulation(req, body);
     language = String(body?.language || 'fr').substring(0, 2).toLowerCase();
     const recipeId = typeof body?.recipe_id === 'string' ? body.recipe_id : '';
+    // Comparaison des consignes (scripts/image-compare) : version imposée, avec la clé secrète seulement
+    const promptVersion: ImagePromptVersion = req.headers.get('x-simulate-key') === SUPABASE_SECRET_KEY && SUPABASE_SECRET_KEY && body?.prompt_version
+      ? imagePromptVersion(String(body.prompt_version))
+      : IMAGE_PROMPT_VERSION;
 
     const user = await getAuthenticatedUser(req);
     if (!user) return errorResponse('unauthorized', language);
@@ -267,7 +284,7 @@ Deno.serve(withCors(async (req: Request) => {
 
     let bytes: Uint8Array;
     try {
-      bytes = await generateImage(buildImagePrompt(recipe), simulation?.providers.cloudflare);
+      bytes = await generateImageWithRetry(buildImagePrompt(recipe, promptVersion), simulation?.providers.cloudflare);
     } catch (error) {
       const details = error instanceof Error ? error.message : String(error);
       const reason = classifyProviderFailure(error instanceof CloudflareError ? error.status : undefined, details);
@@ -304,7 +321,7 @@ Deno.serve(withCors(async (req: Request) => {
       return errorResponse('storage_error', language, error instanceof Error ? error.message : String(error));
     }
 
-    console.log(`[generate-recipe-image] image de ${recipe.id} en ${Date.now() - t0} ms (${Math.round(originalSize / 1024)} Ko → ${Math.round(bytes.length / 1024)} Ko)`);
+    console.log(`[generate-recipe-image] image de ${recipe.id} en ${Date.now() - t0} ms (consigne ${promptVersion}, ${Math.round(originalSize / 1024)} Ko → ${Math.round(bytes.length / 1024)} Ko)`);
     return jsonResponse({ image_url: imageUrl, generated: true }, 200);
   } catch (error) {
     console.error('[generate-recipe-image] erreur :', error);

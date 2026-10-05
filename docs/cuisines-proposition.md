@@ -1,6 +1,6 @@
 # Découpage des cuisines (phase 9)
 
-Statut : **décidé le 02/10/2026, préparé sur la branche `phase-9`.** Les écrans de l'app ne changent qu'après la validation de la phase 8 et de la bibliothèque de plats (`docs/bibliotheque-plats.md`).
+Statut : **décidé le 02/10/2026, intégré dans l'app le 05/10/2026 (phase 9b).**
 
 ## Avant
 
@@ -41,7 +41,7 @@ On choisit une famille, puis, si on veut, une région. Le choix de la famille en
 
 - Champ libre court, dans les trois langues (« Autre cuisine… », « Other cuisine… », « Otra cocina… »). Le texte est réduit aux lettres, espaces, traits d'union et apostrophes, 40 caractères au plus.
 - Le prompt le traite comme un simple nom de cuisine (aucune consigne lue dedans), sans plats de référence. Si ce n'est pas une cuisine reconnaissable, la cuisine est libre.
-- **Demandes enregistrées sans donnée personnelle**, pour repérer les cuisines à ajouter : table `cuisine_requests` (texte nettoyé, langue, date ; ni utilisateur, ni foyer), écrite par le serveur seulement. La migration est prête dans `supabase/migrations-pending/` et n'est pas appliquée : elle sera déplacée dans `supabase/migrations/` au moment de l'intégration.
+- **Demandes enregistrées sans donnée personnelle**, pour repérer les cuisines à ajouter : table `cuisine_requests` (texte nettoyé, langue, date ; ni utilisateur, ni foyer), écrite par le serveur seulement. Migration `supabase/migrations/20261005100000_cuisine_requests.sql`, appliquée le 05/10/2026 (test : `supabase/tests/cuisine_requests.sql`).
 
 ## Ergonomie
 
@@ -68,8 +68,8 @@ Les valeurs actuelles restent valides, aucune migration de données :
 - Prompt v4 : région ou famille (libellé avec les pays), « Autre cuisine… » ; plats de référence tirés dans les régions choisies.
 - Évaluation : un cas par région et un pour « Autre cuisine » (`scripts/recipe-eval/cases-regions.json`).
 
-## Reste à faire à l'intégration (après validation)
+## Intégration (05/10/2026)
 
-- Écrans des Préférences et de génération, traductions (fr, en, es).
-- `generate-recipes` : version v4 par défaut, lecture du choix de cuisine, enregistrement des demandes « Autre cuisine ».
-- Appliquer la migration `cuisine_requests` (testée en transaction annulée).
+- App : `lib/cuisines.ts` (mêmes identifiants que le serveur, anciennes valeurs ramenées au découpage actuel), `components/recipe/CuisinePicker.tsx` dans les Préférences et les filtres de la génération, libellés en trois langues.
+- Base : `user_preferences.default_cuisine` accepte les nouveaux choix (anciennes valeurs toujours valides), `default_cuisine_other` garde le texte de « Autre cuisine… » (`20261005110000_preferences_cuisines.sql`, test `preferences_cuisines.sql`).
+- `generate-recipes` : lecture du choix (région, famille, « Autre cuisine… »), plats de référence de la région, demandes « Autre cuisine… » enregistrées (`cuisineRequests.ts`).

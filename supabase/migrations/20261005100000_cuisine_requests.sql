@@ -1,6 +1,5 @@
--- « Autre cuisine… » (phase 9, découpage des cuisines) : demandes enregistrées sans donnée personnelle, pour
--- repérer les cuisines à ajouter. EN ATTENTE : à déplacer dans supabase/migrations/ à l'intégration, après la
--- validation de la phase 8 et de la bibliothèque (docs/cuisines-proposition.md).
+-- « Autre cuisine… » (phase 9b, découpage des cuisines, docs/cuisines-proposition.md) : demandes enregistrées sans
+-- donnée personnelle, pour repérer les cuisines à ajouter.
 -- Ni utilisateur ni foyer : seulement le texte nettoyé par le serveur, la langue et la date. Écrite par
 -- generate-recipes avec la clé secrète ; aucune lecture ni écriture depuis l'app (RLS sans politique).
 

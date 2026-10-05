@@ -2,6 +2,7 @@
 // tri des recettes les plus faisables avec le garde-manger actuel, sections par période. Sans appel réseau.
 
 import type { Recipe } from '@/components/recipe/types';
+import { cuisineKey } from './cuisines';
 
 export type SavedTab = 'favorites' | 'later' | 'all';
 export type Period = 'week' | 'month' | 'older';
@@ -52,7 +53,7 @@ export function filterRecipes(recipes: SavedRecipe[], tab: SavedTab, filters: Sa
     && (!filters.feasible || missingCount(recipe, context) <= MAX_MISSING)
     && (!filters.urgent || context.toSave(recipe) > 0)
     && (!filters.quick || (recipe.total_time > 0 && recipe.total_time < QUICK_MINUTES))
-    && (!filters.cuisine || recipe.cuisine === filters.cuisine)
+    && (!filters.cuisine || (!!recipe.cuisine && cuisineKey(recipe.cuisine) === filters.cuisine))
     && (!filters.diet || recipe.dietary_tags.includes(`diet:${filters.diet}`))
     && (!filters.meal || recipe.meal_type === filters.meal));
   if (!filters.feasible) return kept;

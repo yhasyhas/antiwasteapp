@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocalSearchParams } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LayoutList, Rows3, Search, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -6,7 +7,8 @@ import { useSavedRecipes } from '@/hooks/useSavedRecipes';
 import { feasibility, toSaveCount, usePantryUrgency } from '@/hooks/usePantryUrgency';
 import { RecipeListCard } from '@/components/recipe/RecipeListCard';
 import { RecipeSheet } from '@/components/recipe/RecipeSheet';
-import { cuisineOptions, mealTypes } from '@/components/recipe/options';
+import { mealTypes } from '@/components/recipe/options';
+import { cuisineKey, cuisineLabel } from '@/lib/cuisines';
 import { Chip } from '@/components/ui/Chip';
 import { EmptyState } from '@/components/ui/Illustrations';
 import { TextField } from '@/components/ui/Input';
@@ -33,7 +35,14 @@ export default function SavedScreen() {
   const { recipes, loading, selectedRecipe, setSelectedRecipe, isImageLoading, imageNotice, openRecipe, toggleFavorite, toggleLater } = useSavedRecipes();
   const { t } = useLanguage();
   const pantry = usePantryUrgency();
-  const [tab, setTab] = useState<SavedTab>('favorites');
+  // Onglet demandé par l'accueil (« Tout voir ») : Favoris s'il y en a au moins un, sinon Toutes
+  // (« at » : chaque toucher est une nouvelle demande, même après un changement d'onglet à la main)
+  const params = useLocalSearchParams<{ tab?: string; at?: string }>();
+  const requestedTab = params.tab === 'favorites' || params.tab === 'later' || params.tab === 'all' ? params.tab : null;
+  const [tab, setTab] = useState<SavedTab>(requestedTab ?? 'favorites');
+  useEffect(() => {
+    if (requestedTab) setTab(requestedTab);
+  }, [requestedTab, params.at]);
   const [filters, setFilters] = useState<SavedFilters>(NO_FILTERS);
   const [compact, setCompact] = useState(false);
   const update = (change: Partial<SavedFilters>) => setFilters((current) => ({ ...current, ...change }));
@@ -60,13 +69,11 @@ export default function SavedScreen() {
       { text: t('common.cancel'), style: 'cancel' as const },
     ]);
   };
-  const cuisines = optionsOf(recipes, (recipe) => (recipe.cuisine ? [recipe.cuisine] : []));
+  // Anciennes valeurs (« african ») ramenées au découpage actuel
+  const cuisines = optionsOf(recipes, (recipe) => (recipe.cuisine && cuisineKey(recipe.cuisine) !== 'any' ? [cuisineKey(recipe.cuisine)] : []));
   const diets = DIETS.filter((diet) => recipes.some((recipe) => recipe.dietary_tags.includes(`diet:${diet.value}`)));
   const meals = optionsOf(recipes, (recipe) => (recipe.meal_type ? [recipe.meal_type] : []));
-  const cuisineLabel = (value: string) => {
-    const option = cuisineOptions.find((item) => item.value === value);
-    return option ? t(option.labelKey) : value;
-  };
+  const cuisineName = (value: string) => cuisineLabel(t, value);
   const mealLabel = (value: string) => {
     const option = mealTypes.find((item) => item.value === value);
     return option ? t(option.labelKey) : value;
@@ -153,9 +160,9 @@ export default function SavedScreen() {
             <Chip label={t('saved.filterQuick')} selected={filters.quick} onPress={() => update({ quick: !filters.quick })} />
             {cuisines.length > 0 ? (
               <Chip
-                label={filters.cuisine ? cuisineLabel(filters.cuisine) : t('saved.filterCuisine')}
+                label={filters.cuisine ? cuisineName(filters.cuisine) : t('saved.filterCuisine')}
                 selected={!!filters.cuisine}
-                onPress={() => pick(t('saved.filterCuisine'), cuisines.map((value) => ({ value, label: cuisineLabel(value) })), filters.cuisine, (cuisine) => update({ cuisine }))}
+                onPress={() => pick(t('saved.filterCuisine'), cuisines.map((value) => ({ value, label: cuisineName(value) })), filters.cuisine, (cuisine) => update({ cuisine }))}
               />
             ) : null}
             {diets.length > 0 ? (

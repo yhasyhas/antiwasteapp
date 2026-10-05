@@ -2,7 +2,7 @@
 // Lancement : deno test --no-config supabase/functions/
 
 import { assert, assertEquals } from 'jsr:@std/assert@1';
-import { type AiProvider, type AiRequest, type AttemptLog, classifyProviderFailure, isProviderMalfunction, orderProviders, type ParseResult, type ProviderResult, runWithFallback } from './ai.ts';
+import { type AiProvider, type AiRequest, type AttemptLog, classifyProviderFailure, isProviderMalfunction, isTransientOverload, orderProviders, type ParseResult, type ProviderResult, runWithFallback } from './ai.ts';
 
 const REQUEST: AiRequest = { prompt: 'test', schema: {}, schemaName: 'test', temperature: 0, maxOutputTokens: 100 };
 
@@ -136,6 +136,17 @@ Deno.test('classification : erreurs de quota de Gemini, Groq et Cloudflare ; le 
   assertEquals(classifyProviderFailure(503, 'Gemini 503: {\"status\":\"UNAVAILABLE\",\"message\":\"The model is overloaded\"}'), 'provider_error');
   assertEquals(classifyProviderFailure(500, 'Groq 500: internal error'), 'provider_error');
   assertEquals(classifyProviderFailure(undefined, 'Gemini: TimeoutError: Signal timed out.'), 'provider_error');
+});
+
+Deno.test('capacité de Cloudflare dépassée (429) : surcharge passagère, ni quota ni dysfonctionnement', () => {
+  const details = 'Cloudflare 429: {"errors":[{"message":"AiError: AiError: Capacity temporarily exceeded, please try again. (aa0cc1cb)"}]}';
+  assertEquals(classifyProviderFailure(429, details), 'provider_error');
+  assertEquals(isProviderMalfunction(429, details), false);
+  assertEquals(isTransientOverload(429, details), true);
+  assertEquals(isTransientOverload(503, 'Gemini 503: overloaded'), true);
+  // Un vrai quota épuisé ou une requête refusée ne valent pas un nouvel essai immédiat
+  assertEquals(isTransientOverload(429, 'Cloudflare 429: daily free allocation of 10,000 neurons'), false);
+  assertEquals(isTransientOverload(400, 'Cloudflare 400: bad request'), false);
 });
 
 Deno.test('quota épuisé chez le principal, le secours répond : succès, quota signalé', async () => {

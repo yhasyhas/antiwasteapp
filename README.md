@@ -245,7 +245,7 @@ npx expo start --dev-client                          # puis ouvrir l'app install
 
 ```bash
 npm run typecheck                                  # app (TypeScript)
-deno test --no-config --allow-env supabase/functions/          # fonctions : secours, validation, identifiants, régimes
+deno test --no-config --allow-env supabase/functions/ lib/    # fonctions et lib : secours, validation, identifiants, régimes, mode cuisine
 PGPASSWORD="$SUPABASE_DB_PASSWORD" psql "$(cat supabase/.temp/pooler-url)" -v ON_ERROR_STOP=1 \
   -f supabase/tests/household_rls.sql              # idem usage_counters, recipe_images, ingredients_expiry, provider_quota_events, household_sharing, daily_digest, shopping_list, food_events, user_preferences, anonymous_users, food_facts
 ```

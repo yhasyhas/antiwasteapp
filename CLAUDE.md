@@ -15,14 +15,16 @@ Application mobile anti-gaspi (Expo / React Native, Supabase) : on remplit son g
 - **Branches** :
   - une branche par phase ;
   - fusion dans `master` seulement après validation des tests par l'utilisateur ;
-  - branche supprimée juste après la fusion (locale et GitHub).
+  - branche supprimée juste après la fusion (locale et GitHub) ;
+  - ne jamais enchaîner une action destructrice (suppression de branche, effacement de données) dans la même commande qu'une autre ; la lancer seulement après avoir vérifié que l'étape précédente a réussi.
 - **Commits** :
   - un commit par tâche, message en français ;
   - `npm run typecheck` avant chaque commit.
 - **Tests** : tous passent avant chaque fusion, sans exception connue :
   - SQL : `supabase/tests/`, chaque test dans une transaction annulée ;
-  - fonctions : `deno test --no-config --allow-env supabase/functions/` ;
-  - typecheck.
+  - fonctions : `deno test --no-config --allow-env supabase/functions/ lib/` ;
+  - typecheck ;
+  - tout test écrit est ajouté au dépôt ; aucun test ne reste dans un dossier temporaire.
 - **Autonomie** :
   - seul pour le code, les commits, le déploiement des fonctions, les secrets de configuration et les migrations testées en transaction annulée ;
   - sauvegarde (`npx supabase db dump --data-only` dans `backups/`) avant de modifier des données.

@@ -63,8 +63,9 @@ export function translatedRecipe<T extends Recipe>(recipe: T, text: RecipeText):
   };
 }
 
-// Cuisines du monde (paramètre cuisine de generate-recipes)
-export type Cuisine = 'any' | 'african' | 'maghreb' | 'asian' | 'latin' | 'mediterranean' | 'french';
+// Cuisine (paramètre cuisine de generate-recipes) : « any », une famille, une région, « france » ou « other »
+// (lib/cuisines.ts)
+export type Cuisine = string;
 
 export interface Filters {
   dietary: string[];
@@ -72,6 +73,8 @@ export interface Filters {
   maxCookTime: number;
   mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
   cuisine: Cuisine;
+  // Texte de « Autre cuisine… »
+  cuisineOther: string | null;
   language: string;
   // Préférences : nombre de personnes (null : non précisé) et aliments exclus (allergies, goûts)
   servings: number | null;

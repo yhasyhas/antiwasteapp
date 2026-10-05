@@ -13,9 +13,11 @@ Dernière mise à jour : 30/09/2026
 
 - **Une branche par phase** : `phase-0`, `phase-1`, etc. Fusion dans `master` quand la phase est terminée.
 - **Une branche est supprimée juste après sa fusion** (localement et sur GitHub).
+- **Ne jamais enchaîner une action destructrice (suppression de branche, effacement de données) dans la même commande qu'une autre ; la lancer seulement après avoir vérifié que l'étape précédente a réussi.**
 - **Un commit par tâche**, avec un message clair en français.
 - **`npm run typecheck` doit passer avant chaque commit** (à partir de la fin de la phase 0).
-- **Tous les tests passent avant chaque fusion, sans exception connue** : tests SQL (`supabase/tests/`), tests des fonctions (Deno) et typecheck.
+- **Tous les tests passent avant chaque fusion, sans exception connue** : tests SQL (`supabase/tests/`), tests des fonctions et de `lib/` (Deno) et typecheck.
+- **Tout test écrit est ajouté au dépôt ; aucun test ne reste dans un dossier temporaire.**
 - **Tout nouveau compte, variable ou secret est ajouté à `docs/ENVIRONMENT.md` dans le même commit.**
 - **Aucune clé secrète dans le code ni dans les réponses envoyées à l'app.** Les secrets vont dans `supabase secrets set`.
 - **Noms de modèles IA toujours dans des secrets** (`GROQ_MODEL`, `GEMINI_MODEL`…), jamais en dur : les fournisseurs retirent des modèles régulièrement.
@@ -325,9 +327,9 @@ Suite de la phase 7, sur la branche `phase-7-finalisation`.
 
 Partie restante de la phase 9.
 
-- [ ] Mode cuisine étape par étape avec minuteurs (si garder l'écran allumé demande un module natif, cette partie va en phase 12)
+- [x] Mode cuisine étape par étape avec minuteurs : « Commencer à cuisiner » sur la fiche, mise en place à cocher, une étape à la fois en très gros caractères (Précédent / Suivant, glissement), ingrédients et température à cœur de l'étape, minuteurs simultanés (heure de fin, notification locale), reprise à la même étape, écran allumé (`expo-keep-awake`, déjà dans le build), « C'est prêt ! » qui ouvre « J'ai cuisiné ça »
 - [ ] Bibliothèque de plats de référence (`generate-recipes/library/`, `docs/bibliotheque-plats.md`) : inspiration tirée au hasard, seulement avec une cuisine précise ; à faire valider par des personnes qui cuisinent ces plats avant de l'utiliser dans l'app
-- [ ] Découpage plus précis des cuisines (`docs/cuisines-proposition.md`) : décision de l'utilisateur attendue, rien de changé dans l'app avant
+- [x] Découpage plus précis des cuisines (`docs/cuisines-proposition.md`) : décision prise, intégrée dans l'app (choix en deux niveaux, famille puis région, dans les Préférences et sur l'écran de génération ; « Autre cuisine… » ; migration `cuisine_requests`)
 - [ ] Évaluation : 3 garde-manger par région dans les cas fixes, une fois la bibliothèque relue
 
 **Terminé quand** : une recette peut être suivie étape par étape avec ses minuteurs.
@@ -348,19 +350,25 @@ Partie restante de la phase 9.
 
 **Terminé quand** : un nouvel utilisateur est guidé jusqu'à son premier scan, voit son impact du mois, et l'app reste utilisable avec les plus grandes tailles de texte et un lecteur d'écran.
 
+## Phase 10b — Petit groupe de testeurs
+
+- [ ] Partage avec un petit groupe de testeurs (3 à 5 amis, Android) : build preview avec un paquet provisoire .preview, ajouté au projet Firebase, lien d'installation, groupe de retours
+
 ## Phase 11 — Point de décision
 
 - [ ] Modèle économique
 - [ ] Services payants à prendre
 - [ ] Nom de l'app (pistes : Miette, Glana, Frigoscope)
+- [ ] Comparer d'autres modèles d'image (FLUX.2 klein et autres) si Cloudflare reste lent ou si les images manquent de naturel. Critères tirés de l'essai v1.1 du 06/10/2026 (voir le journal) : un plat dit « entier » est montré entier, une seule assiette par image, poissons d'anatomie crédible ; aucune règle pour la volaille (déjà bien rendue)
 
 **Terminé quand** : les trois décisions sont prises et notées au journal.
 
 ## Phase 12 — Natif (un seul build)
 
+- [ ] **Prioritaire** — Minuteurs du mode cuisine à l'heure exacte téléphone en veille sur Android 12 et plus : permission `SCHEDULE_EXACT_ALARM` (sans elle, Android peut retarder la notification de quelques minutes en veille profonde) ; **retard de plusieurs minutes confirmé le 05/10/2026 sur le Redmi (Android 12 ou plus)**
 - [ ] Connexion Google
 - [ ] Partage de recette en image
-- [ ] Écran allumé en mode cuisine
+- [x] Écran allumé en mode cuisine (fait en phase 9b : `expo-keep-awake` était déjà dans le build)
 - [ ] Demande de note sur le store
 - [ ] Mises à jour à distance (EAS Update)
 - [ ] Consultation hors connexion du garde-manger et des recettes sauvegardées
@@ -372,7 +380,7 @@ Partie restante de la phase 9.
 - [ ] Service d'envoi d'emails dédié et vérification des emails, emails dans les trois langues ; réactiver la confirmation d'email dans Supabase (Authentication → Sign In / Providers → Email) (déplacé depuis le lancement)
 - [ ] Mesure d'usage avec consentement
 - [ ] Offre Pro de Supabase
-- [ ] Offres payantes de Gemini et Cloudflare (les données de l'offre gratuite de Gemini servent à améliorer les produits Google) ; revoir les limites de Groq (~3 scans/min en secours, modèle en preview) (déplacé depuis le lancement)
+- [ ] Offre payante de Gemini (Cloudflare : offre Workers Paid prise le 05/10/2026, voir le journal) (les données de l'offre gratuite de Gemini servent à améliorer les produits Google) ; revoir les limites de Groq (~3 scans/min en secours, modèle en preview) (déplacé depuis le lancement)
 
 **Terminé quand** : les emails partent du service dédié dans les trois langues, la mesure d'usage respecte le consentement, et les services retenus en phase 11 sont souscrits.
 
@@ -642,3 +650,8 @@ Ancienne phase 8.
 | 03/10/2026 | **Surveillance et qualité du secours (Gemini)**. Alerte Sentry `alert:provider_failure` (une fois par jour et par fournisseur) quand un fournisseur échoue pour une autre raison qu'un quota ou une surcharge (HTTP 4xx hors 429, réponse vide, tronquée ou illisible) ; un délai, un 5xx ou un 498 restent des surcharges. Recettes servies comptées par fournisseur (`provider_usage_daily`), part du secours sur 7 jours dans « État des services ». Évaluation Gemini seul contre Groq (17 cas, sans juge pour ménager l'offre gratuite) : 49/49 recettes servies chacun, 100 % sûres une fois servies, titres, quantités naturelles, four, régimes à 100 % pour les deux ; noms dans la langue de la recette : Groq 97 %, Gemini 88 % (« pork chops » dans une recette espagnole, « merluza », « patatas » dans une recette anglaise) ; Gemini 16,7 s par génération contre 8,9 s | Corrections pour tous les fournisseurs : pluriels retrouvés par le singulier des fiches (« patatas » → « patata ») ; couscous en espagnol (« cuscús ») jamais « sans gluten » (défaut trouvé chez Groq). Consigne propre à Gemini (`providerNotes`) : relire chaque nom et le traduire, rappel des titres et des quantités. Après correction, Gemini sur les 4 cas mélangés : 100 % des noms traduits, 12/12 recettes |
 | 03/10/2026 | **Revue des mots interdits des régimes** (après « cuscús » étiqueté sans gluten) : grille de 161 aliments interdits courants, chacun en français, anglais et espagnol, au singulier et au pluriel (`generate-recipes/dietWords.test.ts`, un test par aliment), et aliments permis à ne jamais écarter. 86 aliments avaient au moins un nom non repéré : environ 200 mots ajoutés (charcuteries, coupes de viande, gibier, abats, nombreux poissons et fruits de mer, gélatine en feuilles, fromages nommés, lactosérum, caséine, pâtes et pâtisseries en espagnol, panko, malt, teriyaki, sauces aux œufs) ; expressions au pluriel (« salsas de soja ») | Deux défauts de logique corrigés : un ingrédient de base (« riz », « soja ») ne disculpe plus que s'il est accolé au mot interdit (« lait de riz », « oat milk ») : « riz au lait » n'est plus « sans lactose », « poulet sauce soja » plus végétarien ; « végétal », « sans gluten »… restent valables partout dans le nom. Mots écartés car ambigus : « glace », « rib », « gravy », « bar », « coque », « lieu » seul, « oca » (tubercule andin) |
 | 05/10/2026 | **Phase 9 validée sur les deux téléphones et fusionnée dans `master`** : noms dans la langue de la recette, titres, barre d'en-tête, génération, « Mes recettes » 2.0, « État des services », alerte Sentry `provider_failure` reçue, fluidité sur le A30 | Partie restante renommée « Phase 9b — Mode cuisine » : mode cuisine, plus la bibliothèque de plats (validation par des personnes qui les cuisinent), le découpage des cuisines (décision attendue) et les cas d'évaluation par région, qui n'étaient pas faits |
+| 05/10/2026 | **Phase 9b** : découpage des cuisines intégré (famille puis région, France, « Autre cuisine… » ; anciennes préférences toujours valides ; migrations `cuisine_requests` et `preferences_cuisines` appliquées) ; mode cuisine (`app/cook.tsx`, `lib/cookingSession.ts`, `lib/cookingSteps.ts`) | Aucun nouveau build : `expo-keep-awake` (dépendance d'`expo`, déjà liée), `expo-notifications`, `expo-haptics` et le stockage local étaient présents. Son de fin : celui de la notification, sur un canal dédié « Minuteurs de cuisine » (importance haute, distinct du canal « Aliments qui expirent » du résumé quotidien), aucun module audio ajouté (choix validé). Sans la permission d'alarme exacte (nouveau build, phase 12), une fin de minuteur peut être retardée en veille profonde sur Android 12+ ; l'A30 (Android 11) n'est pas concerné (report en phase 12 validé) |
+| 05/10/2026 | **Cloudflare en offre Workers Paid** (5 $ par mois, plus ≈ 0,002 $ par image au-delà de l'allocation gratuite), prise par l'utilisateur : **exception à la règle « services payants en phase 13 »**, comme Groq. Quota de 30 images par jour et par utilisateur vérifié (secret `QUOTA_DAILY_IMAGES` = 30, contrôlé avant chaque génération) | Images lentes ou absentes après l'abonnement : les journaux montrent des 429 « Capacity temporarily exceeded, please try again » (surcharge passagère de Cloudflare), classés à tort « quota épuisé » ; l'app ne redemandait alors l'image que le lendemain. Corrigé : surcharge traitée comme une panne passagère (un nouvel essai dans la fonction après 1,5 à 3 s), et l'app redemande une image en échec dès qu'une autre réussit, ou au bout d'une heure. Une image a aussi mis 25 s (Cloudflare lent juste après la surcharge), les autres 4 à 10 s, trois en parallèle. Vers 20 h (UTC), pendant la comparaison des consignes : Cloudflare très lent (14 à 55 s par image) et erreurs « Unknown internal error » (503, code 3048), sans incident déclaré sur cloudflarestatus.com ; délai porté de 40 à 60 s, ces 503 relancés une fois. À surveiller : si la lenteur dure, envisager un autre modèle d'image en revue des coûts |
+| 05/10/2026 | Minuteurs du mode cuisine : retard de plusieurs minutes confirmé sur le Redmi (Android 12 ou plus), téléphone verrouillé | Permission des alarmes exactes (`SCHEDULE_EXACT_ALARM`) marquée **prioritaire** en tête de la phase 12 (nouveau build) |
+| 06/10/2026 | Tests des corrections de la phase 9b validés sur les deux téléphones (favoris de l'accueil, images, légende, mot « urgent », icônes et photo du mode cuisine, fluidité sur le A30). Images : **v1 gardée par défaut** (nettement préférée à la v2 « cuisine maison » par les amis de l'utilisateur) | Poissons souvent d'aspect artificiel (anatomie bizarre) : consigne v1.1 préparée (la v1, plus une règle pour les poissons et les volailles entières : morceaux ou filets, en partie dans la sauce), comparée à la v1 sur 5 recettes de poisson et 1 de poulet ; choix en attente |
+| 06/10/2026 | **Images : la v1 reste la consigne par défaut** ; la v1.1 (poissons en filets ou morceaux, volaille entière découpée) n'est pas retenue après comparaison sur 5 poissons et 1 poulet rôti, et reste disponible dans le code (`IMAGE_PROMPT_VERSION=v1.1`), sans être par défaut | Enseignements pour la comparaison d'autres modèles d'image (phase 11) : **le problème vient du modèle, pas de la consigne** (FLUX schnell) ; un plat dit « entier » doit être montré entier (la v1.1 montrait une « dorade entière » en morceaux) ; une seule assiette par image (la v1.1 en produisait plusieurs) ; têtes de poisson toujours bizarres en arrière-plan ; morceaux de tilapia ressemblant à du tofu ; **aucune règle pour la volaille** (le poulet rôti était déjà très bien en v1) |
