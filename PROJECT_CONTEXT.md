@@ -298,7 +298,7 @@ npx supabase db push         # appliquer les migrations sur le projet lié
 npx supabase functions deploy analyze-image
 npx supabase functions deploy generate-recipes
 npx supabase functions deploy generate-recipe-image
-deno test --no-config --allow-env supabase/functions/   # tests Deno (secours, validation, identifiants, régimes)
+deno test --no-config --allow-env supabase/functions/ lib/   # tests Deno (secours, validation, identifiants, régimes, mode cuisine)
 PGPASSWORD="$SUPABASE_DB_PASSWORD" psql "$(cat supabase/.temp/pooler-url)" -v ON_ERROR_STOP=1 -f supabase/tests/household_rls.sql   # tests de sécurité (idem usage_counters.sql, recipe_images.sql)
 npm run export               # régénère l'export complet du projet (voir scripts/export-project.mjs)
 ```

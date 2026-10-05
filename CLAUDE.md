@@ -22,8 +22,9 @@ Application mobile anti-gaspi (Expo / React Native, Supabase) : on remplit son g
   - `npm run typecheck` avant chaque commit.
 - **Tests** : tous passent avant chaque fusion, sans exception connue :
   - SQL : `supabase/tests/`, chaque test dans une transaction annulée ;
-  - fonctions : `deno test --no-config --allow-env supabase/functions/` ;
-  - typecheck.
+  - fonctions : `deno test --no-config --allow-env supabase/functions/ lib/` ;
+  - typecheck ;
+  - tout test écrit est ajouté au dépôt ; aucun test ne reste dans un dossier temporaire.
 - **Autonomie** :
   - seul pour le code, les commits, le déploiement des fonctions, les secrets de configuration et les migrations testées en transaction annulée ;
   - sauvegarde (`npx supabase db dump --data-only` dans `backups/`) avant de modifier des données.

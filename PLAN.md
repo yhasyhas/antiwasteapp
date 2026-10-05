@@ -16,7 +16,8 @@ Dernière mise à jour : 30/09/2026
 - **Ne jamais enchaîner une action destructrice (suppression de branche, effacement de données) dans la même commande qu'une autre ; la lancer seulement après avoir vérifié que l'étape précédente a réussi.**
 - **Un commit par tâche**, avec un message clair en français.
 - **`npm run typecheck` doit passer avant chaque commit** (à partir de la fin de la phase 0).
-- **Tous les tests passent avant chaque fusion, sans exception connue** : tests SQL (`supabase/tests/`), tests des fonctions (Deno) et typecheck.
+- **Tous les tests passent avant chaque fusion, sans exception connue** : tests SQL (`supabase/tests/`), tests des fonctions et de `lib/` (Deno) et typecheck.
+- **Tout test écrit est ajouté au dépôt ; aucun test ne reste dans un dossier temporaire.**
 - **Tout nouveau compte, variable ou secret est ajouté à `docs/ENVIRONMENT.md` dans le même commit.**
 - **Aucune clé secrète dans le code ni dans les réponses envoyées à l'app.** Les secrets vont dans `supabase secrets set`.
 - **Noms de modèles IA toujours dans des secrets** (`GROQ_MODEL`, `GEMINI_MODEL`…), jamais en dur : les fournisseurs retirent des modèles régulièrement.
