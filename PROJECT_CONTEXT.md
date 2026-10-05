@@ -270,7 +270,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 
 ### Phase 9b — mode cuisine (branche `phase-9b`, en cours)
 - Cuisines : `lib/cuisines.ts` (familles, régions, France, « Autre cuisine… », anciennes valeurs ramenées au découpage actuel), `components/recipe/CuisinePicker.tsx` (Préférences, filtres de la génération) ; `user_preferences.default_cuisine_other` ; demandes « Autre cuisine… » dans `cuisine_requests` (sans donnée personnelle, `generate-recipes/cuisineRequests.ts`).
-- Mode cuisine : écran `app/cook.tsx` (mise en place, étapes, « C'est prêt ! » avec `CookedButton` ouvert d'office), `components/cook/` (`CookStep`, `TimerStrip`, `CookStartButton` sur la fiche recette, `CookingBanner` sur l'accueil) ; séance gardée dans le stockage local (`lib/cookingSession.ts`, une à la fois, 24 h au plus) ; minuteurs à heure de fin et notification locale (canal `cook-timers`) ; lecture des étapes (`lib/cookingSteps.ts` : durées, température à cœur, ingrédients) ; écran allumé (`expo-keep-awake`).
+- Mode cuisine : écran `app/cook.tsx` (mise en place, étapes, « C'est prêt ! » avec `CookedButton` ouvert d'office), `components/cook/` (`CookStep`, `TimerStrip`, `CookStartButton` sur la fiche recette, `CookingBanner` sur l'accueil) ; séance gardée dans le stockage local (`lib/cookingSession.ts`, une à la fois, 24 h au plus) ; minuteurs à heure de fin et notification locale (canal dédié `cook-timers` « Minuteurs de cuisine », importance haute, distinct du canal du résumé quotidien) ; lecture des étapes (`lib/cookingSteps.ts` : durées, température à cœur, ingrédients) ; écran allumé (`expo-keep-awake`).
 
 ## 5. État actuel et problèmes connus
 

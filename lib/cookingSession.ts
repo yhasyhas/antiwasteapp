@@ -130,11 +130,14 @@ export async function endCooking() {
 
 const useOwnChannel = Platform.OS === 'android' && !isRunningInExpoGo();
 
+// Canal Android « Minuteurs de cuisine », distinct de celui du résumé quotidien (« Aliments qui expirent »,
+// importance normale) : importance haute (son, vibration, bannière par-dessus l'écran), réglable à part par
+// l'utilisateur. Android garde l'importance fixée à la création du canal.
 async function ensureChannel() {
   if (!useOwnChannel) return;
   await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
     name: i18n.t('cook.channelName'),
-    importance: Notifications.AndroidImportance.MAX,
+    importance: Notifications.AndroidImportance.HIGH,
     // Sans « sound » : son de notification par défaut du téléphone
     vibrationPattern: [0, 600, 300, 600, 300, 600],
     enableVibrate: true,
