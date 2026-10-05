@@ -21,7 +21,9 @@ const CLOUDFLARE_ACCOUNT_ID = Deno.env.get('CLOUDFLARE_ACCOUNT_ID') || '';
 const CLOUDFLARE_API_TOKEN = Deno.env.get('CLOUDFLARE_API_TOKEN') || '';
 // Modèle configurable par secret : les fournisseurs retirent régulièrement des modèles
 const CLOUDFLARE_IMAGE_MODEL = Deno.env.get('CLOUDFLARE_IMAGE_MODEL') || '@cf/black-forest-labs/flux-1-schnell';
-const CLOUDFLARE_TIMEOUT_MS = 40_000;
+// 60 s : le 05/10/2026, des images ont mis 25 à 31 s et d'autres ont dépassé 40 s (Cloudflare lent, sans incident
+// déclaré) ; l'app n'impose pas de délai à cet appel, et la fonction a 150 s au plus
+const CLOUDFLARE_TIMEOUT_MS = 60_000;
 // Consigne d'image (voir imagePrompt.ts) : v1 par défaut, v2 « cuisine maison » ; réglable sans redéployer
 const IMAGE_PROMPT_VERSION = imagePromptVersion(Deno.env.get('IMAGE_PROMPT_VERSION'));
 // Surcharge passagère de Cloudflare (« Capacity temporarily exceeded », 5xx) : un seul nouvel essai, après
