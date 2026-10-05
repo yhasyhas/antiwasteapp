@@ -33,6 +33,7 @@ import { IconChip } from '@/components/ui/IconChip';
 import { EmptyState } from '@/components/ui/Illustrations';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Touchable } from '@/components/ui/Touchable';
+import { CookingBanner } from '@/components/cook/CookingBanner';
 import { colors, sizes, spacing, typography } from '@/constants/theme';
 
 type RecentRecipe = Recipe & { id: string };
@@ -150,6 +151,9 @@ export default function HomeScreen() {
           <Text style={styles.hello}>{t('home.hello')}</Text>
           <Text style={styles.headline}>{t('home.headline')}</Text>
         </View>
+
+        {/* Séance du mode cuisine en cours : reprise à la même étape */}
+        <CookingBanner />
 
         <WasteCounter />
 

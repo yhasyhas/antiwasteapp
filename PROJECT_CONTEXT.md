@@ -266,8 +266,11 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Secours des fournisseurs : dysfonctionnement (réponse refusée, schéma invalide, réponse illisible) signalé à Sentry (`alert:provider_failure`, `isProviderMalfunction` dans `_shared/ai.ts`) ; recettes servies par fournisseur (`provider_usage_daily`) et part du secours sur 7 jours dans « État des services » ; consigne propre à Gemini (`providerNotes`, `geminiRecipeNote`) ; noms au pluriel retrouvés par le singulier des fiches.
 - « Faisable maintenant » : « Il manque : … » sur la carte, avec l'ajout aux courses (`RecipeListCard`).
 - App : conseils de conservation selon l'emplacement et la langue (`lib/storageTip.ts`) ; message des recettes écartées selon les critères choisis.
-- Migration en attente (non appliquée) : `supabase/migrations-pending/` (`cuisine_requests`).
 - Évaluation rejouable : `scripts/recipe-eval` (cas fixes `cases.json` dont 4 en langues mélangées, `cases-regions.json` et `cases-proteins.json`, `run.mjs`, `checks.mjs`, `compare.mjs`, `summary.mjs`, `variety.mjs`, résultats dans `results/`) et la copie `generate-recipes-eval` (génération et juge, clé secrète seulement).
+
+### Phase 9b — mode cuisine (branche `phase-9b`, en cours)
+- Cuisines : `lib/cuisines.ts` (familles, régions, France, « Autre cuisine… », anciennes valeurs ramenées au découpage actuel), `components/recipe/CuisinePicker.tsx` (Préférences, filtres de la génération) ; `user_preferences.default_cuisine_other` ; demandes « Autre cuisine… » dans `cuisine_requests` (sans donnée personnelle, `generate-recipes/cuisineRequests.ts`).
+- Mode cuisine : écran `app/cook.tsx` (mise en place, étapes, « C'est prêt ! » avec `CookedButton` ouvert d'office), `components/cook/` (`CookStep`, `TimerStrip`, `CookStartButton` sur la fiche recette, `CookingBanner` sur l'accueil) ; séance gardée dans le stockage local (`lib/cookingSession.ts`, une à la fois, 24 h au plus) ; minuteurs à heure de fin et notification locale (canal `cook-timers`) ; lecture des étapes (`lib/cookingSteps.ts` : durées, température à cœur, ingrédients) ; écran allumé (`expo-keep-awake`).
 
 ## 5. État actuel et problèmes connus
 
@@ -285,7 +288,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Tests : Deno (`supabase/functions/**/*.test.ts`) et SQL (`supabase/tests/*.sql`).
 
 ## 6. Prochaine étape
-Phase 9b Mode cuisine (branche à créer), puis 10 Premier contact, 11 Point de décision, 12 Natif (un seul build), 13 Services et abonnements, 14 Audit, 15 Lancement. Détails dans `PLAN.md`.
+Phase 9b Mode cuisine (branche `phase-9b`, tests sur téléphone), puis 10 Premier contact, 10b Petit groupe de testeurs, 11 Point de décision, 12 Natif (un seul build), 13 Services et abonnements, 14 Audit, 15 Lancement. Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash

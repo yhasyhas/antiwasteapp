@@ -10,7 +10,7 @@ const useLastResponse = notificationsSupported ? Notifications.useLastNotificati
 
 // Rappels de péremption de l'utilisateur connecté : recalculés à la connexion, au changement de langue,
 // au retour dans l'app et à chaque changement du garde-manger. Toucher un rappel ouvre la génération
-// avec ses aliments présélectionnés.
+// avec ses aliments présélectionnés ; toucher la fin d'un minuteur du mode cuisine rouvre le mode cuisine.
 export function useExpiryReminders(userId: string | null, language: string) {
   const userIdRef = useRef(userId);
   userIdRef.current = userId;
@@ -41,9 +41,15 @@ export function useExpiryReminders(userId: string | null, language: string) {
   const response = useLastResponse();
   useEffect(() => {
     if (!userId || !response || response.actionIdentifier !== Notifications.DEFAULT_ACTION_IDENTIFIER) return;
-    const priority = response.notification.request.content.data?.priority;
+    const data = response.notification.request.content.data;
+    const priority = data?.priority;
     // Traitée une seule fois, même si l'app est relancée plus tard
     Notifications.clearLastNotificationResponse();
+    // Minuteur du mode cuisine : retour à la séance en cours
+    if (data?.cook === '1') {
+      const timer = setTimeout(() => router.push('/cook'), 400);
+      return () => clearTimeout(timer);
+    }
     if (typeof priority !== 'string' || priority === '') return;
     // Au lancement depuis la notification, laisse l'écran d'accueil s'installer avant d'ouvrir la génération
     const timer = setTimeout(() => router.push({ pathname: '/recipe/generate', params: { priority } }), 400);

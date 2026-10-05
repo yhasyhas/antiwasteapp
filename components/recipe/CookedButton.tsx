@@ -40,6 +40,8 @@ interface Props {
   recipeTitle?: string;
   // Conteneur du bouton (barre fixée en bas de la fiche recette)
   style?: StyleProp<ViewStyle>;
+  // Fin du mode cuisine (« C'est prêt ! ») : la feuille s'ouvre tout de suite
+  openOnMount?: boolean;
 }
 
 // Quantité utilisée : un nombre dans l'unité du garde-manger (réglé avec + et −), ou, sans unité commune avec
@@ -86,7 +88,7 @@ type Mode = { kind: 'new' } | { kind: 'modify'; action: LastCook };
 // Recette enregistrée : ensuite « ✓ Cuisiné aujourd'hui » (grisé), récapitulatif avant / après de chaque
 // aliment, « Modifier » (feuille rouverte avec les quantités saisies ; la correction remplace l'action en une
 // seule opération, conflit compris) et « Je l'ai cuisinée à nouveau » (vrai deuxième repas).
-export function CookedButton({ ingredientsUsed, recipeId, recipeTitle, style }: Props) {
+export function CookedButton({ ingredientsUsed, recipeId, recipeTitle, style, openOnMount = false }: Props) {
   const { t, language } = useLanguage();
   const [rows, setRows] = useState<CookRow[] | null>(null);
   const [mode, setMode] = useState<Mode>({ kind: 'new' });
@@ -190,6 +192,10 @@ export function CookedButton({ ingredientsUsed, recipeId, recipeTitle, style }: 
     setMode(next);
     setRows(found);
   };
+
+  useEffect(() => {
+    if (openOnMount) open();
+  }, []);
 
   const setUsed = (key: string, next: Used) =>
     setRows((current) => current?.map((row) => (row.key === key ? { ...row, used: next } : row)) ?? null);
