@@ -221,8 +221,18 @@ export type ProviderFailureReason = 'provider_quota' | 'provider_error';
 // pour tous. Un 503 « surchargé » de Gemini est une panne, pas un quota.
 const QUOTA_PATTERN = /RESOURCE_EXHAUSTED|rate_limit_exceeded|rate limit|quota|free allocation|neurons|"code":\s*3036/i;
 
+// Surcharge passagère signalée par un 429 : Cloudflare « Capacity temporarily exceeded, please try again »
+// (relevé le 05/10/2026, offre payante). Ce n'est pas un quota épuisé : l'image peut être redemandée tout de suite.
+const CAPACITY_PATTERN = /capacity temporarily exceeded/i;
+
 export function classifyProviderFailure(status: number | undefined, details: string): ProviderFailureReason {
+  if (CAPACITY_PATTERN.test(details)) return 'provider_error';
   return status === 429 || QUOTA_PATTERN.test(details) ? 'provider_quota' : 'provider_error';
+}
+
+// Échec passager, qui vaut un nouvel essai immédiat : surcharge (capacité dépassée, 5xx, 498)
+export function isTransientOverload(status: number | undefined, details: string): boolean {
+  return CAPACITY_PATTERN.test(details) || (status !== undefined && (status >= 500 || status === 498));
 }
 
 // Surcharge ou indisponibilité passagère : HTTP 5xx, 498 (capacité de Groq dépassée), délai, réseau
@@ -233,6 +243,7 @@ const OVERLOAD_PATTERN = /TimeoutError|AbortError|timed out|network|connection|e
 // Le secours masque ces échecs à l'utilisateur : sans alerte, on ne les verrait pas.
 export function isProviderMalfunction(status: number | undefined, details: string): boolean {
   if (classifyProviderFailure(status, details) === 'provider_quota') return false;
+  if (CAPACITY_PATTERN.test(details)) return false;
   if (status !== undefined) return status < 500 && status !== 498;
   return !OVERLOAD_PATTERN.test(details);
 }

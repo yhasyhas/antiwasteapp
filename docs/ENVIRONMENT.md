@@ -92,6 +92,7 @@ Modèle sans valeurs : `.env.example`. Toutes ces valeurs sont **publiques par n
 | `RECIPE_PROMPT_VERSION` | Version du prompt de `generate-recipes` (configuration, pas un secret ; facultatif). Réglée à `v4.1` depuis le 02/10/2026 ; absente : la version par défaut du code (v4.1 depuis la phase 9) ; `v4` : sans la limite d'achats ni la règle des types de plats ; `v1` : retour à l'ancienne version sans contrôle de sécurité, sans redéployer | — |
 | `CLOUDFLARE_ACCOUNT_ID` | Compte Cloudflare pour Workers AI (images des recettes) | dash.cloudflare.com (identifiant, pas un secret) |
 | `CLOUDFLARE_API_TOKEN` | Jeton Workers AI (génération d'images) | dash.cloudflare.com → My Profile → API Tokens ; droits : Workers AI seulement (à vérifier en phase 14) |
+| `IMAGE_PROMPT_VERSION` | Consigne des images de recettes (configuration, pas un secret ; facultatif). Absente : `v1`, photo culinaire « professionnelle » écrite par `generate-recipes` ; `v2` : photo de cuisine maison (lumière naturelle, présentation simple). Prise en compte sans redéployer, aussi pour les recettes déjà enregistrées qui n'ont pas encore d'image | — |
 | `CRON_SECRET` | En-tête `x-cron-secret` de l'appel planifié de `daily-digest` | Voir ci-dessous (deux endroits à changer ensemble) |
 | `SENTRY_DSN` | Envoi des alertes des fonctions à Sentry (quotas, échecs d'envoi) | Sentry → Client Keys |
 | `QUOTA_DAILY_GENERATIONS`, `QUOTA_DAILY_IMAGES`, `QUOTA_DAILY_SCANS` | Quotas quotidiens par utilisateur (configuration) | — |
@@ -142,7 +143,7 @@ Pour le renouveler : générer une valeur aléatoire, la poser dans les fonction
 
 | Service | Rôle | Accès actuel |
 |---|---|---|
-| Workers AI | Images des recettes (`flux-1-schnell`) | Par les fonctions Supabase (`CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`). Consommation : Dashboard → Workers AI → Utilisation (le jeton n'y a pas accès) |
+| Workers AI | Images des recettes (`flux-1-schnell`). **Offre Workers Paid** depuis le 05/10/2026 : 5 $ par mois, plus environ 0,002 $ par image au-delà de l'allocation gratuite (exception à la règle « services payants en phase 13 », comme Groq : coût faible, images fiables pour les tests). Le quota de 30 images par jour et par utilisateur (`QUOTA_DAILY_IMAGES`, vérifié le 05/10/2026) limite la dépense | Par les fonctions Supabase (`CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`). Consommation et facturation : Dashboard → Workers AI → Utilisation, et Manage Account → Billing (le jeton n'y a pas accès) |
 | Pages | Page d'invitation et page captcha : `https://antigaspi-invite.pages.dev` (projet `antigaspi-invite`, dossier `web/invite`) | Wrangler connecté par OAuth (`npx wrangler login`, session enregistrée dans `%APPDATA%\xdg.config\.wrangler\`). Déploiement : `npx wrangler pages deploy web/invite --project-name antigaspi-invite --branch main`. Ne jamais lancer `wrangler deploy` à la racine |
 | Turnstile | Captcha, widget « Antigaspi » (mode Managed), limité au domaine de la page d'invitation | Dashboard Cloudflare seulement. Clé de site dans `.env`, clé secrète dans Supabase (section 4) |
 
@@ -194,7 +195,7 @@ Ces éléments seront ajoutés à cet inventaire au moment de leur création.
 - **Phase 13 (services)** :
   - service d'envoi d'emails : clé d'API et réglages SMTP dans Supabase ;
   - mesure d'usage : clé du service choisi ;
-  - offre Pro de Supabase et offres payantes de Gemini et Cloudflare : moyens de paiement sur les comptes (hors dépôt).
+  - offre Pro de Supabase et offre payante de Gemini : moyens de paiement sur les comptes (hors dépôt). Cloudflare est déjà en offre Workers Paid (05/10/2026, section 6).
 - **Phase 14 (audit)** :
   - sauvegardes automatiques de la base : secrets GitHub Actions (adresse et mot de passe de la base, ou jeton d'accès) et emplacement des sauvegardes ;
   - relecture des droits des jetons Expo et Cloudflare (Sentry vérifié le 30/09/2026).

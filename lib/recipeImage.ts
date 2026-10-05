@@ -3,13 +3,15 @@ import { failureReasonOf, type FailureReason } from './quotaReason';
 
 // Images des recettes : un seul état partagé par toute l'app. Chaque carte et chaque fiche lit l'image
 // ici, quel que soit l'écran qui l'a demandée ou reçue. Une recette n'est jamais redemandée tant que son
-// image est en cours ou déjà obtenue. Après une panne, elle peut l'être à la prochaine ouverture ; après
-// un quota épuisé (personnel ou Cloudflare), pas avant le lendemain (UTC, comme les quotas).
+// image est en cours ou déjà obtenue. Après une panne ou une saturation de Cloudflare, elle est redemandée
+// dès qu'une autre image réussit (le service fonctionne de nouveau), et sinon : après une panne, à la
+// prochaine ouverture ; après une saturation (provider_quota), au bout d'une heure. Quota personnel atteint :
+// pas avant le lendemain (UTC, comme les quotas).
 
 type ImageState =
   | { status: 'loading' }
   | { status: 'done'; url: string }
-  | { status: 'failed'; reason: FailureReason; day: string };
+  | { status: 'failed'; reason: FailureReason; day: string; at: number; language: string };
 
 const utcDay = () => new Date().toISOString().slice(0, 10);
 
@@ -21,6 +23,8 @@ let version = 0;
 // « en cours » : on redemande toutes les 3 s, 20 fois au plus (la génération prend 2 à 6 s)
 const RETRY_DELAY_MS = 3000;
 const MAX_ATTEMPTS = 20;
+// Service d'images saturé : nouvel essai au bout d'une heure
+const PROVIDER_RETRY_MS = 60 * 60 * 1000;
 
 // Valeur de recipes.image_url pendant la génération (réservation par la fonction) : pas une image
 export const isPendingImage = (url: string | null | undefined) => !!url && url.startsWith('pending:');
@@ -85,11 +89,39 @@ export function requestRecipeImage(recipeId: string | undefined, language: strin
   }
   const state = states.get(recipeId);
   if (state?.status === 'loading' || state?.status === 'done') return;
-  // Quota épuisé aujourd'hui : inutile de redemander avant demain
-  if (state?.status === 'failed' && state.reason !== 'provider_error' && state.day === utcDay()) return;
+  if (state?.status === 'failed' && !canRetry(state)) return;
+  fetchAndStore(recipeId, language);
+}
 
+function canRetry(state: Extract<ImageState, { status: 'failed' }>): boolean {
+  // Quota personnel atteint : inutile de redemander avant demain
+  if (state.reason === 'user_quota') return state.day !== utcDay();
+  if (state.reason === 'provider_quota') return Date.now() - state.at >= PROVIDER_RETRY_MS;
+  return true;
+}
+
+function fetchAndStore(recipeId: string, language: string) {
   setState(recipeId, { status: 'loading' });
   fetchImage(recipeId, language).then((result) => {
-    setState(recipeId, 'url' in result ? { status: 'done', url: result.url } : { status: 'failed', reason: result.reason, day: utcDay() });
+    if ('url' in result) {
+      setState(recipeId, { status: 'done', url: result.url });
+      retryProviderFailures();
+      return;
+    }
+    setState(recipeId, { status: 'failed', reason: result.reason, day: utcDay(), at: Date.now(), language });
+    // Saturation : nouvel essai automatique au bout d'une heure (si l'app est restée ouverte)
+    if (result.reason === 'provider_quota') {
+      setTimeout(() => {
+        const current = states.get(recipeId);
+        if (current?.status === 'failed' && current.reason === 'provider_quota') fetchAndStore(recipeId, language);
+      }, PROVIDER_RETRY_MS);
+    }
+  });
+}
+
+// Une image vient de réussir : le service fonctionne, les images en échec côté fournisseur sont redemandées
+function retryProviderFailures() {
+  states.forEach((state, recipeId) => {
+    if (state.status === 'failed' && state.reason !== 'user_quota') fetchAndStore(recipeId, state.language);
   });
 }
