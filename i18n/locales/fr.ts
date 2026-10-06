@@ -151,6 +151,10 @@ const fr = {
     confirmSubtitle: "Voici ce que nous avons détecté. Décoche ce que tu ne veux pas ajouter :",
     addCount_one: 'Ajouter {{count}} aliment',
     addCount_other: 'Ajouter {{count}} aliments',
+    pointReceipt: 'Cadre tout le ticket, bien à plat et éclairé',
+    analyzingReceipt: 'Lecture du ticket…',
+    noReceiptTitle: 'Aucun aliment lu',
+    noReceiptText: 'Aucun produit alimentaire lisible sur ce ticket. Essaie avec le ticket bien à plat, ou ajoute tes aliments à la main.',
   },
   barcode: {
     modePhoto: 'Photo',
@@ -161,6 +165,7 @@ const fr = {
     unknownHint: 'Produit inconnu d’Open Food Facts : donne-lui un nom, puis ajoute-le à la liste.',
     lookupFailedTitle: 'Recherche impossible',
     lookupFailedText: 'Open Food Facts ne répond pas. Vérifie ta connexion ; tu peux ajouter le produit à la main.',
+    modeReceipt: 'Ticket',
   },
   manual: {
     title: 'Ajouter des ingrédients',
@@ -966,11 +971,6 @@ const fr = {
     actionManual: 'Ajouter à la main',
     actionManualText: 'Tape le nom d’un aliment et sa date',
   },
-};
-
-export default fr;
-
-// Même structure que le français, avec des textes quelconques : les trois langues ont les mêmes clés
   impact: {
     title: 'Mon impact',
     open: 'Voir mon impact',
@@ -994,5 +994,10 @@ export default fr;
     tipLabel: 'Conseil',
     loadError: 'Impossible de charger ton impact. Vérifie ta connexion.',
   },
+};
+
+export default fr;
+
+// Même structure que le français, avec des textes quelconques : les trois langues ont les mêmes clés
 type Strings<T> = { [K in keyof T]: T[K] extends string ? string : Strings<T[K]> };
 export type Translations = Strings<typeof fr>;

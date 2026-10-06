@@ -155,7 +155,7 @@ export default function CameraScreen() {
 
     // Même compression qu'avant l'envoi à analyze-image (useScan)
     const uri = await cameraRef.current.takePhoto();
-    if (uri) analyzeImage(uri);
+    if (uri) analyzeImage(uri, mode === 'receipt' ? 'receipt' : 'photo');
   };
 
   const barcode = mode === 'barcode';
@@ -192,7 +192,7 @@ export default function CameraScreen() {
         ) : (
           // La caméra n'accepte pas d'enfants : le cadre de visée est superposé en position absolue
           <View style={styles.overlay} pointerEvents="none">
-            <View style={[styles.frame, barcode && styles.barcodeFrame]}>
+            <View style={[styles.frame, barcode && styles.barcodeFrame, mode === 'receipt' && styles.receiptFrame]}>
               <View style={[styles.corner, styles.topLeft]} />
               <View style={[styles.corner, styles.topRight]} />
               <View style={[styles.corner, styles.bottomLeft]} />
@@ -208,7 +208,7 @@ export default function CameraScreen() {
         {(analyzing || lookingUp) && (
           <View style={styles.analyzing}>
             <ActivityIndicator size="large" color={colors.accent} />
-            <Text style={styles.analyzingText}>{lookingUp ? t('barcode.lookingUp') : t('scan.analyzingPhoto')}</Text>
+            <Text style={styles.analyzingText}>{lookingUp ? t('barcode.lookingUp') : mode === 'receipt' ? t('scan.analyzingReceipt') : t('scan.analyzingPhoto')}</Text>
             {analyzing ? <Text style={styles.analyzingHint}>{t('scan.analyzingHint')}</Text> : null}
           </View>
         )}
@@ -230,7 +230,7 @@ export default function CameraScreen() {
 
       <View style={styles.controls}>
         <ScanModeToggle mode={mode} onChange={setMode} />
-        <Text style={styles.instruction}>{barcode ? t('barcode.pointCamera') : t('scan.pointCamera')}</Text>
+        <Text style={styles.instruction}>{barcode ? t('barcode.pointCamera') : mode === 'receipt' ? t('scan.pointReceipt') : t('scan.pointCamera')}</Text>
 
         <View style={styles.buttonRow}>
           <Touchable onPress={toggleCameraFacing} style={styles.flip} accessibilityRole="button" accessibilityLabel={t('scan.flipCamera')}>
@@ -354,6 +354,11 @@ const styles = StyleSheet.create({
   },
   barcodeFrame: {
     height: sizes.scanFrame / 2,
+  },
+  // Ticket : plus haut que large
+  receiptFrame: {
+    width: sizes.scanFrame * 0.75,
+    height: sizes.scanFrame * 1.3,
   },
   corner: {
     position: 'absolute',

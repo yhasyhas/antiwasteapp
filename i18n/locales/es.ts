@@ -150,6 +150,10 @@ const es: Translations = {
     confirmSubtitle: 'Esto es lo que detectamos. Desmarca lo que no quieras añadir:',
     addCount_one: 'Añadir {{count}} alimento',
     addCount_other: 'Añadir {{count}} alimentos',
+    pointReceipt: 'Encuadra todo el ticket, plano y bien iluminado',
+    analyzingReceipt: 'Leyendo el ticket…',
+    noReceiptTitle: 'Ningún alimento leído',
+    noReceiptText: 'No hay ningún producto alimentario legible en este ticket. Prueba con el ticket plano, o añade tus alimentos a mano.',
   },
   barcode: {
     modePhoto: 'Foto',
@@ -160,6 +164,7 @@ const es: Translations = {
     unknownHint: 'Producto desconocido en Open Food Facts: ponle un nombre y añádelo a la lista.',
     lookupFailedTitle: 'Búsqueda imposible',
     lookupFailedText: 'Open Food Facts no responde. Revisa tu conexión; puedes añadir el producto a mano.',
+    modeReceipt: 'Ticket',
   },
   manual: {
     title: 'Añadir ingredientes',
@@ -965,9 +970,6 @@ const es: Translations = {
     actionManual: 'Añadir a mano',
     actionManualText: 'Escribe el nombre de un alimento y su fecha',
   },
-};
-
-export default es;
   impact: {
     title: 'Mi impacto',
     open: 'Ver mi impacto',
@@ -991,3 +993,6 @@ export default es;
     tipLabel: 'Consejo',
     loadError: 'No se pudo cargar tu impacto. Revisa tu conexión.',
   },
+};
+
+export default es;
