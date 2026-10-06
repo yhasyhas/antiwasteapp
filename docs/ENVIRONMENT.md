@@ -34,7 +34,7 @@ En bash, dans une session démarrée après la modification : `[ -n "$NOM" ] && 
 - **Droits** : tout le compte Supabase (tous les projets, API de gestion). Il n'existe pas de jeton plus restreint.
 
 ### SUPABASE_DB_PASSWORD
-- **Rôle** : mot de passe Postgres du projet. Il sert aux tests SQL en transaction annulée (`psql` sur le pooler) et aux sauvegardes (`npx supabase db dump`, qui a besoin de Docker Desktop lancé ; sinon `pg_dump` directement : `PGPASSWORD="$SUPABASE_DB_PASSWORD" pg_dump "$(cat supabase/.temp/pooler-url)" --data-only --schema=public --no-owner --no-privileges -f backups/<nom>.sql`). Toujours vérifier que le fichier de sauvegarde n'est pas vide avant de modifier les données.
+- **Rôle** : mot de passe Postgres du projet. Il sert aux tests SQL en transaction annulée (`psql` sur le pooler) et aux sauvegardes : `node scripts/backup/backup.mjs <nom>` (pg_dump installé avec PostgreSQL, sans Docker ; schémas public, auth et storage ; vérification bloquante et journal `backups/journal.json`). `npx supabase db dump` n'est plus utilisé : il dépend de Docker Desktop et échouait sans le signaler quand Docker était arrêté.
 - **Emplacement** : l'adresse du pooler (sans mot de passe) est dans `supabase/.temp/pooler-url`, hors de git.
 - **Vérifier** : un test de `supabase/tests/` passe, ou `psql "$(cat supabase/.temp/pooler-url)" -c 'select 1'` avec `PGPASSWORD="$SUPABASE_DB_PASSWORD"`.
 - **Renouveler** : Dashboard Supabase → Project Settings → Database → Reset database password, puis mettre à jour la variable.
@@ -183,7 +183,7 @@ Pour le renouveler : générer une valeur aléatoire, la poser dans les fonction
 |---|---|---|
 | `.env` | Variables de l'app (section 2) | `.gitignore` ; modèle `.env.example` |
 | `google-services.json` | Configuration Firebase Android | `.gitignore` |
-| `backups/` | Sauvegardes de données (`npx supabase db dump --data-only`) : données personnelles des utilisateurs | `.gitignore` ; jamais exportées ni partagées |
+| `backups/` | Sauvegardes de données (`scripts/backup/backup.mjs`, avec les comptes) et journal des sauvegardes vérifiées (`journal.json`) : données personnelles des utilisateurs | `.gitignore` ; jamais exportées ni partagées |
 | `supabase/.temp/` | Lien du CLI au projet, adresse du pooler | `.gitignore` |
 | `export/` | Export du code pour les revues | `.gitignore` |
 | Clé du compte de service Firebase | Section 5 | Hors du dossier du projet |
