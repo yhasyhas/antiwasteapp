@@ -515,6 +515,9 @@ const es: Translations = {
     selectionActive_other: 'Recetas solo con estos {{count}} ingredientes (más sal, pimienta, aceite, agua).',
     clearSelection: 'Usar todo',
     transformLeftovers: 'Transformar mis sobras',
+    narrowPantry: 'Añade 1 o 2 ingredientes para tener más ideas.',
+    narrowSelection: 'Elige 1 o 2 alimentos más para tener más ideas.',
+    narrowAction: 'Añadir un alimento',
   },
   notifications: {
     title: '¡Úsalo pronto!',

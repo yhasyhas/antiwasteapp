@@ -516,6 +516,9 @@ const fr = {
     selectionActive_other: 'Recettes avec ces {{count}} ingrédients seulement (plus sel, poivre, huile, eau).',
     clearSelection: 'Tout utiliser',
     transformLeftovers: 'Transformer mes restes',
+    narrowPantry: 'Ajoute 1 ou 2 ingrédients pour plus d’idées.',
+    narrowSelection: 'Choisis 1 ou 2 aliments de plus pour plus d’idées.',
+    narrowAction: 'Ajouter un aliment',
   },
   notifications: {
     title: 'À cuisiner vite',
