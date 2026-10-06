@@ -39,9 +39,10 @@ try {
   for (const [index, lang] of langs.entries()) {
     if (index > 0) await sleep(61_000);
     await setLang(user.id, { lang });
-    const response = await fetch(`${URL_}/auth/v1/recover`, {
+    // Adresse de retour dans l'adresse de la requête, comme supabase-js : dans le corps, elle est ignorée (retour vers l'adresse du site)
+    const response = await fetch(`${URL_}/auth/v1/recover?redirect_to=${encodeURIComponent('myapp://auth/reset')}`, {
       method: 'POST', headers: admin,
-      body: JSON.stringify({ email, redirect_to: 'myapp://auth/reset' }),
+      body: JSON.stringify({ email }),
     });
     console.log(`${response.ok ? 'OK' : 'ÉCHEC'} : e-mail ${lang} (${response.status})${response.ok ? '' : ' ' + (await response.text()).slice(0, 200)}`);
   }
