@@ -116,9 +116,13 @@ Pour le renouveler : générer une valeur aléatoire, la poser dans les fonction
   - Le captcha protège la connexion, l'inscription et l'essai sans compte.
   - Renouveler : Cloudflare → Turnstile → widget « Antigaspi » → nouvelle clé secrète, à recoller dans Supabase.
 - **Connexion anonyme** (essai sans compte) : activée (Authentication → Sign In / Providers → Anonymous).
-- **Confirmation d'email** : désactivée pendant le développement (Authentication → Sign In / Providers → Email). Elle sera réactivée en phase 13 avec le service d'emails.
+- **Confirmation d'email** : désactivée pendant le développement (Authentication → Sign In / Providers → Email). Elle sera décidée en phase 15 ; son modèle d'e-mail est déjà prêt en trois langues.
 - **Adresses de redirection** (Authentication → URL Configuration → Redirect URLs) : le lien de l'e-mail « Mot de passe oublié » (phase 10) ouvre `myapp://auth/reset` ; cette adresse doit être autorisée, sinon le lien mène à l'adresse du site (`http://localhost:3000`). Autorisées depuis le 06/10/2026 : `myapp://**` (l'app) et `http://localhost:8082/**` (tests de la version web). Le schéma définitif (phase 15) devra y être ajouté. Lecture sans afficher de secret : `GET https://api.supabase.com/v1/projects/iqzjonmjlscuckdmiehk/config/auth` avec `SUPABASE_ACCESS_TOKEN`, champ `uri_allow_list`.
-- **E-mails d'authentification** : service intégré de Supabase pour l'instant. Il n'envoie **qu'aux adresses des membres de l'équipe du projet**, au plus 2 e-mails par heure : un testeur ne reçoit pas l'e-mail « Mot de passe oublié » tant qu'un serveur d'e-mails personnalisé (SMTP) n'est pas configuré (phase 13).
+- **E-mails d'authentification** : envoyés par **SMTP2GO** depuis le 06/10/2026 (section 7), plus par le service intégré de Supabase (qui n'envoyait qu'aux membres de l'équipe du projet, 2 par heure).
+  - **SMTP** (Authentication → Emails → SMTP Settings, réglé par l'utilisateur) : serveur `mail-eu.smtp2go.com`, port 465, expéditeur `noreply@terangu.com`, nom « Antigaspi ». L'utilisateur et le mot de passe SMTP sont seulement dans Supabase et dans le gestionnaire de mots de passe de l'utilisateur : ni dans le dépôt, ni dans une variable. Vérifier sans afficher de secret : `GET …/config/auth` (ci-dessus), champs `smtp_host`, `smtp_admin_email`, `smtp_sender_name`, et seulement la présence de `smtp_user` et `smtp_pass`.
+  - **Modèles** (Authentication → Emails → Templates) : réinitialisation du mot de passe et confirmation d'inscription, en français, anglais et espagnol. Source : `scripts/email-templates/templates.mjs` (nom de l'app dans la constante `APP_NAME`) ; envoi avec `node scripts/email-templates/push.mjs` (`SUPABASE_ACCESS_TOKEN`, met aussi à jour le nom d'expéditeur), aperçus avec `--preview DOSSIER`. Une modification faite dans le Dashboard est écrasée au prochain envoi : la reporter dans `templates.mjs`. Langue : métadonnée `lang` du compte, copiée depuis les préférences (migration `20261006110000_email_language.sql`) ; français sinon.
+  - **Limites** (Authentication → Rate Limits, ou `rate_limit_email_sent` dans `config/auth`) : 30 e-mails par heure pour tout le projet (valeur par défaut avec un SMTP personnalisé, suffisante pour quelques testeurs), 60 s entre deux e-mails au même compte (`smtp_max_frequency`). À relever au lancement si besoin.
+  - **Envoi de test** : `node scripts/e2e/recovery-email.mjs ADRESSE fr,en,es` (compte temporaire créé puis supprimé si l'adresse n'en a pas).
 - **Vérifier** : Dashboard, en lecture seulement. Un changement de ces réglages demande l'accord de l'utilisateur, qui a l'accès au Dashboard.
 
 ---
@@ -167,6 +171,7 @@ Pour le renouveler : générer une valeur aléatoire, la poser dans les fonction
 | Firebase | FCM (push Android) | Console Firebase (utilisateur) ; clé de compte de service (section 5) |
 | Cloudflare | Workers AI, Pages, Turnstile | Section 6 |
 | GitHub | Dépôt `yhasyhas/antiwasteapp` | Identifiants de Git pour Windows (Git Credential Manager) ; vérifier avec `git ls-remote origin` ; `gh` n'est pas installé |
+| SMTP2GO | Envoi des e-mails d'authentification ; domaine `terangu.com` vérifié (enregistrements DNS chez Porkbun), utilisateur SMTP dédié à Supabase | Compte SMTP2GO (utilisateur) ; mot de passe SMTP seulement dans Supabase et dans le gestionnaire de mots de passe de l'utilisateur (section 4, « E-mails d'authentification ») |
 | Open Food Facts | Produits par code-barres | Aucun compte ni clé : chaque requête s'identifie par un User-Agent avec l'adresse du dépôt (`lib/openFoodFacts.ts`) |
 
 ---
@@ -195,7 +200,6 @@ Ces éléments seront ajoutés à cet inventaire au moment de leur création.
   - connexion Google : identifiants OAuth (Google Cloud) et fournisseur Google dans Supabase ;
   - EAS Update : canal et configuration.
 - **Phase 13 (services)** :
-  - service d'envoi d'emails : clé d'API et réglages SMTP dans Supabase ;
   - mesure d'usage : clé du service choisi ;
   - offre Pro de Supabase et offre payante de Gemini : moyens de paiement sur les comptes (hors dépôt). Cloudflare est déjà en offre Workers Paid (05/10/2026, section 6).
 - **Phase 14 (audit)** :

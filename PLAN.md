@@ -338,7 +338,8 @@ Partie restante de la phase 9.
 
 - [x] Premier lancement guidé : trois écrans et un premier scan accompagné — *partie A : trois écrans qu'on peut passer, questions facultatives (régimes, cuisine, personnes), première action (scanner ou à la main) ; version courte après une invitation ; une seule fois par compte (`profiles.onboarded_at`)*
 - [ ] Écran « Mon impact » simple : sauvés et gaspillés par mois, aliments les plus gaspillés avec un conseil
-- [x] « Mot de passe oublié » sur l'écran de connexion : e-mail de réinitialisation, protégé par la vérification anti-robot (captcha) (déplacé depuis « Obligatoire avant la bêta ») — *lien vers « Nouveau mot de passe » dans l'app ; adresses de redirection ajoutées le 06/10/2026 ; e-mails reçus seulement par les membres de l'équipe du projet tant qu'il n'y a pas de serveur d'e-mails (voir le journal)*
+- [x] « Mot de passe oublié » sur l'écran de connexion : e-mail de réinitialisation, protégé par la vérification anti-robot (captcha) (déplacé depuis « Obligatoire avant la bêta ») — *lien vers « Nouveau mot de passe » dans l'app ; adresses de redirection ajoutées le 06/10/2026 ; e-mails envoyés par SMTP2GO depuis le 06/10/2026 (voir le journal)*
+- [x] Service d'envoi d'e-mails (SMTP2GO) avancé depuis la phase 13, par exception : nécessaire pour que les testeurs reçoivent « Mot de passe oublié » — *modèles de réinitialisation et de confirmation d'inscription en trois langues, aux couleurs de l'app (`scripts/email-templates/`) ; langue lue dans les métadonnées du compte (`lang`, copiée depuis les préférences)*
 - [ ] Ticket de caisse dans l'app (le mode existe déjà côté serveur)
 - [x] « Donner mon avis » — *Réglages ; table `feedback`, fonction `send-feedback`, un email Sentry par avis*
 - [x] Avec un garde-manger étroit, suggérer d'ajouter 1 ou 2 ingrédients pour plus d'idées — *2 aliments ou moins disponibles ou choisis, basiques non comptés*
@@ -378,12 +379,12 @@ Partie restante de la phase 9.
 
 ## Phase 13 — Services et abonnements
 
-- [ ] Service d'envoi d'emails dédié et vérification des emails, emails dans les trois langues ; réactiver la confirmation d'email dans Supabase (Authentication → Sign In / Providers → Email) (déplacé depuis le lancement)
+- [x] Service d'envoi d'emails dédié, emails dans les trois langues (déplacé depuis le lancement) — *avancé en phase 10 le 06/10/2026 (SMTP2GO, voir le journal) ; confirmation d'email déplacée en phase 15*
 - [ ] Mesure d'usage avec consentement
 - [ ] Offre Pro de Supabase
 - [ ] Offre payante de Gemini (Cloudflare : offre Workers Paid prise le 05/10/2026, voir le journal) (les données de l'offre gratuite de Gemini servent à améliorer les produits Google) ; revoir les limites de Groq (~3 scans/min en secours, modèle en preview) (déplacé depuis le lancement)
 
-**Terminé quand** : les emails partent du service dédié dans les trois langues, la mesure d'usage respecte le consentement, et les services retenus en phase 11 sont souscrits.
+**Terminé quand** : la mesure d'usage respecte le consentement, et les services retenus en phase 11 sont souscrits.
 
 ## Phase 14 — Audit qualité et sécurité
 
@@ -404,6 +405,7 @@ Ancienne phase 8a.
 - [ ] Environnement de test séparé (second projet Supabase) pour ne plus déployer sur la base utilisée par l'app pendant le développement
 - [ ] Vérifier que les post-traitements (noms, titres, sécurité, étiquettes) s'appliquent quel que soit le fournisseur
 - [ ] Tests automatisés des parcours critiques sur téléphone : connexion, scan, génération, « J'ai cuisiné ça », foyer
+- [ ] Retirer http://localhost:8082/** des adresses de retour autorisées dans Supabase en production
 
 **Terminé quand** : chaque point de l'audit est traité ou noté au journal avec sa raison.
 
@@ -420,6 +422,7 @@ Ancienne phase 8.
 - [ ] Remplacer le schéma de liens `myapp` (hérité de bolt) par un schéma propre à l'app, avec le nom définitif ; nouveau build nécessaire
 - [ ] Relire les 100 fiches aliments avant la bêta avec `scripts/food-facts/review.mjs` (exemple d'astuce douteuse : « vinaigre de banane »)
 - [ ] Renommer ou supprimer le sous-domaine inutile `bolt-expo-starter.workers.dev`
+- [ ] Décider de la confirmation d'email à l'inscription (Authentication → Sign In / Providers → Email), désactivée jusqu'ici ; le modèle d'e-mail est prêt en trois langues (déplacé depuis la phase 13)
 
 ### Obligatoire avant la bêta
 
@@ -658,3 +661,4 @@ Ancienne phase 8.
 | 06/10/2026 | **Images : la v1 reste la consigne par défaut** ; la v1.1 (poissons en filets ou morceaux, volaille entière découpée) n'est pas retenue après comparaison sur 5 poissons et 1 poulet rôti, et reste disponible dans le code (`IMAGE_PROMPT_VERSION=v1.1`), sans être par défaut | Enseignements pour la comparaison d'autres modèles d'image (phase 11) : **le problème vient du modèle, pas de la consigne** (FLUX schnell) ; un plat dit « entier » doit être montré entier (la v1.1 montrait une « dorade entière » en morceaux) ; une seule assiette par image (la v1.1 en produisait plusieurs) ; têtes de poisson toujours bizarres en arrière-plan ; morceaux de tilapia ressemblant à du tofu ; **aucune règle pour la volaille** (le poulet rôti était déjà très bien en v1) |
 | 06/10/2026 | **Phase 10, partie A** (branche `phase-10`) : premier lancement guidé, mot de passe oublié, « Donner mon avis », notes et signalements des recettes, « Mes basiques », garde-manger étroit ; migration `first_contact` appliquée (sauvegarde faite avant) | Guide noté sur le compte dès son affichage (jamais deux fois, même interrompu) ; comptes existants exclus. « Mes basiques » : identifiants reconnus en trois langues (sel, poivre, huile, eau, ail, oignon, sucre, farine, beurre, épices courantes, vinaigre, moutarde, bouillon) ou noms libres ; les quatre par défaut se retirent aussi ; « Épices courantes » couvre cumin, paprika, curry, cannelle… ; poivrons et beurre de cacahuète jamais pris pour des basiques. Avis et signalements : 20 par jour au plus, aucune donnée personnelle envoyée à Sentry ; un email par avis et par recette signalée dangereuse (nouveau problème Sentry à chaque fois) |
 | 06/10/2026 | Mot de passe oublié : le service d'e-mails intégré de Supabase n'envoie **qu'aux membres de l'équipe du projet**, au plus 2 e-mails par heure (documentation vérifiée) ; les testeurs de la phase 10b ne recevraient pas l'e-mail sans serveur d'e-mails personnalisé. Le lien ouvre l'app seulement si `myapp://**` figure dans les adresses de redirection autorisées (vide jusqu'ici) | Adresses de redirection `myapp://**` et `http://localhost:8082/**` ajoutées par l'API de gestion avec l'accord de l'utilisateur (rien d'autre modifié) ; parcours vérifié en version web (`scripts/e2e/password-reset-web.mjs`). Serveur d'e-mails : décision de l'utilisateur (avancer ce point de la phase 13 avant la phase 10b) |
+| 06/10/2026 | **Service d'e-mails avancé de la phase 13 à la phase 10, par exception** : SMTP2GO (compte, domaine `terangu.com` vérifié, utilisateur SMTP dédié, SMTP personnalisé activé dans Supabase par l'utilisateur), expéditeur `noreply@terangu.com`, nom « Antigaspi » | Nécessaire pour que les testeurs de la phase 10b reçoivent « Mot de passe oublié » (le service intégré n'envoie qu'à l'équipe du projet). Modèles de réinitialisation et de confirmation en trois langues, aux couleurs de l'app, nom de l'app en une seule constante (`scripts/email-templates/templates.mjs`, envoyés par `push.mjs`) ; langue lue dans `auth.users.raw_user_meta_data.lang`, copiée depuis `user_preferences.default_language` par un déclencheur (migration `email_language`, sauvegarde faite avant) et envoyée à l'inscription, français sinon. Correction liée : un premier enregistrement des préférences prenait la langue par défaut de la colonne (« fr ») et pouvait repasser l'app en français. Limite d'envoi gardée à 30 e-mails par heure pour tout le projet (valeur par défaut avec un SMTP personnalisé), 60 s entre deux e-mails au même compte. Confirmation d'email à l'inscription toujours désactivée : décision en phase 15 |

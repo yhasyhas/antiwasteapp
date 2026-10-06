@@ -2,6 +2,7 @@ import { supabase } from './supabase';
 import type { Cuisine } from '@/components/recipe/types';
 import { cuisineId, OTHER_CUISINE, OTHER_MAX_LENGTH } from './cuisines';
 import { cleanBasics, DEFAULT_BASICS, setUserBasics } from './basics';
+import { currentLanguage } from '@/i18n';
 
 // Préférences de génération de l'utilisateur (table user_preferences) : appliquées par défaut à chaque
 // génération, modifiables ponctuellement dans les filtres.
@@ -60,6 +61,9 @@ export async function savePreferences(userId: string, preferences: Preferences):
     default_cuisine_other: preferences.cuisine === OTHER_CUISINE ? preferences.cuisineOther?.trim().slice(0, OTHER_MAX_LENGTH) || null : null,
     servings: preferences.servings,
     basics: cleanBasics(preferences.basics),
+    // Sinon un premier enregistrement prend la valeur par défaut de la colonne (« fr ») : l'app et les e-mails
+    // repasseraient en français
+    default_language: currentLanguage(),
     updated_at: new Date().toISOString(),
   }, { onConflict: 'user_id' });
   if (error) throw new Error(error.message);
