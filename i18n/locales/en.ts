@@ -968,3 +968,26 @@ const en: Translations = {
 };
 
 export default en;
+  impact: {
+    title: 'My impact',
+    open: 'See my impact',
+    household: 'Household',
+    me: 'Me',
+    thisMonth: 'This month',
+    saved_one: 'food saved',
+    saved_other: 'foods saved',
+    wasted_one: 'wasted',
+    wasted_other: 'wasted',
+    months: 'Last 6 months',
+    legendSaved: 'Saved',
+    legendWasted: 'Wasted',
+    monthA11y: '{{month}}: {{saved}}, {{wasted}}',
+    topTitle: 'Most wasted',
+    topSubtitleHousehold: 'By the household, over the last 6 months',
+    topSubtitle: 'Over the last 6 months',
+    times_one: 'thrown away once',
+    times_other: 'thrown away {{count}} times',
+    topNone: 'Nothing wasted over the last 6 months. Well done!',
+    tipLabel: 'Tip',
+    loadError: 'Could not load your impact. Check your connection.',
+  },

@@ -971,5 +971,28 @@ const fr = {
 export default fr;
 
 // Même structure que le français, avec des textes quelconques : les trois langues ont les mêmes clés
+  impact: {
+    title: 'Mon impact',
+    open: 'Voir mon impact',
+    household: 'Le foyer',
+    me: 'Moi',
+    thisMonth: 'Ce mois-ci',
+    saved_one: 'aliment sauvé',
+    saved_other: 'aliments sauvés',
+    wasted_one: 'gaspillé',
+    wasted_other: 'gaspillés',
+    months: 'Les 6 derniers mois',
+    legendSaved: 'Sauvés',
+    legendWasted: 'Gaspillés',
+    monthA11y: '{{month}} : {{saved}}, {{wasted}}',
+    topTitle: 'Les plus gaspillés',
+    topSubtitleHousehold: 'Par le foyer, ces 6 derniers mois',
+    topSubtitle: 'Ces 6 derniers mois',
+    times_one: 'jeté {{count}} fois',
+    times_other: 'jeté {{count}} fois',
+    topNone: 'Aucun aliment gaspillé ces 6 derniers mois. Bravo !',
+    tipLabel: 'Conseil',
+    loadError: 'Impossible de charger ton impact. Vérifie ta connexion.',
+  },
 type Strings<T> = { [K in keyof T]: T[K] extends string ? string : Strings<T[K]> };
 export type Translations = Strings<typeof fr>;

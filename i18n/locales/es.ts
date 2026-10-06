@@ -968,3 +968,26 @@ const es: Translations = {
 };
 
 export default es;
+  impact: {
+    title: 'Mi impacto',
+    open: 'Ver mi impacto',
+    household: 'El hogar',
+    me: 'Yo',
+    thisMonth: 'Este mes',
+    saved_one: 'alimento salvado',
+    saved_other: 'alimentos salvados',
+    wasted_one: 'desperdiciado',
+    wasted_other: 'desperdiciados',
+    months: 'Últimos 6 meses',
+    legendSaved: 'Salvados',
+    legendWasted: 'Desperdiciados',
+    monthA11y: '{{month}}: {{saved}}, {{wasted}}',
+    topTitle: 'Los más desperdiciados',
+    topSubtitleHousehold: 'Por el hogar, en los últimos 6 meses',
+    topSubtitle: 'En los últimos 6 meses',
+    times_one: 'tirado {{count}} vez',
+    times_other: 'tirado {{count}} veces',
+    topNone: 'Nada desperdiciado en los últimos 6 meses. ¡Bravo!',
+    tipLabel: 'Consejo',
+    loadError: 'No se pudo cargar tu impacto. Revisa tu conexión.',
+  },
