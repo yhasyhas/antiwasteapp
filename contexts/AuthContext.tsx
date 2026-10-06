@@ -88,9 +88,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) throw error;
 
       if (!profile) {
-        // Compte anonyme : pas d'adresse e-mail
-        const { error: insertError } = await supabase.from('profiles').insert({ id, email: email ?? null });
+        // Compte anonyme : pas d'adresse e-mail. Le profil peut avoir été créé entre-temps (premier lancement guidé,
+        // lib/onboarding.ts) : pas d'erreur, l'adresse est ajoutée ci-dessous
+        const { error: insertError } = await supabase.from('profiles').upsert({ id, email: email ?? null }, { onConflict: 'id', ignoreDuplicates: true });
         if (insertError) throw insertError;
+        if (email) await supabase.from('profiles').update({ email }).eq('id', id).is('email', null);
       } else if (email) {
         // Après la conversion d'un compte anonyme : l'adresse rejoint le profil
         await supabase.from('profiles').update({ email }).eq('id', id).is('email', null);

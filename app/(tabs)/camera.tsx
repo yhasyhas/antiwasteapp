@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, AppState, Image, Linking, StyleSheet, Text, View } from 'react-native';
-import { useIsFocused } from 'expo-router';
+import { useIsFocused, useLocalSearchParams } from 'expo-router';
 import { Plus, RefreshCw } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSafeSpacing } from '@/hooks/useSafeSpacing';
@@ -32,6 +32,11 @@ export default function CameraScreen() {
   const [mode, setMode] = useState<ScanMode>('photo');
   // Ajout manuel prérempli après un scan de code-barres
   const [prefill, setPrefill] = useState<ManualPrefill | null>(null);
+  // « Ajouter à la main » demandé par un autre écran (premier lancement guidé) ; « at » : chaque demande est nouvelle
+  const { manual, at } = useLocalSearchParams<{ manual?: string; at?: string }>();
+  useEffect(() => {
+    if (manual === '1') setShowManualAdd(true);
+  }, [manual, at]);
   const cameraRef = useRef<ScannerCameraHandle>(null);
   const { lookingUp, onBarcodeScanned, resume } = useBarcodeScan((result) => {
     setPrefill(result);

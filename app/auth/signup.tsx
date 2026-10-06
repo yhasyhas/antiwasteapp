@@ -67,7 +67,7 @@ export default function SignUpScreen() {
 
     setSuccess(true);
     setTimeout(() => {
-      router.replace('/(tabs)');
+      router.replace('/');
     }, 1000);
   };
 

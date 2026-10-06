@@ -59,6 +59,8 @@ function RootNavigator() {
           expo-router renvoie vers index, qui redirige vers la connexion */}
       <Stack.Protected guard={!!user}>
         <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
+        {/* Premier lancement guidé : une seule fois par compte, sans retour en arrière */}
+        <Stack.Screen name="onboarding" options={{ animation: 'fade', gestureEnabled: false }} />
         <Stack.Screen name="recipe/generate" />
         <Stack.Screen name="household" />
         <Stack.Screen name="preferences" />

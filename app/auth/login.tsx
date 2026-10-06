@@ -50,7 +50,7 @@ export default function LoginScreen() {
       setError(authErrorMessage(t, anonymousError));
       return;
     }
-    router.replace('/(tabs)');
+    router.replace('/');
   };
 
   const handleLogin = async () => {
@@ -70,8 +70,8 @@ export default function LoginScreen() {
       return;
     }
 
-    // L'écran index (qui redirige selon la session) n'est plus monté ici : on navigue nous-mêmes
-    router.replace('/(tabs)');
+    // L'écran de démarrage décide : premier lancement guidé ou accueil
+    router.replace('/');
   };
 
   return (
