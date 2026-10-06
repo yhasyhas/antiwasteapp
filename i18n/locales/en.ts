@@ -909,6 +909,22 @@ const en: Translations = {
     sendError: 'Could not send right now. Check your connection and try again.',
     dailyLimit: 'You have already sent many messages today. Try again tomorrow.',
   },
+  feedback: {
+    title: 'Give feedback',
+    rowSubtitle: 'A problem, an idea? Write to us',
+    subtitle: 'Every message is read.',
+    kind: {
+      problem: 'A problem',
+      idea: 'An idea',
+      other: 'Other',
+    },
+    placeholder: 'Your message',
+    placeholderProblem: 'What happened? On which screen?',
+    technical: 'Added automatically: {{details}}',
+    send: 'Send',
+    sentTitle: 'Thank you!',
+    sentText: 'Your message has been received.',
+  },
 };
 
 export default en;

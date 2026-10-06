@@ -910,6 +910,22 @@ const fr = {
     sendError: 'Envoi impossible pour le moment. Vérifie ta connexion et réessaie.',
     dailyLimit: 'Tu as déjà envoyé beaucoup de messages aujourd’hui. Réessaie demain.',
   },
+  feedback: {
+    title: 'Donner mon avis',
+    rowSubtitle: 'Un problème, une idée ? Écris-nous',
+    subtitle: 'Chaque message est lu.',
+    kind: {
+      problem: 'Un problème',
+      idea: 'Une idée',
+      other: 'Autre',
+    },
+    placeholder: 'Ton message',
+    placeholderProblem: 'Que s’est-il passé ? Sur quel écran ?',
+    technical: 'Ajouté automatiquement : {{details}}',
+    send: 'Envoyer',
+    sentTitle: 'Merci !',
+    sentText: 'Ton message est bien arrivé.',
+  },
 };
 
 export default fr;

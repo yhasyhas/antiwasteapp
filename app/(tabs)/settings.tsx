@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { Bell, Globe, LogOut, Minus, Plus, Trash2, UserRound, Users, Utensils } from 'lucide-react-native';
+import { Bell, Globe, LogOut, MessageSquare, Minus, Plus, Trash2, UserRound, Users, Utensils } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHousehold } from '@/hooks/useHousehold';
@@ -25,6 +25,7 @@ import { Touchable } from '@/components/ui/Touchable';
 import { APP_LANGUAGES } from '@/lib/languages';
 import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 import { showDialog } from '@/lib/dialog';
+import { FeedbackSheet } from '@/components/settings/FeedbackSheet';
 
 export default function SettingsScreen() {
   const { language, t } = useLanguage();
@@ -35,6 +36,8 @@ export default function SettingsScreen() {
   const [editingName, setEditingName] = useState(false);
   const [name, setName] = useState('');
   const [savingName, setSavingName] = useState(false);
+  // « Donner mon avis »
+  const [givingFeedback, setGivingFeedback] = useState(false);
 
   useEffect(() => setName(me?.name ?? ''), [me?.name, editingName]);
 
@@ -188,6 +191,10 @@ export default function SettingsScreen() {
         </Card>
 
         <Card style={styles.list}>
+          <ListRow icon={MessageSquare} title={t('feedback.title')} subtitle={t('feedback.rowSubtitle')} onPress={() => setGivingFeedback(true)} />
+        </Card>
+
+        <Card style={styles.list}>
           <ListRow icon={Trash2} title={t('settings.clearPantry')} danger onPress={clearPantry} />
           <ListRow divider icon={LogOut} title={t('settings.signOut')} danger onPress={confirmSignOut} />
         </Card>
@@ -210,6 +217,8 @@ export default function SettingsScreen() {
           <Text style={styles.footerSubtext}>{t('settings.tagline')}</Text>
         </View>
       </ScrollView>
+
+      <FeedbackSheet visible={givingFeedback} onClose={() => setGivingFeedback(false)} />
 
       <BottomSheet visible={editingName} onClose={() => setEditingName(false)} keyboard>
         <SheetHeader title={t('household.yourName')} subtitle={t('household.yourNameHint')} onClose={() => setEditingName(false)} />

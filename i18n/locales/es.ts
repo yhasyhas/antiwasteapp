@@ -909,6 +909,22 @@ const es: Translations = {
     sendError: 'No se pudo enviar ahora. Revisa tu conexión e inténtalo de nuevo.',
     dailyLimit: 'Ya has enviado muchos mensajes hoy. Inténtalo mañana.',
   },
+  feedback: {
+    title: 'Dar mi opinión',
+    rowSubtitle: '¿Un problema, una idea? Escríbenos',
+    subtitle: 'Leemos cada mensaje.',
+    kind: {
+      problem: 'Un problema',
+      idea: 'Una idea',
+      other: 'Otro',
+    },
+    placeholder: 'Tu mensaje',
+    placeholderProblem: '¿Qué pasó? ¿En qué pantalla?',
+    technical: 'Se añade automáticamente: {{details}}',
+    send: 'Enviar',
+    sentTitle: '¡Gracias!',
+    sentText: 'Tu mensaje ha llegado.',
+  },
 };
 
 export default es;
