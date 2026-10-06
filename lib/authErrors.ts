@@ -11,6 +11,8 @@ const AUTH_ERROR_KEYS = {
   validation_failed: 'auth.errors.invalidEmail',
   over_request_rate_limit: 'auth.errors.rateLimit',
   over_email_send_rate_limit: 'auth.errors.rateLimit',
+  same_password: 'auth.samePassword',
+  captcha_failed: 'auth.captchaFailed',
 } as const;
 
 export function authErrorMessage(t: TFunction, error: { code?: string; name?: string; status?: number } | null | undefined): string {

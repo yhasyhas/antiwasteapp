@@ -52,6 +52,9 @@ function RootNavigator() {
       <Stack.Screen name="index" options={{ animation: 'fade' }} />
       <Stack.Screen name="auth/login" options={{ animation: 'fade' }} />
       <Stack.Screen name="auth/signup" />
+      {/* Mot de passe oublié : demande de l'e-mail, puis « Nouveau mot de passe » ouvert par le lien (sans session au départ) */}
+      <Stack.Screen name="auth/forgot" />
+      <Stack.Screen name="auth/reset" options={{ animation: 'fade' }} />
       {/* Sans session (déconnexion, session expirée), ces écrans deviennent inaccessibles :
           expo-router renvoie vers index, qui redirige vers la connexion */}
       <Stack.Protected guard={!!user}>

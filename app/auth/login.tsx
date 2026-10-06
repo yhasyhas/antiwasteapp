@@ -109,6 +109,14 @@ export default function LoginScreen() {
             autoComplete="password"
             editable={!loading}
           />
+          <Touchable
+            onPress={() => router.push({ pathname: '/auth/forgot', params: email.trim() ? { email: email.trim() } : {} })}
+            disabled={loading}
+            style={styles.forgot}
+            accessibilityRole="link"
+          >
+            <Text style={styles.forgotText}>{t('auth.forgotPassword')}</Text>
+          </Touchable>
 
           <CaptchaField ref={captcha} onToken={setCaptchaToken} />
 
@@ -172,6 +180,16 @@ const styles = StyleSheet.create({
   form: {
     marginTop: spacing.xxl,
     gap: spacing.lg,
+  },
+  forgot: {
+    alignSelf: 'flex-end',
+    minHeight: sizes.touch,
+    justifyContent: 'center',
+    marginTop: -spacing.md,
+  },
+  forgotText: {
+    ...typography.secondaryStrong,
+    color: colors.primary,
   },
   error: {
     ...typography.body,
