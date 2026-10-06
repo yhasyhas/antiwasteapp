@@ -752,6 +752,13 @@ const en: Translations = {
     servingsValue_one: '{{count}} person',
     servingsValue_other: '{{count}} people',
     save: 'Save',
+    basics: 'My basics',
+    basicsHint: 'What you always have at home: recipes use it without counting it as a purchase, and “Doable now” counts it as available.',
+    basicsPlaceholder: 'E.g. soy sauce',
+    basicsSuggestions: 'Suggestions',
+    basicsEmpty: 'No basics: every ingredient outside your pantry counts as a purchase.',
+    removeBasic: 'Remove {{name}}',
+    addBasic: 'Add {{name}}',
   },
   upgrade: {
     title: 'Create my account',
@@ -864,6 +871,23 @@ const en: Translations = {
     title: 'Oops!',
     text: "This screen doesn't exist.",
     goHome: 'Go to home screen',
+  },
+  basics: {
+    item: {
+      salt: 'Salt',
+      pepper: 'Pepper',
+      oil: 'Oil',
+      water: 'Water',
+      garlic: 'Garlic',
+      onion: 'Onion',
+      sugar: 'Sugar',
+      flour: 'Flour',
+      butter: 'Butter',
+      spices: 'Common spices',
+      vinegar: 'Vinegar',
+      mustard: 'Mustard',
+      stock: 'Stock (cube)',
+    },
   },
 };
 

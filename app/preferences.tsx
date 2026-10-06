@@ -14,10 +14,11 @@ import { colors, sizes, spacing, typography } from '@/constants/theme';
 import { CookTimeChoice, ExcludedEditor, ServingsStepper } from '@/components/recipe/PreferenceControls';
 import { dietaryOptions } from '@/components/recipe/options';
 import { CuisinePicker } from '@/components/recipe/CuisinePicker';
+import { BasicsEditor } from '@/components/recipe/BasicsEditor';
 import { DEFAULT_PREFERENCES, loadPreferences, savePreferences, type Preferences } from '@/lib/preferences';
 import { showDialog } from '@/lib/dialog';
 
-// Préférences de génération : régimes, aliments exclus (allergies, goûts), temps maximum, cuisine
+// Préférences de génération : régimes, aliments exclus (allergies, goûts), « Mes basiques », temps maximum, cuisine
 // préférée, nombre de personnes. Appliquées par défaut à chaque génération (modifiables dans les filtres).
 export default function PreferencesScreen() {
   const { user } = useAuth();
@@ -82,6 +83,10 @@ export default function PreferencesScreen() {
 
             <Section title={t('preferences.excluded')} hint={t('preferences.excludedHint')}>
               <ExcludedEditor value={preferences.excluded} onChange={(excluded) => update({ excluded })} />
+            </Section>
+
+            <Section title={t('preferences.basics')} hint={t('preferences.basicsHint')}>
+              <BasicsEditor value={preferences.basics} onChange={(basics) => update({ basics })} />
             </Section>
 
             <Section title={t('preferences.maxTime')}>

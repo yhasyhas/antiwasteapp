@@ -752,6 +752,13 @@ const es: Translations = {
     servingsValue_one: '{{count}} persona',
     servingsValue_other: '{{count}} personas',
     save: 'Guardar',
+    basics: 'Mis básicos',
+    basicsHint: 'Lo que siempre tienes en casa: las recetas lo usan sin contarlo como compra, y «Factible ahora» lo cuenta como disponible.',
+    basicsPlaceholder: 'Ej. salsa de soja',
+    basicsSuggestions: 'Sugerencias',
+    basicsEmpty: 'Sin básicos: todo ingrediente que no esté en la despensa cuenta como compra.',
+    removeBasic: 'Quitar {{name}}',
+    addBasic: 'Añadir {{name}}',
   },
   upgrade: {
     title: 'Crear mi cuenta',
@@ -864,6 +871,23 @@ const es: Translations = {
     title: '¡Vaya!',
     text: 'Esta pantalla no existe.',
     goHome: 'Volver al inicio',
+  },
+  basics: {
+    item: {
+      salt: 'Sal',
+      pepper: 'Pimienta',
+      oil: 'Aceite',
+      water: 'Agua',
+      garlic: 'Ajo',
+      onion: 'Cebolla',
+      sugar: 'Azúcar',
+      flour: 'Harina',
+      butter: 'Mantequilla',
+      spices: 'Especias comunes',
+      vinegar: 'Vinagre',
+      mustard: 'Mostaza',
+      stock: 'Caldo (cubito)',
+    },
   },
 };
 

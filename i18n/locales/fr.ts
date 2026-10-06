@@ -753,6 +753,13 @@ const fr = {
     servingsValue_one: '{{count}} personne',
     servingsValue_other: '{{count}} personnes',
     save: 'Enregistrer',
+    basics: 'Mes basiques',
+    basicsHint: "Ce que tu as toujours chez toi : les recettes s'en servent sans le compter comme un achat, et « Faisable maintenant » le compte comme disponible.",
+    basicsPlaceholder: 'Ex. sauce soja',
+    basicsSuggestions: 'Suggestions',
+    basicsEmpty: 'Aucun basique : tout ingrédient hors garde-manger compte comme un achat.',
+    removeBasic: 'Retirer {{name}}',
+    addBasic: 'Ajouter {{name}}',
   },
   upgrade: {
     title: 'Créer mon compte',
@@ -865,6 +872,23 @@ const fr = {
     title: 'Oups !',
     text: "Cet écran n'existe pas.",
     goHome: "Retour à l'accueil",
+  },
+  basics: {
+    item: {
+      salt: 'Sel',
+      pepper: 'Poivre',
+      oil: 'Huile',
+      water: 'Eau',
+      garlic: 'Ail',
+      onion: 'Oignon',
+      sugar: 'Sucre',
+      flour: 'Farine',
+      butter: 'Beurre',
+      spices: 'Épices courantes',
+      vinegar: 'Vinaigre',
+      mustard: 'Moutarde',
+      stock: 'Bouillon (cube)',
+    },
   },
 };
 
