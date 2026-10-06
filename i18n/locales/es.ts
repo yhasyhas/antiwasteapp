@@ -889,6 +889,26 @@ const es: Translations = {
       stock: 'Caldo (cubito)',
     },
   },
+  rating: {
+    title: 'Tu opinión',
+    liked: 'Nos gustó',
+    disliked: 'No es para nosotros',
+    dislikedNote: 'Anotado: no volveremos a proponerte este plato.',
+    report: 'Señalar un problema',
+    reportTitle: '¿Cuál es el problema?',
+    reason: {
+      dangerous: 'Peligrosa',
+      incorrect: 'Incorrecta',
+      bad: 'No está buena',
+      translation: 'Traducción',
+    },
+    commentPlaceholder: 'Añade detalles si quieres (opcional)',
+    send: 'Enviar',
+    sentThanks: 'Gracias, anotado.',
+    sentDangerous: 'Gracias: revisaremos esta receta con prioridad.',
+    sendError: 'No se pudo enviar ahora. Revisa tu conexión e inténtalo de nuevo.',
+    dailyLimit: 'Ya has enviado muchos mensajes hoy. Inténtalo mañana.',
+  },
 };
 
 export default es;

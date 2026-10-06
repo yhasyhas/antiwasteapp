@@ -22,6 +22,7 @@ import { colors, motion, radius, sizes, spacing, typography } from '@/constants/
 import { CookedButton } from './CookedButton';
 import { AddMissingButton } from './AddMissingButton';
 import { CookStartButton } from '@/components/cook/CookStartButton';
+import { RecipeRating } from './RecipeRating';
 import { translatedRecipe, type Recipe, type RecipeText } from './types';
 import { showDialog } from '@/lib/dialog';
 
@@ -240,6 +241,9 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
                 </Text>
               </View>
             ))}
+
+            {/* « On a aimé » / « Pas pour nous », « Signaler un problème » : recettes enregistrées seulement */}
+            {recipe.id ? <RecipeRating recipeId={recipe.id} initial={original.rating ?? null} style={styles.rating} /> : null}
           </View>
         </ScrollView>
 
@@ -297,6 +301,12 @@ function RoundButton({ onPress, label, selected, children }: { onPress: () => vo
 }
 
 const styles = StyleSheet.create({
+  rating: {
+    marginTop: spacing.xl,
+    paddingTop: spacing.lg,
+    borderTopWidth: sizes.borderWidth,
+    borderTopColor: colors.border,
+  },
   cookStart: {
     marginTop: spacing.xs,
   },

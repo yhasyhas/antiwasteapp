@@ -889,6 +889,26 @@ const en: Translations = {
       stock: 'Stock (cube)',
     },
   },
+  rating: {
+    title: 'Your opinion',
+    liked: 'We liked it',
+    disliked: 'Not for us',
+    dislikedNote: 'Noted: this dish won’t be suggested again.',
+    report: 'Report a problem',
+    reportTitle: 'What is the problem?',
+    reason: {
+      dangerous: 'Unsafe',
+      incorrect: 'Incorrect',
+      bad: 'Not good',
+      translation: 'Translation',
+    },
+    commentPlaceholder: 'Add details if you like (optional)',
+    send: 'Send',
+    sentThanks: 'Thanks, noted.',
+    sentDangerous: 'Thanks: this recipe will be checked first.',
+    sendError: 'Could not send right now. Check your connection and try again.',
+    dailyLimit: 'You have already sent many messages today. Try again tomorrow.',
+  },
 };
 
 export default en;

@@ -13,6 +13,7 @@ import { Touchable } from '@/components/ui/Touchable';
 import { CookStep } from '@/components/cook/CookStep';
 import { TimerStrip } from '@/components/cook/TimerStrip';
 import { CookedButton } from '@/components/recipe/CookedButton';
+import { RecipeRating } from '@/components/recipe/RecipeRating';
 import { colors, fontFamilies, radius, sizes, spacing, typography } from '@/constants/theme';
 import { recipeAmount } from '@/lib/quantity';
 import { useRecipeImages } from '@/hooks/useRecipeImages';
@@ -176,6 +177,7 @@ export default function CookScreen() {
           {fromPantry ? (
             <CookedButton ingredientsUsed={recipe.ingredients_used} recipeId={recipe.id} recipeTitle={recipe.title} openOnMount style={styles.cooked} />
           ) : null}
+          {recipe.id ? <RecipeRating recipeId={recipe.id} style={styles.cooked} /> : null}
         </ScrollView>
         <View style={[styles.footer, safe.bottom(spacing.md)]}>
           <Button label={t('cook.close')} variant="outline" size="large" onPress={closeDone} style={styles.footerButton} />

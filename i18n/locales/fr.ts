@@ -890,6 +890,26 @@ const fr = {
       stock: 'Bouillon (cube)',
     },
   },
+  rating: {
+    title: 'Ton avis',
+    liked: 'On a aimé',
+    disliked: 'Pas pour nous',
+    dislikedNote: 'Noté : ce plat ne te sera plus proposé.',
+    report: 'Signaler un problème',
+    reportTitle: 'Quel est le problème ?',
+    reason: {
+      dangerous: 'Dangereux',
+      incorrect: 'Incorrect',
+      bad: 'Pas bon',
+      translation: 'Traduction',
+    },
+    commentPlaceholder: 'Précise si tu veux (facultatif)',
+    send: 'Envoyer',
+    sentThanks: 'Merci, c’est noté.',
+    sentDangerous: 'Merci : cette recette sera vérifiée en priorité.',
+    sendError: 'Envoi impossible pour le moment. Vérifie ta connexion et réessaie.',
+    dailyLimit: 'Tu as déjà envoyé beaucoup de messages aujourd’hui. Réessaie demain.',
+  },
 };
 
 export default fr;
