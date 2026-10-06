@@ -142,7 +142,7 @@ export default function ImpactScreen() {
 function Total({ value, label, color }: { value: number; label: string; color: string }) {
   return (
     <View style={styles.total} accessible accessibilityLabel={`${value} ${label}`}>
-      <Text style={[styles.totalNumber, { color }]}>{value}</Text>
+      <Text style={[styles.totalNumber, { color }]} maxFontSizeMultiplier={1.5}>{value}</Text>
       <Text style={styles.totalLabel}>{label}</Text>
     </View>
   );

@@ -100,7 +100,7 @@ function Choice({ icon: Icon, label, selected, onPress }: { icon: LucideIcon; la
       accessibilityLabel={label}
     >
       <Icon size={sizes.icon} color={selected ? colors.onPrimary : colors.primary} fill={selected ? colors.onPrimary : colors.transparent} />
-      <Text style={[styles.choiceText, selected && styles.choiceTextSelected]} numberOfLines={1}>{label}</Text>
+      <Text style={[styles.choiceText, selected && styles.choiceTextSelected]} numberOfLines={2}>{label}</Text>
     </Touchable>
   );
 }

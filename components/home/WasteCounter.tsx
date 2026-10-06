@@ -66,7 +66,7 @@ export function WasteCounter() {
       onPress={() => router.push('/impact')}
       accessibilityLabel={`${mine.saved} ${t('counter.bigLabel', { count: mine.saved })}. ${empty ? t('counter.hint') : line}. ${t('impact.open')}`}
     >
-      <Text style={styles.number}>{mine.saved}</Text>
+      <Text style={styles.number} maxFontSizeMultiplier={1.5}>{mine.saved}</Text>
       <View style={styles.text}>
         <Text style={styles.label}>{t('counter.bigLabel', { count: mine.saved })}</Text>
         <Text style={styles.line}>{empty ? t('counter.hint') : line}</Text>

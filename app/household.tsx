@@ -192,7 +192,7 @@ export default function HouseholdScreen() {
                   <View style={styles.codeRow} accessible accessibilityLabel={household.invite.code}>
                     {household.invite.code.split('').map((char, index) => (
                       <View key={index} style={styles.codeBox}>
-                        <Text style={styles.codeChar}>{char}</Text>
+                        <Text style={styles.codeChar} maxFontSizeMultiplier={1.4}>{char}</Text>
                       </View>
                     ))}
                   </View>
@@ -334,7 +334,8 @@ const styles = StyleSheet.create({
   },
   codeBox: {
     flex: 1,
-    height: sizes.codeBox,
+    // Grandes tailles de texte : la case grandit avec le caractère
+    minHeight: sizes.codeBox,
     maxWidth: sizes.codeBox,
     borderRadius: radius.iconChip,
     borderWidth: sizes.borderWidth,
