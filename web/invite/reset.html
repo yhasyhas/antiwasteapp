@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="referrer" content="no-referrer">
+  <title>Antigaspi</title>
+  <!-- « Mot de passe oublié » : le lien de l'e-mail passe par le serveur d'authentification de Supabase, qui renvoie
+       ici avec la session du lien dans le fragment (#access_token=…&refresh_token=…&type=recovery, ou #error=…).
+       Sur téléphone : bouton qui ouvre l'app sur « Nouveau mot de passe » (myapp://auth/reset?…). Partout (ordinateur,
+       app absente, build de développement) : nouveau mot de passe choisi ici, enregistré par l'API d'authentification.
+       Langue : celle du compte (métadonnée `lang` du jeton), sinon `?lang=` (ajouté par l'app), sinon le navigateur.
+       Adresse et clé publique de Supabase insérées au déploiement (scripts/deploy-pages.mjs). -->
+  <style>
+    :root {
+      --bg: #F3F7F1;
+      --surface: #FFFFFF;
+      --text: #15241B;
+      --muted: #52645A;
+      --border: #D7E3D5;
+      --primary: #2E6A4A;
+      --on-primary: #FFFFFF;
+      --accent: #B9D45A;
+      --primary-soft: #E1EEDF;
+      --error: #B3261E;
+      --error-bg: #F9E1DE;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 16px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    main {
+      width: 100%;
+      max-width: 440px;
+      margin-top: 4vh;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .brand { background: var(--primary); color: var(--on-primary); font-size: 22px; font-weight: 700; padding: 18px 24px; }
+    .stripe { height: 4px; background: var(--accent); }
+    .body { padding: 24px; }
+    h1 { font-size: 22px; line-height: 28px; margin: 0 0 8px; }
+    p { color: var(--muted); line-height: 1.5; margin: 0 0 16px; font-size: 16px; }
+    label { display: block; font-size: 14px; font-weight: 600; margin: 16px 0 6px; color: var(--text); }
+    input {
+      width: 100%;
+      font: inherit;
+      font-size: 16px;
+      padding: 13px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface);
+      color: var(--text);
+    }
+    input:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+    button, a.button {
+      display: block;
+      width: 100%;
+      text-align: center;
+      text-decoration: none;
+      font: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      border: 0;
+      border-radius: 12px;
+      padding: 15px 16px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    .primary { background: var(--primary); color: var(--on-primary); }
+    .secondary { background: var(--primary-soft); color: var(--primary); }
+    button:disabled { opacity: 0.6; cursor: default; }
+    .divider { margin: 24px 0 0; font-size: 14px; color: var(--muted); }
+    .error { background: var(--error-bg); color: var(--error); border-radius: 12px; padding: 12px 14px; margin: 16px 0 0; font-size: 15px; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="brand" id="brand">Antigaspi</div>
+    <div class="stripe"></div>
+    <div class="body">
+      <h1 id="title"></h1>
+      <p id="text"></p>
+
+      <div id="open-block" class="hidden">
+        <a class="button primary" id="open"></a>
+        <p class="divider" id="or-here"></p>
+      </div>
+
+      <form id="form" class="hidden" novalidate>
+        <label for="password" id="password-label"></label>
+        <input id="password" type="password" autocomplete="new-password" minlength="6" required>
+        <label for="confirm" id="confirm-label"></label>
+        <input id="confirm" type="password" autocomplete="new-password" minlength="6" required>
+        <p class="error hidden" id="error" role="alert"></p>
+        <button class="primary" id="save" type="submit"></button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    // ---- Configuration (à changer au lancement : nom, paquet et schéma définitifs) ----
+    const CONFIG = {
+      appName: 'Antigaspi',
+      scheme: 'myapp',
+      androidPackage: 'com.yhasyhas.antiwasteapp.dev',
+      // Insérés par scripts/deploy-pages.mjs depuis .env (valeurs publiques, déjà dans l'app)
+      supabaseUrl: '__SUPABASE_URL__',
+      supabaseKey: '__SUPABASE_PUBLISHABLE_KEY__',
+      minLength: 6,
+    };
+
+    const TEXTS = {
+      fr: {
+        title: 'Nouveau mot de passe',
+        text: 'Choisis ton nouveau mot de passe (6 caractères au moins).',
+        textMobile: "Ouvre l'app pour choisir ton nouveau mot de passe.",
+        open: "Ouvrir dans l'app",
+        orHere: 'Ou choisis-le ici, sans l’app :',
+        password: 'Nouveau mot de passe',
+        confirm: 'Confirme le mot de passe',
+        save: 'Enregistrer',
+        tooShort: 'Le mot de passe doit contenir au moins 6 caractères.',
+        mismatch: 'Les mots de passe ne correspondent pas.',
+        same: 'Choisis un mot de passe différent de l’ancien.',
+        weak: 'Ce mot de passe est trop faible. Choisis-en un plus long.',
+        failed: "Impossible d'enregistrer le mot de passe. Vérifie ta connexion et réessaie.",
+        doneTitle: 'Mot de passe changé',
+        doneText: "Tu peux te connecter dans l'app avec ton nouveau mot de passe. Tu peux fermer cette page.",
+        invalidTitle: 'Lien expiré',
+        invalidText: "Ce lien a expiré ou a déjà servi. Demande un nouvel e-mail dans l'app : Connexion, puis « Mot de passe oublié ? ».",
+      },
+      en: {
+        title: 'New password',
+        text: 'Choose your new password (at least 6 characters).',
+        textMobile: 'Open the app to choose your new password.',
+        open: 'Open in the app',
+        orHere: 'Or choose it here, without the app:',
+        password: 'New password',
+        confirm: 'Confirm password',
+        save: 'Save',
+        tooShort: 'Password must be at least 6 characters.',
+        mismatch: 'Passwords do not match.',
+        same: 'Choose a password different from the old one.',
+        weak: 'This password is too weak. Choose a longer one.',
+        failed: "Couldn't save the password. Check your connection and try again.",
+        doneTitle: 'Password changed',
+        doneText: 'You can sign in to the app with your new password. You can close this page.',
+        invalidTitle: 'Link expired',
+        invalidText: 'This link has expired or was already used. Ask for a new email in the app: Sign in, then “Forgot your password?”.',
+      },
+      es: {
+        title: 'Nueva contraseña',
+        text: 'Elige tu nueva contraseña (6 caracteres como mínimo).',
+        textMobile: 'Abre la app para elegir tu nueva contraseña.',
+        open: 'Abrir en la app',
+        orHere: 'O elígela aquí, sin la app:',
+        password: 'Nueva contraseña',
+        confirm: 'Confirma la contraseña',
+        save: 'Guardar',
+        tooShort: 'La contraseña debe tener al menos 6 caracteres.',
+        mismatch: 'Las contraseñas no coinciden.',
+        same: 'Elige una contraseña distinta de la anterior.',
+        weak: 'Esta contraseña es demasiado débil. Elige una más larga.',
+        failed: 'No se pudo guardar la contraseña. Revisa tu conexión e inténtalo de nuevo.',
+        doneTitle: 'Contraseña cambiada',
+        doneText: 'Ya puedes iniciar sesión en la app con tu nueva contraseña. Puedes cerrar esta página.',
+        invalidTitle: 'Enlace caducado',
+        invalidText: 'Este enlace ha caducado o ya se usó. Pide un nuevo correo en la app: Iniciar sesión y luego «¿Olvidaste tu contraseña?».',
+      },
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const show = (id, visible) => $(id).classList.toggle('hidden', !visible);
+    const query = new URLSearchParams(location.search);
+
+    // Session du lien : fragment, ou sessionStorage au retour d'une ouverture de l'app manquée (app absente)
+    const STORE = 'antigaspi-reset';
+    const fragment = new URLSearchParams(location.hash.slice(1));
+    let link = null;
+    if (fragment.get('access_token') || fragment.get('error') || fragment.get('error_code')) {
+      link = Object.fromEntries(fragment);
+      try { sessionStorage.setItem(STORE, JSON.stringify(link)); } catch (e) {}
+    } else {
+      try { link = JSON.parse(sessionStorage.getItem(STORE) || 'null'); } catch (e) {}
+    }
+    // Le jeton ne reste ni dans l'adresse affichée ni dans l'historique
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+
+    // Contenu du jeton (sans vérification : seule la langue du compte en est lue)
+    function tokenClaims(token) {
+      try {
+        const part = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+        return JSON.parse(decodeURIComponent(escape(atob(part))));
+      } catch (e) {
+        return {};
+      }
+    }
+    const claims = link && link.access_token ? tokenClaims(link.access_token) : {};
+    const browserLanguages = (navigator.languages || [navigator.language || 'fr']).map((l) => String(l).slice(0, 2).toLowerCase());
+    const language = [claims.user_metadata && claims.user_metadata.lang, query.get('lang'), ...browserLanguages].find((l) => l in TEXTS) || 'fr';
+    const text = TEXTS[language];
+    document.documentElement.lang = language;
+    document.title = `${text.title} · ${CONFIG.appName}`;
+    $('brand').textContent = CONFIG.appName;
+
+    function showMessage(title, body) {
+      $('title').textContent = title;
+      $('text').textContent = body;
+      show('open-block', false);
+      show('form', false);
+    }
+
+    const valid = link && link.access_token && link.refresh_token && (link.type || 'recovery') === 'recovery' && !(claims.exp && claims.exp * 1000 < Date.now());
+    if (!valid) {
+      showMessage(text.invalidTitle, text.invalidText);
+    } else {
+      $('title').textContent = text.title;
+      $('password-label').textContent = text.password;
+      $('confirm-label').textContent = text.confirm;
+      $('save').textContent = text.save;
+      show('form', true);
+
+      // Téléphone : ouverture de l'app sur « Nouveau mot de passe », session du lien comprise
+      const isAndroid = /android/i.test(navigator.userAgent);
+      const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+      const tokens = `access_token=${encodeURIComponent(link.access_token)}&refresh_token=${encodeURIComponent(link.refresh_token)}&type=recovery`;
+      if ((isAndroid || isIos) && query.get('app') !== 'absent') {
+        // App absente : Chrome revient ici (?app=absent) et la session est relue dans sessionStorage
+        const fallback = new URL(location.href);
+        fallback.searchParams.set('app', 'absent');
+        $('open').href = isAndroid
+          ? `intent://auth/reset?${tokens}#Intent;scheme=${CONFIG.scheme};package=${CONFIG.androidPackage};S.browser_fallback_url=${encodeURIComponent(fallback.toString())};end`
+          : `${CONFIG.scheme}://auth/reset?${tokens}`;
+        $('open').textContent = text.open;
+        $('or-here').textContent = text.orHere;
+        $('text').textContent = text.textMobile;
+        show('open-block', true);
+      } else {
+        $('text').textContent = text.text;
+      }
+    }
+
+    function showError(message) {
+      $('error').textContent = message;
+      show('error', Boolean(message));
+    }
+
+    $('form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const password = $('password').value;
+      if (password.length < CONFIG.minLength) return showError(text.tooShort);
+      if (password !== $('confirm').value) return showError(text.mismatch);
+      showError('');
+      $('save').disabled = true;
+      const headers = { apikey: CONFIG.supabaseKey, Authorization: `Bearer ${link.access_token}`, 'Content-Type': 'application/json' };
+      try {
+        const response = await fetch(`${CONFIG.supabaseUrl}/auth/v1/user`, { method: 'PUT', headers, body: JSON.stringify({ password }) });
+        if (!response.ok) {
+          const body = await response.json().catch(() => ({}));
+          const code = body.error_code || body.code || '';
+          if (response.status === 401 || response.status === 403 || code === 'session_not_found' || code === 'bad_jwt') {
+            try { sessionStorage.removeItem(STORE); } catch (e) {}
+            return showMessage(text.invalidTitle, text.invalidText);
+          }
+          showError(code === 'same_password' ? text.same : code === 'weak_password' ? text.weak : text.failed);
+          return;
+        }
+        // Session du lien fermée : le mot de passe servira dans l'app
+        fetch(`${CONFIG.supabaseUrl}/auth/v1/logout?scope=local`, { method: 'POST', headers }).catch(() => {});
+        try { sessionStorage.removeItem(STORE); } catch (e) {}
+        showMessage(text.doneTitle, text.doneText);
+      } catch (e) {
+        showError(text.failed);
+      } finally {
+        $('save').disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

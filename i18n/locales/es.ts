@@ -74,7 +74,7 @@ const es: Translations = {
     forgotTitle: 'Contraseña olvidada',
     forgotSubtitle: 'Indica tu correo: recibirás un enlace para elegir una nueva contraseña.',
     forgotSend: 'Enviar el enlace',
-    resetSent: 'Si existe una cuenta para {{email}}, acabamos de enviar un correo con un enlace. Ábrelo en este teléfono para elegir una nueva contraseña. Revisa también la carpeta de spam.',
+    resetSent: 'Si existe una cuenta para {{email}}, acabamos de enviar un correo con un enlace. Ábrelo para elegir una nueva contraseña, en este teléfono o en un ordenador. Revisa también la carpeta de spam.',
     resetTitle: 'Nueva contraseña',
     resetSubtitle: 'Elige tu nueva contraseña (6 caracteres como mínimo).',
     newPassword: 'Nueva contraseña',

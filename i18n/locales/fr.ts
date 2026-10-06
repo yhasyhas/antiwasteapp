@@ -75,7 +75,7 @@ const fr = {
     forgotTitle: 'Mot de passe oublié',
     forgotSubtitle: 'Indique ton adresse e-mail : tu recevras un lien pour choisir un nouveau mot de passe.',
     forgotSend: 'Envoyer le lien',
-    resetSent: 'Si un compte existe pour {{email}}, un e-mail avec un lien vient de partir. Ouvre-le sur ce téléphone pour choisir un nouveau mot de passe. Pense à regarder dans les indésirables.',
+    resetSent: 'Si un compte existe pour {{email}}, un e-mail avec un lien vient de partir. Ouvre-le pour choisir un nouveau mot de passe, sur ce téléphone ou sur un ordinateur. Pense à regarder dans les indésirables.',
     resetTitle: 'Nouveau mot de passe',
     resetSubtitle: 'Choisis ton nouveau mot de passe (6 caractères au moins).',
     newPassword: 'Nouveau mot de passe',

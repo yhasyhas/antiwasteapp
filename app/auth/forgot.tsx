@@ -14,12 +14,15 @@ import { ScreenHeader } from '@/components/ui/ScreenHeader';
 import { CaptchaField, captchaEnabled, type CaptchaHandle } from '@/components/auth/Captcha';
 import { supabase } from '@/lib/supabase';
 import { authErrorMessage } from '@/lib/authErrors';
+import { INVITE_URL } from '@/lib/invite';
 import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 
-// Adresse ouverte par le lien de l'e-mail : l'écran « Nouveau mot de passe » de l'app (schéma de l'app sur le
-// téléphone, adresse du site en version web). Elle doit figurer dans les adresses de redirection autorisées de
+// Adresse ouverte par le lien de l'e-mail : la page « Nouveau mot de passe » du site (web/invite/reset.html), qui
+// ouvre l'app sur téléphone ou laisse choisir le mot de passe dans le navigateur (ordinateur, app absente). Sans
+// site configuré : l'écran de l'app directement. Elle doit figurer dans les adresses de redirection autorisées de
 // Supabase (Authentication → URL Configuration), sinon le lien mène à l'adresse du site par défaut.
-function resetUrl(): string {
+function resetUrl(language: string): string {
+  if (INVITE_URL) return `${INVITE_URL.replace(/\/+$/, '')}/reset?lang=${language}`;
   if (Platform.OS === 'web') return Linking.createURL('/auth/reset');
   const scheme = Constants.expoConfig?.scheme;
   return `${Array.isArray(scheme) ? scheme[0] : scheme || 'myapp'}://auth/reset`;
@@ -28,7 +31,7 @@ function resetUrl(): string {
 // « Mot de passe oublié » : e-mail de réinitialisation (vérification anti-robot comprise). Même réponse que
 // l'adresse ait un compte ou non : l'écran ne révèle pas quelles adresses sont inscrites.
 export default function ForgotPasswordScreen() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const safe = useSafeSpacing();
   const keyboardScroll = useKeyboardScroll();
   const params = useLocalSearchParams<{ email?: string }>();
@@ -50,7 +53,7 @@ export default function ForgotPasswordScreen() {
     setLoading(true);
     const token = captchaToken ?? undefined;
     if (captchaEnabled) captcha.current?.reset();
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(address, { redirectTo: resetUrl(), captchaToken: token });
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(address, { redirectTo: resetUrl(language), captchaToken: token });
     setLoading(false);
     if (resetError) {
       setError(authErrorMessage(t, resetError));

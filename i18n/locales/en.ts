@@ -74,7 +74,7 @@ const en: Translations = {
     forgotTitle: 'Forgot password',
     forgotSubtitle: 'Enter your email address: you will receive a link to choose a new password.',
     forgotSend: 'Send the link',
-    resetSent: 'If an account exists for {{email}}, an email with a link is on its way. Open it on this phone to choose a new password. Check your spam folder too.',
+    resetSent: 'If an account exists for {{email}}, an email with a link is on its way. Open it to choose a new password, on this phone or on a computer. Check your spam folder too.',
     resetTitle: 'New password',
     resetSubtitle: 'Choose your new password (at least 6 characters).',
     newPassword: 'New password',

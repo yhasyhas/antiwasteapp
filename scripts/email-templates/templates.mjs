@@ -26,7 +26,7 @@ const TEXTS = {
     fr: {
       subject: 'Réinitialise ton mot de passe {app}',
       title: 'Nouveau mot de passe',
-      intro: 'Tu as demandé à changer le mot de passe de ton compte {app}. Ouvre ce lien sur le téléphone où l’app est installée :',
+      intro: 'Tu as demandé à changer le mot de passe de ton compte {app}. Choisis-en un nouveau, sur ton téléphone ou sur un ordinateur :',
       button: 'Choisir un nouveau mot de passe',
       validity: 'Ce lien est valable 1 heure et ne sert qu’une fois.',
       ignore: 'Si tu n’as rien demandé, ignore cet e-mail : ton mot de passe ne change pas.',
@@ -34,7 +34,7 @@ const TEXTS = {
     en: {
       subject: 'Reset your {app} password',
       title: 'New password',
-      intro: 'You asked to change the password of your {app} account. Open this link on the phone where the app is installed:',
+      intro: 'You asked to change the password of your {app} account. Choose a new one, on your phone or on a computer:',
       button: 'Choose a new password',
       validity: 'This link is valid for 1 hour and works only once.',
       ignore: 'If you didn’t ask for this, ignore this email: your password stays the same.',
@@ -42,7 +42,7 @@ const TEXTS = {
     es: {
       subject: 'Restablece tu contraseña de {app}',
       title: 'Nueva contraseña',
-      intro: 'Pediste cambiar la contraseña de tu cuenta de {app}. Abre este enlace en el teléfono donde tienes la app:',
+      intro: 'Pediste cambiar la contraseña de tu cuenta de {app}. Elige una nueva, en tu teléfono o en un ordenador:',
       button: 'Elegir una nueva contraseña',
       validity: 'Este enlace es válido durante 1 hora y solo funciona una vez.',
       ignore: 'Si no lo pediste, ignora este correo: tu contraseña no cambia.',
