@@ -34,7 +34,7 @@ En bash, dans une session démarrée après la modification : `[ -n "$NOM" ] && 
 - **Droits** : tout le compte Supabase (tous les projets, API de gestion). Il n'existe pas de jeton plus restreint.
 
 ### SUPABASE_DB_PASSWORD
-- **Rôle** : mot de passe Postgres du projet. Il sert aux tests SQL en transaction annulée (`psql` sur le pooler) et aux sauvegardes (`npx supabase db dump`).
+- **Rôle** : mot de passe Postgres du projet. Il sert aux tests SQL en transaction annulée (`psql` sur le pooler) et aux sauvegardes (`npx supabase db dump`, qui a besoin de Docker Desktop lancé ; sinon `pg_dump` directement : `PGPASSWORD="$SUPABASE_DB_PASSWORD" pg_dump "$(cat supabase/.temp/pooler-url)" --data-only --schema=public --no-owner --no-privileges -f backups/<nom>.sql`). Toujours vérifier que le fichier de sauvegarde n'est pas vide avant de modifier les données.
 - **Emplacement** : l'adresse du pooler (sans mot de passe) est dans `supabase/.temp/pooler-url`, hors de git.
 - **Vérifier** : un test de `supabase/tests/` passe, ou `psql "$(cat supabase/.temp/pooler-url)" -c 'select 1'` avec `PGPASSWORD="$SUPABASE_DB_PASSWORD"`.
 - **Renouveler** : Dashboard Supabase → Project Settings → Database → Reset database password, puis mettre à jour la variable.
