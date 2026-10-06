@@ -274,6 +274,14 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Images : consigne réglable par `IMAGE_PROMPT_VERSION` (`generate-recipe-image/imagePrompt.ts` : v1 par défaut ; v1.1 « poissons en morceaux » et v2 « cuisine maison » essayées et non retenues, gardées dans le code) ; « Capacity temporarily exceeded » (429) et 5xx de Cloudflare traités comme une surcharge passagère (un nouvel essai), délai de 60 s ; l'app redemande une image en échec dès qu'une autre réussit ou au bout d'une heure (`lib/recipeImage.ts`). Cloudflare en offre Workers Paid depuis le 05/10/2026. Comparaison des consignes : `scripts/image-compare/compare.mjs`.
 - Accueil : « Mes recettes » montre les favoris d'abord (faisables maintenant en tête), quel que soit leur âge ; « Tout voir » ouvre l'onglet Favoris s'il y en a. Le mot « urgent » n'apparaît plus dans les recettes (prompt et retrait côté serveur, `withoutUrgencyWords`). Tests : `lib/*.test.ts` lancés avec les tests Deno, parcours web `scripts/e2e/cooking-web.mjs`.
 
+### Phase 10 — premier contact (branche `phase-10`, partie A en test)
+- Premier lancement guidé : `app/onboarding.tsx` (trois écrans, questions facultatives, première action ; version courte après une invitation), `lib/onboarding.ts` (`profiles.onboarded_at`, noté dès l'affichage) ; l'écran de démarrage (`app/index.tsx`) choisit entre le guide et les onglets, y compris après connexion ou inscription.
+- Mot de passe oublié : `app/auth/forgot.tsx` (e-mail de réinitialisation, captcha), `app/auth/reset.tsx` (« Nouveau mot de passe », lien lu par `lib/recoveryLink.ts`).
+- Retours : `lib/feedback.ts` ; notes des recettes (`recipes.rating`, `components/recipe/RecipeRating.tsx` sur la fiche et la fin du mode cuisine) ; « Signaler un problème » et « Donner mon avis » (`components/settings/FeedbackSheet.tsx`) par la fonction `send-feedback` (tables `recipe_reports` et `feedback`, 20 envois par jour, email via Sentry, `_shared/sentry.ts`).
+- « Mes basiques » : `lib/basics.ts` (même logique que `generate-recipes/basics.ts`), `components/recipe/BasicsEditor.tsx`, `user_preferences.basics` ; envoyés à la génération (prompt, achats, sélection) ; anti-répétition : recettes « Pas pour nous » toujours évitées (`history.ts`).
+- Garde-manger étroit : `components/recipe/NarrowPantryHint.tsx` sur l'écran de génération.
+- Tests : `supabase/tests/first_contact.sql`, Deno (basiques, avis, lien de réinitialisation), parcours `scripts/e2e/first-contact-web.mjs` et `scripts/e2e/feedback.mjs`.
+
 ## 5. État actuel et problèmes connus
 
 ### Sécurité
@@ -291,7 +299,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Images FLUX schnell : anatomie des poissons parfois bizarre ; la consigne n'y change rien (essai v1.1 du 06/10/2026). Autres modèles à comparer en phase 11.
 
 ## 6. Prochaine étape
-Phase 10 Premier contact, puis 10b Petit groupe de testeurs, 11 Point de décision, 12 Natif (un seul build ; en tête : alarmes exactes des minuteurs), 13 Services et abonnements, 14 Audit, 15 Lancement. Restent ouverts de la phase 9b : validation de la bibliothèque de plats par des personnes qui les cuisinent, cas d'évaluation par région. Détails dans `PLAN.md`.
+Phase 10 Premier contact (partie A en test sur téléphone, partie B ensuite), puis 10b Petit groupe de testeurs, 11 Point de décision, 12 Natif (un seul build ; en tête : alarmes exactes des minuteurs), 13 Services et abonnements, 14 Audit, 15 Lancement. Restent ouverts de la phase 9b : validation de la bibliothèque de plats par des personnes qui les cuisinent, cas d'évaluation par région. Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash

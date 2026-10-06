@@ -105,7 +105,7 @@ Modèle sans valeurs : `.env.example`. Toutes ces valeurs sont **publiques par n
 
 Pour le renouveler : générer une valeur aléatoire, la poser dans les fonctions (`secrets set`), puis dans Vault (`select vault.update_secret(…)`, depuis le SQL Editor du Dashboard).
 
-**Clé secrète Supabase dans un en-tête** (aucun secret en plus) : les tests de quotas simulés (en-tête `x-simulate-key`) et la copie d'évaluation des recettes `generate-recipes-eval` (en-tête `x-eval-key`, phase 9) n'acceptent que la clé secrète. Les scripts la lisent avec `npx supabase projects api-keys --reveal` et la gardent en mémoire. L'app n'appelle jamais `generate-recipes-eval`.
+**Clé secrète Supabase dans un en-tête** (aucun secret en plus) : les tests de quotas simulés (en-tête `x-simulate-key`, aussi utilisé par `send-feedback` pour envoyer les événements Sentry d'essai dans l'environnement « test ») et la copie d'évaluation des recettes `generate-recipes-eval` (en-tête `x-eval-key`, phase 9) n'acceptent que la clé secrète. Les scripts la lisent avec `npx supabase projects api-keys --reveal` et la gardent en mémoire. L'app n'appelle jamais `generate-recipes-eval`.
 
 ---
 
@@ -117,6 +117,8 @@ Pour le renouveler : générer une valeur aléatoire, la poser dans les fonction
   - Renouveler : Cloudflare → Turnstile → widget « Antigaspi » → nouvelle clé secrète, à recoller dans Supabase.
 - **Connexion anonyme** (essai sans compte) : activée (Authentication → Sign In / Providers → Anonymous).
 - **Confirmation d'email** : désactivée pendant le développement (Authentication → Sign In / Providers → Email). Elle sera réactivée en phase 13 avec le service d'emails.
+- **Adresses de redirection** (Authentication → URL Configuration → Redirect URLs) : le lien de l'e-mail « Mot de passe oublié » (phase 10) ouvre `myapp://auth/reset` ; cette adresse doit être autorisée (`myapp://**`), sinon le lien mène à l'adresse du site (`http://localhost:3000`). Lecture sans afficher de secret : `GET https://api.supabase.com/v1/projects/iqzjonmjlscuckdmiehk/config/auth` avec `SUPABASE_ACCESS_TOKEN`, champ `uri_allow_list`.
+- **E-mails d'authentification** : service intégré de Supabase pour l'instant. Il n'envoie **qu'aux adresses des membres de l'équipe du projet**, au plus 2 e-mails par heure : un testeur ne reçoit pas l'e-mail « Mot de passe oublié » tant qu'un serveur d'e-mails personnalisé (SMTP) n'est pas configuré (phase 13).
 - **Vérifier** : Dashboard, en lecture seulement. Un changement de ces réglages demande l'accord de l'utilisateur, qui a l'accès au Dashboard.
 
 ---

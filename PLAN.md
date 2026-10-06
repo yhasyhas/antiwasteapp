@@ -336,17 +336,18 @@ Partie restante de la phase 9.
 
 ## Phase 10 — Premier contact
 
-- [ ] Premier lancement guidé : trois écrans et un premier scan accompagné
+- [x] Premier lancement guidé : trois écrans et un premier scan accompagné — *partie A : trois écrans qu'on peut passer, questions facultatives (régimes, cuisine, personnes), première action (scanner ou à la main) ; version courte après une invitation ; une seule fois par compte (`profiles.onboarded_at`)*
 - [ ] Écran « Mon impact » simple : sauvés et gaspillés par mois, aliments les plus gaspillés avec un conseil
 - [ ] « Mot de passe oublié » sur l'écran de connexion : e-mail de réinitialisation, protégé par la vérification anti-robot (captcha) (déplacé depuis « Obligatoire avant la bêta »)
 - [ ] Ticket de caisse dans l'app (le mode existe déjà côté serveur)
-- [ ] « Donner mon avis »
-- [ ] Avec un garde-manger étroit, suggérer d'ajouter 1 ou 2 ingrédients pour plus d'idées
-- [ ] « On a aimé » / « Pas pour nous » / « Signaler un problème » sur chaque recette ; les plats aimés enrichissent la bibliothèque après validation
+- [x] « Donner mon avis » — *Réglages ; table `feedback`, fonction `send-feedback`, un email Sentry par avis*
+- [x] Avec un garde-manger étroit, suggérer d'ajouter 1 ou 2 ingrédients pour plus d'idées — *2 aliments ou moins disponibles ou choisis, basiques non comptés*
+- [x] « On a aimé » / « Pas pour nous » / « Signaler un problème » sur chaque recette — *fiche et fin du mode cuisine ; « Pas pour nous » évité par l'anti-répétition ; signalements dans `recipe_reports`, alerte Sentry pour « dangereux »*
+- [ ] Les plats aimés enrichissent la bibliothèque après validation (les notes sont enregistrées : `recipes.rating`)
 - [ ] Accessibilité : grandes tailles de texte, lecteurs d'écran, contrastes
 - [ ] Option « Pas d'images en données mobiles »
-- [ ] « Mes basiques » : liste modifiable dans les Préférences (préremplie avec sel, poivre, huile, eau), considérée comme toujours disponible par la génération, jamais ajoutée à « À acheter » ni aux courses
-- [ ] Les épices déclarées dans « Mes basiques » ne comptent pas comme achats (limite de 3 ingrédients à acheter par recette)
+- [x] « Mes basiques » : liste modifiable dans les Préférences (préremplie avec sel, poivre, huile, eau), considérée comme toujours disponible par la génération, jamais ajoutée à « À acheter » ni aux courses
+- [x] Les épices déclarées dans « Mes basiques » ne comptent pas comme achats (limite de 3 ingrédients à acheter par recette)
 
 **Terminé quand** : un nouvel utilisateur est guidé jusqu'à son premier scan, voit son impact du mois, et l'app reste utilisable avec les plus grandes tailles de texte et un lecteur d'écran.
 
@@ -655,3 +656,5 @@ Ancienne phase 8.
 | 05/10/2026 | Minuteurs du mode cuisine : retard de plusieurs minutes confirmé sur le Redmi (Android 12 ou plus), téléphone verrouillé | Permission des alarmes exactes (`SCHEDULE_EXACT_ALARM`) marquée **prioritaire** en tête de la phase 12 (nouveau build) |
 | 06/10/2026 | Tests des corrections de la phase 9b validés sur les deux téléphones (favoris de l'accueil, images, légende, mot « urgent », icônes et photo du mode cuisine, fluidité sur le A30). Images : **v1 gardée par défaut** (nettement préférée à la v2 « cuisine maison » par les amis de l'utilisateur) | Poissons souvent d'aspect artificiel (anatomie bizarre) : consigne v1.1 préparée (la v1, plus une règle pour les poissons et les volailles entières : morceaux ou filets, en partie dans la sauce), comparée à la v1 sur 5 recettes de poisson et 1 de poulet ; choix en attente |
 | 06/10/2026 | **Images : la v1 reste la consigne par défaut** ; la v1.1 (poissons en filets ou morceaux, volaille entière découpée) n'est pas retenue après comparaison sur 5 poissons et 1 poulet rôti, et reste disponible dans le code (`IMAGE_PROMPT_VERSION=v1.1`), sans être par défaut | Enseignements pour la comparaison d'autres modèles d'image (phase 11) : **le problème vient du modèle, pas de la consigne** (FLUX schnell) ; un plat dit « entier » doit être montré entier (la v1.1 montrait une « dorade entière » en morceaux) ; une seule assiette par image (la v1.1 en produisait plusieurs) ; têtes de poisson toujours bizarres en arrière-plan ; morceaux de tilapia ressemblant à du tofu ; **aucune règle pour la volaille** (le poulet rôti était déjà très bien en v1) |
+| 06/10/2026 | **Phase 10, partie A** (branche `phase-10`) : premier lancement guidé, mot de passe oublié, « Donner mon avis », notes et signalements des recettes, « Mes basiques », garde-manger étroit ; migration `first_contact` appliquée (sauvegarde faite avant) | Guide noté sur le compte dès son affichage (jamais deux fois, même interrompu) ; comptes existants exclus. « Mes basiques » : identifiants reconnus en trois langues (sel, poivre, huile, eau, ail, oignon, sucre, farine, beurre, épices courantes, vinaigre, moutarde, bouillon) ou noms libres ; les quatre par défaut se retirent aussi ; « Épices courantes » couvre cumin, paprika, curry, cannelle… ; poivrons et beurre de cacahuète jamais pris pour des basiques. Avis et signalements : 20 par jour au plus, aucune donnée personnelle envoyée à Sentry ; un email par avis et par recette signalée dangereuse (nouveau problème Sentry à chaque fois) |
+| 06/10/2026 | Mot de passe oublié : le service d'e-mails intégré de Supabase n'envoie **qu'aux membres de l'équipe du projet**, au plus 2 e-mails par heure (documentation vérifiée) ; les testeurs de la phase 10b ne recevraient pas l'e-mail sans serveur d'e-mails personnalisé. Le lien ouvre l'app seulement si `myapp://**` figure dans les adresses de redirection autorisées (vide jusqu'ici) | Adresses de redirection : réglage du compte Supabase, accord de l'utilisateur demandé. Serveur d'e-mails : décision de l'utilisateur (avancer ce point de la phase 13 avant la phase 10b) |
