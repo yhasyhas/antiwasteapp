@@ -43,6 +43,7 @@ import { resolveCuisine } from '../generate-recipes/cuisines.ts';
 import { type SafetyReport, safetyPass } from '../generate-recipes/safetyPass.ts';
 import { recentTitles } from '../generate-recipes/history.ts';
 import { factNamesFor, translatePantryNames } from '../generate-recipes/pantryNames.ts';
+import { titleWithKind, varietyPass, type VarietyReport } from '../generate-recipes/variety.ts';
 import { JUDGE_SCHEMA, judgePrompt, VARIETY_SCHEMA, varietyPrompt } from './judge.ts';
 
 const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') || '';
@@ -156,6 +157,21 @@ async function generate(body: any) {
     }
   }
 
+  // Variété au sein de la génération (v4.1, ou variety: true) : même code et même échéance que generate-recipes (variety.ts)
+  let variety: VarietyReport | null = null;
+  if ((body.variety ?? version === 'v4.1') && recipes.length > 1) {
+    const pass = await varietyPass(recipes, {
+      latestStart: t0 + 22_000,
+      request: async (replacements, keep) => {
+        const call = await runWithFallback(providers, request(buildPrompts({ ...promptOptions, count: replacements, avoidTitles: keep.map(titleWithKind) })),
+          (text) => parseRecipes(text, pantry, diets, { ...context, maxRecipes: replacements }), { label: 'generate-recipes-eval:variety', log, t0 });
+        return call.ok ? call.value.recipes : null;
+      },
+    });
+    recipes = pass.recipes;
+    variety = pass.report;
+  }
+
   // Contrôle de sécurité (v4 et suivantes, ou safety: true) : même code que generate-recipes (safetyPass.ts)
   let safety: Omit<SafetyReport, 'correction' | 'replacement'> & { checked: boolean } = { checked: false, first: [], corrected: [], replaced: [], dropped: [] };
   if (body.safety ?? v4) {
@@ -180,6 +196,8 @@ async function generate(body: any) {
     refusal: first.refusal,
     retried,
     safety,
+    // Recettes trop proches d'une autre au premier jet, remplacées, gardées (null : contrôle non appliqué)
+    variety,
     // Plats de référence envoyés au modèle pour cette génération
     examples: examples.map((dish) => ({ name: dish.name, region: dish.region })),
     provider: result.provider.name,

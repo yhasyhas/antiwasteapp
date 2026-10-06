@@ -27,6 +27,7 @@ import { safetyPass } from './safetyPass.ts';
 import { factNamesFor, translatePantryNames } from './pantryNames.ts';
 import { resolveCuisine } from './cuisines.ts';
 import { recordCuisineRequest } from './cuisineRequests.ts';
+import { titleWithKind, varietyPass, type VarietyReport, withoutKind } from './variety.ts';
 
 // Modèles configurables par secret : les fournisseurs retirent régulièrement des modèles
 const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') || '';
@@ -49,6 +50,10 @@ const MAX_OUTPUT_TOKENS = 8000;
 // Durée maximale d'une génération avant de servir les recettes déjà valides : la correction et les recettes de
 // remplacement s'arrêtent à cette échéance (un premier appel lent laisse moins de temps à la correction)
 const GENERATION_BUDGET_MS = 45_000;
+
+// Variété (variety.ts) : une recette trop proche d'une autre n'est redemandée que si la génération a commencé il y a
+// moins de ce délai (la nouvelle demande prend 10 à 15 s, le contrôle de sécurité vient ensuite)
+const VARIETY_LATEST_START_MS = 22_000;
 
 // Version du prompt (évaluation de la phase 9 : scripts/recipe-eval), réglable par secret sans redéployer ;
 // v1 : l'ancienne version, sans contrôle de sécurité ni plats de référence
@@ -333,6 +338,27 @@ Deno.serve(withCors(async (req: Request) => {
       return failureResponse('dietary_refusal', language, debug === true ? { debug: { ...debugInfo.debug, dietary_rejections: dietaryRejections, invalid, refusal } } : debugInfo);
     }
 
+    // Variété au sein de la génération (v4.1, variety.ts) : une recette trop proche d'une autre (même plat à un ou deux
+    // ingrédients près) est redemandée une fois, sans compter une autre génération dans le quota
+    let varietyReport: VarietyReport | null = null;
+    if (PROMPT_VERSION === 'v4.1' && recipes.length > 1) {
+      const variety = await varietyPass(recipes, {
+        basics,
+        latestStart: t0 + VARIETY_LATEST_START_MS,
+        request: async (replacements, keep) => {
+          const again = buildPrompts({ ...promptOptions, count: replacements, avoidTitles: keep.map(titleWithKind) });
+          const call = await runWithFallback(providers, {
+            system: again.system, prompt: again.prompt, schema, schemaName: 'recipes', providerNotes, temperature: 0.8, maxOutputTokens: MAX_OUTPUT_TOKENS,
+          }, (text) => parseRecipes(text, pantry, diets, { ...context, maxRecipes: replacements }), { label: 'generate-recipes:variety', log, t0, simulate: simulation?.providers });
+          reportHits(call);
+          return call.ok ? call.value.recipes : null;
+        },
+      });
+      recipes = variety.recipes;
+      varietyReport = variety.report;
+      if (varietyReport.close.length > 0) console.warn(`[generate-recipes] variété : ${varietyReport.close.length} recette(s) trop proche(s) (${varietyReport.close.join(' ; ')}), ${varietyReport.replaced.length} remplacée(s) en ${Date.now() - t0} ms`);
+    }
+
     // Contrôle de sécurité (v4 et suivantes, safety.ts) : une demande de correction pour les recettes en défaut,
     // puis celles qui restent en défaut sont écartées ; aucune génération de plus comptée dans le quota
     let safetyReport = null;
@@ -368,14 +394,14 @@ Deno.serve(withCors(async (req: Request) => {
     reportInBackground(recordProviderUsage('generate-recipes', result.provider.name, result.provider !== providers[0], recipes.length, simulation !== null || debug === true));
     console.log(`[generate-recipes] ${result.provider.name} (${result.provider.model}) : ${recipes.length}/${count} recette(s) en ${Date.now() - t0} ms, prompt ${PROMPT_VERSION}, cuisine ${resolved.kind === 'regions' ? resolved.id : resolved.kind === 'other' ? 'autre' : cuisine}, langue ${language}`);
     return jsonResponse({
-      recipes,
+      recipes: recipes.map(withoutKind),
       totalGenerated: recipes.length,
       requested: count,
       // Recettes écartées et non remplacées (l'app l'explique) ; moins de 3 demandées avec peu d'aliments
       rejected: Math.max(0, count - recipes.length),
       fewIngredients: count < 3,
       provider: result.provider.name,
-      ...(debug === true && { debug: { ...debugInfo.debug, dietary_rejections: dietaryRejections, invalid, version: PROMPT_VERSION, safety: safetyReport, examples: promptOptions.examples, recent_titles: promptOptions.recentTitles } }),
+      ...(debug === true && { debug: { ...debugInfo.debug, dietary_rejections: dietaryRejections, invalid, version: PROMPT_VERSION, safety: safetyReport, variety: varietyReport, examples: promptOptions.examples, recent_titles: promptOptions.recentTitles } }),
     }, 200);
   } catch (error) {
     console.error('Error generating recipes:', error);

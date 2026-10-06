@@ -274,7 +274,7 @@ ${v4 ? SAFETY_RULES_V4 : SAFETY_RULES}
   const prompt = `Garde-manger (identifiant : nom) :
 ${options.pantryText}
 
-Crée exactement ${options.count} recette${options.count > 1 ? 's' : ''}${options.count > 1 ? ((v5 || v41) && (options.cuisine !== 'any' || options.cuisineChoice) ? ' vraiment différentes : des types de plats différents, choisis parmi ceux qui sont courants dans la cuisine demandée (pas de gratin, de salade composée ni de tarte si elle n’en fait pas), jamais deux fois la même base' : v2 ? ' vraiment différentes : des plats de types différents (ex. un plat mijoté, un plat au four, une salade ou une soupe), jamais deux fois la même base (deux plats de pâtes à la tomate)' : ' vraiment différentes les unes des autres (plat, technique de cuisson, texture)') : ''}.
+Crée exactement ${options.count} recette${options.count > 1 ? 's' : ''}${options.count > 1 ? (v41 ? varietyRule(options.cuisine !== 'any' || Boolean(options.cuisineChoice)) : v5 && (options.cuisine !== 'any' || options.cuisineChoice) ? ' vraiment différentes : des types de plats différents, choisis parmi ceux qui sont courants dans la cuisine demandée (pas de gratin, de salade composée ni de tarte si elle n’en fait pas), jamais deux fois la même base' : v2 ? ' vraiment différentes : des plats de types différents (ex. un plat mijoté, un plat au four, une salade ou une soupe), jamais deux fois la même base (deux plats de pâtes à la tomate)' : ' vraiment différentes les unes des autres (plat, technique de cuisson, texture)') : ''}.
 - Difficulté : ${options.difficulty}
 - Temps total maximum : ${options.maxCookTime} minutes${options.avoidTitles && options.avoidTitles.length > 0 ? `
 - Déjà proposées, à ne pas refaire (autre plat, autre technique) : ${options.avoidTitles.map((title) => `« ${title} »`).join(', ')}` : ''}${v4 && options.recentTitles && options.recentTitles.length > 0 ? `
@@ -284,6 +284,27 @@ Crée exactement ${options.count} recette${options.count > 1 ? 's' : ''}${option
 ${refusal}`;
 
   return { system, prompt };
+}
+
+// v4.1, phase 10 : recettes d'une même génération de types de plats ou de techniques différents ; le serveur vérifie
+// (variety.ts) et redemande une recette trop proche (deux recettes du même plat, l'une au poivron, l'autre à la tomate).
+// Exemples de types tirés au hasard et dans un ordre différent à chaque demande : une liste fixe fait choisir ses
+// premiers exemples presque à chaque fois (soupe, puis grillade, dans l'évaluation du 06/10/2026)
+const DISH_EXAMPLES = ['plat mijoté', 'grillade', 'plat au four', 'plat de riz ou de céréales', 'galette ou crêpe', 'sauté', 'salade', 'soupe', 'plat d’œufs', 'beignets', 'plat vapeur', 'légumes farcis', 'plat de pâtes ou de nouilles'];
+
+export function dishExamples(count = 5, random: () => number = Math.random): string[] {
+  const pool = [...DISH_EXAMPLES];
+  const picked: string[] = [];
+  while (picked.length < count && pool.length > 0) picked.push(pool.splice(Math.floor(random() * pool.length), 1)[0]);
+  return picked;
+}
+
+function varietyRule(withCuisine: boolean): string {
+  const examples = dishExamples().join(', ');
+  const kinds = withCuisine
+    ? `chacune d’un type de plat différent (par exemple ${examples}…) ou d’une technique de cuisson différente, choisis parmi ceux qui sont courants dans la cuisine demandée et qui conviennent au repas (pas de gratin, de salade composée ni de tarte si elle n’en fait pas)`
+    : `chacune d’un type de plat différent (par exemple ${examples}…) ou d’une technique de cuisson différente, qui conviennent au repas`;
+  return ` vraiment différentes : ${kinds}, jamais deux fois la même base ; deux recettes qui ne diffèrent que par un ou deux ingrédients (l’une au poivron, l’autre à la tomate) comptent comme la même recette. "dish_type" et "technique" décrivent chaque recette`;
 }
 
 // Demande de correction (v4) des recettes qui ne respectent pas les règles de sécurité (safety.ts) : mêmes

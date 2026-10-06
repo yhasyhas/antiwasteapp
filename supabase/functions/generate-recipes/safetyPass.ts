@@ -7,6 +7,7 @@
 import { type AiProvider, type AiRequest, type AttemptLog, type FallbackResult, runWithFallback, type SimulatedFailure } from '../_shared/ai.ts';
 import { MISSING, type Pantry, parseRecipes, type ParsedRecipes, type Recipe, type StrictDiet } from './recipes.ts';
 import { buildCorrectionPrompt } from './prompt.ts';
+import { titleWithKind } from './variety.ts';
 import { type SafetyCode, type SafetyIssue, safetyIssues } from './safety.ts';
 
 // Recette sous la forme envoyée par le modèle (alias du garde-manger), pour la demande de correction
@@ -25,6 +26,8 @@ export function rawRecipe(recipe: Recipe, pantry: Pantry) {
     tips: recipe.tips,
     suggestion: recipe.suggestion ?? '',
     image_prompt: recipe.image_prompt,
+    dish_type: recipe.dish_type ?? 'other',
+    technique: recipe.technique ?? 'other',
   };
 }
 
@@ -78,7 +81,7 @@ export async function safetyPass(recipes: Recipe[], options: {
   // En parallèle, pour ne pas allonger l'attente : de quoi remplacer les recettes qui resteraient en défaut
   const blocking = flawed.filter((c) => isBlocking(c.issues)).length;
   const replacementCall = blocking > 0 && options.replacementRequest
-    ? runWithFallback(options.providers, options.replacementRequest(blocking, recipes.map((r) => r.title)), parse(blocking), { ...common, label: `${options.label}:remplacement` })
+    ? runWithFallback(options.providers, options.replacementRequest(blocking, recipes.map(titleWithKind)), parse(blocking), { ...common, label: `${options.label}:remplacement` })
     : Promise.resolve(null);
   const [correction, replacement] = await Promise.all([correctionCall, replacementCall]);
   report.correction = correction;

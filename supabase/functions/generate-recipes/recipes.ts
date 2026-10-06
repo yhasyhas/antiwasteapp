@@ -1,6 +1,7 @@
 // Logique de generate-recipes sans appel réseau (testée par recipes.test.ts) :
 // schéma de sortie, alias des ingrédients du garde-manger, lecture de la réponse du modèle, régimes.
 
+import { cleanKind, DISH_TYPE_HINT, DISH_TYPES, type DishType, TECHNIQUE_HINT, TECHNIQUES, type Technique } from './kinds.ts';
 import { withoutOvenHeatLevel } from './safety.ts';
 import { DEFAULT_BASICS, isBasicFor } from './basics.ts';
 
@@ -432,10 +433,13 @@ export function buildRecipeSchema(pantry: Pantry, diets: StrictDiet[], unitHint 
       tips: { type: 'array', items: { type: 'string' } },
       suggestion: { type: 'string', description: 'Chaîne vide sauf si la recette convient mieux à un autre moment de la journée' },
       image_prompt: { type: 'string' },
+      // Variété au sein d'une génération (variety.ts)
+      dish_type: { type: 'string', description: DISH_TYPE_HINT },
+      technique: { type: 'string', description: TECHNIQUE_HINT },
     },
     required: [
       'title', 'description', 'difficulty', 'prep_time', 'cook_time', 'total_time', 'servings',
-      'ingredients', 'instructions', 'tips', 'suggestion', 'image_prompt',
+      'ingredients', 'instructions', 'tips', 'suggestion', 'image_prompt', 'dish_type', 'technique',
     ],
     additionalProperties: false,
   };
@@ -480,6 +484,9 @@ export interface Recipe {
   tips: string[];
   suggestion?: string;
   image_prompt: string;
+  // Déclarés par le modèle, pour la variété au sein d'une génération (variety.ts) ; retirés avant l'envoi à l'app
+  dish_type?: DishType;
+  technique?: Technique;
 }
 
 export interface ParsedRecipes {
@@ -619,6 +626,8 @@ export function toRecipe(raw: any, pantry: Pantry, context: { mealType: string; 
     image_prompt: typeof raw.image_prompt === 'string' && raw.image_prompt.trim() !== ''
       ? raw.image_prompt
       : `Professional food photography, ${raw.title}, appetizing`,
+    dish_type: cleanKind(raw.dish_type, DISH_TYPES),
+    technique: cleanKind(raw.technique, TECHNIQUES),
   };
 }
 

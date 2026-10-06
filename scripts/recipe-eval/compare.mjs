@@ -7,7 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { noStoveCelsius, unitsInLanguage } from './checks.mjs';
+import { noStoveCelsius, unitsInLanguage, varietyWithin } from './checks.mjs';
 import { celsiusWithoutMeat, heatWithoutCooking, safetyIssues } from '../../supabase/functions/generate-recipes/safety.ts';
 
 // Prix par million de tokens (entrée, sortie), offre payante, relevés le 02/10/2026 : à vérifier avant toute
@@ -91,7 +91,10 @@ function stats(side) {
       no_heat_without_cooking: mean(all.map((r) => (heatWithoutCooking(r.recipe).length === 0 ? 1 : 0))),
       no_celsius_without_meat: mean(all.map((r) => (celsiusWithoutMeat(r.recipe) ? 0 : 1))),
       units_language: mean(commonIds.flatMap((id) => side.cases.get(id).recipes.map((r) => unitsInLanguage(r.recipe, LANGUAGE[id])))),
-      diversity: mean(entries.map((e) => e.diversity_auto)) },
+      diversity: mean(entries.map((e) => e.diversity_auto)),
+      variety_within: mean(entries.map((e) => e.variety_within ?? varietyWithin((e.recipes ?? []).map((r) => r.recipe)))),
+      variety_within_first: mean(entries.filter((e) => e.variety).map((e) => (e.variety.close.length === 0 ? 1 : 0))) },
+    variety_replaced: entries.reduce((n, e) => n + (e.variety?.replaced?.length ?? 0), 0),
     recipes: all.length,
     corrected: entries.reduce((n, e) => n + (e.safety?.corrected?.length ?? 0), 0),
     dropped: entries.reduce((n, e) => n + (e.safety?.dropped?.length ?? 0), 0),
@@ -119,8 +122,9 @@ console.log([
   '',
   `| Vérification automatique | ${before.version} | ${after.version} | Écart |`,
   '|---|---|---|---|',
-  ...Object.entries({ ...AUTO, safety_rules: 'Règles de sécurité respectées (recettes servies)', safety_first: 'Règles de sécurité au premier jet', no_heat_without_cooking: 'Pas de feu dans une étape sans cuisson', no_celsius_without_meat: 'Pas de °C à cœur hors viande et poisson', units_language: 'Unités dans la langue de la recette', stove_celsius: 'Pas de °C sur le feu (artifice)', diversity: 'Diversité (ingrédients et titres)' }).map(([key, label]) => `| ${label} | ${fmt(a.auto[key], true)} | ${fmt(b.auto[key], true)} | ${delta(a.auto[key], b.auto[key], true)} |`),
+  ...Object.entries({ ...AUTO, safety_rules: 'Règles de sécurité respectées (recettes servies)', safety_first: 'Règles de sécurité au premier jet', no_heat_without_cooking: 'Pas de feu dans une étape sans cuisson', no_celsius_without_meat: 'Pas de °C à cœur hors viande et poisson', units_language: 'Unités dans la langue de la recette', stove_celsius: 'Pas de °C sur le feu (artifice)', diversity: 'Diversité (ingrédients et titres)', variety_within: 'Variété au sein d’une génération (aucune recette trop proche, servies)', variety_within_first: 'Variété au sein d’une génération (premier jet)' }).map(([key, label]) => `| ${label} | ${fmt(a.auto[key], true)} | ${fmt(b.auto[key], true)} | ${delta(a.auto[key], b.auto[key], true)} |`),
   `| Recettes écartées par le serveur (1re demande) | ${a.rejected} | ${b.rejected} | |`,
+  `| Recettes trop proches remplacées (contrôle de variété) | ${a.variety_replaced} | ${b.variety_replaced} | |`,
   `| Recettes corrigées / écartées par le contrôle de sécurité | ${a.corrected} / ${a.dropped} | ${b.corrected} / ${b.dropped} | |`,
   `| Tokens par génération (toutes demandes) | ${Math.round(a.tokens_per_generation ?? 0)} | ${Math.round(b.tokens_per_generation ?? 0)} | |`,
   `| Coût estimé par recette (offre payante) | ${cents(a.cost_per_recipe)} | ${cents(b.cost_per_recipe)} | |`,
