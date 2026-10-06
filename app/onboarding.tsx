@@ -12,6 +12,7 @@ import { Chip } from '@/components/ui/Chip';
 import { IconChip } from '@/components/ui/IconChip';
 import { Touchable } from '@/components/ui/Touchable';
 import { CuisinePicker } from '@/components/recipe/CuisinePicker';
+import { KeyboardAvoider, useKeyboardScroll, useKeyboardVisible } from '@/components/ui/KeyboardAvoider';
 import { ServingsStepper } from '@/components/recipe/PreferenceControls';
 import { dietaryOptions } from '@/components/recipe/options';
 import { hasPendingInvite, takePendingInvite } from '@/lib/invite';
@@ -43,6 +44,9 @@ export default function OnboardingScreen() {
   const { user } = useAuth();
   const { t } = useLanguage();
   const safe = useSafeSpacing();
+  // Questions : « Autre cuisine… » au-dessus du clavier
+  const keyboardScroll = useKeyboardScroll();
+  const keyboardVisible = useKeyboardVisible();
   // null : pas encore su (lecture de l'invitation en attente)
   const [invited, setInvited] = useState<boolean | null>(null);
   const [step, setStep] = useState<Step>({ kind: 'intro', index: 0 });
@@ -130,14 +134,21 @@ export default function OnboardingScreen() {
   // ---------- Questions facultatives ----------
   if (step.kind === 'questions') {
     return (
-      <View style={[styles.container, safe.top(spacing.md)]}>
+      <KeyboardAvoider style={[styles.container, safe.top(spacing.md)]}>
         <View style={styles.topBar}>
           <View />
           <Touchable onPress={() => afterQuestions(false)} style={styles.skip} accessibilityRole="button">
             <Text style={styles.skipText}>{t('onboarding.skip')}</Text>
           </Touchable>
         </View>
-        <ScrollView contentContainerStyle={styles.questions} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          ref={keyboardScroll.scrollRef}
+          onScroll={keyboardScroll.onScroll}
+          scrollEventThrottle={keyboardScroll.scrollEventThrottle}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.questions}
+          showsVerticalScrollIndicator={false}
+        >
           <Text style={styles.title}>{t('onboarding.questionsTitle')}</Text>
           <Text style={styles.text}>{t('onboarding.questionsText')}</Text>
           <Card style={styles.section}>
@@ -163,10 +174,12 @@ export default function OnboardingScreen() {
             <ServingsStepper value={answers.servings} onChange={(servings) => answer({ servings })} />
           </Card>
         </ScrollView>
-        <View style={[styles.footer, safe.bottom(spacing.lg)]}>
-          <Button label={t('onboarding.continue')} onPress={() => afterQuestions(true)} loading={saving} />
-        </View>
-      </View>
+        {keyboardVisible ? null : (
+          <View style={[styles.footer, safe.bottom(spacing.lg)]}>
+            <Button label={t('onboarding.continue')} onPress={() => afterQuestions(true)} loading={saving} />
+          </View>
+        )}
+      </KeyboardAvoider>
     );
   }
 

@@ -14,6 +14,7 @@ import { CookStep } from '@/components/cook/CookStep';
 import { TimerStrip } from '@/components/cook/TimerStrip';
 import { CookedButton } from '@/components/recipe/CookedButton';
 import { RecipeRating } from '@/components/recipe/RecipeRating';
+import { KeyboardAvoider, useKeyboardScroll, useKeyboardVisible } from '@/components/ui/KeyboardAvoider';
 import { colors, fontFamilies, radius, sizes, spacing, typography } from '@/constants/theme';
 import { recipeAmount } from '@/lib/quantity';
 import { useRecipeImages } from '@/hooks/useRecipeImages';
@@ -30,6 +31,9 @@ const FRESH_ALERT_MS = 10_000;
 export default function CookScreen() {
   const { t, language } = useLanguage();
   const safe = useSafeSpacing();
+  // Fin : « Signaler un problème » au-dessus du clavier
+  const keyboardScroll = useKeyboardScroll();
+  const keyboardVisible = useKeyboardVisible();
   const { width } = useWindowDimensions();
   const session = useCookingSession();
   // Photo du plat : celle de la séance, ou celle arrivée depuis (image générée pendant la cuisine)
@@ -160,10 +164,16 @@ export default function CookScreen() {
     const fromPantry = recipe.ingredients_used.some((item) => item.pantry_id);
     const photo = images.withImage({ id: recipe.id, image_url: recipe.image_url }).image_url;
     return (
-      <View style={styles.container}>
+      <KeyboardAvoider style={styles.container}>
         {header}
         <TimerStrip timers={timers} now={now} />
-        <ScrollView contentContainerStyle={styles.doneContent}>
+        <ScrollView
+          ref={keyboardScroll.scrollRef}
+          onScroll={keyboardScroll.onScroll}
+          scrollEventThrottle={keyboardScroll.scrollEventThrottle}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={styles.doneContent}
+        >
           {photo ? (
             <View style={styles.photoBlock}>
               <Image source={{ uri: photo }} style={styles.photo} contentFit="cover" cachePolicy="memory-disk" accessibilityIgnoresInvertColors />
@@ -179,10 +189,12 @@ export default function CookScreen() {
           ) : null}
           {recipe.id ? <RecipeRating recipeId={recipe.id} style={styles.cooked} /> : null}
         </ScrollView>
-        <View style={[styles.footer, safe.bottom(spacing.md)]}>
-          <Button label={t('cook.close')} variant="outline" size="large" onPress={closeDone} style={styles.footerButton} />
-        </View>
-      </View>
+        {keyboardVisible ? null : (
+          <View style={[styles.footer, safe.bottom(spacing.md)]}>
+            <Button label={t('cook.close')} variant="outline" size="large" onPress={closeDone} style={styles.footerButton} />
+          </View>
+        )}
+      </KeyboardAvoider>
     );
   }
 

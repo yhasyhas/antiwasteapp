@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { difficultyLabel } from '@/lib/labels';
 import { BottomSheet, SheetHeader } from '@/components/ui/BottomSheet';
+import { useKeyboardScroll } from '@/components/ui/KeyboardAvoider';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { spacing, typography, colors } from '@/constants/theme';
@@ -22,12 +23,22 @@ interface Props {
 // Feuille des filtres de génération : type de repas, cuisine, temps, personnes, régimes, difficulté, langue
 export function FiltersModal({ visible, filters, onChange, onToggleDietary, onClose }: Props) {
   const { t } = useLanguage();
+  // « Autre cuisine… » : le champ remonte au-dessus du clavier
+  const keyboardScroll = useKeyboardScroll();
 
   return (
-    <BottomSheet visible={visible} onClose={onClose}>
+    <BottomSheet visible={visible} onClose={onClose} keyboard>
       <SheetHeader title={t('generate.filtersTitle')} onClose={onClose} />
 
-      <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        ref={keyboardScroll.scrollRef}
+        onScroll={keyboardScroll.onScroll}
+        scrollEventThrottle={keyboardScroll.scrollEventThrottle}
+        keyboardShouldPersistTaps="handled"
+        style={styles.body}
+        contentContainerStyle={styles.bodyContent}
+        showsVerticalScrollIndicator={false}
+      >
         <Group title={t('generate.mealType')}>
           {mealTypes.map((meal) => (
             <Chip
