@@ -356,10 +356,30 @@ Partie restante de la phase 9.
 
 ## Phase 10b — Petit groupe de testeurs
 
-- [ ] Partage avec un petit groupe de testeurs (3 à 5 amis, Android) : build preview avec un paquet provisoire .preview, ajouté au projet Firebase, lien d'installation, groupe de retours
-- [ ] Pages du site (`web/invite/index.html` et `reset.html`) : remplacer `androidPackage` par le paquet du build de test, puis `node scripts/deploy-pages.mjs`
+- [x] Build de test (profil `preview`) : paquet provisoire `com.yhasyhas.antiwasteapp.preview` ajouté au projet Firebase, nom « Antigaspi (test) », code embarqué, installable à côté du build de développement — *variables publiques et fichier Firebase dans l'environnement EAS `preview`, même clé FCM que `.dev`, clé de signature créée par EAS (docs/ENVIRONMENT.md, section 5)*
+- [x] Identification : « version 1.0, test N » dans les Réglages (numéro de build incrémenté par EAS), joint à « Donner mon avis » et à chaque erreur Sentry (environnement `preview`) ; outils de développement masqués (État des services, erreur de test Sentry, rappel d'essai)
+- [x] Pages du site (`web/invite/index.html` et `reset.html`) : lien vers le paquet `.preview` et page d'installation du build de test ; déployées et vérifiées (`scripts/e2e/invite-page.mjs`, `password-reset-page.mjs`)
+- [ ] Installation vérifiée par l'utilisateur sur ses deux téléphones, puis lien envoyé aux amis (3 à 5, Android) avec un groupe de retours
 - [ ] Revérifier sur le build de test le lien « Mot de passe oublié » : e-mail → page du site → « Ouvrir dans l'app » → « Nouveau mot de passe », app fermée puis app ouverte (dans le build de développement, l'app fermée affiche l'erreur du lanceur, voir le journal du 06/10/2026)
 - [ ] Taille de police maximale sur les téléphones des testeurs (case ouverte de la phase 10) : accueil, Scanner, « Mon foyer » et fiche d'un membre, fiche recette, « Mon impact » ; textes lisibles, rien de coupé ni de superposé, boutons atteignables
+
+**À chaque nouveau build de test** : son lien dans `downloadUrl` de `web/invite/index.html`, `node scripts/deploy-pages.mjs`, `node scripts/e2e/invite-page.mjs`.
+
+**Deux apps sur un même téléphone** (développement et test) : les liens des pages web (invitation, « Nouveau mot de passe ») ouvrent toujours l'app de test, sans question ; l'app de développement ne s'ouvre plus par ces liens. Connecté au même compte dans les deux, le téléphone reçoit le résumé de 9 h deux fois (un jeton par app).
+
+### Tests pour les testeurs
+
+À envoyer avec le lien d'installation, en mots simples. Chacun note son téléphone (marque, modèle) et le numéro affiché en bas des Réglages (« version 1.0, test N »), et fait ses retours par « Donner mon avis » (Réglages).
+
+1. **Installation** : ouvrir le lien sur le téléphone, installer « Antigaspi (test) » (autoriser l'installation depuis le navigateur si Android le demande), créer un compte.
+2. **Premier lancement** : suivre les trois écrans d'accueil, faire le premier scan proposé.
+3. **Garde-manger** : ajouter des aliments par photo du frigo, par code-barres et par ticket de caisse ; corriger un nom ou une date dans la confirmation.
+4. **Recettes** : générer des recettes, en ouvrir une, lancer le mode cuisine avec un minuteur, puis « J'ai cuisiné ça ».
+5. **Foyer** : inviter un autre testeur par lien, vérifier que le garde-manger et la liste de courses sont partagés.
+6. **Notifications** : accepter les notifications ; le lendemain, recevoir le résumé du matin s'il y a des aliments qui périment bientôt ; laisser un minuteur du mode cuisine sonner téléphone verrouillé.
+7. **Mot de passe oublié** : depuis l'écran de connexion, recevoir l'e-mail, l'ouvrir sur le téléphone, choisir un nouveau mot de passe, se reconnecter.
+8. **Taille de police maximale** : Paramètres du téléphone → Affichage → taille de police au maximum ; parcourir l'accueil, le Scanner, « Mon foyer » (toucher un membre), une recette et « Mon impact » (toucher le compteur de l'accueil) ; signaler tout texte coupé ou bouton impossible à toucher.
+9. **Donner mon avis** : envoyer au moins un avis (ce qui plaît, ce qui gêne).
 
 ## Phase 11 — Point de décision
 
@@ -678,3 +698,4 @@ Ancienne phase 8.
 | 07/10/2026 | Corrections après les tests de la phase 10 : page « Nouveau mot de passe » (œil sur les deux champs, texte saisi toujours foncé : schéma de couleurs clair imposé) ; « Mon impact » (« Tout vient de toi ce mois-ci » quand les chiffres du foyer et les miens sont identiques) ; foyer (fiche d'un membre, confirmations détaillées pour retirer un membre et quitter le foyer) ; ticket de caisse (non alimentaire et invraisemblable écartés, produits déjà cuits en plats cuisinés, lignes incertaines décochées) | « Mon impact » vérifié : chiffres identiques chez l'utilisateur parce qu'un seul membre de son foyer a sauvé ou gaspillé ce mois-ci ; calcul juste avec deux comptes de test agissant chacun avec son jeton (`scripts/e2e/impact-shared.mjs`). Ticket : le modèle donne le texte exact de chaque ligne, le serveur applique des règles déterministes (`analyze-image/receipt.ts`) ; une pizza surgelée n'est jamais un plat cuisiné, le jambon cuit non plus. Évaluation du mode ticket (`scripts/receipt-eval`, 5 cas piégeux, dont le ticket de l'utilisateur reconstitué) : 5/5. Le test de la taille de police maximale reste à faire sur téléphone |
 | 07/10/2026 | Ticket de caisse sur la vraie photo de l'utilisateur (`scripts/receipt-eval/tickets/ticket-jouets.png`, ajoutée aux cas fixes) : « SQUISH SEA TURTLE » et « SQUAWKING CHICKEN » (jouets) écartés, poulet rôti en plat cuisiné à réchauffer, chips et bananes gardées, sur 3 essais (Gemini et Groq) ; évaluation 6/6. Aucune ligne incertaine sur ces tickets : le décochage par défaut n'est vérifié que par le code (`hooks/useScan.ts`) | Avant la correction, la consigne demandait de décoder chaque libellé en nom générique d'aliment, ne citait comme non alimentaires que l'hygiène et l'entretien (pas les jouets) et imposait "kind" = "ingredient" à toutes les lignes (poulet rôti devenu poulet cru), sans aucun contrôle du serveur. Correction dans la consigne (le modèle écarte lui-même les jouets) et côté serveur en filet de sécurité (`receipt.ts`) |
 | 07/10/2026 | **Phase 10 validée sur les deux téléphones et fusionnée dans `master`**, sauf le test de la taille de police maximale, reporté à la phase 10b sur les téléphones des testeurs (case ouverte) | Pas de téléphone disponible pour ce test avant la fusion |
+| 07/10/2026 | **Phase 10b, build de test** (branche `phase-10b`) : profil `preview`, paquet `com.yhasyhas.antiwasteapp.preview`, « Antigaspi (test) » ; numéro de build à distance initialisé à 1 (« test 1 »), puis incrémenté ; clé FCM du compte EAS réutilisée pour ce paquet ; variables publiques de l'app envoyées dans l'environnement EAS `preview` (code embarqué : `.env` n'est pas envoyé) ; pages du site vers le paquet `.preview` ; `expo-application` déclaré (déjà dans le build par `expo-notifications`, aucun nouveau code natif) | Schéma `myapp` gardé pour les deux apps : les pages ouvrent l'app par un lien « intent » qui vise un paquet précis ; un schéma propre à l'app de test aurait demandé une nouvelle adresse de redirection dans Supabase (Dashboard) sans rien apporter aux liens actuels |

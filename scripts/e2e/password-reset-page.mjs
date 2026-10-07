@@ -3,7 +3,7 @@
 // passage par le serveur d'authentification, puis :
 //   ordinateur : langue du compte, jeton retiré de l'adresse, erreurs du formulaire, mot de passe enregistré
 //                (connexion réussie avec le nouveau), lien déjà utilisé refusé ;
-//   téléphone Android : bouton « Ouvrir dans l'app » vers myapp://auth/reset (lien intent, session comprise) et
+//   téléphone Android : bouton « Ouvrir dans l'app » vers myapp://auth/reset (lien intent vers l'app de test, paquet .preview, session comprise) et
 //                formulaire disponible aussi ;
 //   lien expiré : message.
 // L'adresse https://antigaspi-invite.pages.dev/reset** doit figurer dans les adresses de redirection autorisées.
@@ -122,7 +122,7 @@ try {
   check('téléphone : bouton « Abrir en la app »', await mobile.has('Abrir en la app'));
   const href = await mobile.page.$eval('#open', (el) => el.getAttribute('href'));
   check('téléphone : lien vers myapp://auth/reset avec la session et le paquet de l’app',
-    /^intent:\/\/auth\/reset\?access_token=[^&]+&refresh_token=[^&]+&type=recovery#Intent;scheme=myapp;package=com\.yhasyhas\.antiwasteapp\.dev;S\.browser_fallback_url=/.test(href ?? ''));
+    /^intent:\/\/auth\/reset\?access_token=[^&]+&refresh_token=[^&]+&type=recovery#Intent;scheme=myapp;package=com\.yhasyhas\.antiwasteapp\.preview;S\.browser_fallback_url=/.test(href ?? ''));
   check('téléphone : formulaire disponible aussi', await mobile.page.$eval('#form', (el) => !el.classList.contains('hidden')));
   await mobile.page.screenshot({ path: path.join(out, '4-telephone.png') });
   // App absente : Chrome revient sur la page (?app=absent), la session est relue, le formulaire seul est proposé

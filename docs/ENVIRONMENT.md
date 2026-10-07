@@ -73,7 +73,9 @@ Modèle sans valeurs : `.env.example`. Toutes ces valeurs sont **publiques par n
 | `EXPO_PUBLIC_TURNSTILE_SITE_KEY` | Clé de site du captcha Turnstile | Cloudflare → Turnstile → widget « Antigaspi » |
 
 - **Vérifier** : `grep -c '^NOM=' .env` vaut 1. L'app démarre et se connecte.
-- **Builds EAS** : les mêmes variables doivent exister dans les variables EAS du profil concerné (expo.dev → projet → Environment variables).
+- **Builds EAS** : un build dont le code est embarqué (preview, production) lit ces variables dans l'environnement EAS du profil, pas dans `.env` (exclu de l'envoi par `.gitignore`). Le build de développement n'en a pas besoin : il charge le code depuis le serveur de développement, qui lit `.env`.
+  - **preview** (build de test des amis, phase 10b) : les cinq variables, envoyées le 07/10/2026 depuis une copie temporaire des lignes `EXPO_PUBLIC_` de `.env` (`eas env:push preview --path <fichier temporaire> --force`, fichier supprimé ensuite). À renvoyer si une valeur change dans `.env`.
+  - **Vérifier sans afficher** : `eas env:list preview` en masquant les valeurs (`sed -E 's/=.*/=<masqué>/'`) pour les noms ; pour les valeurs, `eas env:pull preview --path <fichier temporaire>`, comparaison avec `.env` par un script qui n'affiche que « identique » ou « différent », puis suppression du fichier et de `.eas/.env/`. Vérifié le 07/10/2026 : identiques.
 - **Clé secrète Supabase** (`sb_secret_…`) : elle n'est jamais dans `.env`. Les scripts la lisent au moment de s'en servir avec `npx supabase projects api-keys --project-ref iqzjonmjlscuckdmiehk --reveal -o json` et la gardent en mémoire, sans l'afficher.
 
 ---
@@ -130,8 +132,15 @@ Pour le renouveler : générer une valeur aléatoire, la poser dans les fonction
 
 ## 5. EAS et Firebase (notifications push Android)
 
-- **Identifiants push** : la clé du compte de service Firebase (FCM V1) est envoyée à EAS et associée au paquet `com.yhasyhas.antiwasteapp.dev`.
-  - Vérifier : `npx eas-cli credentials`, puis Android, profil de développement.
+- **Paquets Android** (`app.config.js`, variable `APP_VARIANT` fixée par le profil d'`eas.json`) :
+  - `com.yhasyhas.antiwasteapp.dev` : build de développement, « Antigaspi (dev) » ;
+  - `com.yhasyhas.antiwasteapp.preview` : build de test des amis (phase 10b), « Antigaspi (test) », code embarqué ; ajouté au projet Firebase par l'utilisateur le 07/10/2026.
+  - Les deux s'installent côte à côte et gardent le schéma `myapp`. Les pages web (`web/invite`) ouvrent l'app par un lien « intent » qui vise un seul paquet : `.preview` depuis le 07/10/2026.
+- **Identifiants push** : une seule clé du compte de service Firebase (FCM V1, projet Firebase `yhasyhasantiwasteapp`), enregistrée sur le compte EAS et associée aux deux paquets : `.dev` (26/09/2026, par `eas credentials`) et `.preview` (07/10/2026, la même clé associée par l'API GraphQL d'EAS avec `EXPO_TOKEN`, sans renvoyer le fichier).
+  - Vérifier : `npx eas-cli credentials`, puis Android et le profil voulu ; ou la requête GraphQL `app.byId.androidAppCredentials` (paquet et identifiant de la clé, sans valeur secrète).
+- **Clé de signature du build de test** (`.preview`) : créée et gardée par EAS au premier build (07/10/2026). Ne pas la supprimer : les testeurs ne pourraient plus installer les mises à jour par-dessus l'app existante.
+- **Numéro de build** : version à distance (`appVersionSource: remote`), un compteur par paquet. Celui de `.preview` a été initialisé à 1 pour le premier build (« test 1 »), puis augmente de 1 à chaque build (`autoIncrement`). Lecture : `eas build:version:get -p android -e preview`.
+- **Builds de l'offre gratuite** : 30 par mois (période du 1er au 1er), 10 builds locaux. Lecture sans le site : requête GraphQL `account.byName.usageMetrics.byBillingPeriod(service: BUILDS)` avec `EXPO_TOKEN` ; sinon expo.dev → compte → Usage.
   - Renouveler : console Firebase → Paramètres du projet → Comptes de service → Générer une nouvelle clé privée, l'envoyer avec `eas credentials`, puis supprimer l'ancienne clé dans Google Cloud (IAM → Comptes de service).
 - **Clé du compte de service (fichier JSON)** :
   - jamais dans le dépôt ni dans un dossier synchronisé ;
@@ -139,7 +148,8 @@ Pour le renouveler : générer une valeur aléatoire, la poser dans les fonction
   - on peut le supprimer une fois la clé envoyée à EAS.
 - **google-services.json** : configuration Firebase de l'app Android.
   - Emplacement : à la racine du projet, hors de git (`.gitignore`).
-  - Pour les builds : variable EAS de type fichier `GOOGLE_SERVICES_JSON`, lue par `app.config.js`.
+  - Contient les deux apps (`.dev` et `.preview`) depuis le 07/10/2026.
+  - Pour les builds : variable EAS de type fichier `GOOGLE_SERVICES_JSON`, lue par `app.config.js`, dans les environnements `development` et `preview` (mise à jour le 07/10/2026 avec `eas env:update … --environment development --environment preview --type file`).
   - Renouveler : console Firebase → app Android → télécharger le fichier. Mettre à jour le fichier local et la variable EAS (`eas env:update`).
   - Le paquet définitif sera ajouté au projet Firebase en phase 15.
 - **Variables EAS** : expo.dev → projet → Environment variables. Pour lire la liste, préférer le site : `eas env:list` peut afficher les valeurs des variables non secrètes.

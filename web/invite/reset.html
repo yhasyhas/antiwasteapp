@@ -135,7 +135,9 @@
     const CONFIG = {
       appName: 'Antigaspi',
       scheme: 'myapp',
-      androidPackage: 'com.yhasyhas.antiwasteapp.dev',
+      // App de test des amis (phase 10b) : le lien « intent » n'ouvre que ce paquet, même si le build de
+      // développement est aussi installé ; app absente : retour ici, mot de passe choisi dans le navigateur
+      androidPackage: 'com.yhasyhas.antiwasteapp.preview',
       // Insérés par scripts/deploy-pages.mjs depuis .env (valeurs publiques, déjà dans l'app)
       supabaseUrl: '__SUPABASE_URL__',
       supabaseKey: '__SUPABASE_PUBLISHABLE_KEY__',

@@ -84,11 +84,14 @@
   <script>
     // ---- Configuration (à changer au lancement : Play Store, paquet et schéma définitifs) ----
     const CONFIG = {
-      // Schéma de l'app (app.json) et paquet Android du build installé
+      // Schéma de l'app (app.json) et paquet Android visé : l'app de test des amis (phase 10b, « Antigaspi (test) »).
+      // Le lien « intent » n'ouvre que ce paquet : sur un téléphone qui a aussi le build de développement, c'est
+      // l'app de test qui s'ouvre, sans question.
       scheme: 'myapp',
-      androidPackage: 'com.yhasyhas.antiwasteapp.dev',
-      // Téléchargement : build de test pour l'instant, fiche du Play Store plus tard
-      downloadUrl: 'https://expo.dev/accounts/yhasyhas/projects/bolt-expo-nativewind/builds/342ba8b6-a4f1-494c-b6a4-8ee5abb41075',
+      androidPackage: 'com.yhasyhas.antiwasteapp.preview',
+      // Téléchargement : page d'installation du dernier build de test, fiche du Play Store plus tard.
+      // À changer à chaque nouveau build de test (PLAN.md, phase 10b), puis node scripts/deploy-pages.mjs
+      downloadUrl: 'https://expo.dev/accounts/yhasyhas/projects/bolt-expo-nativewind/builds/2e983f57-667b-4276-97aa-4d337420fed3',
     };
 
     const TEXTS = {

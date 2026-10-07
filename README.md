@@ -228,18 +228,27 @@ node scripts/food-facts/review.mjs --reviewed banana,apple   # marque des fiches
 node scripts/food-facts/review.mjs --regenerate banana       # régénère une fiche
 ```
 
-## Build de développement (Android)
+## Builds Android (développement et test)
 
 `eas.json` : profils `development` (APK avec `expo-dev-client`), `preview` et `production`. Chaque profil fixe
-`APP_VARIANT` : le build de développement s'appelle « Antigaspi (dev) », paquet `com.yhasyhas.antiwasteapp.dev`
-(`app.config.js`). Paquet et nom définitifs : phase 8 (d'ici là, preview et production échouent volontairement). Le fichier Firebase
+`APP_VARIANT` (`app.config.js`) :
+- `development` : « Antigaspi (dev) », paquet `com.yhasyhas.antiwasteapp.dev`, code chargé depuis le serveur de développement ;
+- `preview` : « Antigaspi (test) », paquet `com.yhasyhas.antiwasteapp.preview`, build de test des amis (phase 10b), code
+  embarqué, numéro de build incrémenté à chaque build et affiché dans les Réglages (« version 1.0, test N ») ;
+- `production` : pas encore de paquet (échoue volontairement jusqu'au choix du nom).
+
+Les deux premiers s'installent côte à côte. Le fichier Firebase
 `google-services.json` (notifications push) n'est pas dans git : en local à la racine, pour EAS en variable
 d'environnement de type fichier `GOOGLE_SERVICES_JSON` (lue par `app.config.js`).
 
 ```bash
 eas build --profile development --platform android   # APK à installer sur le téléphone
 npx expo start --dev-client                          # puis ouvrir l'app installée
+eas build --profile preview --platform android       # build de test des amis
 ```
+
+Après un nouveau build de test : mettre son lien dans `downloadUrl` de `web/invite/index.html`, puis
+`node scripts/deploy-pages.mjs` et `node scripts/e2e/invite-page.mjs`.
 
 ## Tests
 
