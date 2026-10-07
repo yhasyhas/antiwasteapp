@@ -1,0 +1,348 @@
+[
+  {
+    "id": "en-jouets-ticket-utilisateur",
+    "note": "Ticket de l'utilisateur (phase 10) : jouets au nom d'animal ou d'aliment, poulet rôti du rayon traiteur",
+    "language": "en",
+    "store": "SUPERCENTER #2291",
+    "lines": [
+      [
+        "SQUISH SEA TURTLE 0884920471325",
+        "9.97"
+      ],
+      [
+        "SQUAWKING PARROT TOY 776512039",
+        "12.88"
+      ],
+      [
+        "PLUSH BANANA 30CM 044009123",
+        "6.50"
+      ],
+      [
+        "ROTISSERIE CHICKEN",
+        "4.98"
+      ],
+      [
+        "BANANAS 1.24 LB",
+        "0.73"
+      ],
+      [
+        "GV WHOLE MILK GAL",
+        "3.12"
+      ],
+      [
+        "LG EGGS 12 CT",
+        "2.86"
+      ],
+      [
+        "WHT BREAD 20OZ",
+        "1.42"
+      ]
+    ],
+    "foods": [
+      [
+        "banana"
+      ],
+      [
+        "milk"
+      ],
+      [
+        "egg"
+      ],
+      [
+        "bread"
+      ],
+      [
+        "chicken"
+      ]
+    ],
+    "excluded": [
+      "turtle",
+      "parrot",
+      "toy",
+      "plush"
+    ],
+    "dishes": [
+      [
+        "chicken"
+      ]
+    ],
+    "notDishes": [
+      [
+        "milk"
+      ],
+      [
+        "egg"
+      ]
+    ]
+  },
+  {
+    "id": "en-jouets-dinosaure",
+    "language": "en",
+    "store": "FAMILY MART",
+    "lines": [
+      [
+        "DINO SQUISHMALLOW 8IN 01982736",
+        "14.99"
+      ],
+      [
+        "LEGO CITY 60312",
+        "9.99"
+      ],
+      [
+        "GALA APPLES 3LB",
+        "4.49"
+      ],
+      [
+        "CHEDDAR MILD 8OZ",
+        "2.79"
+      ],
+      [
+        "STRAWBERRY JELLY TOY CANDY",
+        "1.99"
+      ]
+    ],
+    "foods": [
+      [
+        "apple"
+      ],
+      [
+        "cheddar",
+        "cheese"
+      ]
+    ],
+    "excluded": [
+      "dino",
+      "lego",
+      "squish"
+    ],
+    "dishes": [],
+    "notDishes": [
+      [
+        "apple"
+      ],
+      [
+        "cheddar",
+        "cheese"
+      ]
+    ]
+  },
+  {
+    "id": "fr-menager",
+    "note": "Produits ménagers et d'hygiène, dont certains au nom d'aliment (lessive au citron)",
+    "language": "fr",
+    "store": "SUPERMARCHE DU CENTRE",
+    "lines": [
+      [
+        "LESSIVE LIQ CITRON 2L",
+        "7,45"
+      ],
+      [
+        "EPONGE GRATTANTE X3",
+        "1,20"
+      ],
+      [
+        "PQ 12 ROULX",
+        "4,99"
+      ],
+      [
+        "SAVON MAINS AMANDE",
+        "2,10"
+      ],
+      [
+        "SAC CABAS",
+        "0,10"
+      ],
+      [
+        "TOM GRAPPE 1KG",
+        "2,49"
+      ],
+      [
+        "LAIT DEMI-ECR 1L",
+        "0,99"
+      ],
+      [
+        "FROM BLC 0% 500G",
+        "1,35"
+      ],
+      [
+        "BAN BIO 1KG",
+        "2,30"
+      ]
+    ],
+    "foods": [
+      [
+        "tomate"
+      ],
+      [
+        "lait"
+      ],
+      [
+        "fromage blanc"
+      ],
+      [
+        "banane"
+      ]
+    ],
+    "excluded": [
+      "lessive",
+      "eponge",
+      "papier",
+      "savon",
+      "sac",
+      "citron",
+      "amande"
+    ],
+    "dishes": [],
+    "notDishes": [
+      [
+        "tomate"
+      ],
+      [
+        "lait"
+      ]
+    ]
+  },
+  {
+    "id": "fr-traiteur",
+    "note": "Plats du rayon traiteur, charcuterie cuite (pas un plat), surgelé (à cuire)",
+    "language": "fr",
+    "store": "SUPERMARCHE DU CENTRE",
+    "lines": [
+      [
+        "POULET ROTI FERMIER",
+        "8,90"
+      ],
+      [
+        "TABOULE TRAITEUR 300G",
+        "2,65"
+      ],
+      [
+        "LASAGNES BOLO 1KG",
+        "5,40"
+      ],
+      [
+        "JAMBON CUIT 4T",
+        "3,10"
+      ],
+      [
+        "CAFE MOULU 250G",
+        "3,49"
+      ],
+      [
+        "PIZZA SURG 4 FROM",
+        "3,99"
+      ]
+    ],
+    "foods": [
+      [
+        "poulet"
+      ],
+      [
+        "taboule"
+      ],
+      [
+        "lasagne"
+      ],
+      [
+        "jambon"
+      ],
+      [
+        "cafe"
+      ]
+    ],
+    "excluded": [],
+    "dishes": [
+      [
+        "poulet"
+      ],
+      [
+        "taboule"
+      ],
+      [
+        "lasagne"
+      ]
+    ],
+    "notDishes": [
+      [
+        "jambon"
+      ],
+      [
+        "cafe"
+      ],
+      [
+        "pizza"
+      ]
+    ]
+  },
+  {
+    "id": "es-abreviaturas",
+    "note": "Abréviations espagnoles",
+    "language": "es",
+    "store": "SUPERMERCADO LA PLAZA",
+    "lines": [
+      [
+        "LCH ENT 1L",
+        "0,95"
+      ],
+      [
+        "YOG NAT X4",
+        "1,20"
+      ],
+      [
+        "PECH POLLO 500G",
+        "3,45"
+      ],
+      [
+        "PAT 2KG",
+        "1,99"
+      ],
+      [
+        "CEB 1KG",
+        "1,10"
+      ],
+      [
+        "TOM PERA 1KG",
+        "1,85"
+      ],
+      [
+        "BOLSA PAPEL",
+        "0,15"
+      ]
+    ],
+    "foods": [
+      [
+        "leche"
+      ],
+      [
+        "yogur"
+      ],
+      [
+        "pollo",
+        "pechuga"
+      ],
+      [
+        "patata"
+      ],
+      [
+        "cebolla"
+      ],
+      [
+        "tomate"
+      ]
+    ],
+    "excluded": [
+      "bolsa",
+      "papel"
+    ],
+    "dishes": [],
+    "notDishes": [
+      [
+        "pollo",
+        "pechuga"
+      ],
+      [
+        "leche"
+      ]
+    ]
+  }
+]

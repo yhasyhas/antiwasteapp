@@ -6,6 +6,7 @@ import { readSimulation } from '../_shared/simulate.ts';
 import { withCors } from '../_shared/cors.ts';
 import { type AiProvider, type AttemptLog, geminiProvider, groqProvider, runWithFallback } from '../_shared/ai.ts';
 import { parseIngredients, RESPONSE_SCHEMA } from './ingredients.ts';
+import { parseReceipt, RECEIPT_SCHEMA, UNCERTAIN_CONFIDENCE } from './receipt.ts';
 import { FOOD_KEY_GUIDE } from '../_shared/foodKey.ts';
 
 // Modèles configurables par secret : les fournisseurs retirent régulièrement des modèles
@@ -141,11 +142,15 @@ function buildPrompt(language: string, mode: AnalyzeMode): string {
     return `Tu analyses la photo d'un ticket de caisse prise par un utilisateur d'une application anti-gaspi.
 
 Liste uniquement les produits alimentaires achetés.
+- "receipt_line" : texte exact de la ligne du ticket, tel qu'il est imprimé (libellé, poids, codes).
 - "name" : nom courant et générique en ${languageName}, en décodant les libellés abrégés (ex. ${ex.receipt}), sans marque.
+- Articles non alimentaires : ignore-les, même quand leur nom évoque un aliment ou un animal. Jouets, peluches, figurines, objets, vaisselle, papeterie, produits d'entretien et d'hygiène (indices : code de produit à rallonge, mots comme « squish », « squawking », « toy », « plush », « peluche », « jouet »). « SQUISH SEA TURTLE » est un jouet, pas un aliment.
+- Ne propose jamais un aliment qu'aucun supermarché ne vend comme nourriture (tortue, perroquet, dinosaure…) : dans le doute, ignore la ligne.
+- Produit déjà cuit (poulet rôti, « rotisserie », plat préparé, rayon traiteur, plat à réchauffer) : "kind" = "dish", "name" = le plat, "shelf_life_days" 2 ou 3, conseil de le garder au frigo et de le réchauffer à cœur.
 - "quantity" : quantité d'après le ticket, avec son unité en ${languageName} (ex. "1 kg", "6", "1 l") ; chaîne vide si elle n'est pas indiquée.
 - "category" : ${CATEGORY_GUIDE}
-- "confidence" : entre 0 et 1, selon la lisibilité de la ligne et ta certitude sur le produit.
-- "kind" : "ingredient".
+- "confidence" : entre 0 et 1, selon la lisibilité de la ligne et ta certitude sur le produit ; moins de ${UNCERTAIN_CONFIDENCE} si le libellé abrégé peut désigner plusieurs produits ou si la ligne est mal lisible.
+- "kind" : "ingredient", sauf produit déjà cuit ("dish").
 - "storage_tip" : ${STORAGE_TIP_GUIDE(languageName, ex.tip)}
 - "shelf_life_days" : ${SHELF_LIFE_GUIDE} Produit neuf, non ouvert.
 - "food_key" : ${FOOD_KEY_GUIDE}.
@@ -227,11 +232,11 @@ Deno.serve(withCors(async (req: Request) => {
     const result = await runWithFallback(providers, {
       prompt: buildPrompt(language, mode),
       image: { base64: image_base64, mimeType: mime_type || 'image/jpeg' },
-      schema: RESPONSE_SCHEMA,
+      schema: mode === 'receipt' ? RECEIPT_SCHEMA : RESPONSE_SCHEMA,
       schemaName: 'detected_ingredients',
       temperature: 0,
       maxOutputTokens: MAX_OUTPUT_TOKENS,
-    }, parseIngredients, { label: 'analyze-image', log, t0, hedgeDelayMs: HEDGE_DELAY_MS, simulate: simulation?.providers });
+    }, mode === 'receipt' ? parseReceipt(language) : parseIngredients, { label: 'analyze-image', log, t0, hedgeDelayMs: HEDGE_DELAY_MS, simulate: simulation?.providers });
     // Quotas de fournisseurs épuisés, même si le secours a répondu : alerte (une fois par jour et par fournisseur)
     for (const hit of result.quotaHits) {
       reportInBackground(reportProviderQuota(hit.provider, 'analyze-image', hit.details, simulation !== null));
@@ -248,6 +253,9 @@ Deno.serve(withCors(async (req: Request) => {
     }
 
     const { ingredients, invalid } = result.value;
+    // Ticket : lignes écartées par les règles du serveur (non alimentaire, invraisemblable)
+    const dropped = 'dropped' in result.value ? result.value.dropped as { line: string; reason: string }[] : [];
+    if (dropped.length > 0) console.log(`[analyze-image] ticket : ${dropped.length} ligne(s) écartée(s) : ${dropped.map((d) => `${d.line} (${d.reason})`).join(' ; ')}`);
     if (invalid.length > 0) {
       console.warn(`[analyze-image] ${result.provider.name} : ${invalid.length} aliment(s) mal formé(s) écarté(s) : ${invalid.slice(0, 5).join(' ; ')}`);
     }
@@ -259,6 +267,7 @@ Deno.serve(withCors(async (req: Request) => {
       : primaryFailure?.details ?? `${providers[0].name} : pas de réponse après ${HEDGE_DELAY_MS} ms`;
     return jsonResponse({
       ingredients,
+      ...(mode === 'receipt' && { uncertain_below: UNCERTAIN_CONFIDENCE, ...(debug === true && { dropped }) }),
       provider: result.provider.name,
       ...(fallbackReason && { fallback_reason: fallbackReason }),
       ...debugInfo,

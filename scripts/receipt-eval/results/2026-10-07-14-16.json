@@ -1,0 +1,250 @@
+{
+  "summary": {
+    "date": "2026-10-07T14:16:08.723Z",
+    "cases": 5,
+    "passed": 5,
+    "missing_foods": 0,
+    "non_food_kept": 0,
+    "dishes_missed": 0,
+    "wrong_dishes": 0,
+    "uncertain_lines": 0
+  },
+  "results": [
+    {
+      "id": "en-jouets-ticket-utilisateur",
+      "status": 200,
+      "ms": 6856,
+      "provider": "groq",
+      "items": [
+        {
+          "name": "rotisserie chicken",
+          "kind": "dish",
+          "confidence": 1,
+          "shelf_life_days": 3,
+          "storage_tip": "In the fridge, closed; reheat until piping hot before eating"
+        },
+        {
+          "name": "bananas",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 7,
+          "storage_tip": "At room temperature, away from direct sunlight."
+        },
+        {
+          "name": "whole milk",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 7,
+          "storage_tip": "In the fridge, in the coldest part."
+        },
+        {
+          "name": "large eggs",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 28,
+          "storage_tip": "In the fridge, in the original carton."
+        },
+        {
+          "name": "white bread",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 5,
+          "storage_tip": "In a bread box or airtight container at room temperature."
+        }
+      ],
+      "dropped_by_server": [],
+      "missing": [],
+      "leaked": [],
+      "notDish": [],
+      "wrongDish": [],
+      "uncertain": [],
+      "ok": true
+    },
+    {
+      "id": "en-jouets-dinosaure",
+      "status": 200,
+      "ms": 3731,
+      "provider": "gemini",
+      "items": [
+        {
+          "name": "apple",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 14,
+          "storage_tip": "Keep in a cool, dry place or in the fridge."
+        },
+        {
+          "name": "cheddar cheese",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 21,
+          "storage_tip": "Keep refrigerated in an airtight container."
+        }
+      ],
+      "dropped_by_server": [],
+      "missing": [],
+      "leaked": [],
+      "notDish": [],
+      "wrongDish": [],
+      "uncertain": [],
+      "ok": true
+    },
+    {
+      "id": "fr-menager",
+      "status": 200,
+      "ms": 5056,
+      "provider": "groq",
+      "items": [
+        {
+          "name": "tomate grappe",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 5,
+          "storage_tip": "À l'abri de la chaleur, dans le bac à légumes."
+        },
+        {
+          "name": "lait demi-écrémé",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 5,
+          "storage_tip": "Au réfrigérateur, dans la partie la plus froide."
+        },
+        {
+          "name": "fromage blanc",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 10,
+          "storage_tip": "Au réfrigérateur, dans une boîte hermétique."
+        },
+        {
+          "name": "banane",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 5,
+          "storage_tip": "À température ambiante, à l'abri de la lumière."
+        }
+      ],
+      "dropped_by_server": [],
+      "missing": [],
+      "leaked": [],
+      "notDish": [],
+      "wrongDish": [],
+      "uncertain": [],
+      "ok": true
+    },
+    {
+      "id": "fr-traiteur",
+      "status": 200,
+      "ms": 3841,
+      "provider": "gemini",
+      "items": [
+        {
+          "name": "poulet rôti",
+          "kind": "dish",
+          "confidence": 1,
+          "shelf_life_days": 3,
+          "storage_tip": "Au frigo, bien fermé ; réchauffer à cœur avant de manger"
+        },
+        {
+          "name": "taboulé",
+          "kind": "dish",
+          "confidence": 1,
+          "shelf_life_days": 3,
+          "storage_tip": "Au frigo, bien fermé ; réchauffer à cœur avant de manger"
+        },
+        {
+          "name": "lasagnes à la bolognaise",
+          "kind": "dish",
+          "confidence": 1,
+          "shelf_life_days": 3,
+          "storage_tip": "Au frigo, bien fermé ; réchauffer à cœur avant de manger"
+        },
+        {
+          "name": "jambon cuit",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 4,
+          "storage_tip": "Au réfrigérateur, dans son emballage d'origine fermé."
+        },
+        {
+          "name": "café moulu",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 365,
+          "storage_tip": "Dans un endroit sec, à l'abri de la lumière."
+        },
+        {
+          "name": "pizza surgelée",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 180,
+          "storage_tip": "Au congélateur, à cuire selon les instructions."
+        }
+      ],
+      "dropped_by_server": [],
+      "missing": [],
+      "leaked": [],
+      "notDish": [],
+      "wrongDish": [],
+      "uncertain": [],
+      "ok": true
+    },
+    {
+      "id": "es-abreviaturas",
+      "status": 200,
+      "ms": 5107,
+      "provider": "gemini",
+      "items": [
+        {
+          "name": "leche entera",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 7,
+          "storage_tip": "Mantener refrigerada después de abrir."
+        },
+        {
+          "name": "yogur natural",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 20,
+          "storage_tip": "Conservar en el frigorífico."
+        },
+        {
+          "name": "pechuga de pollo",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 2,
+          "storage_tip": "Mantener refrigerado o congelar si no se consume pronto."
+        },
+        {
+          "name": "patata",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 30,
+          "storage_tip": "Guardar en un lugar fresco, seco y oscuro."
+        },
+        {
+          "name": "cebolla",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 20,
+          "storage_tip": "Conservar en un lugar fresco y seco."
+        },
+        {
+          "name": "tomate",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 5,
+          "storage_tip": "Mantener a temperatura ambiente, lejos de la luz solar."
+        }
+      ],
+      "dropped_by_server": [],
+      "missing": [],
+      "leaked": [],
+      "notDish": [],
+      "wrongDish": [],
+      "uncertain": [],
+      "ok": true
+    }
+  ]
+}

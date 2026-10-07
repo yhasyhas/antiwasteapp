@@ -156,7 +156,8 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
             location,
             date_kind: location === 'freezer' ? 'best_before' as const : defaultDateKind(ingredient.category, kind),
             expiry_estimated: true,
-            confirmed: true,
+            // Ticket : ligne incertaine (libellé ambigu, mal lisible) proposée décochée ; seuil donné par le serveur
+            confirmed: mode !== 'receipt' || ingredient.confidence >= (typeof data.uncertain_below === 'number' ? data.uncertain_below : 0.75),
           };
           return { ...detected, choice: defaultChoice(current, detected, language) };
         }));
