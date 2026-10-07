@@ -27,6 +27,7 @@ import {
 import { inviteLink, normalizeInviteCode } from '@/lib/invite';
 import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 import { showDialog } from '@/lib/dialog';
+import { MemberSheet } from '@/components/household/MemberSheet';
 
 // Écran « Mon foyer » : code d'invitation (partage du lien), membres, rejoindre un foyer, quitter le foyer ;
 // le propriétaire peut retirer un membre. Le nom affiché se modifie dans Réglages.
@@ -132,20 +133,28 @@ export default function HouseholdScreen() {
     showDialog(t('household.joinedTitle'), t('household.joinedText'));
   });
 
+  // Quitter : ce qu'on garde et ce qu'on perd ; propriétaire : le membre arrivé le plus tôt prend le relais
   const leave = () => {
     const last = (household?.members.length ?? 0) <= 1;
-    showDialog(t('household.leaveTitle'), last ? t('household.leaveLastText') : t('household.leaveText'), [
+    const owner = household?.role === 'owner';
+    const text = last ? t('household.leaveLastText') : [t('household.leaveText'), ...(owner ? [t('household.leaveOwnerText')] : [])].join('\n');
+    showDialog(t('household.leaveTitle'), text, [
       { text: t('common.cancel'), style: 'cancel' },
       { text: t('household.leave'), style: 'destructive', onPress: () => run('leave', leaveHousehold) },
     ]);
   };
 
   const remove = (member: HouseholdMember) => {
-    showDialog(t('household.removeTitle'), t('household.removeText', { name: member.name ?? t('household.guest') }), [
+    const name = member.name ?? t('household.guest');
+    showDialog(t('household.removeTitle', { name }), t('household.removeText', { name }), [
       { text: t('common.cancel'), style: 'cancel' },
       { text: t('household.remove'), style: 'destructive', onPress: () => run(`remove-${member.user_id}`, () => removeMember(member.user_id)) },
     ]);
   };
+
+  // Fiche du membre touché
+  const [selected, setSelected] = useState<HouseholdMember | null>(null);
+  const selectedName = selected ? (selected.is_me ? t('household.you') : selected.name ?? t('household.guest')) : '';
 
   const joinedLabel = (iso: string) =>
     t('household.joinedOn', { date: new Date(iso).toLocaleDateString(language, { day: 'numeric', month: 'short' }) });
@@ -226,15 +235,23 @@ export default function HouseholdScreen() {
               <View key={member.user_id}>
                 <View style={cardStyles.divider} />
                 <View style={styles.member}>
-                  <View style={[styles.avatar, member.is_me && styles.avatarMe]}>
-                    <Text style={styles.avatarText}>{(member.is_me ? member.name ?? name : name).charAt(0).toUpperCase()}</Text>
-                  </View>
-                  <View style={styles.memberText}>
-                    <Text style={styles.memberName}>{name}</Text>
-                    <Text style={styles.memberDetail}>
-                      {member.is_me && member.role === 'owner' ? t('household.youManage') : joinedLabel(member.joined_at)}
-                    </Text>
-                  </View>
+                  {/* Toucher le membre ouvre sa fiche */}
+                  <Touchable
+                    onPress={() => setSelected(member)}
+                    scale={false}
+                    style={styles.memberOpen}
+                    accessibilityLabel={`${name}, ${t('household.openMember')}`}
+                  >
+                    <View style={[styles.avatar, member.is_me && styles.avatarMe]}>
+                      <Text style={styles.avatarText}>{(member.is_me ? member.name ?? name : name).charAt(0).toUpperCase()}</Text>
+                    </View>
+                    <View style={styles.memberText}>
+                      <Text style={styles.memberName}>{name}</Text>
+                      <Text style={styles.memberDetail}>
+                        {member.is_me && member.role === 'owner' ? t('household.youManage') : joinedLabel(member.joined_at)}
+                      </Text>
+                    </View>
+                  </Touchable>
                   {member.role === 'owner' && <Badge label={t('household.owner')} tone="soon" style={styles.centered} />}
                   {isOwner && household.shared && !member.is_me && (
                     <Touchable
@@ -279,6 +296,7 @@ export default function HouseholdScreen() {
           <Button label={t('household.leave')} variant="danger" size="small" onPress={leave} loading={busy === 'leave'} disabled={!!busy && busy !== 'leave'} />
         )}
       </ScrollView>
+      <MemberSheet householdId={household.id} member={selected} name={selectedName} onClose={() => setSelected(null)} />
     </KeyboardAvoider>
   );
 }
@@ -374,6 +392,12 @@ const styles = StyleSheet.create({
   avatarText: {
     ...typography.button,
     color: colors.onAccent,
+  },
+  memberOpen: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
   },
   memberText: {
     flex: 1,
