@@ -18,6 +18,7 @@ import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext';
 import { DialogHost } from '@/components/ui/DialogHost';
 import { useExpiryReminders } from '@/hooks/useExpiryReminders';
 import { useHouseholdSession } from '@/hooks/useHousehold';
+import { loadPreferences } from '@/lib/preferences';
 import { colors, motion } from '@/constants/theme';
 
 // Écran de démarrage gardé jusqu'au chargement des polices (pas d'affichage avec la police du système)
@@ -33,6 +34,10 @@ function RootNavigator() {
   useHouseholdSession(user?.id ?? null);
   // Rappels de péremption (notifications locales) et ouverture de la génération depuis un rappel
   useExpiryReminders(user?.id ?? null, language);
+  // « Mes basiques » chargés dès la connexion : « Faisable maintenant » et « À acheter » en tiennent compte partout
+  useEffect(() => {
+    if (user?.id) loadPreferences(user.id);
+  }, [user?.id]);
 
   return (
     <Stack
@@ -47,13 +52,19 @@ function RootNavigator() {
       <Stack.Screen name="index" options={{ animation: 'fade' }} />
       <Stack.Screen name="auth/login" options={{ animation: 'fade' }} />
       <Stack.Screen name="auth/signup" />
+      {/* Mot de passe oublié : demande de l'e-mail, puis « Nouveau mot de passe » ouvert par le lien (sans session au départ) */}
+      <Stack.Screen name="auth/forgot" />
+      <Stack.Screen name="auth/reset" options={{ animation: 'fade' }} />
       {/* Sans session (déconnexion, session expirée), ces écrans deviennent inaccessibles :
           expo-router renvoie vers index, qui redirige vers la connexion */}
       <Stack.Protected guard={!!user}>
         <Stack.Screen name="(tabs)" options={{ animation: 'fade' }} />
+        {/* Premier lancement guidé : une seule fois par compte, sans retour en arrière */}
+        <Stack.Screen name="onboarding" options={{ animation: 'fade', gestureEnabled: false }} />
         <Stack.Screen name="recipe/generate" />
         <Stack.Screen name="household" />
         <Stack.Screen name="preferences" />
+        <Stack.Screen name="impact" />
         {/* Mode cuisine : plein écran, glissement vers le haut */}
         <Stack.Screen name="cook" options={{ animation: 'slide_from_bottom', gestureEnabled: false }} />
         <Stack.Screen name="language" />

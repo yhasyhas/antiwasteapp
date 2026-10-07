@@ -61,6 +61,20 @@ export function useKeyboardScroll(margin = 24) {
   return { scrollRef, onScroll, scrollEventThrottle: 32 };
 }
 
+// Clavier ouvert : pour masquer une barre du bas qui recouvrirait le champ en cours de saisie
+export function useKeyboardVisible() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const show = Keyboard.addListener('keyboardDidShow', () => setVisible(true));
+    const hide = Keyboard.addListener('keyboardDidHide', () => setVisible(false));
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
+  return visible;
+}
+
 const styles = StyleSheet.create({
   fill: { flex: 1 },
 });

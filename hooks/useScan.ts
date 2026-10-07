@@ -84,7 +84,8 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
     setCapturedImage(null);
   };
 
-  const analyzeImage = async (imageUri: string) => {
+  // receipt : ticket de caisse (produits alimentaires seulement, libellés abrégés décodés), photo plus grande pour le texte
+  const analyzeImage = async (imageUri: string, mode: 'photo' | 'receipt' = 'photo') => {
     setCapturedImage(imageUri);
     setAnalyzing(true);
     // Photo gardée pour la vignette de la confirmation
@@ -93,7 +94,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
     try {
       // 1. Compresser et convertir en base64 avec expo-image-manipulator
       const context = ImageManipulator.ImageManipulator.manipulate(imageUri);
-      context.resize({ width: 800 }); // Redimensionne pour réduire la taille
+      context.resize({ width: mode === 'receipt' ? 1200 : 800 }); // Redimensionne pour réduire la taille
       const rendered = await context.renderAsync();
       const manipulatedImage = await rendered.saveAsync({
         compress: 0.7,
@@ -114,7 +115,7 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
           image_base64: base64,
           mime_type: 'image/jpeg',
           language,
-          mode: 'photo',
+          mode,
         });
       } catch (error) {
         if (!(error instanceof SessionExpiredError)) throw error;
@@ -155,7 +156,8 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
             location,
             date_kind: location === 'freezer' ? 'best_before' as const : defaultDateKind(ingredient.category, kind),
             expiry_estimated: true,
-            confirmed: true,
+            // Ticket : ligne incertaine (libellé ambigu, mal lisible) proposée décochée ; seuil donné par le serveur
+            confirmed: mode !== 'receipt' || ingredient.confidence >= (typeof data.uncertain_below === 'number' ? data.uncertain_below : 0.75),
           };
           return { ...detected, choice: defaultChoice(current, detected, language) };
         }));
@@ -163,8 +165,8 @@ export function useScan({ onManualAdd }: { onManualAdd: () => void }) {
         setShowConfirmation(true);
       } else {
         showDialog(
-          t('scan.noIngredientsTitle'),
-          t('scan.noIngredientsText'),
+          mode === 'receipt' ? t('scan.noReceiptTitle') : t('scan.noIngredientsTitle'),
+          mode === 'receipt' ? t('scan.noReceiptText') : t('scan.noIngredientsText'),
           [
             { text: t('scan.addManually'), onPress: onManualAdd },
             { text: t('common.retry'), style: 'cancel' }

@@ -192,3 +192,21 @@ export async function personalPantryCount(): Promise<number> {
     .eq('household_id', current?.id ?? '');
   return count ?? 0;
 }
+
+// Fiche d'un membre : aliments qu'il a ajoutés au foyer (historique du garde-manger) et aliments sauvés (« J'ai cuisiné
+// ça ») depuis le début du mois (UTC, comme « Mon impact ») ; null si la lecture échoue
+export async function memberMonthStats(householdId: string, memberId: string): Promise<{ added: number; saved: number } | null> {
+  const now = new Date();
+  const since = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
+  const [added, saved] = await Promise.all([
+    supabase.from('pantry_history').select('id', { count: 'exact', head: true })
+      .eq('household_id', householdId).eq('user_id', memberId).eq('kind', 'added').gte('created_at', since),
+    supabase.from('food_events').select('id', { count: 'exact', head: true })
+      .eq('household_id', householdId).eq('user_id', memberId).eq('kind', 'saved').gte('created_at', since),
+  ]);
+  if (added.error || saved.error) {
+    console.warn('[foyer] chiffres du membre illisibles :', (added.error ?? saved.error)?.message);
+    return null;
+  }
+  return { added: added.count ?? 0, saved: saved.count ?? 0 };
+}

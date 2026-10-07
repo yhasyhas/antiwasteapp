@@ -22,7 +22,8 @@
   - pas de température en °C sur le feu ;
   - règles de sécurité du serveur (`generate-recipes/safety.ts`) : ingrédients crus cuits, légumineuses sèches trempées ou « en conserve », viande et poisson avec température à cœur et signe visible, restes réchauffés à cœur, riz refroidi vite ;
   - pas de feu dans une étape sans cuisson, pas de °C à cœur hors viande et poisson ;
-  - diversité.
+  - diversité ;
+  - **variété au sein d'une génération** (phase 10) : aucune recette trop proche d'une autre (même type de plat et même technique, ingrédients en partie communs : `generate-recipes/variety.ts`), sur les recettes servies et au premier jet, et nombre de recettes remplacées par le contrôle du serveur.
 - **Grille notée par un modèle juge** (`supabase/functions/generate-recipes-eval/judge.ts`), de 1 à 5 :
   - quantités dans les étapes ;
   - temps, températures et signes de cuisson ;

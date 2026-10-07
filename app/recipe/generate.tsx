@@ -10,6 +10,7 @@ import { FiltersModal } from '@/components/recipe/FiltersModal';
 import { RecipeListCard } from '@/components/recipe/RecipeListCard';
 import { RecipeSheet } from '@/components/recipe/RecipeSheet';
 import { PantryChips } from '@/components/recipe/PantryChips';
+import { NarrowPantryHint } from '@/components/recipe/NarrowPantryHint';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/Illustrations';
 import { ListItemMotion } from '@/components/ui/ListItemMotion';
@@ -64,6 +65,9 @@ export default function GenerateRecipeScreen() {
         ) : (
           <PantryChips ingredients={ingredients} selectedIds={selectedIds} onToggle={toggleSelected} onClear={clearSelection} />
         )}
+
+        {/* Peu d'aliments disponibles ou choisis : en ajouter pour plus d'idées */}
+        {!loading && !generating ? <NarrowPantryHint ingredients={ingredients} selectedIds={selectedIds} /> : null}
 
         <FilterSummary filters={filters} onOpen={() => setShowFilters(true)} />
 

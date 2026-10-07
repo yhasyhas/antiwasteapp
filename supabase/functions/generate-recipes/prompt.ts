@@ -153,8 +153,11 @@ export function buildPrompts(options: {
   // (texte libre déjà nettoyé, sans bibliothèque) ; absent : les 7 cuisines actuelles de l'app
   cuisineChoice?: { label: string } | { other: string };
   examplesHint?: boolean;
+  // « Mes basiques » (basics.ts), déjà écrits pour le prompt ; absent : sel, poivre, huile, eau
+  basicsText?: string;
 }): { system: string; prompt: string } {
   const languageName = LANGUAGE_NAMES[options.language] || LANGUAGE_NAMES['en'];
+  const basicsText = options.basicsText || 'sel, poivre, huile, eau';
   // v3 : v2, sans température en °C sur le feu (artifice relevé par l'évaluation de v2), et sans nom de plat
   // trompeur (« façon mafé » sans arachide)
   const v3 = options.version === 'v3';
@@ -225,13 +228,14 @@ INGRÉDIENTS :
 - ANTI-GASPI : les ingrédients marqués [URGENT] passent avant tous les autres. Chaque recette en utilise au moins un, au cœur du plat (pas en simple garniture), et l'ensemble des recettes les utilise tous si c'est possible.` : ''}${options.hasLeftovers ? `
 - Un ingrédient marqué [reste de plat] est un plat déjà cuisiné : on le transforme ou on l'intègre, et il n'est réchauffé qu'une fois, bien à cœur.` : ''}
 - Un ingrédient marqué [date dépassée] n'est jamais mis en avant ; s'il s'agit d'un produit frais (viande, poisson, produit laitier, plat cuisiné), ne l'utilise pas.
-- "pantry_id" : l'identifiant (p1, p2…) de l'ingrédient du garde-manger utilisé, ou "missing" pour tout ingrédient qui n'en vient pas (y compris sel, poivre, huile).
+- "pantry_id" : l'identifiant (p1, p2…) de l'ingrédient du garde-manger utilisé, ou "missing" pour tout ingrédient qui n'en vient pas (y compris les basiques).
+- Basiques toujours disponibles chez l'utilisateur, utilisables sans être dans la liste ("pantry_id" = "missing"), jamais comptés comme achats : ${basicsText}.
 ${v4 ? `- Pour un ingrédient du garde-manger, "name" est son nom en ${languageName}, traduit s'il est écrit dans une autre langue (${TRANSLATED_NAME_EXAMPLE[options.language] || TRANSLATED_NAME_EXAMPLE.en}) ; les étapes le nomment de la même façon.
 - Les identifiants (p1, p2…), "missing" et les repères de la liste ([URGENT], [reste de plat]…) servent seulement au champ "pantry_id" : jamais dans un texte (titre, description, étapes, astuces, suggestion).
 - N'écris jamais le mot « urgent » ni un équivalent (urgente, urgence, urgently, urgente, urgencia…) dans un texte ni dans un nom d'ingrédient : écris « des poivrons », pas « des poivrons urgents ».` : `- Pour un ingrédient du garde-manger, "name" reprend son nom tel qu'il est écrit dans la liste.`}
 - "name" : le nom de l'ingrédient seul, sans préparation ni précision (« ail » et non « ail, émincé ») ; la préparation va dans les étapes.
 - Chaque recette utilise au moins un ingrédient du garde-manger.${v41 ? `
-- Au plus ${MAX_PURCHASES} ingrédients à acheter par recette (hors sel, poivre, huile, eau), seulement les indispensables (règle vérifiée après coup) ; tout le reste vient du garde-manger.` : ''}${v2 ? `
+- Au plus ${MAX_PURCHASES} ingrédients à acheter par recette (hors basiques), seulement les indispensables (règle vérifiée après coup) ; tout le reste vient du garde-manger.` : ''}${v2 ? `
 - Un ingrédient du garde-manger qui ne respecte pas un régime ou une exclusion n'est jamais utilisé : ignore-le (ex. la feta pour un repas vegan).
 - La liste contient tout ce que les étapes utilisent, même un accompagnement (« servir avec du riz » : le riz est dans la liste et cuit dans les étapes) ; pas d'ingrédient facultatif : les variantes vont dans les astuces.
 - "quantity" : le nombre seul (ex. "500", "2", "1/2") ; "unit" : l'unité abrégée, en ${languageName} (${UNITS[options.language] || UNITS.en}) ; sel et poivre : 1 ${options.language === 'en' ? 'pinch' : options.language === 'es' ? 'pizca' : 'pincée'}.${v4 ? `
@@ -240,7 +244,7 @@ ${v4 ? `- Pour un ingrédient du garde-manger, "name" est son nom en ${languageN
 - "diet_violations" : pour chaque ingrédient, ceux des régimes vegan, vegetarian, gluten-free et dairy-free qu'il ne respecte pas (liste vide s'il les respecte tous). Sois exact : le lait de coco est vegan, le beurre ne l'est pas ; la farine de blé, le pain, les pâtes et la sauce soja contiennent du gluten ; le beurre, la crème et le fromage sont des produits laitiers. Liste aussi la farine, le beurre ou le lait d'une sauce (béchamel).${options.selection ? `
 
 SÉLECTION DE L'UTILISATEUR (règle stricte) :
-- Il veut cuisiner avec les seuls ingrédients listés dans le garde-manger, plus les basiques : sel, poivre, huile, eau (avec "pantry_id" = "missing").
+- Il veut cuisiner avec les seuls ingrédients listés dans le garde-manger, plus les basiques : ${basicsText} (avec "pantry_id" = "missing").
 - Tout autre ingrédient est à acheter : au plus 2 par recette, et seulement s'il est indispensable.${options.otherPantry.length > 0 ? `
 - Ces ingrédients sont chez lui mais réservés : n'en utilise AUCUN, ni sous un autre nom : ${options.otherPantry.join(', ')}.` : ''}` : ''}${options.mode === 'leftovers' ? `
 
@@ -270,7 +274,7 @@ ${v4 ? SAFETY_RULES_V4 : SAFETY_RULES}
   const prompt = `Garde-manger (identifiant : nom) :
 ${options.pantryText}
 
-Crée exactement ${options.count} recette${options.count > 1 ? 's' : ''}${options.count > 1 ? ((v5 || v41) && (options.cuisine !== 'any' || options.cuisineChoice) ? ' vraiment différentes : des types de plats différents, choisis parmi ceux qui sont courants dans la cuisine demandée (pas de gratin, de salade composée ni de tarte si elle n’en fait pas), jamais deux fois la même base' : v2 ? ' vraiment différentes : des plats de types différents (ex. un plat mijoté, un plat au four, une salade ou une soupe), jamais deux fois la même base (deux plats de pâtes à la tomate)' : ' vraiment différentes les unes des autres (plat, technique de cuisson, texture)') : ''}.
+Crée exactement ${options.count} recette${options.count > 1 ? 's' : ''}${options.count > 1 ? (v41 ? varietyRule(options.cuisine !== 'any' || Boolean(options.cuisineChoice)) : v5 && (options.cuisine !== 'any' || options.cuisineChoice) ? ' vraiment différentes : des types de plats différents, choisis parmi ceux qui sont courants dans la cuisine demandée (pas de gratin, de salade composée ni de tarte si elle n’en fait pas), jamais deux fois la même base' : v2 ? ' vraiment différentes : des plats de types différents (ex. un plat mijoté, un plat au four, une salade ou une soupe), jamais deux fois la même base (deux plats de pâtes à la tomate)' : ' vraiment différentes les unes des autres (plat, technique de cuisson, texture)') : ''}.
 - Difficulté : ${options.difficulty}
 - Temps total maximum : ${options.maxCookTime} minutes${options.avoidTitles && options.avoidTitles.length > 0 ? `
 - Déjà proposées, à ne pas refaire (autre plat, autre technique) : ${options.avoidTitles.map((title) => `« ${title} »`).join(', ')}` : ''}${v4 && options.recentTitles && options.recentTitles.length > 0 ? `
@@ -280,6 +284,27 @@ Crée exactement ${options.count} recette${options.count > 1 ? 's' : ''}${option
 ${refusal}`;
 
   return { system, prompt };
+}
+
+// v4.1, phase 10 : recettes d'une même génération de types de plats ou de techniques différents ; le serveur vérifie
+// (variety.ts) et redemande une recette trop proche (deux recettes du même plat, l'une au poivron, l'autre à la tomate).
+// Exemples de types tirés au hasard et dans un ordre différent à chaque demande : une liste fixe fait choisir ses
+// premiers exemples presque à chaque fois (soupe, puis grillade, dans l'évaluation du 06/10/2026)
+const DISH_EXAMPLES = ['plat mijoté', 'grillade', 'plat au four', 'plat de riz ou de céréales', 'galette ou crêpe', 'sauté', 'salade', 'soupe', 'plat d’œufs', 'beignets', 'plat vapeur', 'légumes farcis', 'plat de pâtes ou de nouilles'];
+
+export function dishExamples(count = 5, random: () => number = Math.random): string[] {
+  const pool = [...DISH_EXAMPLES];
+  const picked: string[] = [];
+  while (picked.length < count && pool.length > 0) picked.push(pool.splice(Math.floor(random() * pool.length), 1)[0]);
+  return picked;
+}
+
+function varietyRule(withCuisine: boolean): string {
+  const examples = dishExamples().join(', ');
+  const kinds = withCuisine
+    ? `chacune d’un type de plat différent (par exemple ${examples}…) ou d’une technique de cuisson différente, choisis parmi ceux qui sont courants dans la cuisine demandée et qui conviennent au repas (pas de gratin, de salade composée ni de tarte si elle n’en fait pas)`
+    : `chacune d’un type de plat différent (par exemple ${examples}…) ou d’une technique de cuisson différente, qui conviennent au repas`;
+  return ` vraiment différentes : ${kinds}, jamais deux fois la même base ; deux recettes qui ne diffèrent que par un ou deux ingrédients (l’une au poivron, l’autre à la tomate) comptent comme la même recette. "dish_type" et "technique" décrivent chaque recette`;
 }
 
 // Demande de correction (v4) des recettes qui ne respectent pas les règles de sécurité (safety.ts) : mêmes

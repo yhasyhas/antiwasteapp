@@ -2,6 +2,7 @@ import { useEffect, useSyncExternalStore } from 'react';
 import { AppState } from 'react-native';
 import { router } from 'expo-router';
 import { takePendingInvite } from '@/lib/invite';
+import { needsOnboarding } from '@/lib/onboarding';
 import { getHousehold, loadHousehold, setHouseholdUser, subscribeHousehold } from '@/lib/household';
 
 // Foyer actif, mis à jour dès qu'il change (arrivée, départ, membres, temps réel)
@@ -14,11 +15,15 @@ export function useHousehold() {
 export function useHouseholdSession(userId: string | null) {
   useEffect(() => setHouseholdUser(userId), [userId]);
 
-  // Lien d'invitation ouvert sans session : « Mon foyer » avec le code, une fois connecté
+  // Lien d'invitation ouvert sans session : « Mon foyer » avec le code, une fois connecté. Nouveau compte : le
+  // premier lancement guidé (version courte) s'en charge à sa fin
   useEffect(() => {
     if (!userId) return;
-    takePendingInvite().then((code) => {
-      if (code) setTimeout(() => router.push({ pathname: '/household', params: { code } }), 800);
+    needsOnboarding(userId).then((onboarding) => {
+      if (onboarding) return;
+      takePendingInvite().then((code) => {
+        if (code) setTimeout(() => router.push({ pathname: '/household', params: { code } }), 800);
+      });
     });
   }, [userId]);
 

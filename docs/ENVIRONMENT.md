@@ -34,7 +34,7 @@ En bash, dans une session démarrée après la modification : `[ -n "$NOM" ] && 
 - **Droits** : tout le compte Supabase (tous les projets, API de gestion). Il n'existe pas de jeton plus restreint.
 
 ### SUPABASE_DB_PASSWORD
-- **Rôle** : mot de passe Postgres du projet. Il sert aux tests SQL en transaction annulée (`psql` sur le pooler) et aux sauvegardes (`npx supabase db dump`).
+- **Rôle** : mot de passe Postgres du projet. Il sert aux tests SQL en transaction annulée (`psql` sur le pooler) et aux sauvegardes : `node scripts/backup/backup.mjs <nom>` (pg_dump installé avec PostgreSQL, sans Docker ; schémas public, auth et storage ; vérification bloquante et journal `backups/journal.json`). `npx supabase db dump` n'est plus utilisé : il dépend de Docker Desktop et échouait sans le signaler quand Docker était arrêté.
 - **Emplacement** : l'adresse du pooler (sans mot de passe) est dans `supabase/.temp/pooler-url`, hors de git.
 - **Vérifier** : un test de `supabase/tests/` passe, ou `psql "$(cat supabase/.temp/pooler-url)" -c 'select 1'` avec `PGPASSWORD="$SUPABASE_DB_PASSWORD"`.
 - **Renouveler** : Dashboard Supabase → Project Settings → Database → Reset database password, puis mettre à jour la variable.
@@ -105,7 +105,7 @@ Modèle sans valeurs : `.env.example`. Toutes ces valeurs sont **publiques par n
 
 Pour le renouveler : générer une valeur aléatoire, la poser dans les fonctions (`secrets set`), puis dans Vault (`select vault.update_secret(…)`, depuis le SQL Editor du Dashboard).
 
-**Clé secrète Supabase dans un en-tête** (aucun secret en plus) : les tests de quotas simulés (en-tête `x-simulate-key`) et la copie d'évaluation des recettes `generate-recipes-eval` (en-tête `x-eval-key`, phase 9) n'acceptent que la clé secrète. Les scripts la lisent avec `npx supabase projects api-keys --reveal` et la gardent en mémoire. L'app n'appelle jamais `generate-recipes-eval`.
+**Clé secrète Supabase dans un en-tête** (aucun secret en plus) : les tests de quotas simulés (en-tête `x-simulate-key`, aussi utilisé par `send-feedback` pour envoyer les événements Sentry d'essai dans l'environnement « test ») et la copie d'évaluation des recettes `generate-recipes-eval` (en-tête `x-eval-key`, phase 9) n'acceptent que la clé secrète. Les scripts la lisent avec `npx supabase projects api-keys --reveal` et la gardent en mémoire. L'app n'appelle jamais `generate-recipes-eval`.
 
 ---
 
@@ -116,7 +116,14 @@ Pour le renouveler : générer une valeur aléatoire, la poser dans les fonction
   - Le captcha protège la connexion, l'inscription et l'essai sans compte.
   - Renouveler : Cloudflare → Turnstile → widget « Antigaspi » → nouvelle clé secrète, à recoller dans Supabase.
 - **Connexion anonyme** (essai sans compte) : activée (Authentication → Sign In / Providers → Anonymous).
-- **Confirmation d'email** : désactivée pendant le développement (Authentication → Sign In / Providers → Email). Elle sera réactivée en phase 13 avec le service d'emails.
+- **Confirmation d'email** : désactivée pendant le développement (Authentication → Sign In / Providers → Email). Elle sera décidée en phase 15 ; son modèle d'e-mail est déjà prêt en trois langues.
+- **Adresses de redirection** (Authentication → URL Configuration → Redirect URLs) : le lien de l'e-mail « Mot de passe oublié » (phase 10) ouvre la page `https://antigaspi-invite.pages.dev/reset`, qui peut ouvrir `myapp://auth/reset` ; cette adresse doit être autorisée, sinon le lien mène à l'adresse du site (`http://localhost:3000`). Autorisées depuis le 06/10/2026 : `myapp://**` (l'app), `http://localhost:8082/**` (tests de la version web, à retirer en production : phase 14) et `https://antigaspi-invite.pages.dev/reset**` (page « Nouveau mot de passe », adresse utilisée par l'e-mail). Le schéma définitif (phase 15) devra y être ajouté. Lecture sans afficher de secret : `GET https://api.supabase.com/v1/projects/iqzjonmjlscuckdmiehk/config/auth` avec `SUPABASE_ACCESS_TOKEN`, champ `uri_allow_list`.
+- **E-mails d'authentification** : envoyés par **SMTP2GO** depuis le 06/10/2026 (section 7), plus par le service intégré de Supabase (qui n'envoyait qu'aux membres de l'équipe du projet, 2 par heure).
+  - **SMTP** (Authentication → Emails → SMTP Settings, réglé par l'utilisateur) : serveur `mail-eu.smtp2go.com`, port 465, expéditeur `noreply@terangu.com`, nom « Antigaspi ». L'utilisateur et le mot de passe SMTP sont seulement dans Supabase et dans le gestionnaire de mots de passe de l'utilisateur : ni dans le dépôt, ni dans une variable. Vérifier sans afficher de secret : `GET …/config/auth` (ci-dessus), champs `smtp_host`, `smtp_admin_email`, `smtp_sender_name`, et seulement la présence de `smtp_user` et `smtp_pass`.
+  - **Modèles** (Authentication → Emails → Templates) : réinitialisation du mot de passe et confirmation d'inscription, en français, anglais et espagnol. Source : `scripts/email-templates/templates.mjs` (nom de l'app dans la constante `APP_NAME`) ; envoi avec `node scripts/email-templates/push.mjs` (`SUPABASE_ACCESS_TOKEN`, met aussi à jour le nom d'expéditeur), aperçus avec `--preview DOSSIER`. Une modification faite dans le Dashboard est écrasée au prochain envoi : la reporter dans `templates.mjs`. Langue : métadonnée `lang` du compte, copiée depuis les préférences (migration `20261006110000_email_language.sql`) ; français sinon.
+  - **Limites** (Authentication → Rate Limits, ou `rate_limit_email_sent` dans `config/auth`) : 30 e-mails par heure pour tout le projet (valeur par défaut avec un SMTP personnalisé, suffisante pour quelques testeurs), 60 s entre deux e-mails au même compte (`smtp_max_frequency`). À relever au lancement si besoin.
+  - **Envoi de test** : `node scripts/e2e/recovery-email.mjs ADRESSE fr,en,es` (compte temporaire créé puis supprimé si l'adresse n'en a pas).
+  - **Délivrabilité** (vérifiée le 06/10/2026 sur Gmail) : SPF, DKIM (domaine `terangu.com`) et DMARC à PASS ; enregistrement `_dmarc` (`v=DMARC1; p=none`) chez Porkbun ; suivi des clics et des ouvertures désactivé dans SMTP2GO (les liens vont directement à Supabase ; `link.terangu.com` reste dans le DNS, inutilisé). Expéditeur neuf : les premiers e-mails peuvent tomber en spam.
 - **Vérifier** : Dashboard, en lecture seulement. Un changement de ces réglages demande l'accord de l'utilisateur, qui a l'accès au Dashboard.
 
 ---
@@ -144,7 +151,7 @@ Pour le renouveler : générer une valeur aléatoire, la poser dans les fonction
 | Service | Rôle | Accès actuel |
 |---|---|---|
 | Workers AI | Images des recettes (`flux-1-schnell`). **Offre Workers Paid** depuis le 05/10/2026 : 5 $ par mois, plus environ 0,002 $ par image au-delà de l'allocation gratuite (exception à la règle « services payants en phase 13 », comme Groq : coût faible, images fiables pour les tests). Le quota de 30 images par jour et par utilisateur (`QUOTA_DAILY_IMAGES`, vérifié le 05/10/2026) limite la dépense | Par les fonctions Supabase (`CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`). Consommation et facturation : Dashboard → Workers AI → Utilisation, et Manage Account → Billing (le jeton n'y a pas accès) |
-| Pages | Page d'invitation et page captcha : `https://antigaspi-invite.pages.dev` (projet `antigaspi-invite`, dossier `web/invite`) | Wrangler connecté par OAuth (`npx wrangler login`, session enregistrée dans `%APPDATA%\xdg.config\.wrangler\`). Déploiement : `npx wrangler pages deploy web/invite --project-name antigaspi-invite --branch main`. Ne jamais lancer `wrangler deploy` à la racine |
+| Pages | Page d'invitation, page captcha et page « Nouveau mot de passe » (`/reset`) : `https://antigaspi-invite.pages.dev` (projet `antigaspi-invite`, dossier `web/invite`) | Wrangler connecté par OAuth (`npx wrangler login`, session enregistrée dans `%APPDATA%\xdg.config\.wrangler\`). Déploiement : `node scripts/deploy-pages.mjs` (insère l'adresse et la clé publique de Supabase, lues dans `.env`, dans une copie ; refuse une clé secrète). Ne jamais lancer `wrangler deploy` à la racine |
 | Turnstile | Captcha, widget « Antigaspi » (mode Managed), limité au domaine de la page d'invitation | Dashboard Cloudflare seulement. Clé de site dans `.env`, clé secrète dans Supabase (section 4) |
 
 - **Vérifier** : `npx wrangler whoami` (session OAuth valide). Les images des recettes apparaissent dans l'app.
@@ -165,6 +172,7 @@ Pour le renouveler : générer une valeur aléatoire, la poser dans les fonction
 | Firebase | FCM (push Android) | Console Firebase (utilisateur) ; clé de compte de service (section 5) |
 | Cloudflare | Workers AI, Pages, Turnstile | Section 6 |
 | GitHub | Dépôt `yhasyhas/antiwasteapp` | Identifiants de Git pour Windows (Git Credential Manager) ; vérifier avec `git ls-remote origin` ; `gh` n'est pas installé |
+| SMTP2GO | Envoi des e-mails d'authentification ; domaine `terangu.com` vérifié (enregistrements DNS chez Porkbun), utilisateur SMTP dédié à Supabase | Compte SMTP2GO (utilisateur) ; mot de passe SMTP seulement dans Supabase et dans le gestionnaire de mots de passe de l'utilisateur (section 4, « E-mails d'authentification ») |
 | Open Food Facts | Produits par code-barres | Aucun compte ni clé : chaque requête s'identifie par un User-Agent avec l'adresse du dépôt (`lib/openFoodFacts.ts`) |
 
 ---
@@ -175,7 +183,7 @@ Pour le renouveler : générer une valeur aléatoire, la poser dans les fonction
 |---|---|---|
 | `.env` | Variables de l'app (section 2) | `.gitignore` ; modèle `.env.example` |
 | `google-services.json` | Configuration Firebase Android | `.gitignore` |
-| `backups/` | Sauvegardes de données (`npx supabase db dump --data-only`) : données personnelles des utilisateurs | `.gitignore` ; jamais exportées ni partagées |
+| `backups/` | Sauvegardes de données (`scripts/backup/backup.mjs`, avec les comptes) et journal des sauvegardes vérifiées (`journal.json`) : données personnelles des utilisateurs | `.gitignore` ; jamais exportées ni partagées |
 | `supabase/.temp/` | Lien du CLI au projet, adresse du pooler | `.gitignore` |
 | `export/` | Export du code pour les revues | `.gitignore` |
 | Clé du compte de service Firebase | Section 5 | Hors du dossier du projet |
@@ -193,7 +201,6 @@ Ces éléments seront ajoutés à cet inventaire au moment de leur création.
   - connexion Google : identifiants OAuth (Google Cloud) et fournisseur Google dans Supabase ;
   - EAS Update : canal et configuration.
 - **Phase 13 (services)** :
-  - service d'envoi d'emails : clé d'API et réglages SMTP dans Supabase ;
   - mesure d'usage : clé du service choisi ;
   - offre Pro de Supabase et offre payante de Gemini : moyens de paiement sur les comptes (hors dépôt). Cloudflare est déjà en offre Workers Paid (05/10/2026, section 6).
 - **Phase 14 (audit)** :

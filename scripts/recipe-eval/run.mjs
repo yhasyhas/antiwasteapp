@@ -15,7 +15,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { checkRecipe, diversity, unitsInLanguage } from './checks.mjs';
+import { checkRecipe, diversity, unitsInLanguage, varietyWithin } from './checks.mjs';
 import { evalClient } from './call.mjs';
 
 import { fileURLToPath } from 'node:url';
@@ -120,6 +120,9 @@ for (const [n, situation] of cases.entries()) {
     safety: generated.data.safety ?? null,
     examples: generated.data.examples ?? [],
     diversity_auto: diversity(recipes),
+    // Variété au sein de la génération : recettes servies sans paire trop proche ; rapport du contrôle du serveur
+    variety_within: varietyWithin(recipes),
+    variety: generated.data.variety ?? null,
     diversity_judge: judgement ? clamp(judgement.diversity) : null,
     diversity_comment: judgement?.diversity_comment ?? null,
     judge_model: judgement?.judge_model ?? null,
@@ -170,7 +173,10 @@ const summary = {
     no_heat_without_cooking: mean(all.map((r) => r.checks.no_heat_without_cooking)),
     no_celsius_without_meat: mean(all.map((r) => r.checks.no_celsius_without_meat)),
     diversity: mean(results.filter((r) => r.recipes).map((r) => r.diversity_auto)),
+    variety_within: mean(results.filter((r) => r.recipes).map((r) => r.variety_within)),
+    variety_within_first: mean(results.filter((r) => r.variety).map((r) => (r.variety.close.length === 0 ? 1 : 0))),
   },
+  variety_replaced: results.reduce((total, r) => total + (r.variety?.replaced?.length ?? 0), 0),
   rejected_first: results.reduce((total, r) => total + (r.rejected_first ?? 0), 0),
   median_ms: (() => {
     const times = results.filter((r) => r.ms).map((r) => r.ms).sort((a, b) => a - b);

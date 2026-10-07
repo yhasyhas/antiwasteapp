@@ -29,7 +29,11 @@ export interface Recipe {
   // « Mes recettes » : mise de côté « Pour plus tard » (null sinon) et date d'enregistrement
   later_at?: string | null;
   created_at?: string;
+  // « On a aimé » / « Pas pour nous » (null : pas d'avis)
+  rating?: RecipeRatingValue | null;
 }
+
+export type RecipeRatingValue = 'liked' | 'disliked';
 
 // Textes traduits d'une recette (fonction translate-recipe) : même ordre et même nombre d'éléments que
 // l'original ; quantités, liens vers le garde-manger et régimes inchangés
@@ -125,6 +129,7 @@ export function recipeFromRow(row: any): Recipe & { id: string } {
     translations: row?.translations && typeof row.translations === 'object' ? row.translations : {},
     last_cooked_at: typeof row?.last_cooked_at === 'string' ? row.last_cooked_at : null,
     later_at: typeof row?.later_at === 'string' ? row.later_at : null,
+    rating: row?.rating === 'liked' || row?.rating === 'disliked' ? row.rating : null,
     created_at: typeof row?.created_at === 'string' ? row.created_at : undefined,
     cuisine: typeof row?.cuisine === 'string' ? row.cuisine : undefined,
   };

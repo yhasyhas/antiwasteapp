@@ -50,7 +50,7 @@ export default function LoginScreen() {
       setError(authErrorMessage(t, anonymousError));
       return;
     }
-    router.replace('/(tabs)');
+    router.replace('/');
   };
 
   const handleLogin = async () => {
@@ -70,8 +70,8 @@ export default function LoginScreen() {
       return;
     }
 
-    // L'écran index (qui redirige selon la session) n'est plus monté ici : on navigue nous-mêmes
-    router.replace('/(tabs)');
+    // L'écran de démarrage décide : premier lancement guidé ou accueil
+    router.replace('/');
   };
 
   return (
@@ -109,6 +109,14 @@ export default function LoginScreen() {
             autoComplete="password"
             editable={!loading}
           />
+          <Touchable
+            onPress={() => router.push({ pathname: '/auth/forgot', params: email.trim() ? { email: email.trim() } : {} })}
+            disabled={loading}
+            style={styles.forgot}
+            accessibilityRole="link"
+          >
+            <Text style={styles.forgotText}>{t('auth.forgotPassword')}</Text>
+          </Touchable>
 
           <CaptchaField ref={captcha} onToken={setCaptchaToken} />
 
@@ -172,6 +180,16 @@ const styles = StyleSheet.create({
   form: {
     marginTop: spacing.xxl,
     gap: spacing.lg,
+  },
+  forgot: {
+    alignSelf: 'flex-end',
+    minHeight: sizes.touch,
+    justifyContent: 'center',
+    marginTop: -spacing.md,
+  },
+  forgotText: {
+    ...typography.secondaryStrong,
+    color: colors.primary,
   },
   error: {
     ...typography.body,

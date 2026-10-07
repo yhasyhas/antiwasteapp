@@ -35,4 +35,10 @@ i18n.use(initReactI18next).init({
   interpolation: { escapeValue: false },
 });
 
+// Langue affichée par l'app. Aussi envoyée au compte (métadonnée `lang`) : les e-mails d'authentification sont
+// écrits dans cette langue (supabase/templates/)
+export function currentLanguage(): Language {
+  return isSupportedLanguage(i18n.language) ? i18n.language : 'fr';
+}
+
 export default i18n;

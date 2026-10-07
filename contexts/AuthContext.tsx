@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { AuthError, Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { unregisterPush } from '@/lib/pushNotifications';
+import { currentLanguage } from '@/i18n';
 
 // Jeton de rafraîchissement absent, expiré ou déjà utilisé : la session enregistrée est inutilisable
 function isInvalidRefreshToken(error: AuthError) {
@@ -88,9 +89,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) throw error;
 
       if (!profile) {
-        // Compte anonyme : pas d'adresse e-mail
-        const { error: insertError } = await supabase.from('profiles').insert({ id, email: email ?? null });
+        // Compte anonyme : pas d'adresse e-mail. Le profil peut avoir été créé entre-temps (premier lancement guidé,
+        // lib/onboarding.ts) : pas d'erreur, l'adresse est ajoutée ci-dessous
+        const { error: insertError } = await supabase.from('profiles').upsert({ id, email: email ?? null }, { onConflict: 'id', ignoreDuplicates: true });
         if (insertError) throw insertError;
+        if (email) await supabase.from('profiles').update({ email }).eq('id', id).is('email', null);
       } else if (email) {
         // Après la conversion d'un compte anonyme : l'adresse rejoint le profil
         await supabase.from('profiles').update({ email }).eq('id', id).is('email', null);
@@ -117,7 +120,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { captchaToken },
+      // Langue de l'e-mail de confirmation (et des suivants tant que la langue n'est pas enregistrée dans les préférences)
+      options: { captchaToken, data: { lang: currentLanguage() } },
     });
     // Confirmation d'email active : le compte est créé mais sans session tant que le lien n'est pas ouvert
     return { error, needsEmailConfirmation: !error && !data.session };
@@ -130,7 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // L'adresse d'abord (le compte devient permanent), puis le mot de passe ; nouveau jeton sans is_anonymous
   const upgradeAccount = async (email: string, password: string) => {
-    const { error: emailError } = await supabase.auth.updateUser({ email });
+    const { error: emailError } = await supabase.auth.updateUser({ email, data: { lang: currentLanguage() } });
     if (emailError) return { error: emailError };
     const { error: passwordError } = await supabase.auth.updateUser({ password });
     if (passwordError) return { error: passwordError };

@@ -14,6 +14,7 @@ import { daysLeftForRecipes } from '@/lib/storage';
 import { onPantryChanged } from '@/lib/pantryEvents';
 import { activeHouseholdId } from '@/lib/household';
 import { loadPreferences } from '@/lib/preferences';
+import { getUserBasics } from '@/lib/basics';
 import { groupLots, totalLabel } from '@/lib/pantryLots';
 import { useFoodNaming } from '@/lib/foodNames';
 import type { PantryIngredient } from '@/components/pantry/IngredientCard';
@@ -177,6 +178,8 @@ export function useRecipeGeneration(initialSelectedIds: string[] = []) {
           language: filters.language,
           excluded: filters.excluded,
           ...(filters.servings && { servings: filters.servings }),
+          // « Mes basiques » : disponibles pour les recettes, jamais comptés comme achats
+          basics: getUserBasics(),
         },
       }, GENERATION_TIMEOUT_MS);
 

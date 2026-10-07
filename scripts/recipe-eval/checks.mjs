@@ -3,6 +3,7 @@
 
 import { celsiusWithoutMeat, heatWithoutCooking, safetyIssues, withoutOvenHeatLevel } from '../../supabase/functions/generate-recipes/safety.ts';
 import { hasInternalCodes } from '../../supabase/functions/generate-recipes/recipes.ts';
+import { tooCloseIndexes } from '../../supabase/functions/generate-recipes/variety.ts';
 
 const BASICS = ['sel', 'poivre', 'huile', 'eau', 'salt', 'pepper', 'oil', 'water', 'sal', 'pimienta', 'aceite', 'agua'];
 // Mots trop généraux pour reconnaître un ingrédient dans les étapes
@@ -141,6 +142,11 @@ export function diversity(recipes) {
   for (let i = 0; i < sets.length; i++) for (let j = i + 1; j < sets.length; j++) pairs.push(jaccard(sets[i], sets[j]));
   return 1 - pairs.reduce((a, b) => a + b, 0) / pairs.length;
 }
+
+// Variété au sein d'une génération (phase 10) : 1 si aucune recette n'est trop proche d'une autre (même plat à un ou
+// deux ingrédients près : contrôle du serveur, generate-recipes/variety.ts), 0 sinon. Recettes d'avant la phase 10 :
+// sans type de plat déclaré, seuls les ingrédients sont comparés
+export const varietyWithin = (recipes) => (tooCloseIndexes(recipes.map((r) => ({ ...r, ingredients_used: r.ingredients_used ?? [] }))).length === 0 ? 1 : 0);
 
 // Unités écrites dans une autre langue que la recette (« c. à soupe » dans une recette en anglais) : part des
 // ingrédients dont l'unité est dans la bonne langue

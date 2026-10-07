@@ -207,7 +207,7 @@ export default function HomeScreen() {
                     <View style={styles.row}>
                       <FoodIcon category={ingredient.category} kind={ingredient.kind} />
                       <View style={styles.rowText}>
-                        <Text style={styles.rowTitle} numberOfLines={1}>{foodName(ingredient)}</Text>
+                        <Text style={styles.rowTitle} numberOfLines={2}>{foodName(ingredient)}</Text>
                         {ingredient.quantity ? <Text style={styles.rowSubtitle} numberOfLines={1}>{displayQuantity(ingredient.quantity, language)}</Text> : null}
                       </View>
                       <View style={styles.badges}>

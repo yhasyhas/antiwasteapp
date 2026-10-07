@@ -30,7 +30,7 @@ export function Chip({ label, selected = false, onPress, showCheck = false, icon
     >
       {selected && showCheck ? <Check size={sizes.iconSmall} color={textColor} /> : null}
       {Icon && !(selected && showCheck) ? <Icon size={sizes.iconSmall} color={selected ? textColor : iconColor ?? colors.primary} /> : null}
-      <Text style={[styles.label, { color: textColor }]} numberOfLines={1}>{label}</Text>
+      <Text style={[styles.label, { color: textColor }]} numberOfLines={2}>{label}</Text>
     </Touchable>
   );
 }
@@ -53,5 +53,7 @@ const styles = StyleSheet.create({
   },
   label: {
     ...typography.listTitle,
+    // Grandes tailles de texte : la puce passe sur deux lignes au lieu de couper son libellé
+    flexShrink: 1,
   },
 });

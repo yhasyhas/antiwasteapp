@@ -29,3 +29,7 @@ verify_jwt = false
 # scripts/recipe-eval avec la clé secrète (en-tête x-eval-key), jamais par l'app
 [functions.generate-recipes-eval]
 verify_jwt = false
+
+# Avis (« Donner mon avis ») et recettes signalées : la fonction vérifie l'utilisateur elle-même
+[functions.send-feedback]
+verify_jwt = false

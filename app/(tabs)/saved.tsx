@@ -127,7 +127,7 @@ export default function SavedScreen() {
                 accessibilityRole="tab"
                 accessibilityState={{ selected: tab === key }}
               >
-                <Text style={[styles.tabText, tab === key && styles.tabTextActive]} numberOfLines={1}>
+                <Text style={[styles.tabText, tab === key && styles.tabTextActive]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
                   {t(key === 'favorites' ? 'saved.tabFavorites' : key === 'later' ? 'saved.tabLater' : 'saved.tabAll')} · {counts[key]}
                 </Text>
               </Touchable>

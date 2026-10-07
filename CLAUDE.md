@@ -27,7 +27,8 @@ Application mobile anti-gaspi (Expo / React Native, Supabase) : on remplit son g
   - tout test écrit est ajouté au dépôt ; aucun test ne reste dans un dossier temporaire.
 - **Autonomie** :
   - seul pour le code, les commits, le déploiement des fonctions, les secrets de configuration et les migrations testées en transaction annulée ;
-  - sauvegarde (`npx supabase db dump --data-only` dans `backups/`) avant de modifier des données.
+  - sauvegarde vérifiée (`node scripts/backup/backup.mjs <nom>`, pg_dump sans Docker, dans `backups/`) avant de modifier des données ; migrations appliquées avec `node scripts/backup/migrate.mjs` ;
+  - **une sauvegarde vide ou en échec bloque toute migration** : sans sauvegarde vérifiée du jour, le hook du projet (`.claude/settings.json`) refuse `supabase db push`.
   - Accord explicite de l'utilisateur avant : une action irréversible, une dépense, un accès au Dashboard ou à un compte, un choix produit visible.
 - **Rapports** : en français, courts, avec une liste de tests limitée à l'essentiel.
 - **Secrets** :

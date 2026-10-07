@@ -22,6 +22,8 @@ import { colors, motion, radius, sizes, spacing, typography } from '@/constants/
 import { CookedButton } from './CookedButton';
 import { AddMissingButton } from './AddMissingButton';
 import { CookStartButton } from '@/components/cook/CookStartButton';
+import { RecipeRating } from './RecipeRating';
+import { KeyboardAvoider, useKeyboardScroll, useKeyboardVisible } from '@/components/ui/KeyboardAvoider';
 import { translatedRecipe, type Recipe, type RecipeText } from './types';
 import { showDialog } from '@/lib/dialog';
 
@@ -55,6 +57,9 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
   const [showOriginal, setShowOriginal] = useState(false);
   // Image dépassée : barre d'en-tête opaque (retour, titre, favori) qui couvre aussi la barre d'état
   const [pastHero, setPastHero] = useState(false);
+  // « Signaler un problème » : le champ du commentaire remonte au-dessus du clavier
+  const keyboardScroll = useKeyboardScroll();
+  const keyboardVisible = useKeyboardVisible();
   const heroLimit = sizes.recipeHero - safe.insets.top - sizes.touch - spacing.xl;
   const [translating, setTranslating] = useState(false);
   useEffect(() => {
@@ -113,12 +118,15 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
 
   return (
     <Modal visible animationType="slide" statusBarTranslucent navigationBarTranslucent onRequestClose={onClose}>
-      <View style={styles.container}>
+      <KeyboardAvoider style={styles.container}>
         <ScrollView
+          ref={keyboardScroll.scrollRef}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={styles.scroll}
           scrollEventThrottle={16}
           onScroll={(event) => {
+            keyboardScroll.onScroll(event);
             const past = event.nativeEvent.contentOffset.y > heroLimit;
             if (past !== pastHero) setPastHero(past);
           }}
@@ -240,6 +248,9 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
                 </Text>
               </View>
             ))}
+
+            {/* « On a aimé » / « Pas pour nous », « Signaler un problème » : recettes enregistrées seulement */}
+            {recipe.id ? <RecipeRating recipeId={recipe.id} initial={original.rating ?? null} style={styles.rating} /> : null}
           </View>
         </ScrollView>
 
@@ -255,13 +266,13 @@ export function RecipeSheet({ recipe: original, imageLoading, imageNotice, isFav
         </View>
 
         {/* Barre du bas : messages (« Voir », « Annuler ») et « J'ai cuisiné ça » toujours visible */}
-        {toast || recipe.ingredients_used.some((item) => item.pantry_id) ? (
+        {!keyboardVisible && (toast || recipe.ingredients_used.some((item) => item.pantry_id)) ? (
           <View style={[styles.bottomBar, safe.bottom(spacing.md)]}>
             <Toast message={toast} actionLabel={t('common.view')} onAction={openShoppingList} inset={false} />
             <CookedButton ingredientsUsed={recipe.ingredients_used} recipeId={recipe.id} recipeTitle={recipe.title} />
           </View>
         ) : null}
-      </View>
+      </KeyboardAvoider>
     </Modal>
   );
 }
@@ -297,6 +308,12 @@ function RoundButton({ onPress, label, selected, children }: { onPress: () => vo
 }
 
 const styles = StyleSheet.create({
+  rating: {
+    marginTop: spacing.xl,
+    paddingTop: spacing.lg,
+    borderTopWidth: sizes.borderWidth,
+    borderTopColor: colors.border,
+  },
   cookStart: {
     marginTop: spacing.xs,
   },

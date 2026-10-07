@@ -1,0 +1,292 @@
+{
+  "summary": {
+    "date": "2026-10-07T16:29:24.130Z",
+    "cases": 6,
+    "passed": 6,
+    "missing_foods": 0,
+    "non_food_kept": 0,
+    "dishes_missed": 0,
+    "wrong_dishes": 0,
+    "uncertain_lines": 0
+  },
+  "results": [
+    {
+      "id": "en-jouets-ticket-utilisateur",
+      "status": 200,
+      "ms": 5105,
+      "provider": "groq",
+      "items": [
+        {
+          "name": "rotisserie chicken",
+          "kind": "dish",
+          "confidence": 1,
+          "shelf_life_days": 3,
+          "storage_tip": "In the fridge, closed; reheat until piping hot before eating"
+        },
+        {
+          "name": "bananas",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 7,
+          "storage_tip": "At room temperature, away from direct sunlight."
+        },
+        {
+          "name": "whole milk",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 7,
+          "storage_tip": "In the fridge, in the coldest part."
+        },
+        {
+          "name": "large eggs",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 28,
+          "storage_tip": "In the fridge, in the original carton."
+        },
+        {
+          "name": "white bread",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 5,
+          "storage_tip": "In a bread box or airtight container at room temperature."
+        }
+      ],
+      "dropped_by_server": [],
+      "missing": [],
+      "leaked": [],
+      "notDish": [],
+      "wrongDish": [],
+      "tooMany": [],
+      "uncertain": [],
+      "ok": true
+    },
+    {
+      "id": "en-jouets-photo-utilisateur",
+      "status": 200,
+      "ms": 4810,
+      "provider": "groq",
+      "items": [
+        {
+          "name": "banana",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 5,
+          "storage_tip": "Keep at room temperature, away from direct sunlight."
+        },
+        {
+          "name": "potato chips",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 30,
+          "storage_tip": "Store in a cool, dry place in a sealed bag."
+        },
+        {
+          "name": "rotisserie chicken",
+          "kind": "dish",
+          "confidence": 1,
+          "shelf_life_days": 3,
+          "storage_tip": "In the fridge, closed; reheat until piping hot before eating"
+        }
+      ],
+      "dropped_by_server": [],
+      "missing": [],
+      "leaked": [],
+      "notDish": [],
+      "wrongDish": [],
+      "tooMany": [],
+      "uncertain": [],
+      "ok": true
+    },
+    {
+      "id": "en-jouets-dinosaure",
+      "status": 200,
+      "ms": 3522,
+      "provider": "groq",
+      "items": [
+        {
+          "name": "apple",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 7,
+          "storage_tip": "In the fridge, in the crisper drawer"
+        },
+        {
+          "name": "cheddar cheese",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 21,
+          "storage_tip": "In the fridge, wrapped in its original packaging"
+        }
+      ],
+      "dropped_by_server": [],
+      "missing": [],
+      "leaked": [],
+      "notDish": [],
+      "wrongDish": [],
+      "tooMany": [],
+      "uncertain": [],
+      "ok": true
+    },
+    {
+      "id": "fr-menager",
+      "status": 200,
+      "ms": 4415,
+      "provider": "groq",
+      "items": [
+        {
+          "name": "tomate grappe",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 5,
+          "storage_tip": "À l'abri de la chaleur, dans le bac à légumes."
+        },
+        {
+          "name": "lait demi-écrémé",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 5,
+          "storage_tip": "Au réfrigérateur, dans la partie la plus froide."
+        },
+        {
+          "name": "fromage blanc",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 10,
+          "storage_tip": "Au réfrigérateur, dans une boîte hermétique."
+        },
+        {
+          "name": "banane",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 5,
+          "storage_tip": "À température ambiante, à l'abri de la lumière."
+        }
+      ],
+      "dropped_by_server": [],
+      "missing": [],
+      "leaked": [],
+      "notDish": [],
+      "wrongDish": [],
+      "tooMany": [],
+      "uncertain": [],
+      "ok": true
+    },
+    {
+      "id": "fr-traiteur",
+      "status": 200,
+      "ms": 3440,
+      "provider": "gemini",
+      "items": [
+        {
+          "name": "poulet rôti",
+          "kind": "dish",
+          "confidence": 1,
+          "shelf_life_days": 3,
+          "storage_tip": "Au frigo, bien fermé ; réchauffer à cœur avant de manger"
+        },
+        {
+          "name": "taboulé",
+          "kind": "dish",
+          "confidence": 1,
+          "shelf_life_days": 3,
+          "storage_tip": "Au frigo, bien fermé ; réchauffer à cœur avant de manger"
+        },
+        {
+          "name": "lasagnes à la bolognaise",
+          "kind": "dish",
+          "confidence": 1,
+          "shelf_life_days": 3,
+          "storage_tip": "Au frigo, bien fermé ; réchauffer à cœur avant de manger"
+        },
+        {
+          "name": "jambon cuit",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 4,
+          "storage_tip": "Au réfrigérateur, dans son emballage d'origine fermé."
+        },
+        {
+          "name": "café moulu",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 365,
+          "storage_tip": "Dans un endroit sec, à l'abri de la lumière."
+        },
+        {
+          "name": "pizza surgelée",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 180,
+          "storage_tip": "Au congélateur, à cuire selon les instructions."
+        }
+      ],
+      "dropped_by_server": [],
+      "missing": [],
+      "leaked": [],
+      "notDish": [],
+      "wrongDish": [],
+      "tooMany": [],
+      "uncertain": [],
+      "ok": true
+    },
+    {
+      "id": "es-abreviaturas",
+      "status": 200,
+      "ms": 4441,
+      "provider": "groq",
+      "items": [
+        {
+          "name": "pechuga de pollo",
+          "kind": "ingredient",
+          "confidence": 0.95,
+          "shelf_life_days": 2,
+          "storage_tip": "En la nevera, en la parte más fría."
+        },
+        {
+          "name": "leche entera",
+          "kind": "ingredient",
+          "confidence": 0.9,
+          "shelf_life_days": 5,
+          "storage_tip": "En la nevera, en la parte más fría."
+        },
+        {
+          "name": "yogur natural",
+          "kind": "ingredient",
+          "confidence": 0.9,
+          "shelf_life_days": 15,
+          "storage_tip": "En la nevera, en su envase original."
+        },
+        {
+          "name": "patatas",
+          "kind": "ingredient",
+          "confidence": 0.9,
+          "shelf_life_days": 30,
+          "storage_tip": "En un lugar fresco, oscuro y ventilado."
+        },
+        {
+          "name": "cebollas",
+          "kind": "ingredient",
+          "confidence": 0.9,
+          "shelf_life_days": 30,
+          "storage_tip": "En un lugar fresco, oscuro y ventilado."
+        },
+        {
+          "name": "tomates pera",
+          "kind": "ingredient",
+          "confidence": 0.9,
+          "shelf_life_days": 5,
+          "storage_tip": "En la encimera, lejos del sol directo."
+        }
+      ],
+      "dropped_by_server": [],
+      "missing": [],
+      "leaked": [],
+      "notDish": [],
+      "wrongDish": [],
+      "tooMany": [],
+      "uncertain": [],
+      "ok": true
+    }
+  ]
+}

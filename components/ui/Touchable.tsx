@@ -11,7 +11,8 @@ type Props = Omit<PressableProps, 'style'> & {
   scale?: boolean;
 };
 
-// Zone tactile de l'app : retour visuel au toucher (légère réduction et opacité), animé
+// Zone tactile de l'app : retour visuel au toucher (légère réduction et opacité), animé. Annoncée comme bouton par les
+// lecteurs d'écran, sauf autre rôle donné (onglet, case à cocher, lien…)
 export function Touchable({ style, scale = true, disabled, onPressIn, onPressOut, children, ...props }: Props) {
   const pressed = useSharedValue(0);
   // Opacité du style (bouton désactivé, estompé) gardée sous l'animation
@@ -24,6 +25,7 @@ export function Touchable({ style, scale = true, disabled, onPressIn, onPressOut
 
   return (
     <AnimatedPressable
+      accessibilityRole="button"
       {...props}
       disabled={disabled}
       accessibilityState={{ disabled: !!disabled, ...props.accessibilityState }}

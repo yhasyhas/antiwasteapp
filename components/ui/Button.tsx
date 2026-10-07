@@ -54,7 +54,8 @@ export function Button({ label, onPress, variant = 'primary', size = 'large', ic
       ) : (
         <>
           {Icon ? <Icon size={sizes.icon} color={tone.text} /> : null}
-          <Text style={[styles.label, { color: tone.text }]} numberOfLines={1}>{label}</Text>
+          {/* Grandes tailles de texte : deux lignes plutôt qu'un libellé tronqué */}
+          <Text style={[styles.label, { color: tone.text }]} numberOfLines={2}>{label}</Text>
         </>
       )}
     </Touchable>
@@ -80,5 +81,6 @@ const styles = StyleSheet.create({
   label: {
     ...typography.button,
     flexShrink: 1,
+    textAlign: 'center',
   },
 });
