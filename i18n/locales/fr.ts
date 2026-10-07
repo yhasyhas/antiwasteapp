@@ -993,6 +993,7 @@ const fr = {
     topNone: 'Aucun aliment gaspillé ces 6 derniers mois. Bravo !',
     tipLabel: 'Conseil',
     loadError: 'Impossible de charger ton impact. Vérifie ta connexion.',
+    allYours: 'Tout vient de toi ce mois-ci',
   },
 };
 

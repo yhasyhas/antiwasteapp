@@ -50,6 +50,10 @@ export default function ImpactScreen() {
   // Foyer non partagé : un seul bilan, celui du foyer personnel
   const current: Scope = impact?.shared ? scope : 'household';
   const counts = (index: number): Counts => impact?.months[index]?.[current] ?? { saved: 0, wasted: 0 };
+  // Foyer partagé où tout ce qui a été sauvé ou gaspillé ce mois-ci vient de moi : les deux chiffres sont les mêmes
+  const thisMonth = impact?.months[0];
+  const allMine = !!impact?.shared && !!thisMonth && thisMonth.household.saved + thisMonth.household.wasted > 0
+    && thisMonth.household.saved === thisMonth.me.saved && thisMonth.household.wasted === thisMonth.me.wasted;
   const max = Math.max(1, ...(impact?.months ?? []).map((month) => month[current].saved + month[current].wasted));
 
   return (
@@ -80,6 +84,7 @@ export default function ImpactScreen() {
               <Total value={counts(0).saved} label={t('impact.saved', { count: counts(0).saved })} color={colors.primary} />
               <Total value={counts(0).wasted} label={t('impact.wasted', { count: counts(0).wasted })} color={colors.expired.text} />
             </View>
+            {allMine ? <Text style={styles.allMine}>{t('impact.allYours')}</Text> : null}
           </Card>
 
           {/* 6 derniers mois */}
@@ -199,6 +204,10 @@ const styles = StyleSheet.create({
   overline: {
     ...typography.overline,
     color: colors.primary,
+  },
+  allMine: {
+    ...typography.bodyMedium,
+    color: colors.text,
   },
   totals: {
     flexDirection: 'row',

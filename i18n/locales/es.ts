@@ -992,6 +992,7 @@ const es: Translations = {
     topNone: 'Nada desperdiciado en los últimos 6 meses. ¡Bravo!',
     tipLabel: 'Consejo',
     loadError: 'No se pudo cargar tu impacto. Revisa tu conexión.',
+    allYours: 'Todo viene de ti este mes',
   },
 };
 

@@ -992,6 +992,7 @@ const en: Translations = {
     topNone: 'Nothing wasted over the last 6 months. Well done!',
     tipLabel: 'Tip',
     loadError: 'Could not load your impact. Check your connection.',
+    allYours: 'It all comes from you this month',
   },
 };
 
