@@ -16,6 +16,10 @@ Deno.test('ticket : jouets, peluches et produits ménagers écartés, même avec
   assertEquals(receiptDecision(item('LESSIVE LIQ CITRON 2L', 'Citron', 'fruit')), 'non_food');
   assertEquals(receiptDecision(item('EPONGE X3', 'éponge', 'other')), 'non_food');
   assertEquals(receiptDecision(item('BOLSA PAPEL', 'bolsa', 'other')), 'non_food');
+  // Vraie photo (scripts/receipt-eval/tickets/ticket-jouets.png) : libellés coupés sur deux lignes, code à rallonge
+  assertEquals(receiptDecision(item('1 7346890524 SQUISH SEA TURTLE', 'Sea turtle', 'fish')), 'non_food');
+  assertEquals(receiptDecision(item('1 075656017047 SQUAWKING CHICKEN', 'Chicken', 'meat')), 'non_food');
+  assertEquals(receiptDecision(item('1 Rotisserie Chicken', 'Rotisserie chicken', 'meat')), 'cooked');
 });
 
 Deno.test('ticket : aliment invraisemblable en supermarché écarté', () => {

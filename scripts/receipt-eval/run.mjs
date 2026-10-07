@@ -4,7 +4,10 @@
 // Pour chaque cas (cases.json) :
 //   - foods : aliments attendus (un des mots de chaque groupe dans un nom) ;
 //   - excluded : mots qui ne doivent apparaître dans aucun nom (non alimentaire, invraisemblable) ;
-//   - dishes / notDishes : aliments qui doivent être (ou ne pas être) des plats cuisinés ("kind" = "dish").
+//   - dishes / notDishes : aliments qui doivent être (ou ne pas être) des plats cuisinés ("kind" = "dish") ;
+//   - maxItems (facultatif) : nombre maximal d'aliments proposés (un jouet au nom d'aliment ne doit pas en ajouter un) ;
+//   - image (facultatif) : vraie photo de ticket (chemin relatif à ce dossier, ex. tickets/ticket-jouets.png) envoyée
+//     telle quelle, à la place du ticket fabriqué à partir de store et lines.
 // Résultat : scripts/receipt-eval/results/<date>.json et un résumé à l'écran. Compte de test supprimé à la fin.
 // Prérequis : Chrome installé, puppeteer-core disponible (npm i --no-save puppeteer-core).
 // Lancement depuis la racine : node scripts/receipt-eval/run.mjs [--cases id1,id2]
@@ -47,13 +50,19 @@ try {
   await page.setViewport({ width: 420, height: 800, deviceScaleFactor: 2 });
 
   for (const c of cases) {
-    await page.setContent(receiptHtml(c));
-    const image = await (await page.$('#r')).screenshot({ type: 'jpeg', quality: 80, encoding: 'base64' });
+    let image, mime = 'image/jpeg';
+    if (c.image) {
+      image = fs.readFileSync(path.join(HERE, c.image)).toString('base64');
+      mime = c.image.endsWith('.png') ? 'image/png' : 'image/jpeg';
+    } else {
+      await page.setContent(receiptHtml(c));
+      image = await (await page.$('#r')).screenshot({ type: 'jpeg', quality: 80, encoding: 'base64' });
+    }
     const t0 = Date.now();
     const response = await fetch(`${URL_}/functions/v1/analyze-image`, {
       method: 'POST',
       headers: { apikey: PUB, Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image_base64: image, mime_type: 'image/jpeg', language: c.language, mode: 'receipt', debug: true }),
+      body: JSON.stringify({ image_base64: image, mime_type: mime, language: c.language, mode: 'receipt', debug: true }),
     });
     const data = await response.json();
     const items = data.ingredients ?? [];
@@ -62,18 +71,19 @@ try {
     const leaked = c.excluded.filter((word) => items.some((i) => mentions(i.name, word)));
     const notDish = c.dishes.filter((group) => find(group)?.kind !== 'dish').map((g) => g.join('/'));
     const wrongDish = c.notDishes.filter((group) => find(group)?.kind === 'dish').map((g) => g.join('/'));
+    const tooMany = c.maxItems != null && items.length > c.maxItems ? [`${items.length} aliments pour ${c.maxItems} au plus`] : [];
     const uncertain = items.filter((i) => i.confidence < (data.uncertain_below ?? 0.75)).map((i) => i.name);
     const entry = {
       id: c.id, status: response.status, ms: Date.now() - t0, provider: data.provider,
       items: items.map((i) => ({ name: i.name, kind: i.kind, confidence: i.confidence, shelf_life_days: i.shelf_life_days, storage_tip: i.storage_tip })),
       dropped_by_server: data.debug ? data.dropped ?? [] : data.dropped ?? [],
-      missing, leaked, notDish, wrongDish, uncertain,
-      ok: response.ok && missing.length === 0 && leaked.length === 0 && notDish.length === 0 && wrongDish.length === 0,
+      missing, leaked, notDish, wrongDish, tooMany, uncertain,
+      ok: response.ok && missing.length === 0 && leaked.length === 0 && notDish.length === 0 && wrongDish.length === 0 && tooMany.length === 0,
     };
     results.push(entry);
     console.log(`${entry.ok ? 'OK' : 'ÉCHEC'} : ${c.id} (${entry.status}, ${Math.round(entry.ms / 1000)} s, ${entry.provider}) — ${items.map((i) => `${i.name}${i.kind === 'dish' ? ' [plat]' : ''}${uncertain.includes(i.name) ? ' [incertain]' : ''}`).join(', ')}`);
     if (entry.dropped_by_server.length) console.log(`   écartés par le serveur : ${entry.dropped_by_server.map((d) => `${d.line} (${d.reason})`).join(' ; ')}`);
-    for (const [label, list] of [['manquants', missing], ['non alimentaires gardés', leaked], ['plats non reconnus', notDish], ['pris à tort pour des plats', wrongDish]]) {
+    for (const [label, list] of [['manquants', missing], ['non alimentaires gardés', leaked], ['plats non reconnus', notDish], ['pris à tort pour des plats', wrongDish], ['trop d’aliments', tooMany]]) {
       if (list.length) console.log(`   ${label} : ${list.join(', ')}`);
     }
   }

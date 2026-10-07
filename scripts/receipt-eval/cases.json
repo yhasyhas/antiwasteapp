@@ -76,6 +76,45 @@
     ]
   },
   {
+    "id": "en-jouets-photo-utilisateur",
+    "note": "Vraie photo du ticket de l'utilisateur (phase 10) : SQUISH SEA TURTLE et SQUAWKING CHICKEN (jouets), poulet rôti, chips",
+    "language": "en",
+    "image": "tickets/ticket-jouets.png",
+    "foods": [
+      [
+        "banana"
+      ],
+      [
+        "chip",
+        "crisp"
+      ],
+      [
+        "chicken"
+      ]
+    ],
+    "excluded": [
+      "turtle",
+      "squish",
+      "squawk",
+      "toy"
+    ],
+    "dishes": [
+      [
+        "chicken"
+      ]
+    ],
+    "notDishes": [
+      [
+        "banana"
+      ],
+      [
+        "chip",
+        "crisp"
+      ]
+    ],
+    "maxItems": 3
+  },
+  {
     "id": "en-jouets-dinosaure",
     "language": "en",
     "store": "FAMILY MART",

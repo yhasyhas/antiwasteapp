@@ -1,0 +1,51 @@
+{
+  "summary": {
+    "date": "2026-10-07T16:27:53.624Z",
+    "cases": 1,
+    "passed": 1,
+    "missing_foods": 0,
+    "non_food_kept": 0,
+    "dishes_missed": 0,
+    "wrong_dishes": 0,
+    "uncertain_lines": 0
+  },
+  "results": [
+    {
+      "id": "en-jouets-photo-utilisateur",
+      "status": 200,
+      "ms": 5308,
+      "provider": "gemini",
+      "items": [
+        {
+          "name": "banana",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 5,
+          "storage_tip": "Keep at room temperature in a dry place."
+        },
+        {
+          "name": "potato chips",
+          "kind": "ingredient",
+          "confidence": 1,
+          "shelf_life_days": 60,
+          "storage_tip": "Keep in a cool, dry place in a sealed bag."
+        },
+        {
+          "name": "rotisserie chicken",
+          "kind": "dish",
+          "confidence": 1,
+          "shelf_life_days": 3,
+          "storage_tip": "In the fridge, closed; reheat until piping hot before eating"
+        }
+      ],
+      "dropped_by_server": [],
+      "missing": [],
+      "leaked": [],
+      "notDish": [],
+      "wrongDish": [],
+      "tooMany": [],
+      "uncertain": [],
+      "ok": true
+    }
+  ]
+}
