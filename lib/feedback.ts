@@ -1,8 +1,9 @@
 import { useSyncExternalStore } from 'react';
 import { Platform } from 'react-native';
-import Constants from 'expo-constants';
 import { supabase } from './supabase';
 import { callEdgeFunction } from './callEdgeFunction';
+import { buildInfo } from './buildInfo';
+import { technicalVersion } from './buildLabel';
 import type { RecipeRatingValue } from '@/components/recipe/types';
 
 // Retours des utilisateurs : notes des recettes (« On a aimé » / « Pas pour nous »), signalements de recettes et
@@ -71,12 +72,12 @@ export function sendRecipeReport(recipeId: string, reason: ReportReason, comment
   return send({ type: 'recipe_report', recipe_id: recipeId, reason, comment: comment.trim() || undefined, language });
 }
 
-// Informations techniques ajoutées à l'avis : version de l'app, modèle du téléphone, système, langue (rien d'autre)
+// Informations techniques ajoutées à l'avis : version de l'app et numéro du build de test (« 1.0, test 3 »), modèle du téléphone, système, langue (rien d'autre)
 export function technicalInfo(language: string) {
   const constants = (Platform.constants ?? {}) as { Brand?: string; Manufacturer?: string; Model?: string };
   const device = [constants.Brand ?? constants.Manufacturer, constants.Model].filter(Boolean).join(' ') || Platform.OS;
   return {
-    app_version: Constants.expoConfig?.version ?? '?',
+    app_version: technicalVersion(buildInfo),
     device,
     os: `${Platform.OS} ${String(Platform.Version)}`,
     language,

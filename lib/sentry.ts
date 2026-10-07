@@ -1,6 +1,8 @@
 import { Platform } from 'react-native';
 import * as Device from 'expo-device';
 import * as Sentry from '@sentry/react-native';
+import { buildInfo } from './buildInfo';
+import { sentryEnvironment, technicalVersion } from './buildLabel';
 
 // Remontée des erreurs dans Sentry. Inactif tant que EXPO_PUBLIC_SENTRY_DSN n'est pas défini
 // (le DSN est public : il ne permet que d'envoyer des erreurs au projet, pas de les lire).
@@ -12,10 +14,13 @@ export const sentryEnabled = !!DSN;
 if (DSN) {
   Sentry.init({
     dsn: DSN,
-    environment: __DEV__ ? 'development' : 'production',
+    // development (serveur de développement), preview (build de test des amis) ou production
+    environment: sentryEnvironment(buildInfo, __DEV__),
     // Pas d'adresse IP ni d'e-mail : seul l'identifiant (uuid) de l'utilisateur est joint aux erreurs
     sendDefaultPii: false,
   });
+  // Numéro du build de test (« 1.0, test 3 ») sur chaque erreur
+  Sentry.setTag('build', technicalVersion(buildInfo));
 }
 
 export function setSentryUser(userId: string | null) {

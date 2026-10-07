@@ -26,6 +26,8 @@ import { APP_LANGUAGES } from '@/lib/languages';
 import { colors, radius, sizes, spacing, typography } from '@/constants/theme';
 import { showDialog } from '@/lib/dialog';
 import { FeedbackSheet } from '@/components/settings/FeedbackSheet';
+import { buildInfo } from '@/lib/buildInfo';
+import { buildSuffix, shortVersion } from '@/lib/buildLabel';
 
 export default function SettingsScreen() {
   const { language, t } = useLanguage();
@@ -127,6 +129,10 @@ export default function SettingsScreen() {
   const displayName = me?.name || (isAnonymous ? t('auth.guestName') : t('settings.noName'));
   const currentLanguage = APP_LANGUAGES.find((lang) => lang.code === language)?.label ?? language;
 
+  // « 1.0, test 3 » dans le build de test des amis, « 1.0, dev » en développement
+  const suffix = buildSuffix(buildInfo);
+  const versionLabel = [shortVersion(buildInfo.version), suffix.key === 'test' ? t('settings.buildTest', { number: suffix.number }) : suffix.key === 'dev' ? t('settings.buildDev') : null].filter(Boolean).join(', ');
+
   return (
     <View style={styles.container}>
       <ScreenHeader title={t('settings.title')} />
@@ -213,7 +219,7 @@ export default function SettingsScreen() {
         )}
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>{t('settings.appVersion', { version: '1.0' })}</Text>
+          <Text style={styles.footerText}>{t('settings.appVersion', { version: versionLabel })}</Text>
           <Text style={styles.footerSubtext}>{t('settings.tagline')}</Text>
         </View>
       </ScrollView>

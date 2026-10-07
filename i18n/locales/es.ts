@@ -608,6 +608,8 @@ const es: Translations = {
     email: 'Correo electrónico',
     notSignedIn: 'Sin sesión iniciada',
     signOut: 'Cerrar sesión',
+    buildTest: 'prueba {{number}}',
+    buildDev: 'dev',
     appVersion: 'Antigaspi, versión {{version}}',
     tagline: 'Reduce el desperdicio de alimentos, una receta a la vez.',
     sentryTest: 'Enviar un error de prueba a Sentry',

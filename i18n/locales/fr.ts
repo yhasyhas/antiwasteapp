@@ -609,6 +609,8 @@ const fr = {
     email: 'E-mail',
     notSignedIn: 'Non connecté',
     signOut: 'Se déconnecter',
+    buildTest: 'test {{number}}',
+    buildDev: 'dev',
     appVersion: 'Antigaspi, version {{version}}',
     tagline: 'Réduis le gaspillage alimentaire, une recette à la fois.',
     sentryTest: 'Envoyer une erreur de test à Sentry',
