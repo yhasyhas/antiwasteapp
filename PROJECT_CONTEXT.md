@@ -1,6 +1,6 @@
 # Contexte du projet : app mobile anti-gaspi de recettes IA
 
-> Analyse rédigée le 2026-09-23, mise à jour à la fin de la phase 8 (validée). La feuille de route est dans `PLAN.md`.
+> Analyse rédigée le 2026-09-23, mise à jour à la fin de la phase 10 (validée, 07/10/2026). La feuille de route est dans `PLAN.md`.
 
 ## 1. Le produit
 
@@ -274,17 +274,18 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Images : consigne réglable par `IMAGE_PROMPT_VERSION` (`generate-recipe-image/imagePrompt.ts` : v1 par défaut ; v1.1 « poissons en morceaux » et v2 « cuisine maison » essayées et non retenues, gardées dans le code) ; « Capacity temporarily exceeded » (429) et 5xx de Cloudflare traités comme une surcharge passagère (un nouvel essai), délai de 60 s ; l'app redemande une image en échec dès qu'une autre réussit ou au bout d'une heure (`lib/recipeImage.ts`). Cloudflare en offre Workers Paid depuis le 05/10/2026. Comparaison des consignes : `scripts/image-compare/compare.mjs`.
 - Accueil : « Mes recettes » montre les favoris d'abord (faisables maintenant en tête), quel que soit leur âge ; « Tout voir » ouvre l'onglet Favoris s'il y en a. Le mot « urgent » n'apparaît plus dans les recettes (prompt et retrait côté serveur, `withoutUrgencyWords`). Tests : `lib/*.test.ts` lancés avec les tests Deno, parcours web `scripts/e2e/cooking-web.mjs`.
 
-### Phase 10 — premier contact (branche `phase-10` : partie A validée, corrections et partie B en test)
+### Phase 10 — premier contact (validée et fusionnée le 07/10/2026 ; test de la taille de police maximale reporté à la phase 10b)
 - Premier lancement guidé : `app/onboarding.tsx` (trois écrans, questions facultatives, première action ; version courte après une invitation), `lib/onboarding.ts` (`profiles.onboarded_at`, noté dès l'affichage) ; l'écran de démarrage (`app/index.tsx`) choisit entre le guide et les onglets, y compris après connexion ou inscription.
 - Mot de passe oublié : `app/auth/forgot.tsx` (e-mail de réinitialisation, captcha) ; le lien mène à la page « Nouveau mot de passe » du site (`web/invite/reset.html`, déployée par `scripts/deploy-pages.mjs`), qui ouvre l'app sur `app/auth/reset.tsx` (lien lu par `lib/recoveryLink.ts`) ou laisse choisir le mot de passe dans le navigateur. E-mails par SMTP2GO, modèles en trois langues (`scripts/email-templates/`), langue du compte copiée dans `auth.users.raw_user_meta_data.lang`.
 - Retours : `lib/feedback.ts` ; notes des recettes (`recipes.rating`, `components/recipe/RecipeRating.tsx` sur la fiche et la fin du mode cuisine) ; « Signaler un problème » et « Donner mon avis » (`components/settings/FeedbackSheet.tsx`) par la fonction `send-feedback` (tables `recipe_reports` et `feedback`, 20 envois par jour, email via Sentry, `_shared/sentry.ts`).
 - « Mes basiques » : `lib/basics.ts` (même logique que `generate-recipes/basics.ts`), `components/recipe/BasicsEditor.tsx`, `user_preferences.basics` ; envoyés à la génération (prompt, achats, sélection) ; anti-répétition : recettes « Pas pour nous » toujours évitées (`history.ts`).
 - Garde-manger étroit : `components/recipe/NarrowPantryHint.tsx` sur l'écran de génération.
 - Variété au sein d'une génération : type de plat et technique déclarés par le modèle (`generate-recipes/kinds.ts`), recette trop proche redemandée (`generate-recipes/variety.ts`), mesure dans `scripts/recipe-eval`.
-- « Mon impact » : `app/impact.tsx`, `lib/impact.ts`, fonction `food_impact` (6 mois, plus gaspillés avec le conseil de leur fiche) ; ouvert depuis le compteur de l'accueil.
-- Ticket de caisse : mode « Ticket » du Scanner (`components/scan/ScanModeToggle.tsx`, `hooks/useScan.ts`), mode `receipt` d'`analyze-image`.
+- « Mon impact » : `app/impact.tsx`, `lib/impact.ts`, fonction `food_impact` (6 mois, plus gaspillés avec le conseil de leur fiche) ; ouvert depuis le compteur de l'accueil ; « Tout vient de toi ce mois-ci » quand le foyer et moi ont les mêmes chiffres.
+- « Mon foyer » : fiche d'un membre en le touchant (`components/household/MemberSheet.tsx`, chiffres du mois par `memberMonthStats` dans `lib/household.ts`) ; confirmations détaillées pour retirer un membre et quitter le foyer.
+- Ticket de caisse : mode « Ticket » du Scanner (`components/scan/ScanModeToggle.tsx`, `hooks/useScan.ts`), mode `receipt` d'`analyze-image` ; règles du serveur après le modèle (`analyze-image/receipt.ts` : non alimentaire et invraisemblable écartés, produits déjà cuits en plats à date courte, surgelés jamais en plats) ; lignes sous `uncertain_below` (0,75) décochées dans la confirmation ; évaluation `scripts/receipt-eval/` (tickets fabriqués et vraies photos dans `tickets/`).
 - Accessibilité : couleurs dans `constants/palette.ts` (contrastes testés par `lib/contrast.test.ts`), `Touchable` annoncé comme bouton par défaut, audit `scripts/a11y-audit.mjs`, clavier géré par `components/ui/KeyboardAvoider.tsx` dans toutes les feuilles avec un champ.
-- Tests : `supabase/tests/first_contact.sql`, `email_language.sql`, `food_impact.sql` ; Deno (basiques, avis, lien de réinitialisation, modèles d'e-mail, variété, contrastes) ; parcours `scripts/e2e/` : `first-contact-web.mjs`, `feedback.mjs`, `password-reset-page.mjs`, `impact-web.mjs`, `receipt-scan.mjs`, `generate-variety.mjs`, `recovery-email.mjs` (envoi réel).
+- Tests : `supabase/tests/first_contact.sql`, `email_language.sql`, `food_impact.sql` ; Deno (basiques, avis, lien de réinitialisation, modèles d'e-mail, variété, contrastes) ; parcours `scripts/e2e/` : `first-contact-web.mjs`, `feedback.mjs`, `password-reset-page.mjs`, `impact-web.mjs`, `impact-shared.mjs`, `household-web.mjs`, `receipt-scan.mjs`, `generate-variety.mjs`, `recovery-email.mjs` (envoi réel).
 
 ## 5. État actuel et problèmes connus
 
@@ -303,7 +304,7 @@ Le garde-manger appartient à un **foyer** (visible par ses membres) ; recettes,
 - Images FLUX schnell : anatomie des poissons parfois bizarre ; la consigne n'y change rien (essai v1.1 du 06/10/2026). Autres modèles à comparer en phase 11.
 
 ## 6. Prochaine étape
-Phase 10 Premier contact (partie A validée ; corrections et partie B en test sur téléphone, puis fusion), puis 10b Petit groupe de testeurs, 11 Point de décision, 12 Natif (un seul build ; en tête : alarmes exactes des minuteurs), 13 Services et abonnements, 14 Audit, 15 Lancement. Restent ouverts de la phase 9b : validation de la bibliothèque de plats par des personnes qui les cuisinent, cas d'évaluation par région. Détails dans `PLAN.md`.
+Phase 10b Petit groupe de testeurs (build preview, revérifier le lien « Mot de passe oublié », test de la taille de police maximale sur leurs téléphones), puis 11 Point de décision, 12 Natif (un seul build ; en tête : alarmes exactes des minuteurs), 13 Services et abonnements, 14 Audit, 15 Lancement. Restent ouverts de la phase 9b : validation de la bibliothèque de plats par des personnes qui les cuisinent, cas d'évaluation par région. Détails dans `PLAN.md`.
 
 ## 7. Lancer le projet
 ```bash
