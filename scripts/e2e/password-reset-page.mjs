@@ -69,11 +69,25 @@ try {
   const desktopLink = await recoveryLink();
   check('lien de réinitialisation vers la page du site', typeof desktopLink === 'string' && decodeURIComponent(desktopLink).includes(PAGE));
   const desktop = await newPage(false);
+  // Navigateur en mode sombre : le texte saisi doit rester foncé sur les champs blancs
+  await desktop.page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'dark' }]);
   await desktop.page.goto(desktopLink, { waitUntil: 'networkidle2', timeout: 60_000 });
   check(`arrivée sur la page (${new URL(desktop.page.url()).pathname})`, desktop.page.url().startsWith(PAGE));
   check('jeton retiré de l’adresse', !desktop.page.url().includes('access_token'));
   check('langue du compte (espagnol) plutôt que ?lang=fr', await desktop.has('Nueva contraseña'));
   check('pas de bouton « Abrir en la app » sur ordinateur', !(await desktop.page.$eval('#open-block', (el) => !el.classList.contains('hidden'))));
+  // Œil : le mot de passe s'affiche en clair, puis se masque de nouveau ; texte saisi foncé
+  await desktop.page.type('#password', 'visible1');
+  const typeOf = () => desktop.page.$eval('#password', (el) => el.type);
+  await desktop.page.click('button.eye[data-for=password]');
+  const shown = await typeOf();
+  const label = await desktop.page.$eval('button.eye[data-for=password]', (el) => el.getAttribute('aria-label'));
+  await desktop.page.click('button.eye[data-for=password]');
+  check(`œil : mot de passe affiché puis masqué (${label})`, shown === 'text' && (await typeOf()) === 'password' && label === 'Ocultar la contraseña');
+  check('œil sur le champ de confirmation aussi', Boolean(await desktop.page.$('button.eye[data-for=confirm]')));
+  const color = await desktop.page.$eval('#password', (el) => getComputedStyle(el).webkitTextFillColor || getComputedStyle(el).color);
+  check(`texte saisi foncé en mode sombre du navigateur (${color})`, color === 'rgb(21, 36, 27)');
+  await desktop.page.$eval('#password', (el) => { el.value = ''; });
   await desktop.page.screenshot({ path: path.join(out, '1-ordinateur.png') });
   await desktop.page.type('#password', 'abc');
   await desktop.page.type('#confirm', 'abc');
