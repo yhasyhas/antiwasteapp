@@ -44,7 +44,7 @@ try {
   userId = (await (await fetch(`${URL_}/auth/v1/admin/users`, { method: 'POST', headers: admin, body: JSON.stringify({ email, password: `T${crypto.randomUUID()}!`, email_confirm: true }) })).json()).id;
   const link = await (await fetch(`${URL_}/auth/v1/admin/generate_link`, { method: 'POST', headers: admin, body: JSON.stringify({ type: 'magiclink', email }) })).json();
   const session = await (await fetch(`${URL_}/auth/v1/verify`, { method: 'POST', headers: { apikey: PUB, 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'magiclink', token_hash: link.hashed_token ?? link.properties?.hashed_token }) })).json();
-  await fetch(`${URL_}/rest/v1/profiles`, { method: 'POST', headers: { apikey: PUB, Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ id: userId, email }) });
+  await fetch(`${URL_}/rest/v1/profiles`, { method: 'POST', headers: { apikey: PUB, Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ id: userId, email, onboarded_at: new Date().toISOString() }) }); // premier lancement guidé déjà vu (phase 10)
 
   const context = await browser.createBrowserContext();
   const page = await context.newPage();
@@ -111,8 +111,9 @@ try {
   await shot('1b-accueil-favoris.png');
   await tap('Tout voir');
   await sleep(2000);
-  // Onglet Favoris : seul le favori est listé (l'onglet Toutes montrerait les 31 recettes)
-  check('« Tout voir » : onglet Favoris', await has('Favoris · 1') && await has('Favori ancien') && !(await has('Recette récente 2')));
+  // Onglet Favoris : seul le favori est listé (« Favoris · 1 » ; l'onglet Toutes montrerait les 31 recettes). Le texte
+  // de l'accueil, resté dessous dans la pile d'écrans, est encore dans la page : pas de test d'absence sur le texte
+  check('« Tout voir » : onglet Favoris', await has('Favoris · 1') && await has('Favori ancien'));
   await shot('1c-tout-voir.png');
 
   // Mode cuisine

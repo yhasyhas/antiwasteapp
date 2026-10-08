@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { FlatList, ScrollView, StyleSheet, Text, useWindowDimensions, Vibration, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
+import { FlatList, ScrollView, StyleSheet, Text, useWindowDimensions, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 import { router } from 'expo-router';
-import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { ChevronLeft, ChevronRight, ChefHat, X } from 'lucide-react-native';
@@ -18,11 +17,9 @@ import { KeyboardAvoider, useKeyboardScroll, useKeyboardVisible } from '@/compon
 import { colors, fontFamilies, radius, sizes, spacing, typography } from '@/constants/theme';
 import { recipeAmount } from '@/lib/quantity';
 import { useRecipeImages } from '@/hooks/useRecipeImages';
-import { endCooking, loadCookingSession, markTimersAlerted, updateCooking, useCookingSession } from '@/lib/cookingSession';
+import { endCooking, loadCookingSession, updateCooking, useCookingSession } from '@/lib/cookingSession';
 
 const KEEP_AWAKE_TAG = 'cooking-mode';
-// Fin de minuteur constatée dans l'app moins de 10 s après l'heure : vibration (sinon la notification a déjà sonné)
-const FRESH_ALERT_MS = 10_000;
 
 // Mode cuisine : mise en place (ingrédients à cocher), puis une étape à la fois en très gros caractères
 // (« Étape 3 sur 7 », Précédent / Suivant ou glissement), minuteurs en haut de l'écran, et « C'est prêt ! » qui
@@ -54,22 +51,11 @@ export default function CookScreen() {
     };
   }, []);
 
-  // Minuteurs : affichage chaque seconde ; fin constatée dans l'app → vibration (son : notification programmée)
+  // Minuteurs : affichage chaque seconde (vibration et son à l'heure : useTimerAlerts, à la racine de l'app)
   const timers = session?.timers ?? [];
   useEffect(() => {
     if (timers.length === 0) return;
-    const tick = () => {
-      const current = Date.now();
-      setNow(current);
-      const finished = (currentTimers: typeof timers) => currentTimers.filter((timer) => !timer.alerted && timer.endAt <= current);
-      const done = finished(timers);
-      if (done.length === 0) return;
-      if (done.some((timer) => current - timer.endAt < FRESH_ALERT_MS)) {
-        Vibration.vibrate([0, 600, 300, 600, 300, 600]);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => undefined);
-      }
-      markTimersAlerted(done.map((timer) => timer.id));
-    };
+    const tick = () => setNow(Date.now());
     tick();
     const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);

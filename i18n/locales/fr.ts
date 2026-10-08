@@ -394,6 +394,11 @@ const fr = {
     channelName: 'Minuteurs de cuisine',
     timerDoneTitle: 'Minuteur terminé',
     timerDoneBody: 'Étape {{step}} · {{title}}',
+    exactTitle: "Des minuteurs à l’heure",
+    exactText: "Pour que tes minuteurs sonnent à l'heure, autorise les alarmes exactes. Sans elles, Android peut les retarder de plusieurs minutes quand le téléphone est verrouillé.",
+    exactOpen: "Autoriser",
+    exactLater: "Plus tard",
+    exactReminder: "Minuteurs peut-être en retard : autorise les alarmes exactes",
     noSteps: "Cette recette n'a pas d'étapes.",
   },
   recipe: {

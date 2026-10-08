@@ -19,6 +19,7 @@ import { DialogHost } from '@/components/ui/DialogHost';
 import { useExpiryReminders } from '@/hooks/useExpiryReminders';
 import { useHouseholdSession } from '@/hooks/useHousehold';
 import { loadPreferences } from '@/lib/preferences';
+import { useTimerAlerts } from '@/lib/cookingSession';
 import { colors, motion } from '@/constants/theme';
 
 // Écran de démarrage gardé jusqu'au chargement des polices (pas d'affichage avec la police du système)
@@ -34,6 +35,8 @@ function RootNavigator() {
   useHouseholdSession(user?.id ?? null);
   // Rappels de péremption (notifications locales) et ouverture de la génération depuis un rappel
   useExpiryReminders(user?.id ?? null, language);
+  // Minuteurs du mode cuisine : vibration et son à l'heure exacte tant que l'app est ouverte, quel que soit l'écran
+  useTimerAlerts();
   // « Mes basiques » chargés dès la connexion : « Faisable maintenant » et « À acheter » en tiennent compte partout
   useEffect(() => {
     if (user?.id) loadPreferences(user.id);

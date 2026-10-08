@@ -1,0 +1,5 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- Alarmes exactes (Android 12 et plus) : minuteurs du mode cuisine à l'heure. Sur Android 14, l'utilisateur doit
+       l'accorder dans « Alarmes et rappels » ; expo-notifications l'utilise dès qu'elle est accordée. -->
+  <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+</manifest>

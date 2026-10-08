@@ -393,6 +393,11 @@ const en: Translations = {
     channelName: 'Cooking timers',
     timerDoneTitle: 'Timer done',
     timerDoneBody: 'Step {{step}} · {{title}}',
+    exactTitle: "Timers on time",
+    exactText: "For your timers to ring on time, allow exact alarms. Without them, Android can delay them by several minutes when the phone is locked.",
+    exactOpen: "Allow",
+    exactLater: "Later",
+    exactReminder: "Timers may ring late: allow exact alarms",
     noSteps: 'This recipe has no steps.',
   },
   recipe: {

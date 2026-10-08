@@ -1,18 +1,29 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text } from 'react-native';
-import { BellRing, Timer, X } from 'lucide-react-native';
+import { AlarmClockOff, BellRing, ChevronRight, Timer, X } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Touchable } from '@/components/ui/Touchable';
-import { colors, fontFamilies, radius, sizes, spacing } from '@/constants/theme';
+import { colors, fontFamilies, radius, sizes, spacing, typography } from '@/constants/theme';
 import { formatTimer } from '@/lib/cookingSteps';
-import { remainingSeconds, removeTimer, type CookingTimer } from '@/lib/cookingSession';
+import { openExactAlarmSettings, remainingSeconds, removeTimer, useExactAlarms, type CookingTimer } from '@/lib/cookingSession';
 
 // Minuteurs en cours, en haut du mode cuisine : « Étape 3 · 6:42 » ; fini : « Étape 3 · Terminé ! » en rouge.
 // Toucher un minuteur l'arrête (en cours) ou le ferme (fini) ; toucher son étape n'y mène pas (le libellé suffit).
+// Alarmes exactes refusées (Android 12 et plus) : rappel discret au-dessus, qui ouvre « Alarmes et rappels ».
 export function TimerStrip({ timers, now }: { timers: CookingTimer[]; now: number }) {
   const { t } = useLanguage();
-  if (timers.length === 0) return null;
+  const exactAlarms = useExactAlarms();
+  const reminder = exactAlarms === false ? (
+    <Touchable onPress={() => openExactAlarmSettings()} style={styles.reminder} accessibilityRole="button" accessibilityLabel={t('cook.exactReminder')}>
+      <AlarmClockOff size={sizes.iconSmall} color={colors.soon.text} />
+      <Text style={styles.reminderText}>{t('cook.exactReminder')}</Text>
+      <ChevronRight size={sizes.iconSmall} color={colors.soon.text} />
+    </Touchable>
+  ) : null;
+  if (timers.length === 0) return reminder;
   return (
+    <>
+    {reminder}
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row} style={styles.strip}>
       {timers.map((timer) => {
         const left = remainingSeconds(timer, now);
@@ -35,10 +46,27 @@ export function TimerStrip({ timers, now }: { timers: CookingTimer[]; now: numbe
         );
       })}
     </ScrollView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
+  reminder: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    minHeight: sizes.touch,
+    marginHorizontal: spacing.screen,
+    marginBottom: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.control,
+    backgroundColor: colors.soon.background,
+  },
+  reminderText: {
+    ...typography.secondaryStrong,
+    flex: 1,
+    color: colors.soon.text,
+  },
   strip: {
     flexGrow: 0,
   },

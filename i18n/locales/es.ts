@@ -393,6 +393,11 @@ const es: Translations = {
     channelName: 'Temporizadores de cocina',
     timerDoneTitle: 'Temporizador terminado',
     timerDoneBody: 'Paso {{step}} · {{title}}',
+    exactTitle: "Temporizadores a su hora",
+    exactText: "Para que tus temporizadores suenen a su hora, permite las alarmas exactas. Sin ellas, Android puede retrasarlos varios minutos cuando el teléfono está bloqueado.",
+    exactOpen: "Permitir",
+    exactLater: "Más tarde",
+    exactReminder: "Temporizadores quizá con retraso: permite las alarmas exactas",
     noSteps: 'Esta receta no tiene pasos.',
   },
   recipe: {

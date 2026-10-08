@@ -54,7 +54,8 @@
     "owner": "yhasyhas",
     "android": {
       "permissions": [
-        "android.permission.CAMERA"
+        "android.permission.CAMERA",
+        "android.permission.SCHEDULE_EXACT_ALARM"
       ]
     }
   }

@@ -1,0 +1,7 @@
+{
+  "name": "exact-alarms",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Module local : autorisation des alarmes exactes d'Android (minuteurs du mode cuisine)",
+  "main": "index.ts"
+}

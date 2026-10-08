@@ -2,19 +2,32 @@
 // avec ses minuteurs, même après avoir quitté le mode cuisine ou l'app. Chaque minuteur garde son heure de fin
 // et programme une notification locale (son et vibration du canal « Minuteurs »), qui sonne même téléphone
 // verrouillé ou app en arrière-plan.
+// Alarmes exactes (Android 12 et plus, module local modules/exact-alarms) : expo-notifications programme une
+// alarme exacte quand elle est permise ; sinon Android peut retarder la notification jusqu'à 75 % de la durée.
+// Au premier minuteur sans cette permission, explication et bouton vers « Alarmes et rappels » ; rappel dans le
+// mode cuisine tant qu'elle manque ; permission accordée : minuteurs en cours reprogrammés à l'heure exacte.
+// App ouverte : vibration et son à l'heure exacte quoi qu'il arrive (useTimerAlerts, monté à la racine).
 
 import { useEffect, useState } from 'react';
-import { Platform } from 'react-native';
+import { AppState, Platform, Vibration } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isRunningInExpoGo } from 'expo';
 import i18n from '@/i18n';
 import * as Notifications from '@/lib/notificationsApi';
 import { notificationsSupported } from '@/lib/notifications';
+import { showDialog } from '@/lib/dialog';
+import { canScheduleExactAlarms, openExactAlarmSettings } from '@/modules/exact-alarms';
 import type { Recipe } from '@/components/recipe/types';
 
 const STORAGE_KEY = 'cooking_session';
 const CHANNEL_ID = 'cook-timers';
 const NOTIFICATION_PREFIX = 'cook-timer-';
+// Explication des alarmes exactes déjà montrée (une seule fois, au premier minuteur sans la permission)
+const EXACT_EXPLAINED_KEY = 'exact_alarms_explained';
+const VIBRATION = [0, 600, 300, 600, 300, 600];
+// Fin de minuteur constatée dans l'app moins de 10 s après l'heure : alerte (sinon elle a déjà été donnée)
+const FRESH_ALERT_MS = 10_000;
 
 // image_url : photo du plat, montrée sur l'écran « C'est prêt ! »
 export type CookingRecipe = Pick<Recipe, 'title' | 'ingredients_used' | 'instructions' | 'servings' | 'image_url'> & { id?: string; language?: string };
@@ -140,7 +153,7 @@ async function ensureChannel() {
     name: i18n.t('cook.channelName'),
     importance: Notifications.AndroidImportance.HIGH,
     // Sans « sound » : son de notification par défaut du téléphone
-    vibrationPattern: [0, 600, 300, 600, 300, 600],
+    vibrationPattern: VIBRATION,
     enableVibrate: true,
   });
 }
@@ -158,24 +171,123 @@ async function canNotify(): Promise<boolean> {
   }
 }
 
+const timerContent = (timer: CookingTimer, recipeTitle: string) => ({
+  title: i18n.t('cook.timerDoneTitle'),
+  body: i18n.t('cook.timerDoneBody', { step: timer.step + 1, title: recipeTitle }),
+  sound: 'default',
+  data: { cook: '1' },
+});
+
 async function scheduleTimerNotification(timer: CookingTimer, recipeTitle: string): Promise<string | null> {
   if (!(await canNotify())) return null;
   try {
     await ensureChannel();
     return await Notifications.scheduleNotificationAsync({
       identifier: `${NOTIFICATION_PREFIX}${timer.id}`,
-      content: {
-        title: i18n.t('cook.timerDoneTitle'),
-        body: i18n.t('cook.timerDoneBody', { step: timer.step + 1, title: recipeTitle }),
-        sound: 'default',
-        data: { cook: '1' },
-      },
+      content: timerContent(timer, recipeTitle),
       trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: new Date(timer.endAt), ...(useOwnChannel && { channelId: CHANNEL_ID }) },
     });
   } catch (error) {
     console.warn('[cuisine] notification du minuteur impossible :', error);
     return null;
   }
+}
+
+// ---------- Alarmes exactes ----------
+
+// Premier minuteur sans alarmes exactes : explication et bouton vers le réglage d'Android (une seule fois ; le
+// rappel du mode cuisine prend le relais)
+async function explainExactAlarms() {
+  if (canScheduleExactAlarms() !== false) return;
+  try {
+    if (await AsyncStorage.getItem(EXACT_EXPLAINED_KEY)) return;
+    await AsyncStorage.setItem(EXACT_EXPLAINED_KEY, '1');
+  } catch {
+    return;
+  }
+  showDialog(i18n.t('cook.exactTitle'), i18n.t('cook.exactText'), [
+    { text: i18n.t('cook.exactLater'), style: 'cancel' },
+    { text: i18n.t('cook.exactOpen'), onPress: () => openExactAlarmSettings() },
+  ]);
+}
+
+// Permission accordée pendant la séance : minuteurs en cours reprogrammés (alarmes exactes cette fois)
+async function rescheduleRunningTimers() {
+  if (!session) return;
+  const current = session;
+  const running = current.timers.filter((timer) => timer.endAt > Date.now() + 1000);
+  for (const timer of running) {
+    await cancelTimerNotification(timer);
+    await scheduleTimerNotification(timer, current.recipe.title);
+  }
+}
+
+// État des alarmes exactes, relu au retour dans l'app (réglage d'Android ouvert entre-temps) : true permises,
+// false à demander, null inconnu (module absent du build : aucune demande)
+export function useExactAlarms(): boolean | null {
+  const [allowed, setAllowed] = useState(canScheduleExactAlarms);
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state !== 'active') return;
+      const now = canScheduleExactAlarms();
+      setAllowed((before) => {
+        if (before === false && now === true) rescheduleRunningTimers().catch(() => undefined);
+        return now;
+      });
+    });
+    return () => subscription.remove();
+  }, []);
+  return allowed;
+}
+
+export { openExactAlarmSettings };
+
+// ---------- Fin d'un minuteur, app ouverte ----------
+
+// Vibration, puis son : la notification du minuteur, présentée tout de suite si elle n'a pas encore sonné (alarme
+// inexacte en retard) ; sinon seulement la vibration
+async function ringNow(timer: CookingTimer, recipeTitle: string) {
+  Vibration.vibrate(VIBRATION);
+  Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => undefined);
+  if (!notificationsSupported) return;
+  const identifier = `${NOTIFICATION_PREFIX}${timer.id}`;
+  try {
+    // Alarme exacte : elle sonne à la même seconde ; on lui laisse le temps de s'afficher (pas de double son)
+    if (canScheduleExactAlarms() !== false) await new Promise((resolve) => setTimeout(resolve, 1500));
+    const presented = await Notifications.getPresentedNotificationsAsync();
+    if (presented.some((notification) => notification.request.identifier === identifier)) return;
+    if (!(await canNotify())) return;
+    await cancelTimerNotification(timer);
+    await ensureChannel();
+    await Notifications.scheduleNotificationAsync({
+      identifier,
+      content: timerContent(timer, recipeTitle),
+      trigger: useOwnChannel ? { channelId: CHANNEL_ID } : null,
+    });
+  } catch (error) {
+    console.warn('[cuisine] son du minuteur impossible :', error);
+  }
+}
+
+// Surveillance des minuteurs tant que l'app est ouverte, quel que soit l'écran (monté à la racine)
+export function useTimerAlerts() {
+  const current = useCookingSession();
+  const pending = (current?.timers ?? []).some((timer) => !timer.alerted);
+  useEffect(() => {
+    if (!pending) return;
+    const tick = () => {
+      if (!session) return;
+      const now = Date.now();
+      const done = session.timers.filter((timer) => !timer.alerted && timer.endAt <= now);
+      if (done.length === 0) return;
+      const fresh = done.filter((timer) => now - timer.endAt < FRESH_ALERT_MS);
+      if (fresh.length > 0) ringNow(fresh[0], session.recipe.title);
+      markTimersAlerted(done.map((timer) => timer.id));
+    };
+    tick();
+    const interval = setInterval(tick, 250);
+    return () => clearInterval(interval);
+  }, [pending]);
 }
 
 async function cancelTimerNotification(timer: CookingTimer) {
@@ -199,6 +311,7 @@ export async function startTimer(step: number, seconds: number) {
   if (session && notificationId) {
     set({ ...session, timers: session.timers.map((item) => (item.id === timer.id ? { ...item, notificationId } : item)) });
   }
+  await explainExactAlarms();
 }
 
 // Minuteur arrêté ou fini et vu : retiré (sa notification aussi, s'il n'a pas encore sonné)
