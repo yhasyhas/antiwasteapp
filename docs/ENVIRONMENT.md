@@ -48,16 +48,34 @@ En bash, dans une session démarrée après la modification : `[ -n "$NOM" ] && 
 
 ### SENTRY_ACCESS_TOKEN
 - **Rôle** : lecture des événements et des problèmes Sentry, pour analyser les erreurs.
-- **Remplace `SENTRY_AUTH_TOKEN`** : ce nom-là est réservé à un futur jeton d'envoi des source maps lors des builds (voir « À venir »). Il ne doit pas être utilisé pour la lecture.
+- **Distinct de `SENTRY_AUTH_TOKEN`** (jeton d'envoi des source maps, ci-dessous) : ne jamais copier l'un dans l'autre.
 - **Projet** : `yhasral/react-native`, région UE, API sur `https://de.sentry.io/api/0/`.
 - **Passer le jeton à l'outil** :
   - API : en-tête `Authorization: Bearer <jeton>`, lu depuis la variable.
-  - `sentry-cli`, qui attend `SENTRY_AUTH_TOKEN` : pour une seule commande seulement, en PowerShell `$env:SENTRY_AUTH_TOKEN = $env:SENTRY_ACCESS_TOKEN; sentry-cli … ; Remove-Item Env:SENTRY_AUTH_TOKEN`.
+  - `sentry-cli` lit `SENTRY_AUTH_TOKEN`, le jeton d'envoi, qui ne lit pas les événements : pour lire les erreurs, passer par l'API avec ce jeton-ci. Ne plus écraser `SENTRY_AUTH_TOKEN` le temps d'une commande, comme avant le 08/10/2026 : `Remove-Item` effacerait le vrai jeton de la session.
 - **Vérifier** : `GET https://de.sentry.io/api/0/projects/` renvoie 200 et le projet `yhasral/react-native`. Vérifié le 30/09/2026 : 14 événements et 12 problèmes lus.
 - **Vérifier la lecture seule** : une vraie écriture sans effet, par exemple `PUT` sur le projet avec son nom actuel, doit renvoyer 403. Un `PUT` vide ne prouve rien : Sentry l'accepte (200) même sans droit d'écriture.
 - **Renouveler** : sentry.io (région UE) → Settings → Account → Auth Tokens (ou Organization → Auth Tokens), avec les droits `event:read`, `project:read` et `org:read` si besoin.
 - **Droits** : `event:read`, `project:read`, `org:read`. Jeton recréé le 30/09/2026 : lecture seule vérifiée, une écriture sur le projet est refusée (403).
 
+
+### SENTRY_AUTH_TOKEN
+- **Rôle** : envoi des source maps de l'app à Sentry pendant les builds release (preview depuis le 08/10/2026, production plus tard), pour des traces d'erreurs lisibles. Utilisé par `sentry-cli`, que lance le module Sentry à la compilation.
+- **Créé le 08/10/2026 par l'utilisateur** : jeton personnel Sentry (préfixe `sntryu_`), droits `project:releases` et `org:read`.
+- **Deux emplacements, à garder égaux** :
+  - variable Windows `SENTRY_AUTH_TOKEN` (compte utilisateur) : pour `sentry-cli` en local ;
+  - variable EAS `SENTRY_AUTH_TOKEN`, visibilité « secret », environnement `preview` : pour les builds dans le cloud d'Expo. EAS ne la réaffiche jamais (ni sur le site, ni par `eas env:pull`).
+- **Créer ou remplacer la variable EAS sans afficher la valeur**, depuis un terminal ouvert après la création de la variable Windows. La commande ne contient que le nom de la variable :
+  - PowerShell : `npx eas-cli env:create preview --name SENTRY_AUTH_TOKEN --value $env:SENTRY_AUTH_TOKEN --visibility secret --type string --non-interactive` (ajouter `--force` pour remplacer) ;
+  - bash : même commande avec `--value "$SENTRY_AUTH_TOKEN"`.
+  - Faite le 08/10/2026 (environnement `preview`). À ajouter à l'environnement `production` en phase 15.
+- **Réglages de l'envoi** : `app.json`, module `@sentry/react-native` (`url` `https://de.sentry.io/`, `organization` `yhasral`, `project` `react-native`) ; jamais le jeton dans `app.json`.
+- **Vérifier sans afficher** : `[ -n "$SENTRY_AUTH_TOKEN" ] && echo présent` ; `npx sentry-cli --url https://de.sentry.io/ releases --org yhasral --project react-native list` liste les versions (`sentry-cli info` répond 404 avec ce type de jeton, sans conséquence). Côté EAS : le nom apparaît dans `eas env:list preview`, et le build envoie les source maps sans erreur.
+- **Droits vérifiés le 08/10/2026**, par des appels sans effet :
+  - permis : lire l'organisation, lister les versions ;
+  - refusés (403) : lire les problèmes (`event:read`), les membres (`member:read`), les clés du projet ; modifier le projet ou l'organisation, même à l'identique.
+  - La liste des équipes reste lisible : elle relève de `org:read`.
+- **Renouveler** : sentry.io (région UE) → Settings → Account → Personal Tokens, mêmes droits ; mettre à jour la variable Windows, redémarrer VS Code, relancer la commande EAS avec `--force`, puis révoquer l'ancien jeton.
 ---
 
 ## 2. Fichier `.env` de l'app (racine, hors de git)
@@ -140,7 +158,7 @@ Pour le renouveler : générer une valeur aléatoire, la poser dans les fonction
   - Vérifier : `npx eas-cli credentials`, puis Android et le profil voulu ; ou la requête GraphQL `app.byId.androidAppCredentials` (paquet et identifiant de la clé, sans valeur secrète).
 - **Clé de signature du build de test** (`.preview`) : créée et gardée par EAS au premier build (07/10/2026). Ne pas la supprimer : les testeurs ne pourraient plus installer les mises à jour par-dessus l'app existante.
 - **Numéro de build** : version à distance (`appVersionSource: remote`), un compteur par paquet. Celui de `.preview` a été initialisé à 1 pour le premier build (« test 1 »), puis augmente de 1 à chaque build (`autoIncrement`). Lecture : `eas build:version:get -p android -e preview`.
-- **Source maps Sentry** : leur envoi au build est désactivé pour le profil preview (`SENTRY_DISABLE_AUTO_UPLOAD=true` dans `eas.json`) tant que `SENTRY_AUTH_TOKEN` n'existe pas (phase 15) ; sans cela, le build release échoue (« An organization ID or slug is required »). Les erreurs du build de test arrivent quand même dans Sentry, avec un code JavaScript minifié dans les traces.
+- **Source maps Sentry** : envoyées à chaque build preview depuis le 08/10/2026 (secret EAS `SENTRY_AUTH_TOKEN`, section 1). Le build de test 1 a été fait sans elles (`SENTRY_DISABLE_AUTO_UPLOAD`, retiré depuis) : ses traces restent minifiées. Sans jeton ni réglages d'organisation et de projet, un build release échoue (« An organization ID or slug is required »).
 - **Builds de l'offre gratuite** : 30 par mois (période du 1er au 1er), 10 builds locaux. Lecture sans le site : requête GraphQL `account.byName.usageMetrics.byBillingPeriod(service: BUILDS)` avec `EXPO_TOKEN` ; sinon expo.dev → compte → Usage.
   - Renouveler : console Firebase → Paramètres du projet → Comptes de service → Générer une nouvelle clé privée, l'envoyer avec `eas credentials`, puis supprimer l'ancienne clé dans Google Cloud (IAM → Comptes de service).
 - **Clé du compte de service (fichier JSON)** :
@@ -218,7 +236,7 @@ Ces éléments seront ajoutés à cet inventaire au moment de leur création.
   - sauvegardes automatiques de la base : secrets GitHub Actions (adresse et mot de passe de la base, ou jeton d'accès) et emplacement des sauvegardes ;
   - relecture des droits des jetons Expo et Cloudflare (Sentry vérifié le 30/09/2026).
 - **Phase 15 (lancement)** :
-  - `SENTRY_AUTH_TOKEN` : envoi des source maps au build de production ;
+  - `SENTRY_AUTH_TOKEN` : à ajouter à l'environnement EAS `production` (il existe déjà pour `preview`, section 1) ;
   - comptes Google Play Console et App Store Connect ;
   - clé de signature Android (gérée par EAS) ;
   - paquet définitif dans Firebase.

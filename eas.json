@@ -23,8 +23,7 @@
       },
       "environment": "preview",
       "env": {
-        "APP_VARIANT": "preview",
-        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
+        "APP_VARIANT": "preview"
       }
     },
     "production": {
