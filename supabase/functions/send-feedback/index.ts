@@ -3,7 +3,7 @@ import { getAuthenticatedUser } from '../_shared/auth.ts';
 import { withCors } from '../_shared/cors.ts';
 import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_SECRET_KEY, SUPABASE_URL } from '../_shared/keys.ts';
 import { sendSentryEvent } from '../_shared/sentry.ts';
-import { cleanFeedback, cleanReport, type Feedback, type Report } from './validate.ts';
+import { appEnvironment, cleanFeedback, cleanReport, type Feedback, type Report } from './validate.ts';
 
 // « Donner mon avis » (Réglages) et « Signaler un problème » (recette) : enregistrement en base avec le jeton de
 // l'utilisateur (règles d'accès, 20 envois par jour au plus), puis événement Sentry : chaque avis, et chaque recette
@@ -44,23 +44,24 @@ async function loadRecipe(recipeId: string, authorization: string): Promise<Reco
 
 const KIND_LABELS: Record<Feedback['kind'], string> = { problem: 'Problème', idea: 'Idée', other: 'Autre' };
 
-async function sendFeedback(feedback: Feedback, userId: string, authorization: string, test: boolean): Promise<Response> {
+async function sendFeedback(feedback: Feedback, userId: string, authorization: string, test: boolean, environment: string): Promise<Response> {
   const saved = await insert('feedback', { user_id: userId, ...feedback }, authorization);
   if ('error' in saved) return jsonResponse({ error: saved.error }, saved.error === 'daily_limit' ? 429 : 400);
   await sendSentryEvent({
     level: feedback.kind === 'problem' ? 'warning' : 'info',
     logger: 'feedback',
     message: `Avis (${KIND_LABELS[feedback.kind]}) : ${feedback.message.replace(/\s+/g, ' ').slice(0, 90)}`,
-    tags: { feedback: feedback.kind, app_version: feedback.app_version ?? '?', os: feedback.os ?? '?', language: feedback.language ?? '?' },
+    tags: { feedback: feedback.kind, app_version: feedback.app_version ?? '?', app_environment: environment, os: feedback.os ?? '?', language: feedback.language ?? '?' },
     extra: { message: feedback.message, device: feedback.device, feedback_id: saved.id },
     // Un problème Sentry (donc un email) par avis
     fingerprint: ['feedback', saved.id],
     test,
+    environment,
   });
   return jsonResponse({ ok: true }, 200);
 }
 
-async function sendReport(report: Report, userId: string, authorization: string, test: boolean): Promise<Response> {
+async function sendReport(report: Report, userId: string, authorization: string, test: boolean, environment: string): Promise<Response> {
   const recipe = await loadRecipe(report.recipe_id, authorization);
   if (!recipe) return jsonResponse({ error: 'not_found' }, 404);
   const saved = await insert('recipe_reports', { user_id: userId, ...report, recipe_snapshot: recipe }, authorization);
@@ -75,6 +76,7 @@ async function sendReport(report: Report, userId: string, authorization: string,
       extra: { comment: report.comment, report_id: saved.id, recipe_id: report.recipe_id, instructions: recipe.instructions },
       fingerprint: ['recipe-dangerous', saved.id],
       test,
+      environment,
     });
   }
   return jsonResponse({ ok: true }, 200);
@@ -90,11 +92,11 @@ Deno.serve(withCors(async (req: Request) => {
 
     if (body?.type === 'feedback') {
       const feedback = cleanFeedback(body);
-      return feedback ? await sendFeedback(feedback, user.id, authorization, test) : jsonResponse({ error: 'bad_request' }, 400);
+      return feedback ? await sendFeedback(feedback, user.id, authorization, test, appEnvironment(body)) : jsonResponse({ error: 'bad_request' }, 400);
     }
     if (body?.type === 'recipe_report') {
       const report = cleanReport(body);
-      return report ? await sendReport(report, user.id, authorization, test) : jsonResponse({ error: 'bad_request' }, 400);
+      return report ? await sendReport(report, user.id, authorization, test, appEnvironment(body)) : jsonResponse({ error: 'bad_request' }, 400);
     }
     return jsonResponse({ error: 'bad_request' }, 400);
   } catch (error) {

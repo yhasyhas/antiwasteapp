@@ -28,7 +28,7 @@ try {
     const response = await fetch(`${URL_}/functions/v1/send-feedback`, { method: 'POST', headers: { ...asUser, 'x-simulate-key': SECRET }, body: JSON.stringify(body) });
     return { status: response.status, data: await response.json() };
   };
-  const feedback = await call({ type: 'feedback', kind: 'idea', message: `Avis de test (${marker})`, app_version: '1.0.0', device: 'samsung SM-A305F', os: 'android 11', language: 'fr' });
+  const feedback = await call({ type: 'feedback', kind: 'idea', message: `Avis de test (${marker})`, app_version: '1.0, test 1', device: 'samsung SM-A305F', os: 'android 11', language: 'fr' });
   check(`avis enregistré (${feedback.status})`, feedback.status === 200);
   const dangerous = await call({ type: 'recipe_report', recipe_id: recipe.id, reason: 'dangerous', comment: 'Volaille cuite 2 minutes', language: 'fr' });
   check(`signalement « dangereux » (${dangerous.status})`, dangerous.status === 200);
@@ -55,6 +55,14 @@ try {
       titles = Array.isArray(issues) ? issues.map((issue) => issue.title) : [];
     }
     check(`avis et recette dangereuse arrivés dans Sentry (${titles.length})`, titles.some((t) => t.startsWith('Avis (Idée)')) && titles.some((t) => t.startsWith('Recette signalée dangereuse')));
+    // Avis du build de test (« 1.0, test 1 ») : environnement de l'app « preview » (en essai, l'événement reste dans
+    // l'environnement « test » ; la variante est dans l'étiquette app_environment)
+    const issues = await (await fetch(`https://de.sentry.io/api/0/projects/yhasral/react-native/issues/?query=${encodeURIComponent(`${marker} environment:test`)}&statsPeriod=24h`, { headers: { Authorization: `Bearer ${token}` } })).json();
+    const issue = issues.find((i) => i.title.startsWith('Avis (Idée)'));
+    const latest = issue ? await (await fetch(`https://de.sentry.io/api/0/organizations/yhasral/issues/${issue.id}/events/latest/`, { headers: { Authorization: `Bearer ${token}` } })).json() : null;
+    const tagsOf = (event) => Object.fromEntries((event?.tags ?? []).map((tag) => [tag.key, tag.value]));
+    const avis = tagsOf(latest);
+    check(`avis du build de test : app_version « 1.0, test 1 », app_environment « preview » (${avis?.app_version} / ${avis?.app_environment})`, avis?.app_version === '1.0, test 1' && avis?.app_environment === 'preview');
   }
 } catch (error) {
   console.log('ÉCHEC :', String(error?.message ?? error).slice(0, 300));

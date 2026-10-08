@@ -17,6 +17,7 @@ export interface Report {
 }
 
 const KINDS = ['problem', 'idea', 'other'];
+const APP_VARIANTS = ['development', 'preview', 'production'];
 const REASONS = ['dangerous', 'incorrect', 'bad', 'translation'];
 
 // Texte court facultatif : espaces réduits, coupé à max ; vide : null
@@ -37,6 +38,17 @@ export function cleanFeedback(body: any): Feedback | null {
     os: short(body.os, 40),
     language: short(body.language, 5),
   };
+}
+
+// Variante de l'app qui envoie (app.config.js : development, preview = build de test des amis, production) :
+// environnement de l'événement Sentry. Sans variante (build de test 1, envoyé avant ce champ), elle se déduit de
+// la version (lib/buildLabel.ts : « 1.0, test 1 », « 1.0, dev ») ; sinon production.
+export function appEnvironment(body: any): 'development' | 'preview' | 'production' {
+  if (APP_VARIANTS.includes(body?.app_variant)) return body.app_variant;
+  const version = typeof body?.app_version === 'string' ? body.app_version : '';
+  if (/, test \d+$/.test(version)) return 'preview';
+  if (/, dev$/.test(version)) return 'development';
+  return 'production';
 }
 
 export function cleanReport(body: any): Report | null {

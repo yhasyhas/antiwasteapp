@@ -14,6 +14,9 @@ export interface SentryEvent {
   fingerprint: string[];
   // Essai (clé secrète) : environnement « test », séparé des vraies alertes
   test?: boolean;
+  // Environnement de l'app à l'origine de l'événement (avis envoyé depuis le build de test : « preview ») ;
+  // absent : production
+  environment?: string;
 }
 
 export async function sendSentryEvent(event: SentryEvent): Promise<boolean> {
@@ -30,7 +33,7 @@ export async function sendSentryEvent(event: SentryEvent): Promise<boolean> {
     platform: 'javascript',
     level: event.level,
     logger: event.logger,
-    environment: event.test ? 'test' : 'production',
+    environment: event.test ? 'test' : event.environment ?? 'production',
     message: { formatted: `${event.message}${event.test ? ' [essai]' : ''}` },
     tags: { ...event.tags, simulated: String(!!event.test) },
     extra: event.extra ?? {},

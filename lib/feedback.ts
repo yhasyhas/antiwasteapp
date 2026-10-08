@@ -69,7 +69,7 @@ async function send(body: Record<string, unknown>): Promise<SendResult> {
 }
 
 export function sendRecipeReport(recipeId: string, reason: ReportReason, comment: string, language: string): Promise<SendResult> {
-  return send({ type: 'recipe_report', recipe_id: recipeId, reason, comment: comment.trim() || undefined, language });
+  return send({ type: 'recipe_report', recipe_id: recipeId, reason, comment: comment.trim() || undefined, language, app_variant: buildInfo.variant });
 }
 
 // Informations techniques ajoutées à l'avis : version de l'app et numéro du build de test (« 1.0, test 3 »), modèle du téléphone, système, langue (rien d'autre)
@@ -81,6 +81,8 @@ export function technicalInfo(language: string) {
     device,
     os: `${Platform.OS} ${String(Platform.Version)}`,
     language,
+    // Environnement de l'événement Sentry envoyé par send-feedback (preview pour le build de test)
+    app_variant: buildInfo.variant,
   };
 }
 
