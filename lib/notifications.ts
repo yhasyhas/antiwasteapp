@@ -10,6 +10,7 @@ import { notifyPantryChanged } from '@/lib/pantryEvents';
 import { activeHouseholdId } from '@/lib/household';
 import { ensurePushRegistration } from '@/lib/pushNotifications';
 import { loadDigestSettings } from '@/lib/digestSettings';
+import { type FactNames, localFoodName } from '@/lib/localFoodName';
 
 // Rappels de péremption : une seule notification par jour, à l'heure choisie dans les Réglages (9 h par
 // défaut, lib/digestSettings.ts), qui regroupe les aliments du foyer à date stricte, hors congélateur, qui
@@ -47,6 +48,9 @@ interface ReminderItem {
   name: string;
   expires_at: string | null;
   location?: string | null;
+  food_key?: string | null;
+  kind?: string | null;
+  barcode?: string | null;
 }
 
 // Même règle que generate-recipes : 2 recettes pour 1 ou 2 aliments, 3 à partir de 3
@@ -119,19 +123,30 @@ async function cancelReminders() {
     .map((request) => Notifications.cancelScheduledNotificationAsync(request.identifier)));
 }
 
-// Garde-manger du foyer actif (partagé ou personnel)
+// Garde-manger du foyer actif (partagé ou personnel), noms dans la langue de l'app comme partout ailleurs
+// (lib/localFoodName.ts : nom de la fiche pour un aliment brut, nom enregistré pour un produit de marque ou un reste)
 async function loadPantry(_userId: string): Promise<ReminderItem[] | null> {
   const householdId = await activeHouseholdId();
   if (!householdId) return null;
   const { data, error } = await supabase
     .from('ingredients')
-    .select('id, name, expires_at, location')
+    .select('id, name, expires_at, location, food_key, kind, barcode')
     .eq('household_id', householdId);
   if (error) {
     console.warn('[rappels] garde-manger illisible :', error.message);
     return null;
   }
-  return data ?? [];
+  const pantry: ReminderItem[] = data ?? [];
+  const keys = [...new Set(pantry.map((item) => item.food_key).filter((key): key is string => !!key))];
+  if (keys.length === 0) return pantry;
+  const { data: facts, error: factsError } = await supabase
+    .from('food_facts')
+    .select('food_key, fr:content->fr->>name, en:content->en->>name, es:content->es->>name')
+    .in('food_key', keys);
+  // Fiches illisibles : noms enregistrés
+  if (factsError) return pantry;
+  const namesByKey = new Map(((facts ?? []) as unknown as ({ food_key: string } & FactNames)[]).map((fact) => [fact.food_key, fact]));
+  return pantry.map((item) => ({ ...item, name: localFoodName(item, item.food_key ? namesByKey.get(item.food_key) : null, i18n.language) }));
 }
 
 async function scheduleReminders(userId: string | null) {

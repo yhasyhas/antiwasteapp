@@ -8,6 +8,25 @@ export interface DigestItem {
   name: string;
 }
 
+// Nom d'un aliment dans la langue de l'utilisateur : copie de lib/localFoodName.ts (même règle que l'app ;
+// lib/localFoodName.test.ts vérifie que les deux donnent le même résultat).
+//   - produit scanné par code-barres (nom de marque) ou plat cuisiné (reste) : nom enregistré ;
+//   - aliment brut relié à sa fiche (food_key) : nom de la fiche dans la langue demandée ;
+//   - sinon : nom saisi.
+export interface NameableFood {
+  name: string;
+  food_key?: string | null;
+  kind?: string | null;
+  barcode?: string | null;
+}
+export type FactNames = Partial<Record<DigestLanguage, string | null>>;
+
+export function localFoodName(item: NameableFood, factNames: FactNames | null | undefined, language: string): string {
+  if (item.barcode || item.kind === 'dish' || !item.food_key) return item.name;
+  const translated = factNames?.[language as DigestLanguage];
+  return translated && translated.trim() !== '' ? translated : item.name;
+}
+
 const TEXTS: Record<DigestLanguage, {
   title: string;
   today: string;

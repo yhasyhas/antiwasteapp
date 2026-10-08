@@ -8,7 +8,7 @@
 // Lancement depuis la racine :
 //   deno run --allow-run --allow-net --allow-read --allow-env scripts/push/digest-to-device.ts <user_id> <début du jeton>
 // (début du jeton : quelques caractères après « ExponentPushToken[ », pour choisir l'appareil)
-import { digestContent, type DigestItem } from '../../supabase/functions/_shared/digestText.ts';
+import { digestContent, type DigestItem, type FactNames, localFoodName } from '../../supabase/functions/_shared/digestText.ts';
 
 const [userId, tokenStart] = Deno.args;
 if (!userId || !tokenStart) throw new Error('usage : <user_id> <début du jeton>');
@@ -43,8 +43,17 @@ const householdId = memberships.find((m) => !m.households.is_personal)?.househol
 if (!householdId) throw new Error('foyer introuvable');
 const localDate = new Intl.DateTimeFormat('en-CA', { timeZone: device.timezone }).format(new Date());
 const tomorrowDate = new Date(Date.parse(`${localDate}T00:00:00Z`) + 86_400_000).toISOString().slice(0, 10);
-const pantry: { id: string; name: string; expires_at: string | null }[] = await rest(`ingredients?select=id,name,expires_at&household_id=eq.${householdId}&order=name`);
-const pick = (date: string): DigestItem[] => pantry.filter((i) => i.expires_at === date).map(({ id, name }) => ({ id, name }));
+const pantry: { id: string; name: string; expires_at: string | null; location: string | null; food_key: string | null; kind: string | null; barcode: string | null }[] =
+  await rest(`ingredients?select=id,name,expires_at,location,food_key,kind,barcode&household_id=eq.${householdId}&order=name`);
+// Noms dans la langue de l'appareil, comme la fonction (localizeDigests) et l'app
+const factKeys = [...new Set(pantry.map((i) => i.food_key).filter((key): key is string => !!key))];
+const facts: ({ food_key: string } & FactNames)[] = factKeys.length
+  ? await rest(`food_facts?select=food_key,fr:content->fr->>name,en:content->en->>name,es:content->es->>name&food_key=in.(${encodeURIComponent(factKeys.map((k) => `"${k}"`).join(','))})`)
+  : [];
+const namesByKey = new Map(facts.map((fact) => [fact.food_key, fact]));
+// Congélateur jamais dans le résumé (claim_daily_digests)
+const pick = (date: string): DigestItem[] => pantry.filter((i) => i.expires_at === date && i.location !== 'freezer')
+  .map((i) => ({ id: i.id, name: localFoodName(i, i.food_key ? namesByKey.get(i.food_key) : null, device.language) }));
 const today = pick(localDate);
 const tomorrow = pick(tomorrowDate);
 console.log(`foyer : ${pantry.length} aliments ; aujourd'hui (${localDate}) : ${today.length} ; demain : ${tomorrow.length} ; langue : ${device.language}`);

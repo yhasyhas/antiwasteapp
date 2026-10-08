@@ -4,6 +4,7 @@ import { activeHouseholdId } from './household';
 import { callEdgeFunction } from './callEdgeFunction';
 import { notifyPantryChanged } from './pantryEvents';
 import { supabase } from './supabase';
+import { localFoodName } from './localFoodName';
 
 // Noms des aliments dans la langue de l'app : un aliment brut (photo, saisie) relié à sa fiche (food_key)
 // s'affiche avec le nom de la fiche dans la langue choisie ; sans fiche, avec le nom enregistré. Un produit
@@ -99,9 +100,8 @@ export function useFoodNaming(items: NamedFood[] | null | undefined) {
   }, [language, current]);
 
   const name = useCallback((item: NamedFood): string => {
-    if (item.barcode || item.kind === 'dish') return capitalize(item.name);
-    return capitalize(factName(item) ?? item.name);
-  }, [factName]);
+    return capitalize(localFoodName(item, item.food_key ? names.get(item.food_key) : null, language));
+  }, [language, current]);
 
   const generic = useCallback((item: NamedFood): string | null => {
     if (!item.barcode) return null;
@@ -112,8 +112,7 @@ export function useFoodNaming(items: NamedFood[] | null | undefined) {
   // Nom dans une langue donnée (celle d'une recette) : fiche dans cette langue pour un aliment brut, nom du produit
   // pour un code-barres, nom enregistré pour un reste ou sans fiche
   const nameIn = useCallback((item: NamedFood, target: string): string => {
-    if (item.barcode || item.kind === 'dish' || !item.food_key) return item.name;
-    return names.get(item.food_key)?.[target as Language] ?? item.name;
+    return localFoodName(item, item.food_key ? names.get(item.food_key) : null, target);
   }, [current]);
 
   return { name, generic, nameIn };

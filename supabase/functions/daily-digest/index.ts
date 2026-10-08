@@ -1,6 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { SUPABASE_SECRET_KEY, SUPABASE_URL } from '../_shared/keys.ts';
-import { digestContent, type DigestItem } from '../_shared/digestText.ts';
+import { digestContent, type DigestItem, type FactNames, localFoodName } from '../_shared/digestText.ts';
 import { reportPushFailure } from '../_shared/quotaAlerts.ts';
 
 // Résumé quotidien à 9 h (heure locale de chaque utilisateur), envoyé par Expo Push. Appelée toutes les
@@ -9,7 +9,8 @@ import { reportPushFailure } from '../_shared/quotaAlerts.ts';
 // 2. Résumés dus maintenant, réservés en base (claim_daily_digests : jamais deux fois le même jour),
 //    envoyés à tous les appareils de l'utilisateur. Rien à signaler : aucune notification.
 // Échec d'envoi : alerte Sentry une fois par jour (reportPushFailure), comme les quotas.
-// Essais (clé secrète en x-simulate-key) : { "simulate": { "user_id": "…", "force": true, "push": "error" } }
+// Essais (clé secrète en x-simulate-key) : { "simulate": { "user_id": "…", "force": true, "push": "error" } } ;
+// "preview": true renvoie les textes des résumés au lieu de les envoyer (scripts/e2e/digest-names.mjs).
 
 const CRON_SECRET = Deno.env.get('CRON_SECRET') || '';
 // Facultatif : jeton d'accès Expo si la sécurité renforcée des notifications est activée sur le projet
@@ -102,6 +103,37 @@ async function checkReceipts(problems: string[]): Promise<number> {
   return rows.length;
 }
 
+// Noms dans la langue de chaque utilisateur, comme l'app : nom de la fiche pour un aliment brut, nom enregistré
+// pour un produit de marque (code-barres), un reste ou un aliment sans fiche. En cas d'erreur, noms enregistrés.
+async function localizeDigests(digests: DueDigest[]) {
+  const ids = [...new Set(digests.flatMap((digest) => [...digest.today, ...digest.tomorrow].map((item) => item.id)))];
+  if (ids.length === 0) return;
+  try {
+    const foods: { id: string; name: string; food_key: string | null; kind: string | null; barcode: string | null }[] = [];
+    for (let i = 0; i < ids.length; i += 100) {
+      foods.push(...await db(`ingredients?select=id,name,food_key,kind,barcode&id=in.(${ids.slice(i, i + 100).join(',')})`));
+    }
+    const keys = [...new Set(foods.map((food) => food.food_key).filter((key): key is string => !!key))];
+    const facts: ({ food_key: string } & FactNames)[] = [];
+    for (let i = 0; i < keys.length; i += 100) {
+      const list = keys.slice(i, i + 100).map((key) => `"${key}"`).join(',');
+      facts.push(...await db(`food_facts?select=food_key,fr:content->fr->>name,en:content->en->>name,es:content->es->>name&food_key=in.(${encodeURIComponent(list)})`));
+    }
+    const foodById = new Map(foods.map((food) => [food.id, food]));
+    const namesByKey = new Map(facts.map((fact) => [fact.food_key, fact]));
+    for (const digest of digests) {
+      const localize = (item: DigestItem): DigestItem => {
+        const food = foodById.get(item.id);
+        return food ? { ...item, name: localFoodName(food, food.food_key ? namesByKey.get(food.food_key) : null, digest.language) } : item;
+      };
+      digest.today = digest.today.map(localize);
+      digest.tomorrow = digest.tomorrow.map(localize);
+    }
+  } catch (error) {
+    console.warn('[push] noms traduits indisponibles, noms enregistrés :', error);
+  }
+}
+
 // 2. Envoi des résumés dus
 async function sendDigests(digests: DueDigest[], problems: string[], simulatePushError: boolean) {
   const messages = digests.flatMap((digest) => {
@@ -167,6 +199,10 @@ Deno.serve(async (req) => {
         p_force: simulate.force === true,
       }),
     });
+    await localizeDigests(digests);
+    if (simulate.preview === true) {
+      return json({ previews: digests.map((digest) => ({ user_id: digest.user_id, language: digest.language, ...digestContent(digest.today, digest.tomorrow, digest.pantry_size, digest.language) })) });
+    }
     const result = await sendDigests(digests, problems, simulate.push === 'error');
     if (problems.length > 0) await reportPushFailure(FUNCTION_NAME, problems.slice(0, 5).join(' | '), test);
     console.log(`[push] résumés : ${digests.length} dus, ${result.sent} envoyés, ${result.failed} en échec ; ${receiptsChecked} reçus vérifiés`);
